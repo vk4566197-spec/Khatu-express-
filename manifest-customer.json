@@ -1,7 +1,9 @@
 {
-  "name": "Zepto Grocery Delivery",
+  "id": "/customer-app",
+  "name": "Zepto Grocery Customer",
   "short_name": "Zepto",
   "start_url": "./index.html",
+  "scope": "./",
   "display": "standalone",
   "background_color": "#20003b",
   "theme_color": "#3c006b",
