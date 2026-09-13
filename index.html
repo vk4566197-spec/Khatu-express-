@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Zepto | 10 Min Grocery Delivery</title>
 
-  <!-- PWA Install Setup -->
+  <!-- PWA Settings -->
   <link rel="manifest" href="manifest-customer.json">
   <meta name="theme-color" content="#3c006b">
   <meta name="mobile-web-app-capable" content="yes">
@@ -13,9 +13,7 @@
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('sw.js')
-          .then(reg => console.log('Customer SW Registered!', reg))
-          .catch(err => console.log('Customer SW Registration Failed:', err));
+        navigator.serviceWorker.register('sw.js');
       });
     }
   </script>
@@ -54,7 +52,7 @@
       padding-bottom: 120px;
     }
 
-    /* Zepto Top Header */
+    /* Zepto Header */
     header {
       background: linear-gradient(135deg, var(--zepto-dark) 0%, var(--zepto-purple) 100%);
       color: white;
@@ -96,10 +94,7 @@
       color: var(--zepto-yellow);
       border: 1px solid rgba(255, 255, 255, 0.2);
     }
-    .nav-actions {
-      display: flex;
-      gap: 8px;
-    }
+    .nav-actions { display: flex; gap: 8px; }
     .nav-btn {
       background: rgba(255, 255, 255, 0.12);
       border: 1px solid rgba(255, 255, 255, 0.2);
@@ -114,10 +109,8 @@
       gap: 4px;
     }
 
-    /* Zepto Search Bar */
-    .search-wrap {
-      position: relative;
-    }
+    /* Search */
+    .search-wrap { position: relative; }
     .search-input {
       width: 100%;
       padding: 12px 16px 12px 42px;
@@ -139,7 +132,7 @@
       color: #94a3b8;
     }
 
-    /* Categories Horizontal Bar */
+    /* Categories Bar */
     .cat-bar {
       background: white;
       padding: 12px 16px;
@@ -276,7 +269,7 @@
       cursor: pointer;
     }
 
-    /* Past Orders (Max 4 FIFO) */
+    /* Past Orders Section (Max 4 FIFO) */
     .history-section {
       margin-top: 25px;
       border-top: 1px solid #e2e8f0;
@@ -375,7 +368,7 @@
     .cart-amount { font-size: 16px; font-weight: 900; }
     .view-cart-link { font-size: 13px; font-weight: 800; display: flex; align-items: center; gap: 4px; }
 
-    /* Modals / Bottom Sheets */
+    /* Modals */
     .modal-overlay {
       position: fixed;
       top: 0;
@@ -444,16 +437,29 @@
       color: #0f172a;
     }
 
-    .input-group { display: flex; flex-direction: column; gap: 10px; margin-top: 10px; }
+    /* Strict Checkout Form */
+    .input-group { display: flex; flex-direction: column; gap: 8px; margin-top: 10px; }
+    .input-label { font-size: 11px; font-weight: 700; color: #475569; }
     .zepto-input {
       width: 100%;
-      padding: 12px;
+      padding: 11px 12px;
       border-radius: 10px;
-      border: 1px solid #cbd5e1;
+      border: 1.5px solid #cbd5e1;
       font-size: 13px;
       outline: none;
     }
     .zepto-input:focus { border-color: var(--zepto-purple); }
+    .zepto-input.input-err { border-color: #ef4444; background: #fff5f5; }
+
+    .validation-msg {
+      color: #ef4444;
+      font-size: 11px;
+      font-weight: 700;
+      display: none;
+      margin-top: -4px;
+      margin-bottom: 4px;
+    }
+
     .btn-checkout {
       background: linear-gradient(90deg, #ff3269, #e01d51);
       color: white;
@@ -464,7 +470,7 @@
       font-weight: 800;
       cursor: pointer;
       width: 100%;
-      margin-top: 14px;
+      margin-top: 12px;
       box-shadow: 0 4px 14px rgba(255, 50, 105, 0.3);
     }
     .btn-checkout:disabled { background: #cbd5e1; box-shadow: none; }
@@ -527,7 +533,7 @@
 </head>
 <body>
 
-  <!-- Zepto Top Header -->
+  <!-- Top Header -->
   <header>
     <div class="top-bar">
       <div class="brand-box">
@@ -544,7 +550,7 @@
     </div>
   </header>
 
-  <!-- Categories Horizontal Bar -->
+  <!-- Categories Horizontal Filter -->
   <div class="cat-bar" id="category-chips">
     <div class="cat-chip active" onclick="setCategory('All', this)">All Items</div>
   </div>
@@ -579,15 +585,13 @@
     </div>
   </div>
 
-  <!-- Zepto Floating Bottom Cart Bar -->
+  <!-- Floating Cart Bar -->
   <div class="floating-cart-bar" id="cart-float-bar" onclick="openCartModal()">
     <div>
       <div class="cart-summary-text" id="float-qty-text">0 Items Added</div>
       <div class="cart-amount" id="float-total-text">₹0</div>
     </div>
-    <div class="view-cart-link">
-      View Cart ➔
-    </div>
+    <div class="view-cart-link">View Cart ➔</div>
   </div>
 
   <!-- Cart / Checkout Sheet Modal -->
@@ -615,11 +619,20 @@
         </div>
       </div>
 
+      <!-- Strictly Validated Customer Form -->
       <div class="input-group">
-        <div style="font-size: 12px; font-weight: 700; color: #475569;">Delivery Details</div>
-        <input type="text" id="c-name" class="zepto-input" placeholder="Receiver Full Name">
-        <input type="tel" id="c-phone" class="zepto-input" placeholder="10-digit Mobile Number">
-        <textarea id="c-address" class="zepto-input" rows="2" placeholder="Full Address (Flat, Street, Landmark)"></textarea>
+        <label class="input-label">प्राप्तकर्ता का पूरा नाम (Full Name) *</label>
+        <input type="text" id="c-name" class="zepto-input" placeholder="जैसे: Vishal Kumar">
+        <div class="validation-msg" id="err-name">कृपया कम से कम 3 अक्षरों का सही नाम लिखें!</div>
+
+        <label class="input-label">10 अंकों का वैध मोबाइल नंबर (OTP / Call हेतु) *</label>
+        <input type="tel" id="c-phone" class="zepto-input" placeholder="10-digit Mobile (6, 7, 8, 9 से शुरू)" maxlength="10">
+        <div class="validation-msg" id="err-phone">अमान्य नंबर! 10 अंकों का सही भारतीय मोबाइल नंबर डालें।</div>
+
+        <label class="input-label">पूरा डिलीवरी पता (मकान नं, गली, लैंडमार्क, पिनकोड) *</label>
+        <textarea id="c-address" class="zepto-input" rows="2" placeholder="पूरा पता लिखें ताकि राइडर आसानी से पहुँच सके..."></textarea>
+        <div class="validation-msg" id="err-address">कृपया पूरा और स्पष्ट पता लिखें (कम से कम 15 अक्षर)!</div>
+
         <button class="btn-checkout" id="order-submit-btn" onclick="placeOrder()">Place Delivery Order</button>
       </div>
     </div>
@@ -833,15 +846,53 @@
       document.getElementById('bill-grand-total').innerText = `₹${total}`;
     }
 
+    // STRICT VALIDATION BEFORE PLACING ORDER
     async function placeOrder() {
-      const name = document.getElementById('c-name').value.trim();
-      const phone = document.getElementById('c-phone').value.trim();
-      const address = document.getElementById('c-address').value.trim();
+      const nameEl = document.getElementById('c-name');
+      const phoneEl = document.getElementById('c-phone');
+      const addressEl = document.getElementById('c-address');
 
-      if (!name || !phone || !address) {
-        alert('Please fill receiver name, phone, and complete delivery address!');
-        return;
+      const name = nameEl.value.trim();
+      const phone = phoneEl.value.trim().replace(/\s+/g, '');
+      const address = addressEl.value.trim();
+
+      const errName = document.getElementById('err-name');
+      const errPhone = document.getElementById('err-phone');
+      const errAddress = document.getElementById('err-address');
+
+      // Reset Errors
+      nameEl.classList.remove('input-err');
+      phoneEl.classList.remove('input-err');
+      addressEl.classList.remove('input-err');
+      errName.style.display = 'none';
+      errPhone.style.display = 'none';
+      errAddress.style.display = 'none';
+
+      let hasError = false;
+
+      // 1. Name Check (Minimum 3 letters)
+      if (name.length < 3) {
+        nameEl.classList.add('input-err');
+        errName.style.display = 'block';
+        hasError = true;
       }
+
+      // 2. Strict Phone Check (Must be exactly 10 digits and start with 6, 7, 8, or 9)
+      const phoneRegex = /^[6-9]\d{9}$/;
+      if (!phoneRegex.test(phone)) {
+        phoneEl.classList.add('input-err');
+        errPhone.style.display = 'block';
+        hasError = true;
+      }
+
+      // 3. Strict Address Check (Must be at least 15 characters)
+      if (address.length < 15) {
+        addressEl.classList.add('input-err');
+        errAddress.style.display = 'block';
+        hasError = true;
+      }
+
+      if (hasError) return;
 
       const entries = Object.values(cart);
       let totalAmount = 0;
