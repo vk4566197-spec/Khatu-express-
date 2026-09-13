@@ -5,24 +5,20 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Zepto Delivery Partner</title>
   
-  <!-- PWA Settings for App Install -->
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#150226">
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('sw.js')
-          .then(reg => console.log('SW Registered!', reg))
-          .catch(err => console.log('SW Registration failed:', err));
+        navigator.serviceWorker.register('sw.js');
       });
     }
   </script>
 
-  <!-- Supabase CDN -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <!-- Google Font: Inter -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  
   <style>
     :root {
       --z-bg: #0b0214;
@@ -51,7 +47,83 @@
       padding-bottom: 90px;
     }
 
-    /* Zepto Partner Header */
+    /* Auth Screens */
+    .auth-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: var(--z-bg);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 24px;
+      z-index: 1000;
+    }
+    .login-card {
+      background: var(--z-card);
+      border: 1px solid var(--z-border);
+      border-radius: 20px;
+      padding: 26px 20px;
+      width: 100%;
+      max-width: 380px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+      text-align: center;
+    }
+    .brand-large {
+      font-size: 32px;
+      font-weight: 900;
+      background: linear-gradient(90deg, #ff3269, #ff758c);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 4px;
+    }
+    .sub-brand {
+      font-size: 13px;
+      color: #38bdf8;
+      font-weight: 700;
+      letter-spacing: 1px;
+      margin-bottom: 20px;
+    }
+    .login-input {
+      width: 100%;
+      background: var(--z-card-inner);
+      border: 1.5px solid var(--z-border);
+      color: white;
+      padding: 13px;
+      border-radius: 12px;
+      font-size: 14px;
+      margin-bottom: 12px;
+      outline: none;
+    }
+    .login-input:focus {
+      border-color: var(--z-pink);
+    }
+    .btn-login {
+      width: 100%;
+      background: linear-gradient(90deg, #ff3269, #e01d51);
+      color: white;
+      border: none;
+      padding: 14px;
+      border-radius: 12px;
+      font-size: 15px;
+      font-weight: 800;
+      cursor: pointer;
+      margin-top: 8px;
+      box-shadow: 0 4px 15px rgba(255, 50, 105, 0.4);
+    }
+    .switch-link {
+      color: #38bdf8;
+      font-size: 12px;
+      margin-top: 14px;
+      cursor: pointer;
+      display: inline-block;
+      text-decoration: underline;
+    }
+
+    /* Main Header */
     header {
       background: #150226;
       padding: 14px 16px;
@@ -84,34 +156,53 @@
       padding: 3px 8px;
       border-radius: 6px;
       text-transform: uppercase;
-      letter-spacing: 0.5px;
     }
-    .duty-toggle {
-      background: rgba(0, 210, 106, 0.15);
-      border: 1px solid var(--z-green);
-      color: var(--z-green);
-      padding: 6px 12px;
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .duty-btn {
+      border: none;
+      padding: 8px 14px;
       border-radius: 20px;
       font-size: 12px;
       font-weight: 800;
       display: flex;
       align-items: center;
       gap: 6px;
+      cursor: pointer;
+    }
+    .duty-btn.online {
+      background: rgba(0, 210, 106, 0.15);
+      border: 1.5px solid var(--z-green);
+      color: var(--z-green);
+    }
+    .duty-btn.offline {
+      background: rgba(255, 50, 105, 0.15);
+      border: 1.5px solid var(--z-pink);
+      color: var(--z-pink);
     }
     .duty-dot {
       width: 8px;
       height: 8px;
       border-radius: 50%;
-      background: var(--z-green);
-      animation: pulse 1.5s infinite;
     }
+    .online .duty-dot { background: var(--z-green); animation: pulse 1.5s infinite; }
+    .offline .duty-dot { background: var(--z-pink); }
     @keyframes pulse {
-      0% { opacity: 1; transform: scale(1); }
-      50% { opacity: 0.4; transform: scale(1.2); }
-      100% { opacity: 1; transform: scale(1); }
+      0% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.3); opacity: 0.5; }
+      100% { transform: scale(1); opacity: 1; }
     }
 
-    /* Tabs Filter */
+    .logout-link {
+      color: var(--z-muted);
+      font-size: 11px;
+      cursor: pointer;
+      text-decoration: underline;
+    }
+
     .tabs-bar {
       display: flex;
       background: #150226;
@@ -128,9 +219,7 @@
       cursor: pointer;
       position: relative;
     }
-    .tab-item.active {
-      color: #fff;
-    }
+    .tab-item.active { color: #fff; }
     .tab-item.active::after {
       content: '';
       position: absolute;
@@ -148,7 +237,6 @@
       padding: 14px;
     }
 
-    /* Order Card UI */
     .order-card {
       background: var(--z-card);
       border: 1px solid var(--z-border);
@@ -156,16 +244,14 @@
       padding: 16px;
       margin-bottom: 14px;
       box-shadow: 0 4px 16px rgba(0,0,0,0.3);
-      position: relative;
-      overflow: hidden;
     }
     .order-card.new-alert {
       border-color: var(--z-pink);
-      animation: flashBorder 1s infinite alternate;
+      animation: alertGlow 1s infinite alternate;
     }
-    @keyframes flashBorder {
-      from { box-shadow: 0 0 4px rgba(255, 50, 105, 0.2); }
-      to { box-shadow: 0 0 16px rgba(255, 50, 105, 0.7); }
+    @keyframes alertGlow {
+      from { box-shadow: 0 0 4px rgba(255, 50, 105, 0.3); }
+      to { box-shadow: 0 0 18px rgba(255, 50, 105, 0.8); }
     }
 
     .order-header {
@@ -176,24 +262,18 @@
       border-bottom: 1px solid var(--z-border);
       padding-bottom: 10px;
     }
-    .order-id-txt {
-      font-size: 16px;
-      font-weight: 900;
-      color: #fff;
-    }
+    .order-id-txt { font-size: 16px; font-weight: 900; color: #fff; }
     .status-badge {
       font-size: 11px;
       font-weight: 800;
       padding: 4px 10px;
       border-radius: 20px;
       text-transform: uppercase;
-      letter-spacing: 0.5px;
     }
     .badge-placed { background: rgba(255, 199, 39, 0.15); color: var(--z-yellow); border: 1px solid var(--z-yellow); }
     .badge-picked { background: rgba(56, 189, 248, 0.15); color: #38bdf8; border: 1px solid #38bdf8; }
     .badge-delivered { background: rgba(0, 210, 106, 0.15); color: var(--z-green); border: 1px solid var(--z-green); }
 
-    /* Customer Info Box */
     .info-card {
       background: var(--z-card-inner);
       border-radius: 12px;
@@ -218,7 +298,6 @@
       gap: 6px;
     }
 
-    /* Items Preview */
     .items-container {
       background: rgba(0, 0, 0, 0.2);
       border-radius: 10px;
@@ -244,7 +323,6 @@
       color: #fff;
     }
 
-    /* Action Buttons Flow */
     .action-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -281,7 +359,6 @@
       gap: 6px;
     }
 
-    /* Main Zepto Step Buttons */
     .btn-stage {
       width: 100%;
       padding: 14px;
@@ -290,7 +367,6 @@
       font-size: 14px;
       font-weight: 900;
       text-transform: uppercase;
-      letter-spacing: 0.5px;
       cursor: pointer;
       display: flex;
       align-items: center;
@@ -308,7 +384,6 @@
       box-shadow: 0 4px 14px rgba(0, 210, 106, 0.4);
     }
 
-    /* Maps Preview Box */
     .map-preview {
       border-radius: 10px;
       overflow: hidden;
@@ -322,55 +397,124 @@
       border: none;
     }
 
-    /* Audio Enable Bar */
-    .audio-notice {
-      background: rgba(255, 199, 39, 0.1);
-      border: 1px dashed var(--z-yellow);
-      color: var(--z-yellow);
-      padding: 10px 14px;
-      border-radius: 10px;
-      font-size: 12px;
-      font-weight: 700;
-      display: flex;
-      justify-content: space-between;
+    .incoming-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(11, 2, 20, 0.95);
+      backdrop-filter: blur(10px);
+      display: none;
+      flex-direction: column;
+      justify-content: center;
       align-items: center;
-      margin-bottom: 14px;
-      cursor: pointer;
+      padding: 20px;
+      z-index: 500;
+      animation: popIn 0.3s ease-out;
+    }
+    @keyframes popIn {
+      from { transform: scale(0.8); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+    .incoming-box {
+      background: var(--z-card);
+      border: 2px solid var(--z-pink);
+      border-radius: 20px;
+      width: 100%;
+      max-width: 400px;
+      padding: 24px;
+      text-align: center;
+      box-shadow: 0 0 30px rgba(255, 50, 105, 0.6);
+    }
+    .siren-icon {
+      font-size: 50px;
+      animation: wobble 0.6s infinite alternate;
+    }
+    @keyframes wobble {
+      from { transform: rotate(-15deg); }
+      to { transform: rotate(15deg); }
     }
   </style>
 </head>
 <body>
 
-  <!-- Zepto Partner Top Bar -->
-  <header>
-    <div class="brand-wrap">
-      <div class="brand-title">zepto</div>
-      <div class="rider-badge">Rider</div>
-    </div>
-    <div class="duty-toggle">
-      <div class="duty-dot"></div>
-      <span>ONLINE</span>
-    </div>
-  </header>
+  <!-- 1. LOGIN SCREEN -->
+  <div class="auth-overlay" id="login-box">
+    <div class="login-card">
+      <div class="brand-large">zepto</div>
+      <div class="sub-brand">DELIVERY PARTNER APP</div>
 
-  <!-- Filter Tabs -->
-  <div class="tabs-bar">
-    <div class="tab-item active" id="tab-active" onclick="switchTab('active')">Active Orders (<span id="count-active">0</span>)</div>
-    <div class="tab-item" id="tab-delivered" onclick="switchTab('delivered')">Delivered (<span id="count-delivered">0</span>)</div>
+      <input type="tel" id="l-phone" class="login-input" placeholder="Registered Mobile Number" maxlength="10">
+      <input type="password" id="l-pin" class="login-input" placeholder="4-Digit Security PIN" maxlength="4">
+
+      <button class="btn-login" id="login-btn" onclick="riderLogin()">LOGIN AS RIDER</button>
+      <div id="login-err" style="color: #ff3269; font-size: 12px; margin-top: 10px; font-weight: 700;"></div>
+      
+      <div class="switch-link" onclick="toggleAuth(false)">नया राइडर? काम के लिए आवेदन करें (Register)</div>
+    </div>
   </div>
 
-  <div class="container">
-    <!-- Browser Audio Permission Notice -->
-    <div class="audio-notice" id="sound-enabler" onclick="enableAudioEngine()">
-      <span>🔔 <b>Sound Siren:</b> Tap to enable Order Ringtone</span>
-      <span style="font-size: 14px;">🔊</span>
+  <!-- 2. REGISTRATION SCREEN -->
+  <div class="auth-overlay" id="reg-box" style="display: none;">
+    <div class="login-card">
+      <div class="brand-large">zepto</div>
+      <div class="sub-brand">JOIN DELIVERY FLEET</div>
+
+      <input type="text" id="r-name" class="login-input" placeholder="आपका पूरा नाम (Full Name)">
+      <input type="tel" id="r-phone" class="login-input" placeholder="मोबाइल नंबर (10 Digit Mobile)" maxlength="10">
+      <input type="text" id="r-vehicle" class="login-input" placeholder="गाड़ी का नंबर (Bike / Scooter No)">
+      <input type="password" id="r-pin" class="login-input" placeholder="लॉगिन के लिए 4 अंकों का गुप्त PIN" maxlength="4">
+
+      <button class="btn-login" id="reg-btn" onclick="riderRegister()">आवेदन सबमिट करें (Apply)</button>
+      <div id="reg-msg" style="font-size: 12px; margin-top: 10px; font-weight: 700;"></div>
+
+      <div class="switch-link" onclick="toggleAuth(true)">पहले से अकाउंट है? Login करें</div>
+    </div>
+  </div>
+
+  <!-- 3. RIDER DASHBOARD -->
+  <div id="main-dashboard" style="display: none;">
+    <header>
+      <div class="brand-wrap">
+        <div class="brand-title">zepto</div>
+        <div class="rider-badge" id="rider-name-tag">Rider</div>
+      </div>
+      <div class="header-actions">
+        <button class="duty-btn online" id="duty-btn" onclick="toggleDuty()">
+          <div class="duty-dot"></div>
+          <span id="duty-text">ONLINE</span>
+        </button>
+        <span class="logout-link" onclick="logoutRider()">Exit</span>
+      </div>
+    </header>
+
+    <div class="tabs-bar">
+      <div class="tab-item active" id="tab-active" onclick="switchTab('active')">My Active (<span id="count-active">0</span>)</div>
+      <div class="tab-item" id="tab-delivered" onclick="switchTab('delivered')">Delivered (<span id="count-delivered">0</span>)</div>
     </div>
 
-    <div id="loader" style="text-align:center; padding: 40px; font-size: 13px; color: var(--z-muted);">
-      Connecting to Zepto Dark Store...
+    <div class="container">
+      <div id="loader" style="text-align:center; padding: 40px; font-size: 13px; color: var(--z-muted);">
+        Connecting to Dark Store Dispatcher...
+      </div>
+      <div id="orders-list"></div>
     </div>
+  </div>
 
-    <div id="orders-list"></div>
+  <!-- Big Siren Modal -->
+  <div class="incoming-overlay" id="incoming-modal">
+    <div class="incoming-box">
+      <div class="siren-icon">🚨</div>
+      <h2 style="font-size: 22px; font-weight: 900; margin: 10px 0; color: var(--z-pink);">NEW ORDER ASSIGNED!</h2>
+      <div style="font-size: 14px; color: #fff; margin-bottom: 4px;" id="inc-order-id">#ORD-00</div>
+      <div style="font-size: 13px; color: var(--z-muted); margin-bottom: 14px;" id="inc-cust-name">Customer: --</div>
+      <div style="font-size: 20px; font-weight: 900; color: var(--z-green); margin-bottom: 20px;" id="inc-total">₹0</div>
+
+      <button class="btn-stage btn-accept" onclick="acceptIncomingOrder()">
+        ⚡ ACCEPT & STOP SIREN
+      </button>
+    </div>
   </div>
 
   <script>
@@ -378,86 +522,241 @@
     const SUPABASE_KEY = 'sb_publishable_2_wD-pbi_pNf8niiHxFbYA_saCIhApN';
     const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
+    let loggedInRider = null;
     let ordersCache = [];
     let currentTab = 'active';
-    let isAudioAllowed = false;
-    let alertInterval = null;
+    let isOnline = true;
+    let audioCtx = null;
+    let sirenTimer = null;
+    let activeIncomingOrderId = null;
+    let wakeLock = null;
 
-    // Web Audio Siren Synthesizer
-    function playZeptoSiren() {
-      if (!isAudioAllowed) return;
+    window.addEventListener('load', () => {
+      const saved = localStorage.getItem('zepto_logged_rider');
+      if (saved) {
+        loggedInRider = JSON.parse(saved);
+        startRiderApp();
+      }
+    });
+
+    function toggleAuth(showLogin) {
+      document.getElementById('login-box').style.display = showLogin ? 'flex' : 'none';
+      document.getElementById('reg-box').style.display = showLogin ? 'none' : 'flex';
+      document.getElementById('login-err').innerText = '';
+      document.getElementById('reg-msg').innerText = '';
+    }
+
+    // New Rider Registration
+    async function riderRegister() {
+      const name = document.getElementById('r-name').value.trim();
+      const phone = document.getElementById('r-phone').value.trim();
+      const vehicle = document.getElementById('r-vehicle').value.trim();
+      const pin = document.getElementById('r-pin').value.trim();
+      const msg = document.getElementById('reg-msg');
+      const btn = document.getElementById('reg-btn');
+
+      if (!name || !phone || !pin) {
+        msg.style.color = '#ff3269';
+        msg.innerText = 'कृपया नाम, मोबाइल नंबर और पिन भरें!';
+        return;
+      }
+
+      btn.disabled = true;
+      btn.innerText = 'Submitting Application...';
+
       try {
-        const ctx = new (window.AudioContext || window.webkitAudioContext)();
-        const osc = ctx.createOscillator();
-        const gain = ctx.createGain();
+        const { error } = await _supabase.from('riders').insert([{
+          rider_name: name,
+          phone: phone,
+          vehicle_no: vehicle,
+          pin: pin,
+          status: 'PENDING',
+          is_online: false
+        }]);
 
-        osc.type = 'sawtooth';
-        osc.frequency.setValueAtTime(800, ctx.currentTime);
-        osc.frequency.exponentialRampToValueAtTime(1400, ctx.currentTime + 0.3);
+        if (error) {
+          if (error.message.includes('unique')) throw new Error('यह मोबाइल नंबर पहले से रजिस्टर्ड है!');
+          throw error;
+        }
 
-        gain.gain.setValueAtTime(0.3, ctx.currentTime);
-        gain.gain.linearRampToValueAtTime(0.01, ctx.currentTime + 0.35);
-
-        osc.connect(gain);
-        gain.connect(ctx.destination);
-
-        osc.start();
-        osc.stop(ctx.currentTime + 0.35);
+        msg.style.color = '#00d26a';
+        msg.innerText = '✓ आवेदन सबमिट हो गया! एडमिन द्वारा अप्रूवल मिलने के बाद आप लॉगिन कर सकेंगे।';
+        setTimeout(() => toggleAuth(true), 3000);
       } catch (e) {
-        console.log('Audio alert err:', e);
+        msg.style.color = '#ff3269';
+        msg.innerText = e.message;
+      } finally {
+        btn.disabled = false;
+        btn.innerText = 'आवेदन सबमिट करें (Apply)';
       }
     }
 
-    function startSirenLoop() {
-      if (alertInterval) return;
-      playZeptoSiren();
-      alertInterval = setInterval(() => {
-        playZeptoSiren();
-      }, 700);
-    }
+    // Rider Login
+    async function riderLogin() {
+      const phone = document.getElementById('l-phone').value.trim();
+      const pin = document.getElementById('l-pin').value.trim();
+      const err = document.getElementById('login-err');
+      const btn = document.getElementById('login-btn');
 
-    function stopSirenLoop() {
-      if (alertInterval) {
-        clearInterval(alertInterval);
-        alertInterval = null;
+      if (!phone || !pin) {
+        err.innerText = 'मोबाइल नंबर और 4 अंकों का पिन डालें!';
+        return;
+      }
+
+      btn.disabled = true;
+      btn.innerText = 'Verifying...';
+
+      try {
+        const { data, error } = await _supabase
+          .from('riders')
+          .select('*')
+          .eq('phone', phone)
+          .eq('pin', pin)
+          .single();
+
+        if (error || !data) throw new Error('गलत मोबाइल नंबर या पिन!');
+
+        if (data.status === 'PENDING') {
+          throw new Error('आपकी आईडी अभी PENDING है। एडमिन द्वारा अप्रूव होने का इंतज़ार करें।');
+        }
+        if (data.status === 'REJECTED') {
+          throw new Error('आपकी आईडी को ब्लॉक/रिजेक्ट कर दिया गया है।');
+        }
+
+        loggedInRider = data;
+        localStorage.setItem('zepto_logged_rider', JSON.stringify(data));
+        startRiderApp();
+      } catch (e) {
+        err.innerText = e.message;
+      } finally {
+        btn.disabled = false;
+        btn.innerText = 'LOGIN AS RIDER';
       }
     }
 
-    function enableAudioEngine() {
-      isAudioAllowed = true;
-      document.getElementById('sound-enabler').style.display = 'none';
-      playZeptoSiren();
+    function startRiderApp() {
+      document.getElementById('login-box').style.display = 'none';
+      document.getElementById('reg-box').style.display = 'none';
+      document.getElementById('main-dashboard').style.display = 'block';
+      document.getElementById('rider-name-tag').innerText = loggedInRider.rider_name || 'Partner';
+
+      initAudio();
+      requestWakeLock();
+      initRealtime();
     }
 
-    // Initialize App
-    async function initRiderApp() {
-      await fetchAllOrders();
-      setInterval(fetchAllOrders, 4000);
+    function logoutRider() {
+      if (confirm('क्या आप लॉगआउट करना चाहते हैं?')) {
+        stopSiren();
+        releaseWakeLock();
+        localStorage.removeItem('zepto_logged_rider');
+        location.reload();
+      }
     }
 
-    async function fetchAllOrders() {
+    function initAudio() {
+      if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+    }
+
+    async function requestWakeLock() {
+      if ('wakeLock' in navigator) {
+        try { wakeLock = await navigator.wakeLock.request('screen'); } catch (e) {}
+      }
+    }
+    function releaseWakeLock() {
+      if (wakeLock) { wakeLock.release().then(() => { wakeLock = null; }); }
+    }
+
+    function playBeep() {
+      if (!isOnline || !audioCtx) return;
+      try {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(850, audioCtx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(1500, audioCtx.currentTime + 0.25);
+        gain.gain.setValueAtTime(0.4, audioCtx.currentTime);
+        gain.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.3);
+        if ('vibrate' in navigator) navigator.vibrate([300, 100, 300]);
+      } catch (e) {}
+    }
+
+    function startSiren() {
+      if (sirenTimer) return;
+      playBeep();
+      sirenTimer = setInterval(playBeep, 650);
+    }
+    function stopSiren() {
+      if (sirenTimer) { clearInterval(sirenTimer); sirenTimer = null; }
+    }
+
+    function toggleDuty() {
+      initAudio();
+      isOnline = !isOnline;
+      const btn = document.getElementById('duty-btn');
+      const text = document.getElementById('duty-text');
+
+      if (isOnline) {
+        btn.className = 'duty-btn online';
+        text.innerText = 'ONLINE';
+        requestWakeLock();
+        playBeep();
+      } else {
+        btn.className = 'duty-btn offline';
+        text.innerText = 'OFFLINE';
+        releaseWakeLock();
+        stopSiren();
+      }
+    }
+
+    function initRealtime() {
+      fetchMyOrders();
+      _supabase
+        .channel('rider:dispatch')
+        .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'orders' }, payload => {
+          const newOrder = payload.new;
+          if (isOnline && (!newOrder.assigned_rider_id || newOrder.assigned_rider_id === loggedInRider.id)) {
+            ordersCache.unshift(newOrder);
+            renderUI();
+
+            activeIncomingOrderId = newOrder.id;
+            document.getElementById('inc-order-id').innerText = `Order #ORD-${newOrder.id}`;
+            document.getElementById('inc-cust-name').innerText = `Customer: ${newOrder.customer_name}`;
+            document.getElementById('inc-total').innerText = `COD: ₹${newOrder.total_amount}`;
+            document.getElementById('incoming-modal').style.display = 'flex';
+            startSiren();
+          }
+        })
+        .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'orders' }, payload => {
+          const updated = payload.new;
+          const idx = ordersCache.findIndex(o => o.id === updated.id);
+          if (idx !== -1) {
+            ordersCache[idx] = updated;
+            renderUI();
+          }
+        })
+        .subscribe();
+    }
+
+    async function fetchMyOrders() {
       try {
         const { data, error } = await _supabase
           .from('orders')
           .select('*')
+          .or(`assigned_rider_id.is.null,assigned_rider_id.eq.${loggedInRider.id}`)
           .order('id', { ascending: false });
 
         if (error) throw error;
-
-        document.getElementById('loader').style.display = 'none';
         ordersCache = data || [];
-
-        // Check for new incoming orders
-        const hasNewOrder = ordersCache.some(o => o.status === 'Order Placed');
-        if (hasNewOrder) {
-          startSirenLoop();
-        } else {
-          stopSirenLoop();
-        }
-
+        document.getElementById('loader').style.display = 'none';
         renderUI();
       } catch (err) {
-        console.error('Fetch error:', err);
+        console.error(err);
       }
     }
 
@@ -470,31 +769,31 @@
 
     function renderUI() {
       const container = document.getElementById('orders-list');
-      const activeOrders = ordersCache.filter(o => o.status !== 'Delivered');
-      const deliveredOrders = ordersCache.filter(o => o.status === 'Delivered');
+      const active = ordersCache.filter(o => o.status !== 'Delivered');
+      const delivered = ordersCache.filter(o => o.status === 'Delivered');
 
-      document.getElementById('count-active').innerText = activeOrders.length;
-      document.getElementById('count-delivered').innerText = deliveredOrders.length;
+      document.getElementById('count-active').innerText = active.length;
+      document.getElementById('count-delivered').innerText = delivered.length;
 
-      const targetList = currentTab === 'active' ? activeOrders : deliveredOrders;
+      const list = currentTab === 'active' ? active : delivered;
 
-      if (targetList.length === 0) {
+      if (list.length === 0) {
         container.innerHTML = `
           <div style="text-align: center; padding: 60px 0; color: var(--z-muted); font-size: 13px;">
-            ${currentTab === 'active' ? 'No active orders right now. Waiting for customers...' : 'No delivered orders in this shift.'}
+            ${currentTab === 'active' ? 'No active orders right now.' : 'No delivered orders in this shift.'}
           </div>
         `;
         return;
       }
 
-      container.innerHTML = targetList.map(order => {
+      container.innerHTML = list.map(order => {
         const isNew = order.status === 'Order Placed';
         const isPicked = order.status === 'Out for Delivery' || order.status === 'Picked Up';
         const isDone = order.status === 'Delivered';
 
         const itemsHTML = Array.isArray(order.items)
           ? order.items.map(i => `<div class="item-row"><span>${i.name} × ${i.qty}</span><span>₹${i.subtotal}</span></div>`).join('')
-          : 'Items details missing';
+          : 'Items missing';
 
         let badgeClass = 'badge-placed';
         let badgeTxt = 'READY FOR PICKUP';
@@ -508,17 +807,11 @@
               <div class="status-badge ${badgeClass}">${badgeTxt}</div>
             </div>
 
-            <!-- Customer Details -->
             <div class="info-card">
-              <div class="cust-name">
-                <span>👤</span> ${order.customer_name}
-              </div>
-              <div class="cust-loc">
-                <span>📍</span> <span>${order.delivery_address}</span>
-              </div>
+              <div class="cust-name"><span>👤</span> ${order.customer_name}</div>
+              <div class="cust-loc"><span>📍</span> <span>${order.delivery_address}</span></div>
             </div>
 
-            <!-- Items Box -->
             <div class="items-container">
               <div style="font-weight: 700; color: var(--z-muted); margin-bottom: 6px;">ITEMS IN BAG:</div>
               ${itemsHTML}
@@ -528,28 +821,25 @@
               </div>
             </div>
 
-            <!-- Map View (Only when Picked Up) -->
             ${isPicked ? `
               <div class="map-preview">
                 <iframe src="https://maps.google.com/maps?q=${encodeURIComponent(order.delivery_address)}&t=&z=15&ie=UTF8&iwloc=&output=embed"></iframe>
               </div>
             ` : ''}
 
-            <!-- Action Buttons -->
             <div class="action-grid">
               <a class="btn-call" href="tel:${order.customer_phone}">📞 Call</a>
               <a class="btn-maps" target="_blank" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(order.delivery_address)}">🗺️ Open Map</a>
             </div>
 
-            <!-- Zepto Flow Buttons -->
             ${isNew ? `
-              <button class="btn-stage btn-accept" onclick="updateStatus(${order.id}, 'Out for Delivery')">
+              <button class="btn-stage btn-accept" onclick="acceptOrderLock(${order.id})">
                 ⚡ Accept & Pick Up Order
               </button>
             ` : ''}
 
             ${isPicked ? `
-              <button class="btn-stage btn-deliver" onclick="updateStatus(${order.id}, 'Delivered')">
+              <button class="btn-stage btn-deliver" onclick="markDelivered(${order.id})">
                 ✓ Mark as Delivered
               </button>
             ` : ''}
@@ -558,22 +848,46 @@
       }).join('');
     }
 
-    async function updateStatus(orderId, nextStatus) {
-      stopSirenLoop();
+    async function acceptOrderLock(orderId) {
+      stopSiren();
       try {
         const { error } = await _supabase
           .from('orders')
-          .update({ status: nextStatus })
+          .update({
+            status: 'Out for Delivery',
+            assigned_rider_id: loggedInRider.id
+          })
           .eq('id', orderId);
 
         if (error) throw error;
-        await fetchAllOrders();
+        await fetchMyOrders();
       } catch (e) {
-        alert('Status update failed: ' + e.message);
+        alert('Update error: ' + e.message);
       }
     }
 
-    initRiderApp();
+    async function markDelivered(orderId) {
+      try {
+        const { error } = await _supabase
+          .from('orders')
+          .update({ status: 'Delivered' })
+          .eq('id', orderId);
+
+        if (error) throw error;
+        await fetchMyOrders();
+      } catch (e) {
+        alert('Delivered error: ' + e.message);
+      }
+    }
+
+    async function acceptIncomingOrder() {
+      document.getElementById('incoming-modal').style.display = 'none';
+      stopSiren();
+      if (activeIncomingOrderId) {
+        await acceptOrderLock(activeIncomingOrderId);
+        activeIncomingOrderId = null;
+      }
+    }
   </script>
 </body>
 </html>
