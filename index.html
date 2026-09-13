@@ -49,7 +49,7 @@
       box-shadow: 0 2px 4px rgba(0,0,0,0.08);
     }
 
-    /* Search & Categories */
+    /* Controls */
     .controls-container {
       background: white;
       padding: 12px 16px;
@@ -99,7 +99,7 @@
       border-color: #0c831f;
     }
 
-    /* Product Grid */
+    /* Grid */
     .container {
       max-width: 800px;
       margin: 0 auto;
@@ -168,10 +168,6 @@
       font-size: 12px;
       cursor: pointer;
     }
-    .add-btn:active {
-      background-color: #0c831f;
-      color: white;
-    }
     .qty-controls {
       display: flex;
       align-items: center;
@@ -192,7 +188,7 @@
       cursor: pointer;
     }
 
-    /* Cart Drawer / Modal */
+    /* Cart Sheet */
     .cart-modal {
       position: fixed;
       top: 0;
@@ -212,7 +208,7 @@
       background: white;
       border-radius: 16px 16px 0 0;
       padding: 20px;
-      max-height: 80vh;
+      max-height: 85vh;
       overflow-y: auto;
       display: flex;
       flex-direction: column;
@@ -221,7 +217,7 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 16px;
+      margin-bottom: 14px;
     }
     .cart-header h2 {
       font-size: 16px;
@@ -230,7 +226,8 @@
     .close-btn {
       background: #e2e8f0;
       border: none;
-      padding: 6px 10px;
+      width: 28px;
+      height: 28px;
       border-radius: 50%;
       font-weight: bold;
       cursor: pointer;
@@ -238,8 +235,10 @@
     .cart-items-list {
       display: flex;
       flex-direction: column;
-      gap: 12px;
-      margin-bottom: 16px;
+      gap: 10px;
+      margin-bottom: 14px;
+      max-height: 180px;
+      overflow-y: auto;
     }
     .cart-item {
       display: flex;
@@ -261,27 +260,72 @@
       justify-content: space-between;
       font-size: 15px;
       font-weight: 700;
-      margin-top: 10px;
+      margin: 10px 0;
       padding-top: 10px;
       border-top: 1px dashed #cbd5e1;
     }
-    .checkout-btn {
+
+    /* Checkout Details Form */
+    .checkout-form {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-top: 10px;
+      border-top: 1px solid #e2e8f0;
+      padding-top: 14px;
+    }
+    .checkout-form h3 {
+      font-size: 14px;
+      font-weight: 700;
+      color: #334155;
+    }
+    .checkout-input {
+      width: 100%;
+      padding: 10px;
+      border-radius: 8px;
+      border: 1px solid #cbd5e1;
+      font-size: 13px;
+      outline: none;
+    }
+    .checkout-input:focus {
+      border-color: #0c831f;
+    }
+    .order-btn {
       background: #0c831f;
       color: white;
       border: none;
-      padding: 12px;
+      padding: 13px;
       border-radius: 8px;
       font-size: 14px;
       font-weight: 700;
-      margin-top: 16px;
       cursor: pointer;
       width: 100%;
+      margin-top: 10px;
+    }
+    .order-btn:disabled {
+      background: #94a3b8;
     }
     .status-msg {
       text-align: center;
       padding: 30px;
       font-size: 14px;
       color: #64748b;
+    }
+
+    /* Order Success Card */
+    .success-box {
+      text-align: center;
+      padding: 24px 12px;
+    }
+    .success-box h2 {
+      color: #0c831f;
+      font-size: 20px;
+      margin-bottom: 8px;
+    }
+    .success-box p {
+      font-size: 13px;
+      color: #64748b;
+      margin-bottom: 16px;
     }
   </style>
 </head>
@@ -309,21 +353,40 @@
   <!-- Cart / Checkout Slide-up Sheet -->
   <div class="cart-modal" id="cart-modal" onclick="closeCart(event)">
     <div class="cart-sheet" onclick="event.stopPropagation()">
-      <div class="cart-header">
-        <h2>आपका कार्ट (Items)</h2>
-        <button class="close-btn" onclick="toggleCartModal(false)">✕</button>
+      
+      <div id="cart-view">
+        <div class="cart-header">
+          <h2>आपका कार्ट (Delivery Cart)</h2>
+          <button class="close-btn" onclick="toggleCartModal(false)">✕</button>
+        </div>
+
+        <div class="cart-items-list" id="cart-items">
+          <!-- Items will render here -->
+        </div>
+
+        <div class="bill-row">
+          <span>कुल राशि (To Pay):</span>
+          <span id="cart-total-bill">₹0</span>
+        </div>
+
+        <!-- Real Customer Info Form -->
+        <div class="checkout-form" id="checkout-form-box">
+          <h3>डिलीवरी की जानकारी</h3>
+          <input type="text" id="cust-name" class="checkout-input" placeholder="आपका नाम (Full Name)">
+          <input type="tel" id="cust-phone" class="checkout-input" placeholder="मोबाइल नंबर (10 Digit Mobile)">
+          <textarea id="cust-address" class="checkout-input" rows="2" placeholder="पूरा पता (House No, Street, Landmark)"></textarea>
+
+          <button id="submit-order-btn" class="order-btn" onclick="placeOrderToSupabase()">Confirm & Place Order</button>
+        </div>
       </div>
 
-      <div class="cart-items-list" id="cart-items">
-        <!-- कार्ट आइटम्स यहाँ लोड होंगे -->
+      <!-- Success Screen -->
+      <div id="order-success-view" class="success-box" style="display: none;">
+        <h2>🎉 ऑर्डर प्लेस हो गया!</h2>
+        <p id="success-order-details">आपका ऑर्डर सिस्टम में दर्ज हो चुका है और डिलीवरी के लिए तैयार किया जा रहा है।</p>
+        <button class="order-btn" onclick="resetOrderFlow()">और सामान खरीदें</button>
       </div>
 
-      <div class="bill-row">
-        <span>कुल भुगतान (Total Bill):</span>
-        <span id="cart-total-bill">₹0</span>
-      </div>
-
-      <button class="checkout-btn" onclick="placeOrder()">Order via WhatsApp</button>
     </div>
   </div>
 
@@ -334,7 +397,7 @@
     const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
     let allProducts = [];
-    let cart = {}; // { productId: { item, qty } }
+    let cart = {}; 
     let selectedCategory = 'All';
 
     async function init() {
@@ -445,7 +508,6 @@
         delete cart[id];
       }
 
-      // अपडेट बटन UI
       const btnBox = document.getElementById(`btn-container-${id}`);
       if (btnBox) {
         btnBox.innerHTML = renderAddButton(id, cart[id]?.qty || 0);
@@ -477,14 +539,17 @@
     function renderCartItems() {
       const container = document.getElementById('cart-items');
       const totalEl = document.getElementById('cart-total-bill');
+      const formBox = document.getElementById('checkout-form-box');
       const entries = Object.values(cart);
 
       if (entries.length === 0) {
         container.innerHTML = '<p class="status-msg">कार्ट अभी खाली है।</p>';
         totalEl.innerText = '₹0';
+        formBox.style.display = 'none';
         return;
       }
 
+      formBox.style.display = 'flex';
       let total = 0;
       container.innerHTML = entries.map(({ item, qty }) => {
         const itemTotal = item.price * qty;
@@ -507,25 +572,84 @@
       totalEl.innerText = `₹${total}`;
     }
 
-    function placeOrder() {
+    // सीधे Supabase डेटाबेस में ऑर्डर सेव करने का फ़ंक्शन
+    async function placeOrderToSupabase() {
       const entries = Object.values(cart);
-      if (entries.length === 0) {
-        alert('कृपया पहले कार्ट में कुछ सामान जोड़ें!');
+      if (entries.length === 0) return alert('कार्ट खाली है!');
+
+      const name = document.getElementById('cust-name').value.trim();
+      const phone = document.getElementById('cust-phone').value.trim();
+      const address = document.getElementById('cust-address').value.trim();
+
+      if (!name || !phone || !address) {
+        alert('कृपया नाम, मोबाइल नंबर और पूरा पता दर्ज करें!');
         return;
       }
 
-      let orderText = 'नया ग्रोसरी ऑर्डर:\n';
-      let total = 0;
-      entries.forEach(({ item, qty }) => {
-        const itemTotal = item.price * qty;
-        total += itemTotal;
-        orderText += `• ${item.name} (${item.unit || ''}) x ${qty} = ₹${itemTotal}\n`;
-      });
-      orderText += `\nकुल बिल: ₹${total}`;
+      const btn = document.getElementById('submit-order-btn');
+      btn.disabled = true;
+      btn.innerText = 'ऑर्डर दर्ज हो रहा है...';
 
-      // WhatsApp पर ऑर्डर भेजने का लिंक (यहाँ अपना नंबर बदल सकते हैं)
-      const encodedMsg = encodeURIComponent(orderText);
-      window.open(`https://wa.me/?text=${encodedMsg}`, '_blank');
+      let totalAmount = 0;
+      const orderItems = entries.map(({ item, qty }) => {
+        totalAmount += item.price * qty;
+        return {
+          id: item.id,
+          name: item.name,
+          price: item.price,
+          unit: item.unit,
+          qty: qty,
+          subtotal: item.price * qty
+        };
+      });
+
+      try {
+        const { data, error } = await _supabase
+          .from('orders')
+          .insert([
+            {
+              customer_name: name,
+              customer_phone: phone,
+              delivery_address: address,
+              items: orderItems,
+              total_amount: totalAmount,
+              status: 'Order Placed'
+            }
+          ])
+          .select();
+
+        if (error) throw error;
+
+        const orderId = data && data[0] ? data[0].id : '';
+
+        // UI को सक्सेस स्क्रीन में बदलें
+        document.getElementById('cart-view').style.display = 'none';
+        const successView = document.getElementById('order-success-view');
+        successView.style.display = 'block';
+        document.getElementById('success-order-details').innerText = 
+          `ऑर्डर ID: #${orderId} सफलतापूर्वक दर्ज हो गया है। ₹${totalAmount} का भुगतान डिलीवरी के समय करें।`;
+
+        // कार्ट रीसेट करें
+        cart = {};
+        updateCartBadge();
+        renderProducts(allProducts);
+
+      } catch (err) {
+        alert('ऑर्डर दर्ज करने में समस्या: ' + err.message);
+        btn.disabled = false;
+        btn.innerText = 'Confirm & Place Order';
+      }
+    }
+
+    function resetOrderFlow() {
+      document.getElementById('cart-view').style.display = 'block';
+      document.getElementById('order-success-view').style.display = 'none';
+      document.getElementById('submit-order-btn').disabled = false;
+      document.getElementById('submit-order-btn').innerText = 'Confirm & Place Order';
+      document.getElementById('cust-name').value = '';
+      document.getElementById('cust-phone').value = '';
+      document.getElementById('cust-address').value = '';
+      toggleCartModal(false);
     }
 
     init();
