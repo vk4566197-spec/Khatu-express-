@@ -437,7 +437,7 @@
       color: #0f172a;
     }
 
-    /* Strict Checkout Form */
+    /* Clean Compact Checkout Form */
     .input-group { display: flex; flex-direction: column; gap: 8px; margin-top: 10px; }
     .input-label { font-size: 11px; font-weight: 700; color: #475569; }
     .zepto-input {
@@ -619,19 +619,19 @@
         </div>
       </div>
 
-      <!-- Strictly Validated Customer Form -->
+      <!-- Simple Compact Customer Form -->
       <div class="input-group">
-        <label class="input-label">प्राप्तकर्ता का पूरा नाम (Full Name) *</label>
+        <label class="input-label">आपका नाम (Full Name) *</label>
         <input type="text" id="c-name" class="zepto-input" placeholder="जैसे: Vishal Kumar">
-        <div class="validation-msg" id="err-name">कृपया कम से कम 3 अक्षरों का सही नाम लिखें!</div>
+        <div class="validation-msg" id="err-name">कृपया नाम दर्ज करें!</div>
 
-        <label class="input-label">10 अंकों का वैध मोबाइल नंबर (OTP / Call हेतु) *</label>
-        <input type="tel" id="c-phone" class="zepto-input" placeholder="10-digit Mobile (6, 7, 8, 9 से शुरू)" maxlength="10">
-        <div class="validation-msg" id="err-phone">अमान्य नंबर! 10 अंकों का सही भारतीय मोबाइल नंबर डालें।</div>
+        <label class="input-label">मोबाइल नंबर (10 Digit Mobile) *</label>
+        <input type="tel" id="c-phone" class="zepto-input" placeholder="10 अंकों का नंबर (6, 7, 8, 9 से शुरू)" maxlength="10">
+        <div class="validation-msg" id="err-phone">अमान्य नंबर! 10 अंकों का सही मोबाइल नंबर डालें।</div>
 
-        <label class="input-label">पूरा डिलीवरी पता (मकान नं, गली, लैंडमार्क, पिनकोड) *</label>
-        <textarea id="c-address" class="zepto-input" rows="2" placeholder="पूरा पता लिखें ताकि राइडर आसानी से पहुँच सके..."></textarea>
-        <div class="validation-msg" id="err-address">कृपया पूरा और स्पष्ट पता लिखें (कम से कम 15 अक्षर)!</div>
+        <label class="input-label">डिलीवरी का पता (Address / Location) *</label>
+        <input type="text" id="c-address" class="zepto-input" placeholder="जैसे: Aonla Bareilly या गली/मकान नं...">
+        <div class="validation-msg" id="err-address">कृपया डिलीवरी पता दर्ज करें!</div>
 
         <button class="btn-checkout" id="order-submit-btn" onclick="placeOrder()">Place Delivery Order</button>
       </div>
@@ -846,7 +846,7 @@
       document.getElementById('bill-grand-total').innerText = `₹${total}`;
     }
 
-    // STRICT VALIDATION BEFORE PLACING ORDER
+    // SIMPLIFIED & SHORT ADDRESS CHECKOUT
     async function placeOrder() {
       const nameEl = document.getElementById('c-name');
       const phoneEl = document.getElementById('c-phone');
@@ -860,7 +860,6 @@
       const errPhone = document.getElementById('err-phone');
       const errAddress = document.getElementById('err-address');
 
-      // Reset Errors
       nameEl.classList.remove('input-err');
       phoneEl.classList.remove('input-err');
       addressEl.classList.remove('input-err');
@@ -870,14 +869,14 @@
 
       let hasError = false;
 
-      // 1. Name Check (Minimum 3 letters)
-      if (name.length < 3) {
+      // 1. Name Check (कम से कम 2 अक्षर)
+      if (name.length < 2) {
         nameEl.classList.add('input-err');
         errName.style.display = 'block';
         hasError = true;
       }
 
-      // 2. Strict Phone Check (Must be exactly 10 digits and start with 6, 7, 8, or 9)
+      // 2. Strict Phone Check (10 अंक, 6-9 से शुरू)
       const phoneRegex = /^[6-9]\d{9}$/;
       if (!phoneRegex.test(phone)) {
         phoneEl.classList.add('input-err');
@@ -885,8 +884,8 @@
         hasError = true;
       }
 
-      // 3. Strict Address Check (Must be at least 15 characters)
-      if (address.length < 15) {
+      // 3. Short Address Check (केवल 4 अक्षर न्यूनतम, जैसे Aonla Bareilly भी स्वीकार्य)
+      if (address.length < 4) {
         addressEl.classList.add('input-err');
         errAddress.style.display = 'block';
         hasError = true;
