@@ -2,361 +2,378 @@
 <html lang="hi">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Khatu Express Grocery</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Zepto | 10 Min Grocery Delivery</title>
   <!-- Supabase CDN -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <!-- Google Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   <style>
+    :root {
+      --zepto-purple: #3c006b;
+      --zepto-dark: #20003b;
+      --zepto-pink: #ff3269;
+      --zepto-yellow: #ffc727;
+      --zepto-green: #0c831f;
+      --bg-light: #f4f6f8;
+      --card-bg: #ffffff;
+      --text-main: #181c24;
+      --text-muted: #768092;
+      --border-color: #eaecef;
+    }
+
     * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      font-family: 'Inter', -apple-system, sans-serif;
+      -webkit-tap-highlight-color: transparent;
     }
+
     body {
-      background-color: #f8fafc;
-      color: #1e293b;
-      padding-bottom: 100px;
+      background-color: var(--bg-light);
+      color: var(--text-main);
+      padding-bottom: 120px;
     }
+
+    /* Zepto Top Header */
     header {
-      background-color: #0c831f;
+      background: linear-gradient(135deg, var(--zepto-dark) 0%, var(--zepto-purple) 100%);
       color: white;
-      padding: 14px 16px;
+      padding: 14px 16px 16px 16px;
       position: sticky;
       top: 0;
       z-index: 100;
+      box-shadow: 0 4px 12px rgba(43, 2, 68, 0.2);
+    }
+    .top-bar {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      margin-bottom: 12px;
     }
-    header h1 {
-      font-size: 18px;
-      font-weight: 700;
+    .brand-box {
+      display: flex;
+      align-items: center;
+      gap: 8px;
     }
-    .cart-badge-btn {
-      background: #ffffff;
-      color: #0c831f;
-      font-weight: 700;
-      padding: 8px 14px;
+    .brand-title {
+      font-size: 22px;
+      font-weight: 900;
+      letter-spacing: -0.5px;
+      background: linear-gradient(90deg, #ff3269, #ff758c);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .eta-pill {
+      background: rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(8px);
+      padding: 4px 10px;
       border-radius: 20px;
-      font-size: 13px;
-      border: none;
+      font-size: 11px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      color: var(--zepto-yellow);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    .nav-actions {
+      display: flex;
+      gap: 8px;
+    }
+    .nav-btn {
+      background: rgba(255, 255, 255, 0.12);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: white;
+      font-size: 12px;
+      font-weight: 700;
+      padding: 7px 12px;
+      border-radius: 20px;
       cursor: pointer;
       display: flex;
       align-items: center;
-      gap: 6px;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+      gap: 4px;
     }
 
-    /* Controls */
-    .controls-container {
+    /* Zepto Search Bar */
+    .search-wrap {
+      position: relative;
+    }
+    .search-input {
+      width: 100%;
+      padding: 12px 16px 12px 42px;
+      border-radius: 12px;
+      border: none;
+      font-size: 13px;
+      font-weight: 500;
+      outline: none;
+      background: #ffffff;
+      color: var(--text-main);
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+    }
+    .search-icon {
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 15px;
+      color: #94a3b8;
+    }
+
+    /* Categories Horizontal Bar */
+    .cat-bar {
       background: white;
       padding: 12px 16px;
-      border-bottom: 1px solid #e2e8f0;
-      position: sticky;
-      top: 57px;
-      z-index: 90;
-    }
-    .search-box {
-      width: 100%;
-      padding: 10px 14px;
-      border-radius: 8px;
-      border: 1px solid #cbd5e1;
-      font-size: 14px;
-      outline: none;
-      margin-bottom: 10px;
-      background: #f1f5f9;
-    }
-    .search-box:focus {
-      border-color: #0c831f;
-      background: #fff;
-    }
-    .categories {
       display: flex;
       gap: 8px;
       overflow-x: auto;
       scrollbar-width: none;
-      padding-bottom: 2px;
+      border-bottom: 1px solid var(--border-color);
+      position: sticky;
+      top: 105px;
+      z-index: 90;
     }
-    .categories::-webkit-scrollbar {
-      display: none;
-    }
+    .cat-bar::-webkit-scrollbar { display: none; }
     .cat-chip {
-      background: #f1f5f9;
-      color: #475569;
+      background: #f1f3f6;
+      color: #4b5563;
       padding: 6px 14px;
-      border-radius: 16px;
+      border-radius: 20px;
       font-size: 12px;
-      font-weight: 600;
-      border: 1px solid #e2e8f0;
+      font-weight: 700;
       white-space: nowrap;
       cursor: pointer;
+      transition: all 0.2s;
     }
     .cat-chip.active {
-      background: #0c831f;
+      background: var(--zepto-purple);
       color: white;
-      border-color: #0c831f;
+      box-shadow: 0 2px 8px rgba(60, 0, 107, 0.3);
     }
 
-    /* Grid */
     .container {
-      max-width: 800px;
+      max-width: 600px;
       margin: 0 auto;
-      padding: 14px;
+      padding: 14px 12px;
     }
+
+    /* Grid Items (Zepto Card Style) */
     .grid {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
       gap: 12px;
     }
-    .card {
-      background: white;
-      border-radius: 12px;
-      overflow: hidden;
-      border: 1px solid #e2e8f0;
+    .product-card {
+      background: var(--card-bg);
+      border-radius: 14px;
+      border: 1px solid var(--border-color);
+      padding: 10px;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      padding: 10px;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+      position: relative;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.02);
     }
-    .card img {
+    .img-box {
       width: 100%;
-      height: 120px;
-      object-fit: cover;
-      border-radius: 8px;
-      margin-bottom: 8px;
-    }
-    .tag {
-      font-size: 10px;
-      color: #64748b;
-      text-transform: uppercase;
-      font-weight: 700;
-      margin-bottom: 2px;
-    }
-    .title {
-      font-size: 13px;
-      font-weight: 600;
-      line-height: 1.3;
-      margin-bottom: 2px;
-      color: #0f172a;
-    }
-    .unit {
-      font-size: 11px;
-      color: #94a3b8;
-      margin-bottom: 8px;
-    }
-    .price-row {
+      height: 125px;
+      border-radius: 10px;
+      background: #f8fafc;
       display: flex;
-      justify-content: space-between;
       align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      margin-bottom: 8px;
+    }
+    .img-box img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .prod-category {
+      font-size: 10px;
+      font-weight: 800;
+      color: var(--zepto-pink);
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+    }
+    .prod-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: #1e293b;
+      line-height: 1.3;
+      margin: 2px 0;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      height: 34px;
+    }
+    .prod-unit {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-bottom: 10px;
+    }
+    .price-action-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
       margin-top: auto;
     }
-    .price {
-      font-size: 14px;
-      font-weight: 700;
+    .price-tag {
+      font-size: 15px;
+      font-weight: 800;
       color: #0f172a;
     }
-    .add-btn {
-      background-color: #f0fdf4;
-      border: 1px solid #0c831f;
-      color: #0c831f;
-      padding: 6px 14px;
-      border-radius: 6px;
-      font-weight: 700;
+    .btn-add-zepto {
+      background: #fff;
+      border: 1.5px solid var(--zepto-pink);
+      color: var(--zepto-pink);
+      padding: 6px 18px;
+      border-radius: 8px;
+      font-weight: 800;
       font-size: 12px;
       cursor: pointer;
+      text-transform: uppercase;
+      box-shadow: 0 2px 4px rgba(255, 50, 105, 0.1);
     }
-    .qty-controls {
+    .qty-counter {
       display: flex;
       align-items: center;
-      gap: 8px;
-      background: #0c831f;
-      border-radius: 6px;
-      padding: 4px 8px;
+      background: var(--zepto-pink);
+      border-radius: 8px;
       color: white;
-      font-size: 12px;
-      font-weight: bold;
+      padding: 3px 6px;
+      gap: 10px;
+      font-weight: 800;
+      font-size: 13px;
     }
     .qty-btn {
       background: none;
       border: none;
       color: white;
-      font-size: 16px;
-      font-weight: bold;
-      cursor: pointer;
-    }
-
-    /* Cart Sheet */
-    .cart-modal {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0,0,0,0.5);
-      display: none;
-      justify-content: flex-end;
-      flex-direction: column;
-      z-index: 200;
-    }
-    .cart-modal.open {
-      display: flex;
-    }
-    .cart-sheet {
-      background: white;
-      border-radius: 16px 16px 0 0;
-      padding: 20px;
-      max-height: 85vh;
-      overflow-y: auto;
-      display: flex;
-      flex-direction: column;
-    }
-    .cart-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 14px;
-    }
-    .cart-header h2 {
-      font-size: 16px;
-      font-weight: 700;
-    }
-    .close-btn {
-      background: #e2e8f0;
-      border: none;
-      width: 28px;
-      height: 28px;
-      border-radius: 50%;
-      font-weight: bold;
-      cursor: pointer;
-    }
-    .cart-items-list {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      margin-bottom: 14px;
-      max-height: 180px;
-      overflow-y: auto;
-    }
-    .cart-item {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      border-bottom: 1px solid #f1f5f9;
-      padding-bottom: 8px;
-    }
-    .cart-item-name {
-      font-size: 13px;
-      font-weight: 600;
-    }
-    .cart-item-price {
-      font-size: 12px;
-      color: #64748b;
-    }
-    .bill-row {
-      display: flex;
-      justify-content: space-between;
       font-size: 15px;
-      font-weight: 700;
-      margin: 10px 0;
-      padding-top: 10px;
-      border-top: 1px dashed #cbd5e1;
-    }
-
-    /* Checkout Details Form */
-    .checkout-form {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      margin-top: 10px;
-      border-top: 1px solid #e2e8f0;
-      padding-top: 14px;
-    }
-    .checkout-form h3 {
-      font-size: 14px;
-      font-weight: 700;
-      color: #334155;
-    }
-    .checkout-input {
-      width: 100%;
-      padding: 10px;
-      border-radius: 8px;
-      border: 1px solid #cbd5e1;
-      font-size: 13px;
-      outline: none;
-    }
-    .checkout-input:focus {
-      border-color: #0c831f;
-    }
-    .order-btn {
-      background: #0c831f;
-      color: white;
-      border: none;
-      padding: 13px;
-      border-radius: 8px;
-      font-size: 14px;
-      font-weight: 700;
+      font-weight: 900;
       cursor: pointer;
-      width: 100%;
-      margin-top: 10px;
-    }
-    .order-btn:disabled {
-      background: #94a3b8;
-    }
-    .status-msg {
-      text-align: center;
-      padding: 30px;
-      font-size: 14px;
-      color: #64748b;
     }
 
-    /* Floating Zomato-Style Live Tracking Bar */
-    .live-tracker-bar {
+    /* Past Orders Section (Max 4 FIFO) */
+    .history-section {
+      margin-top: 25px;
+      border-top: 1px solid #e2e8f0;
+      padding-top: 18px;
+    }
+    .section-title {
+      font-size: 15px;
+      font-weight: 800;
+      color: var(--zepto-dark);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 12px;
+    }
+    .history-card {
+      background: white;
+      border-radius: 12px;
+      border: 1px solid var(--border-color);
+      padding: 12px 14px;
+      margin-bottom: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .hist-info {
+      flex: 1;
+    }
+    .hist-id {
+      font-size: 12px;
+      font-weight: 800;
+      color: #0f172a;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .hist-badge {
+      font-size: 10px;
+      padding: 2px 6px;
+      border-radius: 10px;
+      background: #e2e8f0;
+      color: #475569;
+    }
+    .hist-summary {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: 4px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 200px;
+    }
+    .hist-price {
+      font-size: 13px;
+      font-weight: 800;
+      color: var(--zepto-green);
+      margin-top: 2px;
+    }
+    .btn-repeat {
+      background: #fff;
+      border: 1.5px solid var(--zepto-purple);
+      color: var(--zepto-purple);
+      font-size: 12px;
+      font-weight: 800;
+      padding: 7px 14px;
+      border-radius: 8px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      white-space: nowrap;
+    }
+
+    /* Zepto Floating Cart Bar */
+    .floating-cart-bar {
       position: fixed;
-      bottom: 15px;
-      left: 12px;
-      right: 12px;
-      background: #0f172a;
+      bottom: 16px;
+      left: 14px;
+      right: 14px;
+      max-width: 572px;
+      margin: 0 auto;
+      background: linear-gradient(90deg, #ff3269, #e01d51);
       color: white;
       border-radius: 14px;
-      padding: 14px 16px;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+      padding: 12px 18px;
       display: none;
-      align-items: center;
       justify-content: space-between;
-      z-index: 150;
-      animation: slideUp 0.3s ease-out;
-      cursor: pointer;
-    }
-    @keyframes slideUp {
-      from { transform: translateY(100%); }
-      to { transform: translateY(0); }
-    }
-    .tracker-left {
-      display: flex;
       align-items: center;
-      gap: 12px;
+      box-shadow: 0 8px 24px rgba(255, 50, 105, 0.4);
+      z-index: 150;
+      cursor: pointer;
+      animation: popUp 0.25s ease-out;
     }
-    .tracker-icon {
-      font-size: 26px;
+    @keyframes popUp {
+      from { transform: translateY(40px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
     }
-    .tracker-title {
-      font-size: 14px;
+    .cart-summary-text {
+      font-size: 13px;
       font-weight: 700;
     }
-    .tracker-subtitle {
-      font-size: 12px;
-      color: #38bdf8;
+    .cart-amount {
+      font-size: 16px;
+      font-weight: 900;
     }
-    .tracker-arrow {
-      font-size: 18px;
-      color: #94a3b8;
+    .view-cart-link {
+      font-size: 13px;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      gap: 4px;
     }
 
-    /* Fullscreen Zomato Tracking Modal */
-    .track-modal {
+    /* Bottom Sheets (Modal) */
+    .modal-overlay {
       position: fixed;
       top: 0;
       left: 0;
@@ -366,217 +383,303 @@
       display: none;
       justify-content: flex-end;
       flex-direction: column;
-      z-index: 250;
+      z-index: 300;
     }
-    .track-modal.open {
-      display: flex;
-    }
-    .track-card {
+    .modal-overlay.active { display: flex; }
+    .bottom-sheet {
       background: white;
       border-radius: 20px 20px 0 0;
-      padding: 24px 20px;
-      max-height: 90vh;
+      padding: 20px 18px 30px 18px;
+      max-height: 85vh;
       overflow-y: auto;
+      animation: slideUp 0.25s ease-out;
     }
-    .track-head {
+    @keyframes slideUp {
+      from { transform: translateY(100%); }
+      to { transform: translateY(0); }
+    }
+    .sheet-head {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 20px;
+      margin-bottom: 16px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--border-color);
     }
-    .track-head h2 {
-      font-size: 18px;
+    .sheet-title {
+      font-size: 16px;
       font-weight: 800;
+      color: var(--zepto-dark);
+    }
+    .sheet-close {
+      background: #f1f3f6;
+      border: none;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    /* Cart Items in Sheet */
+    .cart-item-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 0;
+      border-bottom: 1px solid #f8fafc;
+    }
+    .bill-box {
+      background: #f8fafc;
+      padding: 12px;
+      border-radius: 10px;
+      margin: 14px 0;
+      font-size: 13px;
+    }
+    .bill-row {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 6px;
+    }
+    .bill-row.total {
+      font-weight: 900;
+      font-size: 15px;
+      margin-top: 8px;
+      padding-top: 8px;
+      border-top: 1px dashed #cbd5e1;
       color: #0f172a;
     }
 
-    /* Step Timeline */
-    .timeline {
+    /* Inputs */
+    .input-group {
       display: flex;
       flex-direction: column;
-      gap: 20px;
+      gap: 10px;
       margin-top: 10px;
-      position: relative;
-      padding-left: 28px;
     }
-    .timeline::before {
+    .zepto-input {
+      width: 100%;
+      padding: 12px;
+      border-radius: 10px;
+      border: 1px solid #cbd5e1;
+      font-size: 13px;
+      outline: none;
+    }
+    .zepto-input:focus {
+      border-color: var(--zepto-purple);
+    }
+    .btn-checkout {
+      background: linear-gradient(90deg, #ff3269, #e01d51);
+      color: white;
+      border: none;
+      padding: 14px;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 800;
+      cursor: pointer;
+      width: 100%;
+      margin-top: 14px;
+      box-shadow: 0 4px 14px rgba(255, 50, 105, 0.3);
+    }
+    .btn-checkout:disabled {
+      background: #cbd5e1;
+      box-shadow: none;
+    }
+
+    /* Live Tracking Header Bar */
+    .live-track-banner {
+      background: #0f172a;
+      color: white;
+      border-radius: 14px;
+      padding: 12px 16px;
+      display: none;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+    .track-steps {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      margin-top: 16px;
+      padding-left: 24px;
+      position: relative;
+    }
+    .track-steps::before {
       content: '';
       position: absolute;
-      left: 11px;
-      top: 8px;
-      bottom: 8px;
+      left: 9px;
+      top: 6px;
+      bottom: 6px;
       width: 2px;
       background: #e2e8f0;
     }
-    .step {
+    .t-step {
       position: relative;
+      font-size: 13px;
+      color: #94a3b8;
+      font-weight: 600;
     }
-    .step-dot {
+    .t-step::after {
+      content: '';
       position: absolute;
-      left: -28px;
+      left: -20px;
       top: 2px;
-      width: 22px;
-      height: 22px;
+      width: 12px;
+      height: 12px;
       border-radius: 50%;
       background: #cbd5e1;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 11px;
-      color: white;
-      font-weight: bold;
     }
-    .step.active .step-dot {
-      background: #0c831f;
-      box-shadow: 0 0 0 4px #dcfce7;
-    }
-    .step-title {
-      font-size: 14px;
-      font-weight: 700;
-      color: #64748b;
-    }
-    .step.active .step-title {
+    .t-step.active {
       color: #0f172a;
+      font-weight: 800;
     }
-    .step-desc {
-      font-size: 12px;
-      color: #94a3b8;
-      margin-top: 2px;
-    }
-    .step.active .step-desc {
-      color: #334155;
-    }
-
-    /* Live Rider Map Preview */
-    .map-box {
-      margin-top: 20px;
-      border-radius: 12px;
-      overflow: hidden;
-      border: 1px solid #e2e8f0;
-      height: 180px;
-      background: #f1f5f9;
-      position: relative;
-    }
-    .map-box iframe {
-      width: 100%;
-      height: 100%;
-      border: none;
+    .t-step.active::after {
+      background: var(--zepto-green);
+      box-shadow: 0 0 0 4px #dcfce7;
     }
   </style>
 </head>
 <body>
 
+  <!-- Zepto Brand Header -->
   <header>
-    <h1>Khatu Express</h1>
-    <button class="cart-badge-btn" onclick="openCart()">
-      🛒 <span id="cart-header-count">0 items</span>
-    </button>
+    <div class="top-bar">
+      <div class="brand-box">
+        <span class="brand-title">zepto</span>
+        <div class="eta-pill">⚡ 10 Mins</div>
+      </div>
+      <div class="nav-actions">
+        <button class="nav-btn" onclick="scrollToHistory()">📋 Past Orders</button>
+      </div>
+    </div>
+    <div class="search-wrap">
+      <span class="search-icon">🔍</span>
+      <input type="text" id="search-input" class="search-input" placeholder="Search 'Milk', 'Bread', 'Chips'..." oninput="handleFilter()">
+    </div>
   </header>
 
-  <div class="controls-container">
-    <input type="text" id="search-input" class="search-box" placeholder="सर्च करें (जैसे Bread, Milk, Potatoes)..." oninput="handleFilter()">
-    <div class="categories" id="category-chips">
-      <div class="cat-chip active" onclick="setCategory('All', this)">All</div>
-    </div>
+  <!-- Categories Horizontal Filter -->
+  <div class="cat-bar" id="category-chips">
+    <div class="cat-chip active" onclick="setCategory('All', this)">All Items</div>
   </div>
 
   <div class="container">
-    <div id="loader" class="status-msg">डेटाबेस से प्रोडक्ट्स लोड हो रहे हैं...</div>
-    <div class="grid" id="product-list"></div>
-  </div>
-
-  <!-- Cart / Checkout Slide-up Sheet -->
-  <div class="cart-modal" id="cart-modal" onclick="closeCart(event)">
-    <div class="cart-sheet" onclick="event.stopPropagation()">
-      <div class="cart-header">
-        <h2>आपका कार्ट (Delivery Cart)</h2>
-        <button class="close-btn" onclick="toggleCartModal(false)">✕</button>
-      </div>
-
-      <div class="cart-items-list" id="cart-items"></div>
-
-      <div class="bill-row">
-        <span>कुल राशि (To Pay):</span>
-        <span id="cart-total-bill">₹0</span>
-      </div>
-
-      <div class="checkout-form" id="checkout-form-box">
-        <h3>डिलीवरी की जानकारी</h3>
-        <input type="text" id="cust-name" class="checkout-input" placeholder="आपका नाम (Full Name)">
-        <input type="tel" id="cust-phone" class="checkout-input" placeholder="मोबाइल नंबर (10 Digit Mobile)">
-        <textarea id="cust-address" class="checkout-input" rows="2" placeholder="पूरा पता (House No, Street, Landmark)"></textarea>
-
-        <button id="submit-order-btn" class="order-btn" onclick="placeOrderToSupabase()">Confirm & Place Order</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Zomato Floating Live Order Bar -->
-  <div class="live-tracker-bar" id="live-order-bar" onclick="openTrackModal()">
-    <div class="tracker-left">
-      <div class="tracker-icon" id="bar-icon">🛵</div>
-      <div>
-        <div class="tracker-title" id="bar-status">ऑर्डर तैयार हो रहा है...</div>
-        <div class="tracker-subtitle" id="bar-sub">ट्रैकिंग देखने के लिए टैप करें</div>
-      </div>
-    </div>
-    <div class="tracker-arrow">➔</div>
-  </div>
-
-  <!-- Fullscreen Order Tracking Sheet (Zomato UI) -->
-  <div class="track-modal" id="track-modal" onclick="closeTrackModal(event)">
-    <div class="track-card" onclick="event.stopPropagation()">
-      <div class="track-head">
+    <!-- Active Order Live Tracking Banner -->
+    <div class="live-track-banner" id="live-order-banner" onclick="openTrackModal()">
+      <div style="display: flex; align-items: center; gap: 10px;">
+        <span style="font-size: 20px;" id="banner-icon">🛵</span>
         <div>
-          <h2 id="modal-order-id">Order #--</h2>
-          <span style="font-size: 12px; color: #64748b;" id="modal-order-time">अभी-अभी प्लेस किया गया</span>
-        </div>
-        <button class="close-btn" onclick="toggleTrackModal(false)">✕</button>
-      </div>
-
-      <!-- Zomato Progress Timeline -->
-      <div class="timeline">
-        <div class="step active" id="step-1">
-          <div class="step-dot">✓</div>
-          <div class="step-title">Order Placed & Confirmed</div>
-          <div class="step-desc">स्टोर ने आपका ऑर्डर स्वीकार कर लिया है।</div>
-        </div>
-
-        <div class="step" id="step-2">
-          <div class="step-dot">🛵</div>
-          <div class="step-title">Out for Delivery</div>
-          <div class="step-desc">राइडर आपका सामान लेकर निकल चुका है।</div>
-        </div>
-
-        <div class="step" id="step-3">
-          <div class="step-dot">📦</div>
-          <div class="step-title">Order Delivered</div>
-          <div class="step-desc">सामान सफलतापूर्वक डिलीवर हो गया। धन्यवाद!</div>
+          <div style="font-size: 13px; font-weight: 800;" id="banner-title">Live Tracking Active</div>
+          <div style="font-size: 11px; color: #38bdf8;" id="banner-sub">Tap to see real-time rider status</div>
         </div>
       </div>
+      <span style="font-size: 16px; color: #94a3b8;">➔</span>
+    </div>
 
-      <!-- Live Location Map Preview -->
-      <div class="map-box" id="map-box" style="display: none;">
-        <iframe id="map-frame" src="" loading="lazy"></iframe>
+    <!-- Product Grid -->
+    <div id="loader" style="text-align: center; padding: 40px; font-size: 14px; color: var(--text-muted);">
+      Loading store products...
+    </div>
+    <div class="grid" id="product-list"></div>
+
+    <!-- Past Orders Section (Max 4 Record FIFO) -->
+    <div class="history-section" id="past-orders-section">
+      <div class="section-title">
+        <span>🕒</span> Recent Orders (Last 4)
+      </div>
+      <div id="history-container">
+        <div style="font-size: 12px; color: #94a3b8; padding: 10px 0;">No past orders yet.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Zepto Floating Bottom Cart Bar -->
+  <div class="floating-cart-bar" id="cart-float-bar" onclick="openCartModal()">
+    <div>
+      <div class="cart-summary-text" id="float-qty-text">0 Items Added</div>
+      <div class="cart-amount" id="float-total-text">₹0</div>
+    </div>
+    <div class="view-cart-link">
+      View Cart ➔
+    </div>
+  </div>
+
+  <!-- Cart / Checkout Sheet Modal -->
+  <div class="modal-overlay" id="cart-modal" onclick="closeCartModal(event)">
+    <div class="bottom-sheet" onclick="event.stopPropagation()">
+      <div class="sheet-head">
+        <div class="sheet-title">Your Grocery Bag 🛍️</div>
+        <button class="sheet-close" onclick="toggleCartModal(false)">✕</button>
       </div>
 
-      <button class="order-btn" style="margin-top: 20px; background: #0f172a;" onclick="toggleTrackModal(false)">वापस शॉप पर जाएँ</button>
+      <div id="cart-items-box"></div>
+
+      <div class="bill-box">
+        <div class="bill-row">
+          <span>Item Total</span>
+          <span id="bill-subtotal">₹0</span>
+        </div>
+        <div class="bill-row">
+          <span>Delivery Partner Fee</span>
+          <span style="color: var(--zepto-green); font-weight: 700;">FREE</span>
+        </div>
+        <div class="bill-row total">
+          <span>To Pay</span>
+          <span id="bill-grand-total">₹0</span>
+        </div>
+      </div>
+
+      <div class="input-group">
+        <div style="font-size: 12px; font-weight: 700; color: #475569;">Delivery Details</div>
+        <input type="text" id="c-name" class="zepto-input" placeholder="Receiver Full Name">
+        <input type="tel" id="c-phone" class="zepto-input" placeholder="10-digit Mobile Number">
+        <textarea id="c-address" class="zepto-input" rows="2" placeholder="Full Address (Flat, Street, Landmark)"></textarea>
+        <button class="btn-checkout" id="order-submit-btn" onclick="placeOrder()">Place Delivery Order</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Live Status Fullscreen Modal -->
+  <div class="modal-overlay" id="track-modal" onclick="closeTrackModal(event)">
+    <div class="bottom-sheet" onclick="event.stopPropagation()">
+      <div class="sheet-head">
+        <div>
+          <div class="sheet-title" id="t-order-id">Order #--</div>
+          <div style="font-size: 11px; color: var(--text-muted);">Zepto Instant Express Delivery</div>
+        </div>
+        <button class="sheet-close" onclick="toggleTrackModal(false)">✕</button>
+      </div>
+
+      <div class="track-steps">
+        <div class="t-step active" id="st-1">Order Placed & Confirmed</div>
+        <div class="t-step" id="st-2">Out for Delivery (Rider on the way)</div>
+        <div class="t-step" id="st-3">Order Delivered Successfully 🎉</div>
+      </div>
+
+      <div id="rider-map-box" style="display: none; margin-top: 20px; border-radius: 12px; overflow: hidden; height: 160px; border: 1px solid #e2e8f0;">
+        <iframe id="rider-map" style="width: 100%; height: 100%; border: none;" src=""></iframe>
+      </div>
+
+      <button class="btn-checkout" style="background: var(--zepto-dark); margin-top: 24px;" onclick="toggleTrackModal(false)">Continue Shopping</button>
     </div>
   </div>
 
   <script>
     const SUPABASE_URL = 'https://mpeikimhkjuinqkjaumr.supabase.co';
     const SUPABASE_KEY = 'sb_publishable_2_wD-pbi_pNf8niiHxFbYA_saCIhApN';
-
     const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
     let allProducts = [];
     let cart = {}; 
-    let selectedCategory = 'All';
-    let currentOrderId = localStorage.getItem('khatu_active_order_id') || null;
+    let selectedCat = 'All';
+    let currentOrderId = localStorage.getItem('zepto_active_order') || null;
 
-    async function init() {
-      const loader = document.getElementById('loader');
+    // Load App
+    async function initApp() {
+      renderPastOrdersUI();
       try {
         const { data, error } = await _supabase
           .from('products')
@@ -586,71 +689,71 @@
         if (error) throw error;
 
         allProducts = data || [];
-        loader.style.display = 'none';
+        document.getElementById('loader').style.display = 'none';
 
         renderCategories();
         renderProducts(allProducts);
 
-        // अगर पहले से कोई ऑर्डर एक्टिव है, तो उसका स्टेटस लोड करें
         if (currentOrderId) {
-          trackLiveOrder(currentOrderId);
+          startTracking(currentOrderId);
         }
       } catch (err) {
-        loader.innerText = 'डेटा लोड करने में समस्या: ' + err.message;
+        document.getElementById('loader').innerText = 'Error loading store: ' + err.message;
       }
     }
 
     function renderCategories() {
-      const catContainer = document.getElementById('category-chips');
-      const uniqueCats = ['All', ...new Set(allProducts.map(p => p.category).filter(Boolean))];
-
-      catContainer.innerHTML = uniqueCats.map(cat => `
-        <div class="cat-chip ${cat === 'All' ? 'active' : ''}" onclick="setCategory('${cat}', this)">${cat}</div>
+      const bar = document.getElementById('category-chips');
+      const cats = ['All', ...new Set(allProducts.map(p => p.category).filter(Boolean))];
+      bar.innerHTML = cats.map(c => `
+        <div class="cat-chip ${c === 'All' ? 'active' : ''}" onclick="setCategory('${c}', this)">${c === 'All' ? 'All Items' : c}</div>
       `).join('');
     }
 
     function setCategory(cat, el) {
-      selectedCategory = cat;
+      selectedCat = cat;
       document.querySelectorAll('.cat-chip').forEach(c => c.classList.remove('active'));
       el.classList.add('active');
       handleFilter();
     }
 
     function handleFilter() {
-      const query = document.getElementById('search-input').value.toLowerCase();
+      const q = document.getElementById('search-input').value.toLowerCase();
       const filtered = allProducts.filter(p => {
-        const matchesCategory = selectedCategory === 'All' || p.category === selectedCategory;
-        const matchesSearch = p.name.toLowerCase().includes(query) || (p.category && p.category.toLowerCase().includes(query));
-        return matchesCategory && matchesSearch;
+        const matchC = selectedCat === 'All' || p.category === selectedCat;
+        const matchQ = p.name.toLowerCase().includes(q) || (p.category && p.category.toLowerCase().includes(q));
+        return matchC && matchQ;
       });
       renderProducts(filtered);
     }
 
-    function renderProducts(products) {
+    function renderProducts(items) {
       const container = document.getElementById('product-list');
       container.innerHTML = '';
 
-      if (products.length === 0) {
-        container.innerHTML = '<div class="status-msg" style="grid-column: span 2;">कोई सामान नहीं मिला।</div>';
+      if (items.length === 0) {
+        container.innerHTML = '<div style="grid-column: span 2; text-align: center; color: #94a3b8; padding: 20px;">No groceries found.</div>';
         return;
       }
 
-      products.forEach(item => {
+      items.forEach(p => {
         const card = document.createElement('div');
-        card.className = 'card';
-        const qty = cart[item.id]?.qty || 0;
+        card.className = 'product-card';
+        const qty = cart[p.id]?.qty || 0;
 
         card.innerHTML = `
           <div>
-            <img src="${item.image_url || 'https://via.placeholder.com/150'}" alt="${item.name}">
-            <div class="tag">${item.category || 'General'}</div>
-            <div class="title">${item.name}</div>
-            <div class="unit">${item.unit || ''}</div>
+            <div class="img-box">
+              <img src="${p.image_url || 'https://via.placeholder.com/150'}" alt="${p.name}">
+            </div>
+            <div class="prod-category">${p.category || 'Grocery'}</div>
+            <div class="prod-title">${p.name}</div>
+            <div class="prod-unit">${p.unit || '1 unit'}</div>
           </div>
-          <div class="price-row">
-            <div class="price">₹${item.price}</div>
-            <div id="btn-container-${item.id}">
-              ${renderAddButton(item.id, qty)}
+          <div class="price-action-row">
+            <div class="price-tag">₹${p.price}</div>
+            <div id="btn-box-${p.id}">
+              ${renderButton(p.id, qty)}
             </div>
           </div>
         `;
@@ -658,231 +761,280 @@
       });
     }
 
-    function renderAddButton(id, qty) {
+    function renderButton(id, qty) {
       if (qty > 0) {
         return `
-          <div class="qty-controls">
+          <div class="qty-counter">
             <button class="qty-btn" onclick="updateQty(${id}, -1)">-</button>
             <span>${qty}</span>
             <button class="qty-btn" onclick="updateQty(${id}, 1)">+</button>
           </div>
         `;
       }
-      return `<button class="add-btn" onclick="updateQty(${id}, 1)">ADD</button>`;
+      return `<button class="btn-add-zepto" onclick="updateQty(${id}, 1)">ADD</button>`;
     }
 
     function updateQty(id, delta) {
-      const product = allProducts.find(p => p.id === id);
-      if (!product) return;
+      const prod = allProducts.find(p => p.id === id);
+      if (!prod) return;
 
-      if (!cart[id]) cart[id] = { item: product, qty: 0 };
+      if (!cart[id]) cart[id] = { item: prod, qty: 0 };
       cart[id].qty += delta;
       if (cart[id].qty <= 0) delete cart[id];
 
-      const btnBox = document.getElementById(`btn-container-${id}`);
-      if (btnBox) btnBox.innerHTML = renderAddButton(id, cart[id]?.qty || 0);
+      const box = document.getElementById(`btn-box-${id}`);
+      if (box) box.innerHTML = renderButton(id, cart[id]?.qty || 0);
 
-      updateCartBadge();
-      renderCartItems();
+      updateCartBar();
+      renderCartSheet();
     }
 
-    function updateCartBadge() {
-      const totalItems = Object.values(cart).reduce((sum, entry) => sum + entry.qty, 0);
-      document.getElementById('cart-header-count').innerText = `${totalItems} items`;
+    function updateCartBar() {
+      const totalItems = Object.values(cart).reduce((s, e) => s + e.qty, 0);
+      const totalPrice = Object.values(cart).reduce((s, e) => s + (e.qty * e.item.price), 0);
+
+      const bar = document.getElementById('cart-float-bar');
+      if (totalItems > 0) {
+        bar.style.display = 'flex';
+        document.getElementById('float-qty-text').innerText = `${totalItems} ${totalItems > 1 ? 'Items' : 'Item'} Added`;
+        document.getElementById('float-total-text').innerText = `₹${totalPrice}`;
+      } else {
+        bar.style.display = 'none';
+      }
     }
 
     function toggleCartModal(show) {
-      document.getElementById('cart-modal').className = show ? 'cart-modal open' : 'cart-modal';
+      document.getElementById('cart-modal').className = show ? 'modal-overlay active' : 'modal-overlay';
     }
-    function openCart() {
-      renderCartItems();
+    function openCartModal() {
+      renderCartSheet();
       toggleCartModal(true);
     }
-    function closeCart(e) {
-      toggleCartModal(false);
-    }
+    function closeCartModal(e) { toggleCartModal(false); }
 
-    function renderCartItems() {
-      const container = document.getElementById('cart-items');
-      const totalEl = document.getElementById('cart-total-bill');
-      const formBox = document.getElementById('checkout-form-box');
+    function renderCartSheet() {
+      const box = document.getElementById('cart-items-box');
       const entries = Object.values(cart);
 
       if (entries.length === 0) {
-        container.innerHTML = '<p class="status-msg">कार्ट अभी खाली है।</p>';
-        totalEl.innerText = '₹0';
-        formBox.style.display = 'none';
+        box.innerHTML = '<div style="text-align:center; padding: 20px; color: #94a3b8;">Cart is empty. Add something tasty!</div>';
+        document.getElementById('bill-subtotal').innerText = '₹0';
+        document.getElementById('bill-grand-total').innerText = '₹0';
+        document.getElementById('order-submit-btn').disabled = true;
         return;
       }
 
-      formBox.style.display = 'flex';
+      document.getElementById('order-submit-btn').disabled = false;
       let total = 0;
-      container.innerHTML = entries.map(({ item, qty }) => {
-        const itemTotal = item.price * qty;
-        total += itemTotal;
+      box.innerHTML = entries.map(({ item, qty }) => {
+        const line = item.price * qty;
+        total += line;
         return `
-          <div class="cart-item">
+          <div class="cart-item-row">
             <div>
-              <div class="cart-item-name">${item.name}</div>
-              <div class="cart-item-price">₹${item.price} × ${qty} = ₹${itemTotal}</div>
+              <div style="font-size: 13px; font-weight: 700;">${item.name}</div>
+              <div style="font-size: 11px; color: #64748b;">₹${item.price} × ${qty}</div>
             </div>
-            <div class="qty-controls">
-              <button class="qty-btn" onclick="updateQty(${item.id}, -1)">-</button>
-              <span>${qty}</span>
-              <button class="qty-btn" onclick="updateQty(${item.id}, 1)">+</button>
+            <div style="display: flex; align-items: center; gap: 12px;">
+              <span style="font-size: 13px; font-weight: 800;">₹${line}</span>
+              <div class="qty-counter" style="padding: 2px 6px;">
+                <button class="qty-btn" onclick="updateQty(${item.id}, -1)">-</button>
+                <span>${qty}</span>
+                <button class="qty-btn" onclick="updateQty(${item.id}, 1)">+</button>
+              </div>
             </div>
           </div>
         `;
       }).join('');
 
-      totalEl.innerText = `₹${total}`;
+      document.getElementById('bill-subtotal').innerText = `₹${total}`;
+      document.getElementById('bill-grand-total').innerText = `₹${total}`;
     }
 
-    // ऑर्डर सबमिट और Zomato ट्रैकर शुरू
-    async function placeOrderToSupabase() {
-      const entries = Object.values(cart);
-      if (entries.length === 0) return alert('कार्ट खाली है!');
-
-      const name = document.getElementById('cust-name').value.trim();
-      const phone = document.getElementById('cust-phone').value.trim();
-      const address = document.getElementById('cust-address').value.trim();
+    // Place Order to Supabase
+    async function placeOrder() {
+      const name = document.getElementById('c-name').value.trim();
+      const phone = document.getElementById('c-phone').value.trim();
+      const address = document.getElementById('c-address').value.trim();
 
       if (!name || !phone || !address) {
-        alert('कृपया नाम, मोबाइल नंबर और पूरा पता दर्ज करें!');
+        alert('Please fill receiver name, phone, and complete delivery address!');
         return;
       }
 
-      const btn = document.getElementById('submit-order-btn');
-      btn.disabled = true;
-      btn.innerText = 'ऑर्डर दर्ज हो रहा है...';
-
+      const entries = Object.values(cart);
       let totalAmount = 0;
       const orderItems = entries.map(({ item, qty }) => {
         totalAmount += item.price * qty;
-        return {
-          id: item.id,
-          name: item.name,
-          price: item.price,
-          unit: item.unit,
-          qty: qty,
-          subtotal: item.price * qty
-        };
+        return { id: item.id, name: item.name, price: item.price, unit: item.unit, qty, subtotal: item.price * qty };
       });
+
+      const btn = document.getElementById('order-submit-btn');
+      btn.disabled = true;
+      btn.innerText = 'Placing Order in 10s...';
 
       try {
         const { data, error } = await _supabase
           .from('orders')
-          .insert([
-            {
-              customer_name: name,
-              customer_phone: phone,
-              delivery_address: address,
-              items: orderItems,
-              total_amount: totalAmount,
-              status: 'Order Placed'
-            }
-          ])
+          .insert([{
+            customer_name: name,
+            customer_phone: phone,
+            delivery_address: address,
+            items: orderItems,
+            total_amount: totalAmount,
+            status: 'Order Placed'
+          }])
           .select();
 
         if (error) throw error;
 
-        const orderId = data[0].id;
-        currentOrderId = orderId;
-        localStorage.setItem('khatu_active_order_id', orderId);
+        const newOrder = data[0];
+        currentOrderId = newOrder.id;
+        localStorage.setItem('zepto_active_order', newOrder.id);
 
-        // कार्ट साफ़ करें और बंद करें
+        // Save into Past Orders (Max 4 FIFO)
+        saveOrderToHistory({
+          id: newOrder.id,
+          total_amount: totalAmount,
+          items: orderItems,
+          date: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+        });
+
+        // Reset Cart
         cart = {};
-        updateCartBadge();
+        updateCartBar();
         renderProducts(allProducts);
         toggleCartModal(false);
 
         btn.disabled = false;
-        btn.innerText = 'Confirm & Place Order';
+        btn.innerText = 'Place Delivery Order';
 
-        // ट्रैकर चालू करें और पॉपअप खोलें
-        trackLiveOrder(orderId);
+        // Start Live Tracking
+        startTracking(newOrder.id);
         openTrackModal();
 
-      } catch (err) {
-        alert('ऑर्डर दर्ज करने में समस्या: ' + err.message);
+      } catch (e) {
+        alert('Could not place order: ' + e.message);
         btn.disabled = false;
-        btn.innerText = 'Confirm & Place Order';
+        btn.innerText = 'Place Delivery Order';
       }
     }
 
-    // Zomato लाइव ट्रैकर लॉजिक
-    async function trackLiveOrder(orderId) {
-      document.getElementById('live-order-bar').style.display = 'flex';
-      document.getElementById('modal-order-id').innerText = `Order #${orderId}`;
+    // Past Orders FIFO (Max 4) Logic
+    function saveOrderToHistory(orderObj) {
+      let history = JSON.parse(localStorage.getItem('zepto_order_history') || '[]');
+      history.unshift(orderObj); // नया ऑर्डर सबसे ऊपर जोड़ें
+      if (history.length > 4) {
+        history = history.slice(0, 4); // केवल अंतिम 4 ऑर्डर रखें, पुराना हटा दें
+      }
+      localStorage.setItem('zepto_order_history', JSON.stringify(history));
+      renderPastOrdersUI();
+    }
 
-      const updateUI = (status, address) => {
-        const barStatus = document.getElementById('bar-status');
-        const barSub = document.getElementById('bar-sub');
-        const barIcon = document.getElementById('bar-icon');
-        const mapBox = document.getElementById('map-box');
-        const mapFrame = document.getElementById('map-frame');
+    function renderPastOrdersUI() {
+      const container = document.getElementById('history-container');
+      const history = JSON.parse(localStorage.getItem('zepto_order_history') || '[]');
 
-        const s1 = document.getElementById('step-1');
-        const s2 = document.getElementById('step-2');
-        const s3 = document.getElementById('step-3');
+      if (history.length === 0) {
+        container.innerHTML = '<div style="font-size: 12px; color: #94a3b8; padding: 10px 0;">No past orders yet.</div>';
+        return;
+      }
 
-        s1.classList.remove('active');
-        s2.classList.remove('active');
-        s3.classList.remove('active');
+      container.innerHTML = history.map(order => {
+        const summary = order.items.map(i => `${i.name} (${i.qty})`).join(', ');
+        return `
+          <div class="history-card">
+            <div class="hist-info">
+              <div class="hist-id">Order #${order.id} <span class="hist-badge">${order.date || 'Past'}</span></div>
+              <div class="hist-summary">${summary}</div>
+              <div class="hist-price">₹${order.total_amount}</div>
+            </div>
+            <button class="btn-repeat" onclick='repeatOrder(${JSON.stringify(order.items)})'>
+              🔁 Repeat
+            </button>
+          </div>
+        `;
+      }).join('');
+    }
 
-        if (status === 'Order Placed') {
-          s1.classList.add('active');
-          barIcon.innerText = '👨‍🍳';
-          barStatus.innerText = 'ऑर्डर कन्फर्म हो गया है';
-          barSub.innerText = 'स्टोर सामान पैक कर रहा है';
-          mapBox.style.display = 'none';
-        } else if (status === 'Out for Delivery' || status === 'Picked Up') {
-          s1.classList.add('active');
-          s2.classList.add('active');
-          barIcon.innerText = '🛵';
-          barStatus.innerText = 'राइडर रास्ते में है!';
-          barSub.innerText = 'जल्द ही आपके पते पर पहुँचेगा';
-          
-          if (address) {
-            mapBox.style.display = 'block';
-            mapFrame.src = `https://maps.google.com/maps?q=${encodeURIComponent(address)}&t=&z=15&ie=UTF8&iwloc=&output=embed`;
-          }
-        } else if (status === 'Delivered') {
-          s1.classList.add('active');
-          s2.classList.add('active');
-          s3.classList.add('active');
-          barIcon.innerText = '🎉';
-          barStatus.innerText = 'सामान डिलीवर हो गया!';
-          barSub.innerText = 'ऑर्डर पूरा हुआ';
-          mapBox.style.display = 'none';
-          localStorage.removeItem('khatu_active_order_id');
-        }
-      };
+    // 1-Click Repeat Order (Re-order)
+    function repeatOrder(items) {
+      cart = {}; // कार्ट रीसेट करें
+      items.forEach(oldItem => {
+        const product = allProducts.find(p => p.id === oldItem.id) || {
+          id: oldItem.id,
+          name: oldItem.name,
+          price: oldItem.price,
+          unit: oldItem.unit,
+          image_url: ''
+        };
+        cart[product.id] = { item: product, qty: oldItem.qty };
+      });
 
-      // तुरंत डेटाबेस से स्टेटस चेक करें
-      const fetchStatus = async () => {
+      renderProducts(allProducts);
+      updateCartBar();
+      openCartModal(); // सीधे चेकआउट विंडो खोलें
+    }
+
+    // Live Tracking Polling
+    function startTracking(orderId) {
+      document.getElementById('live-order-banner').style.display = 'flex';
+      document.getElementById('t-order-id').innerText = `Order #${orderId}`;
+
+      const pollStatus = async () => {
         const { data } = await _supabase.from('orders').select('*').eq('id', orderId).single();
-        if (data) {
-          updateUI(data.status, data.delivery_address);
+        if (!data) return;
+
+        const bannerTitle = document.getElementById('banner-title');
+        const bannerSub = document.getElementById('banner-sub');
+        const s1 = document.getElementById('st-1');
+        const s2 = document.getElementById('st-2');
+        const s3 = document.getElementById('st-3');
+        const mapBox = document.getElementById('rider-map-box');
+        const mapFrame = document.getElementById('rider-map');
+
+        s1.className = 't-step';
+        s2.className = 't-step';
+        s3.className = 't-step';
+
+        if (data.status === 'Order Placed') {
+          s1.className = 't-step active';
+          bannerTitle.innerText = 'Order Accepted (Packing)';
+          bannerSub.innerText = 'Store is packing your items';
+          mapBox.style.display = 'none';
+        } else if (data.status === 'Out for Delivery' || data.status === 'Picked Up') {
+          s1.className = 't-step active';
+          s2.className = 't-step active';
+          bannerTitle.innerText = 'Rider is on the way! ⚡';
+          bannerSub.innerText = 'Arriving in 10 minutes';
+          mapBox.style.display = 'block';
+          mapFrame.src = `https://maps.google.com/maps?q=${encodeURIComponent(data.delivery_address)}&t=&z=15&ie=UTF8&iwloc=&output=embed`;
+        } else if (data.status === 'Delivered') {
+          s1.className = 't-step active';
+          s2.className = 't-step active';
+          s3.className = 't-step active';
+          bannerTitle.innerText = 'Order Delivered 🎉';
+          bannerSub.innerText = 'Enjoy your fresh items!';
+          mapBox.style.display = 'none';
+          localStorage.removeItem('zepto_active_order');
         }
       };
 
-      fetchStatus();
-      // हर 5 सेकंड में चेक करेगा कि राइडर ने स्टेटस बदला या नहीं
-      setInterval(fetchStatus, 5000);
+      pollStatus();
+      setInterval(pollStatus, 4000);
     }
 
     function toggleTrackModal(show) {
-      document.getElementById('track-modal').className = show ? 'track-modal open' : 'track-modal';
+      document.getElementById('track-modal').className = show ? 'modal-overlay active' : 'modal-overlay';
     }
-    function openTrackModal() {
-      toggleTrackModal(true);
-    }
-    function closeTrackModal(e) {
-      toggleTrackModal(false);
+    function openTrackModal() { toggleTrackModal(true); }
+    function closeTrackModal(e) { toggleTrackModal(false); }
+
+    function scrollToHistory() {
+      document.getElementById('past-orders-section').scrollIntoView({ behavior: 'smooth' });
     }
 
-    init();
+    initApp();
   </script>
 </body>
 </html>
