@@ -16,7 +16,7 @@
     body {
       background-color: #f8fafc;
       color: #1e293b;
-      padding-bottom: 90px;
+      padding-bottom: 100px;
     }
     header {
       background-color: #0c831f;
@@ -312,20 +312,155 @@
       color: #64748b;
     }
 
-    /* Order Success Card */
-    .success-box {
-      text-align: center;
-      padding: 24px 12px;
+    /* Floating Zomato-Style Live Tracking Bar */
+    .live-tracker-bar {
+      position: fixed;
+      bottom: 15px;
+      left: 12px;
+      right: 12px;
+      background: #0f172a;
+      color: white;
+      border-radius: 14px;
+      padding: 14px 16px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+      display: none;
+      align-items: center;
+      justify-content: space-between;
+      z-index: 150;
+      animation: slideUp 0.3s ease-out;
+      cursor: pointer;
     }
-    .success-box h2 {
-      color: #0c831f;
-      font-size: 20px;
-      margin-bottom: 8px;
+    @keyframes slideUp {
+      from { transform: translateY(100%); }
+      to { transform: translateY(0); }
     }
-    .success-box p {
-      font-size: 13px;
+    .tracker-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .tracker-icon {
+      font-size: 26px;
+    }
+    .tracker-title {
+      font-size: 14px;
+      font-weight: 700;
+    }
+    .tracker-subtitle {
+      font-size: 12px;
+      color: #38bdf8;
+    }
+    .tracker-arrow {
+      font-size: 18px;
+      color: #94a3b8;
+    }
+
+    /* Fullscreen Zomato Tracking Modal */
+    .track-modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.6);
+      display: none;
+      justify-content: flex-end;
+      flex-direction: column;
+      z-index: 250;
+    }
+    .track-modal.open {
+      display: flex;
+    }
+    .track-card {
+      background: white;
+      border-radius: 20px 20px 0 0;
+      padding: 24px 20px;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+    .track-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+    .track-head h2 {
+      font-size: 18px;
+      font-weight: 800;
+      color: #0f172a;
+    }
+
+    /* Step Timeline */
+    .timeline {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      margin-top: 10px;
+      position: relative;
+      padding-left: 28px;
+    }
+    .timeline::before {
+      content: '';
+      position: absolute;
+      left: 11px;
+      top: 8px;
+      bottom: 8px;
+      width: 2px;
+      background: #e2e8f0;
+    }
+    .step {
+      position: relative;
+    }
+    .step-dot {
+      position: absolute;
+      left: -28px;
+      top: 2px;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: #cbd5e1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      color: white;
+      font-weight: bold;
+    }
+    .step.active .step-dot {
+      background: #0c831f;
+      box-shadow: 0 0 0 4px #dcfce7;
+    }
+    .step-title {
+      font-size: 14px;
+      font-weight: 700;
       color: #64748b;
-      margin-bottom: 16px;
+    }
+    .step.active .step-title {
+      color: #0f172a;
+    }
+    .step-desc {
+      font-size: 12px;
+      color: #94a3b8;
+      margin-top: 2px;
+    }
+    .step.active .step-desc {
+      color: #334155;
+    }
+
+    /* Live Rider Map Preview */
+    .map-box {
+      margin-top: 20px;
+      border-radius: 12px;
+      overflow: hidden;
+      border: 1px solid #e2e8f0;
+      height: 180px;
+      background: #f1f5f9;
+      position: relative;
+    }
+    .map-box iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
     }
   </style>
 </head>
@@ -353,40 +488,79 @@
   <!-- Cart / Checkout Slide-up Sheet -->
   <div class="cart-modal" id="cart-modal" onclick="closeCart(event)">
     <div class="cart-sheet" onclick="event.stopPropagation()">
-      
-      <div id="cart-view">
-        <div class="cart-header">
-          <h2>आपका कार्ट (Delivery Cart)</h2>
-          <button class="close-btn" onclick="toggleCartModal(false)">✕</button>
+      <div class="cart-header">
+        <h2>आपका कार्ट (Delivery Cart)</h2>
+        <button class="close-btn" onclick="toggleCartModal(false)">✕</button>
+      </div>
+
+      <div class="cart-items-list" id="cart-items"></div>
+
+      <div class="bill-row">
+        <span>कुल राशि (To Pay):</span>
+        <span id="cart-total-bill">₹0</span>
+      </div>
+
+      <div class="checkout-form" id="checkout-form-box">
+        <h3>डिलीवरी की जानकारी</h3>
+        <input type="text" id="cust-name" class="checkout-input" placeholder="आपका नाम (Full Name)">
+        <input type="tel" id="cust-phone" class="checkout-input" placeholder="मोबाइल नंबर (10 Digit Mobile)">
+        <textarea id="cust-address" class="checkout-input" rows="2" placeholder="पूरा पता (House No, Street, Landmark)"></textarea>
+
+        <button id="submit-order-btn" class="order-btn" onclick="placeOrderToSupabase()">Confirm & Place Order</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Zomato Floating Live Order Bar -->
+  <div class="live-tracker-bar" id="live-order-bar" onclick="openTrackModal()">
+    <div class="tracker-left">
+      <div class="tracker-icon" id="bar-icon">🛵</div>
+      <div>
+        <div class="tracker-title" id="bar-status">ऑर्डर तैयार हो रहा है...</div>
+        <div class="tracker-subtitle" id="bar-sub">ट्रैकिंग देखने के लिए टैप करें</div>
+      </div>
+    </div>
+    <div class="tracker-arrow">➔</div>
+  </div>
+
+  <!-- Fullscreen Order Tracking Sheet (Zomato UI) -->
+  <div class="track-modal" id="track-modal" onclick="closeTrackModal(event)">
+    <div class="track-card" onclick="event.stopPropagation()">
+      <div class="track-head">
+        <div>
+          <h2 id="modal-order-id">Order #--</h2>
+          <span style="font-size: 12px; color: #64748b;" id="modal-order-time">अभी-अभी प्लेस किया गया</span>
+        </div>
+        <button class="close-btn" onclick="toggleTrackModal(false)">✕</button>
+      </div>
+
+      <!-- Zomato Progress Timeline -->
+      <div class="timeline">
+        <div class="step active" id="step-1">
+          <div class="step-dot">✓</div>
+          <div class="step-title">Order Placed & Confirmed</div>
+          <div class="step-desc">स्टोर ने आपका ऑर्डर स्वीकार कर लिया है।</div>
         </div>
 
-        <div class="cart-items-list" id="cart-items">
-          <!-- Items will render here -->
+        <div class="step" id="step-2">
+          <div class="step-dot">🛵</div>
+          <div class="step-title">Out for Delivery</div>
+          <div class="step-desc">राइडर आपका सामान लेकर निकल चुका है।</div>
         </div>
 
-        <div class="bill-row">
-          <span>कुल राशि (To Pay):</span>
-          <span id="cart-total-bill">₹0</span>
-        </div>
-
-        <!-- Real Customer Info Form -->
-        <div class="checkout-form" id="checkout-form-box">
-          <h3>डिलीवरी की जानकारी</h3>
-          <input type="text" id="cust-name" class="checkout-input" placeholder="आपका नाम (Full Name)">
-          <input type="tel" id="cust-phone" class="checkout-input" placeholder="मोबाइल नंबर (10 Digit Mobile)">
-          <textarea id="cust-address" class="checkout-input" rows="2" placeholder="पूरा पता (House No, Street, Landmark)"></textarea>
-
-          <button id="submit-order-btn" class="order-btn" onclick="placeOrderToSupabase()">Confirm & Place Order</button>
+        <div class="step" id="step-3">
+          <div class="step-dot">📦</div>
+          <div class="step-title">Order Delivered</div>
+          <div class="step-desc">सामान सफलतापूर्वक डिलीवर हो गया। धन्यवाद!</div>
         </div>
       </div>
 
-      <!-- Success Screen -->
-      <div id="order-success-view" class="success-box" style="display: none;">
-        <h2>🎉 ऑर्डर प्लेस हो गया!</h2>
-        <p id="success-order-details">आपका ऑर्डर सिस्टम में दर्ज हो चुका है और डिलीवरी के लिए तैयार किया जा रहा है।</p>
-        <button class="order-btn" onclick="resetOrderFlow()">और सामान खरीदें</button>
+      <!-- Live Location Map Preview -->
+      <div class="map-box" id="map-box" style="display: none;">
+        <iframe id="map-frame" src="" loading="lazy"></iframe>
       </div>
 
+      <button class="order-btn" style="margin-top: 20px; background: #0f172a;" onclick="toggleTrackModal(false)">वापस शॉप पर जाएँ</button>
     </div>
   </div>
 
@@ -399,6 +573,7 @@
     let allProducts = [];
     let cart = {}; 
     let selectedCategory = 'All';
+    let currentOrderId = localStorage.getItem('khatu_active_order_id') || null;
 
     async function init() {
       const loader = document.getElementById('loader');
@@ -415,9 +590,13 @@
 
         renderCategories();
         renderProducts(allProducts);
+
+        // अगर पहले से कोई ऑर्डर एक्टिव है, तो उसका स्टेटस लोड करें
+        if (currentOrderId) {
+          trackLiveOrder(currentOrderId);
+        }
       } catch (err) {
-        loader.innerText = 'डेटा लोड करने में समस्या आई: ' + err.message;
-        console.error(err);
+        loader.innerText = 'डेटा लोड करने में समस्या: ' + err.message;
       }
     }
 
@@ -439,13 +618,11 @@
 
     function handleFilter() {
       const query = document.getElementById('search-input').value.toLowerCase();
-
       const filtered = allProducts.filter(p => {
         const matchesCategory = selectedCategory === 'All' || p.category === selectedCategory;
         const matchesSearch = p.name.toLowerCase().includes(query) || (p.category && p.category.toLowerCase().includes(query));
         return matchesCategory && matchesSearch;
       });
-
       renderProducts(filtered);
     }
 
@@ -498,20 +675,12 @@
       const product = allProducts.find(p => p.id === id);
       if (!product) return;
 
-      if (!cart[id]) {
-        cart[id] = { item: product, qty: 0 };
-      }
-
+      if (!cart[id]) cart[id] = { item: product, qty: 0 };
       cart[id].qty += delta;
-
-      if (cart[id].qty <= 0) {
-        delete cart[id];
-      }
+      if (cart[id].qty <= 0) delete cart[id];
 
       const btnBox = document.getElementById(`btn-container-${id}`);
-      if (btnBox) {
-        btnBox.innerHTML = renderAddButton(id, cart[id]?.qty || 0);
-      }
+      if (btnBox) btnBox.innerHTML = renderAddButton(id, cart[id]?.qty || 0);
 
       updateCartBadge();
       renderCartItems();
@@ -523,15 +692,12 @@
     }
 
     function toggleCartModal(show) {
-      const modal = document.getElementById('cart-modal');
-      modal.className = show ? 'cart-modal open' : 'cart-modal';
+      document.getElementById('cart-modal').className = show ? 'cart-modal open' : 'cart-modal';
     }
-
     function openCart() {
       renderCartItems();
       toggleCartModal(true);
     }
-
     function closeCart(e) {
       toggleCartModal(false);
     }
@@ -572,7 +738,7 @@
       totalEl.innerText = `₹${total}`;
     }
 
-    // सीधे Supabase डेटाबेस में ऑर्डर सेव करने का फ़ंक्शन
+    // ऑर्डर सबमिट और Zomato ट्रैकर शुरू
     async function placeOrderToSupabase() {
       const entries = Object.values(cart);
       if (entries.length === 0) return alert('कार्ट खाली है!');
@@ -620,19 +786,22 @@
 
         if (error) throw error;
 
-        const orderId = data && data[0] ? data[0].id : '';
+        const orderId = data[0].id;
+        currentOrderId = orderId;
+        localStorage.setItem('khatu_active_order_id', orderId);
 
-        // UI को सक्सेस स्क्रीन में बदलें
-        document.getElementById('cart-view').style.display = 'none';
-        const successView = document.getElementById('order-success-view');
-        successView.style.display = 'block';
-        document.getElementById('success-order-details').innerText = 
-          `ऑर्डर ID: #${orderId} सफलतापूर्वक दर्ज हो गया है। ₹${totalAmount} का भुगतान डिलीवरी के समय करें।`;
-
-        // कार्ट रीसेट करें
+        // कार्ट साफ़ करें और बंद करें
         cart = {};
         updateCartBadge();
         renderProducts(allProducts);
+        toggleCartModal(false);
+
+        btn.disabled = false;
+        btn.innerText = 'Confirm & Place Order';
+
+        // ट्रैकर चालू करें और पॉपअप खोलें
+        trackLiveOrder(orderId);
+        openTrackModal();
 
       } catch (err) {
         alert('ऑर्डर दर्ज करने में समस्या: ' + err.message);
@@ -641,15 +810,76 @@
       }
     }
 
-    function resetOrderFlow() {
-      document.getElementById('cart-view').style.display = 'block';
-      document.getElementById('order-success-view').style.display = 'none';
-      document.getElementById('submit-order-btn').disabled = false;
-      document.getElementById('submit-order-btn').innerText = 'Confirm & Place Order';
-      document.getElementById('cust-name').value = '';
-      document.getElementById('cust-phone').value = '';
-      document.getElementById('cust-address').value = '';
-      toggleCartModal(false);
+    // Zomato लाइव ट्रैकर लॉजिक
+    async function trackLiveOrder(orderId) {
+      document.getElementById('live-order-bar').style.display = 'flex';
+      document.getElementById('modal-order-id').innerText = `Order #${orderId}`;
+
+      const updateUI = (status, address) => {
+        const barStatus = document.getElementById('bar-status');
+        const barSub = document.getElementById('bar-sub');
+        const barIcon = document.getElementById('bar-icon');
+        const mapBox = document.getElementById('map-box');
+        const mapFrame = document.getElementById('map-frame');
+
+        const s1 = document.getElementById('step-1');
+        const s2 = document.getElementById('step-2');
+        const s3 = document.getElementById('step-3');
+
+        s1.classList.remove('active');
+        s2.classList.remove('active');
+        s3.classList.remove('active');
+
+        if (status === 'Order Placed') {
+          s1.classList.add('active');
+          barIcon.innerText = '👨‍🍳';
+          barStatus.innerText = 'ऑर्डर कन्फर्म हो गया है';
+          barSub.innerText = 'स्टोर सामान पैक कर रहा है';
+          mapBox.style.display = 'none';
+        } else if (status === 'Out for Delivery' || status === 'Picked Up') {
+          s1.classList.add('active');
+          s2.classList.add('active');
+          barIcon.innerText = '🛵';
+          barStatus.innerText = 'राइडर रास्ते में है!';
+          barSub.innerText = 'जल्द ही आपके पते पर पहुँचेगा';
+          
+          if (address) {
+            mapBox.style.display = 'block';
+            mapFrame.src = `https://maps.google.com/maps?q=${encodeURIComponent(address)}&t=&z=15&ie=UTF8&iwloc=&output=embed`;
+          }
+        } else if (status === 'Delivered') {
+          s1.classList.add('active');
+          s2.classList.add('active');
+          s3.classList.add('active');
+          barIcon.innerText = '🎉';
+          barStatus.innerText = 'सामान डिलीवर हो गया!';
+          barSub.innerText = 'ऑर्डर पूरा हुआ';
+          mapBox.style.display = 'none';
+          localStorage.removeItem('khatu_active_order_id');
+        }
+      };
+
+      // तुरंत डेटाबेस से स्टेटस चेक करें
+      const fetchStatus = async () => {
+        const { data } = await _supabase.from('orders').select('*').eq('id', orderId).single();
+        if (data) {
+          updateUI(data.status, data.delivery_address);
+        }
+      };
+
+      fetchStatus();
+      // हर 5 सेकंड में चेक करेगा कि राइडर ने स्टेटस बदला या नहीं
+      setInterval(fetchStatus, 5000);
+    }
+
+    function toggleTrackModal(show) {
+      document.getElementById('track-modal').className = show ? 'track-modal open' : 'track-modal';
+    }
+    function openTrackModal() {
+      toggleTrackModal(true);
+    }
+    function closeTrackModal(e) {
+      toggleTrackModal(false);
     }
 
     init();
