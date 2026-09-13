@@ -1,7 +1,9 @@
 {
+  "id": "/rider-app",
   "name": "Zepto Delivery Partner",
   "short_name": "Zepto Rider",
   "start_url": "./rider.html",
+  "scope": "./",
   "display": "standalone",
   "background_color": "#0b0214",
   "theme_color": "#150226",
