@@ -4,6 +4,20 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Zepto Delivery Partner</title>
+  
+  <!-- PWA Settings for App Install -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#150226">
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('sw.js')
+          .then(reg => console.log('SW Registered!', reg))
+          .catch(err => console.log('SW Registration failed:', err));
+      });
+    }
+  </script>
+
   <!-- Supabase CDN -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <!-- Google Font: Inter -->
@@ -308,7 +322,7 @@
       border: none;
     }
 
-    /* Audio Enable Bar (Required by Browsers) */
+    /* Audio Enable Bar */
     .audio-notice {
       background: rgba(255, 199, 39, 0.1);
       border: 1px dashed var(--z-yellow);
@@ -366,12 +380,10 @@
 
     let ordersCache = [];
     let currentTab = 'active';
-    let knownOrderIds = new Set();
     let isAudioAllowed = false;
-    let audioContext = null;
     let alertInterval = null;
 
-    // Web Audio Siren Synthesizer (No external mp3 link needed)
+    // Web Audio Siren Synthesizer
     function playZeptoSiren() {
       if (!isAudioAllowed) return;
       try {
@@ -414,13 +426,13 @@
     function enableAudioEngine() {
       isAudioAllowed = true;
       document.getElementById('sound-enabler').style.display = 'none';
-      playZeptoSiren(); // टेस्ट साउंड
+      playZeptoSiren();
     }
 
     // Initialize App
     async function initRiderApp() {
       await fetchAllOrders();
-      setInterval(fetchAllOrders, 4000); // 4 सेकंड में रियल-टाइम चेक
+      setInterval(fetchAllOrders, 4000);
     }
 
     async function fetchAllOrders() {
@@ -523,7 +535,7 @@
               </div>
             ` : ''}
 
-            <!-- Communication Action Buttons -->
+            <!-- Action Buttons -->
             <div class="action-grid">
               <a class="btn-call" href="tel:${order.customer_phone}">📞 Call</a>
               <a class="btn-maps" target="_blank" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(order.delivery_address)}">🗺️ Open Map</a>
