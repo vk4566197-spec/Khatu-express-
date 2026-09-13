@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Grocery Store</title>
+  <title>Khatu Express Grocery</title>
   <!-- Supabase CDN -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
@@ -14,14 +14,14 @@
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     }
     body {
-      background-color: #f4f6f8;
-      color: #333;
-      padding-bottom: 70px;
+      background-color: #f8fafc;
+      color: #1e293b;
+      padding-bottom: 90px;
     }
     header {
       background-color: #0c831f;
       color: white;
-      padding: 16px 20px;
+      padding: 14px 16px;
       position: sticky;
       top: 0;
       z-index: 100;
@@ -31,26 +31,84 @@
       box-shadow: 0 2px 8px rgba(0,0,0,0.1);
     }
     header h1 {
-      font-size: 20px;
+      font-size: 18px;
       font-weight: 700;
     }
-    .cart-badge {
-      background: #fff;
+    .cart-badge-btn {
+      background: #ffffff;
       color: #0c831f;
-      font-weight: bold;
-      padding: 6px 14px;
+      font-weight: 700;
+      padding: 8px 14px;
       border-radius: 20px;
-      font-size: 14px;
+      font-size: 13px;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.08);
     }
+
+    /* Search & Categories */
+    .controls-container {
+      background: white;
+      padding: 12px 16px;
+      border-bottom: 1px solid #e2e8f0;
+      position: sticky;
+      top: 57px;
+      z-index: 90;
+    }
+    .search-box {
+      width: 100%;
+      padding: 10px 14px;
+      border-radius: 8px;
+      border: 1px solid #cbd5e1;
+      font-size: 14px;
+      outline: none;
+      margin-bottom: 10px;
+      background: #f1f5f9;
+    }
+    .search-box:focus {
+      border-color: #0c831f;
+      background: #fff;
+    }
+    .categories {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      scrollbar-width: none;
+      padding-bottom: 2px;
+    }
+    .categories::-webkit-scrollbar {
+      display: none;
+    }
+    .cat-chip {
+      background: #f1f5f9;
+      color: #475569;
+      padding: 6px 14px;
+      border-radius: 16px;
+      font-size: 12px;
+      font-weight: 600;
+      border: 1px solid #e2e8f0;
+      white-space: nowrap;
+      cursor: pointer;
+    }
+    .cat-chip.active {
+      background: #0c831f;
+      color: white;
+      border-color: #0c831f;
+    }
+
+    /* Product Grid */
     .container {
       max-width: 800px;
       margin: 0 auto;
-      padding: 16px;
+      padding: 14px;
     }
     .grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-      gap: 14px;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
     }
     .card {
       background: white;
@@ -60,8 +118,8 @@
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      padding: 12px;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+      padding: 10px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.03);
     }
     .card img {
       width: 100%;
@@ -71,23 +129,23 @@
       margin-bottom: 8px;
     }
     .tag {
-      font-size: 11px;
-      color: #666;
+      font-size: 10px;
+      color: #64748b;
       text-transform: uppercase;
-      font-weight: 600;
-      margin-bottom: 4px;
+      font-weight: 700;
+      margin-bottom: 2px;
     }
     .title {
-      font-size: 14px;
+      font-size: 13px;
       font-weight: 600;
       line-height: 1.3;
-      margin-bottom: 4px;
-      color: #1e293b;
+      margin-bottom: 2px;
+      color: #0f172a;
     }
     .unit {
-      font-size: 12px;
-      color: #888;
-      margin-bottom: 10px;
+      font-size: 11px;
+      color: #94a3b8;
+      margin-bottom: 8px;
     }
     .price-row {
       display: flex;
@@ -96,8 +154,8 @@
       margin-top: auto;
     }
     .price {
-      font-size: 15px;
-      font-weight: bold;
+      font-size: 14px;
+      font-weight: 700;
       color: #0f172a;
     }
     .add-btn {
@@ -106,32 +164,167 @@
       color: #0c831f;
       padding: 6px 14px;
       border-radius: 6px;
-      font-weight: bold;
-      font-size: 13px;
+      font-weight: 700;
+      font-size: 12px;
       cursor: pointer;
     }
     .add-btn:active {
       background-color: #0c831f;
       color: white;
     }
+    .qty-controls {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: #0c831f;
+      border-radius: 6px;
+      padding: 4px 8px;
+      color: white;
+      font-size: 12px;
+      font-weight: bold;
+    }
+    .qty-btn {
+      background: none;
+      border: none;
+      color: white;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    /* Cart Drawer / Modal */
+    .cart-modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.5);
+      display: none;
+      justify-content: flex-end;
+      flex-direction: column;
+      z-index: 200;
+    }
+    .cart-modal.open {
+      display: flex;
+    }
+    .cart-sheet {
+      background: white;
+      border-radius: 16px 16px 0 0;
+      padding: 20px;
+      max-height: 80vh;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+    }
+    .cart-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+    .cart-header h2 {
+      font-size: 16px;
+      font-weight: 700;
+    }
+    .close-btn {
+      background: #e2e8f0;
+      border: none;
+      padding: 6px 10px;
+      border-radius: 50%;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    .cart-items-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+    .cart-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid #f1f5f9;
+      padding-bottom: 8px;
+    }
+    .cart-item-name {
+      font-size: 13px;
+      font-weight: 600;
+    }
+    .cart-item-price {
+      font-size: 12px;
+      color: #64748b;
+    }
+    .bill-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 15px;
+      font-weight: 700;
+      margin-top: 10px;
+      padding-top: 10px;
+      border-top: 1px dashed #cbd5e1;
+    }
+    .checkout-btn {
+      background: #0c831f;
+      color: white;
+      border: none;
+      padding: 12px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 700;
+      margin-top: 16px;
+      cursor: pointer;
+      width: 100%;
+    }
     .status-msg {
       text-align: center;
-      padding: 40px;
-      font-size: 15px;
-      color: #666;
+      padding: 30px;
+      font-size: 14px;
+      color: #64748b;
     }
   </style>
 </head>
 <body>
 
   <header>
-    <h1>Grocery Store</h1>
-    <div class="cart-badge" id="cart-count">Cart: 0</div>
+    <h1>Khatu Express</h1>
+    <button class="cart-badge-btn" onclick="openCart()">
+      🛒 <span id="cart-header-count">0 items</span>
+    </button>
   </header>
+
+  <div class="controls-container">
+    <input type="text" id="search-input" class="search-box" placeholder="सर्च करें (जैसे Bread, Milk, Potatoes)..." oninput="handleFilter()">
+    <div class="categories" id="category-chips">
+      <div class="cat-chip active" onclick="setCategory('All', this)">All</div>
+    </div>
+  </div>
 
   <div class="container">
     <div id="loader" class="status-msg">डेटाबेस से प्रोडक्ट्स लोड हो रहे हैं...</div>
     <div class="grid" id="product-list"></div>
+  </div>
+
+  <!-- Cart / Checkout Slide-up Sheet -->
+  <div class="cart-modal" id="cart-modal" onclick="closeCart(event)">
+    <div class="cart-sheet" onclick="event.stopPropagation()">
+      <div class="cart-header">
+        <h2>आपका कार्ट (Items)</h2>
+        <button class="close-btn" onclick="toggleCartModal(false)">✕</button>
+      </div>
+
+      <div class="cart-items-list" id="cart-items">
+        <!-- कार्ट आइटम्स यहाँ लोड होंगे -->
+      </div>
+
+      <div class="bill-row">
+        <span>कुल भुगतान (Total Bill):</span>
+        <span id="cart-total-bill">₹0</span>
+      </div>
+
+      <button class="checkout-btn" onclick="placeOrder()">Order via WhatsApp</button>
+    </div>
   </div>
 
   <script>
@@ -140,18 +333,12 @@
 
     const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    let cartTotalItems = 0;
+    let allProducts = [];
+    let cart = {}; // { productId: { item, qty } }
+    let selectedCategory = 'All';
 
-    function addToCart(productName) {
-      cartTotalItems++;
-      document.getElementById('cart-count').innerText = `Cart: ${cartTotalItems}`;
-      alert(`${productName} कार्ट में जोड़ दिया गया है!`);
-    }
-
-    async function loadProducts() {
+    async function init() {
       const loader = document.getElementById('loader');
-      const container = document.getElementById('product-list');
-
       try {
         const { data, error } = await _supabase
           .from('products')
@@ -160,41 +347,188 @@
 
         if (error) throw error;
 
+        allProducts = data || [];
         loader.style.display = 'none';
 
-        if (!data || data.length === 0) {
-          loader.style.display = 'block';
-          loader.innerText = 'कोई प्रोडक्ट नहीं मिला।';
-          return;
-        }
-
-        container.innerHTML = '';
-        data.forEach(item => {
-          const card = document.createElement('div');
-          card.className = 'card';
-          card.innerHTML = `
-            <div>
-              <img src="${item.image_url || 'https://via.placeholder.com/150'}" alt="${item.name}">
-              <div class="tag">${item.category || 'General'}</div>
-              <div class="title">${item.name}</div>
-              <div class="unit">${item.unit || ''}</div>
-            </div>
-            <div class="price-row">
-              <div class="price">₹${item.price}</div>
-              <button class="add-btn" onclick="addToCart('${item.name}')">ADD</button>
-            </div>
-          `;
-          container.appendChild(card);
-        });
-
+        renderCategories();
+        renderProducts(allProducts);
       } catch (err) {
-        loader.style.display = 'block';
         loader.innerText = 'डेटा लोड करने में समस्या आई: ' + err.message;
         console.error(err);
       }
     }
 
-    loadProducts();
+    function renderCategories() {
+      const catContainer = document.getElementById('category-chips');
+      const uniqueCats = ['All', ...new Set(allProducts.map(p => p.category).filter(Boolean))];
+
+      catContainer.innerHTML = uniqueCats.map(cat => `
+        <div class="cat-chip ${cat === 'All' ? 'active' : ''}" onclick="setCategory('${cat}', this)">${cat}</div>
+      `).join('');
+    }
+
+    function setCategory(cat, el) {
+      selectedCategory = cat;
+      document.querySelectorAll('.cat-chip').forEach(c => c.classList.remove('active'));
+      el.classList.add('active');
+      handleFilter();
+    }
+
+    function handleFilter() {
+      const query = document.getElementById('search-input').value.toLowerCase();
+
+      const filtered = allProducts.filter(p => {
+        const matchesCategory = selectedCategory === 'All' || p.category === selectedCategory;
+        const matchesSearch = p.name.toLowerCase().includes(query) || (p.category && p.category.toLowerCase().includes(query));
+        return matchesCategory && matchesSearch;
+      });
+
+      renderProducts(filtered);
+    }
+
+    function renderProducts(products) {
+      const container = document.getElementById('product-list');
+      container.innerHTML = '';
+
+      if (products.length === 0) {
+        container.innerHTML = '<div class="status-msg" style="grid-column: span 2;">कोई सामान नहीं मिला।</div>';
+        return;
+      }
+
+      products.forEach(item => {
+        const card = document.createElement('div');
+        card.className = 'card';
+        const qty = cart[item.id]?.qty || 0;
+
+        card.innerHTML = `
+          <div>
+            <img src="${item.image_url || 'https://via.placeholder.com/150'}" alt="${item.name}">
+            <div class="tag">${item.category || 'General'}</div>
+            <div class="title">${item.name}</div>
+            <div class="unit">${item.unit || ''}</div>
+          </div>
+          <div class="price-row">
+            <div class="price">₹${item.price}</div>
+            <div id="btn-container-${item.id}">
+              ${renderAddButton(item.id, qty)}
+            </div>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    function renderAddButton(id, qty) {
+      if (qty > 0) {
+        return `
+          <div class="qty-controls">
+            <button class="qty-btn" onclick="updateQty(${id}, -1)">-</button>
+            <span>${qty}</span>
+            <button class="qty-btn" onclick="updateQty(${id}, 1)">+</button>
+          </div>
+        `;
+      }
+      return `<button class="add-btn" onclick="updateQty(${id}, 1)">ADD</button>`;
+    }
+
+    function updateQty(id, delta) {
+      const product = allProducts.find(p => p.id === id);
+      if (!product) return;
+
+      if (!cart[id]) {
+        cart[id] = { item: product, qty: 0 };
+      }
+
+      cart[id].qty += delta;
+
+      if (cart[id].qty <= 0) {
+        delete cart[id];
+      }
+
+      // अपडेट बटन UI
+      const btnBox = document.getElementById(`btn-container-${id}`);
+      if (btnBox) {
+        btnBox.innerHTML = renderAddButton(id, cart[id]?.qty || 0);
+      }
+
+      updateCartBadge();
+      renderCartItems();
+    }
+
+    function updateCartBadge() {
+      const totalItems = Object.values(cart).reduce((sum, entry) => sum + entry.qty, 0);
+      document.getElementById('cart-header-count').innerText = `${totalItems} items`;
+    }
+
+    function toggleCartModal(show) {
+      const modal = document.getElementById('cart-modal');
+      modal.className = show ? 'cart-modal open' : 'cart-modal';
+    }
+
+    function openCart() {
+      renderCartItems();
+      toggleCartModal(true);
+    }
+
+    function closeCart(e) {
+      toggleCartModal(false);
+    }
+
+    function renderCartItems() {
+      const container = document.getElementById('cart-items');
+      const totalEl = document.getElementById('cart-total-bill');
+      const entries = Object.values(cart);
+
+      if (entries.length === 0) {
+        container.innerHTML = '<p class="status-msg">कार्ट अभी खाली है।</p>';
+        totalEl.innerText = '₹0';
+        return;
+      }
+
+      let total = 0;
+      container.innerHTML = entries.map(({ item, qty }) => {
+        const itemTotal = item.price * qty;
+        total += itemTotal;
+        return `
+          <div class="cart-item">
+            <div>
+              <div class="cart-item-name">${item.name}</div>
+              <div class="cart-item-price">₹${item.price} × ${qty} = ₹${itemTotal}</div>
+            </div>
+            <div class="qty-controls">
+              <button class="qty-btn" onclick="updateQty(${item.id}, -1)">-</button>
+              <span>${qty}</span>
+              <button class="qty-btn" onclick="updateQty(${item.id}, 1)">+</button>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      totalEl.innerText = `₹${total}`;
+    }
+
+    function placeOrder() {
+      const entries = Object.values(cart);
+      if (entries.length === 0) {
+        alert('कृपया पहले कार्ट में कुछ सामान जोड़ें!');
+        return;
+      }
+
+      let orderText = 'नया ग्रोसरी ऑर्डर:\n';
+      let total = 0;
+      entries.forEach(({ item, qty }) => {
+        const itemTotal = item.price * qty;
+        total += itemTotal;
+        orderText += `• ${item.name} (${item.unit || ''}) x ${qty} = ₹${itemTotal}\n`;
+      });
+      orderText += `\nकुल बिल: ₹${total}`;
+
+      // WhatsApp पर ऑर्डर भेजने का लिंक (यहाँ अपना नंबर बदल सकते हैं)
+      const encodedMsg = encodeURIComponent(orderText);
+      window.open(`https://wa.me/?text=${encodedMsg}`, '_blank');
+    }
+
+    init();
   </script>
 </body>
 </html>
