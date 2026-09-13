@@ -33,408 +33,103 @@
       --z-border: #320d53;
     }
 
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: 'Inter', -apple-system, sans-serif;
-      -webkit-tap-highlight-color: transparent;
-    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
+    body { background-color: var(--z-bg); color: var(--z-text); padding-bottom: 90px; }
 
-    body {
-      background-color: var(--z-bg);
-      color: var(--z-text);
-      padding-bottom: 90px;
-    }
-
-    /* Auth Screens */
     .auth-overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: var(--z-bg);
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      padding: 24px;
-      z-index: 1000;
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: var(--z-bg); display: flex; flex-direction: column;
+      justify-content: center; align-items: center; padding: 20px; z-index: 1000;
+      overflow-y: auto;
     }
     .login-card {
-      background: var(--z-card);
-      border: 1px solid var(--z-border);
-      border-radius: 20px;
-      padding: 26px 20px;
-      width: 100%;
-      max-width: 380px;
+      background: var(--z-card); border: 1px solid var(--z-border); border-radius: 20px;
+      padding: 24px 18px; width: 100%; max-width: 390px; text-align: center;
       box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-      text-align: center;
     }
     .brand-large {
-      font-size: 32px;
-      font-weight: 900;
+      font-size: 30px; font-weight: 900;
       background: linear-gradient(90deg, #ff3269, #ff758c);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      margin-bottom: 4px;
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 4px;
     }
-    .sub-brand {
-      font-size: 13px;
-      color: #38bdf8;
-      font-weight: 700;
-      letter-spacing: 1px;
-      margin-bottom: 20px;
-    }
-    .login-input {
-      width: 100%;
-      background: var(--z-card-inner);
-      border: 1.5px solid var(--z-border);
-      color: white;
-      padding: 13px;
-      border-radius: 12px;
-      font-size: 14px;
-      margin-bottom: 12px;
-      outline: none;
-    }
-    .login-input:focus {
-      border-color: var(--z-pink);
-    }
-    .btn-login {
-      width: 100%;
-      background: linear-gradient(90deg, #ff3269, #e01d51);
-      color: white;
-      border: none;
-      padding: 14px;
-      border-radius: 12px;
-      font-size: 15px;
-      font-weight: 800;
-      cursor: pointer;
-      margin-top: 8px;
-      box-shadow: 0 4px 15px rgba(255, 50, 105, 0.4);
-    }
-    .switch-link {
-      color: #38bdf8;
-      font-size: 12px;
-      margin-top: 14px;
-      cursor: pointer;
-      display: inline-block;
-      text-decoration: underline;
-    }
+    .sub-brand { font-size: 12px; color: #38bdf8; font-weight: 700; letter-spacing: 1px; margin-bottom: 16px; }
 
-    /* Main Header */
+    .form-group { text-align: left; margin-bottom: 10px; }
+    .form-label { font-size: 11px; font-weight: 700; color: #cbd5e1; margin-bottom: 4px; display: block; }
+    .login-input {
+      width: 100%; background: var(--z-card-inner); border: 1.5px solid var(--z-border);
+      color: white; padding: 11px 12px; border-radius: 10px; font-size: 13px; outline: none;
+    }
+    .login-input:focus { border-color: var(--z-pink); }
+    .login-input.error { border-color: #ef4444; }
+
+    .btn-login {
+      width: 100%; background: linear-gradient(90deg, #ff3269, #e01d51); color: white;
+      border: none; padding: 13px; border-radius: 10px; font-size: 14px; font-weight: 800;
+      cursor: pointer; margin-top: 10px; box-shadow: 0 4px 15px rgba(255, 50, 105, 0.4);
+    }
+    .switch-link { color: #38bdf8; font-size: 12px; margin-top: 14px; cursor: pointer; display: inline-block; text-decoration: underline; }
+
+    /* Dashboard Header */
     header {
-      background: #150226;
-      padding: 14px 16px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      border-bottom: 1px solid var(--z-border);
-      position: sticky;
-      top: 0;
-      z-index: 100;
+      background: #150226; padding: 14px 16px; display: flex; justify-content: space-between;
+      align-items: center; border-bottom: 1px solid var(--z-border); position: sticky; top: 0; z-index: 100;
     }
-    .brand-wrap {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    .brand-title {
-      font-size: 20px;
-      font-weight: 900;
-      background: linear-gradient(90deg, #ff3269, #ff758c);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-    .rider-badge {
-      background: #24083d;
-      border: 1px solid var(--z-purple);
-      color: #38bdf8;
-      font-size: 10px;
-      font-weight: 800;
-      padding: 3px 8px;
-      border-radius: 6px;
-      text-transform: uppercase;
-    }
-    .header-actions {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
+    .brand-wrap { display: flex; align-items: center; gap: 8px; }
+    .brand-title { font-size: 20px; font-weight: 900; background: linear-gradient(90deg, #ff3269, #ff758c); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .rider-badge { background: #24083d; border: 1px solid var(--z-purple); color: #38bdf8; font-size: 10px; font-weight: 800; padding: 3px 8px; border-radius: 6px; text-transform: uppercase; }
+    
     .duty-btn {
-      border: none;
-      padding: 8px 14px;
-      border-radius: 20px;
-      font-size: 12px;
-      font-weight: 800;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      cursor: pointer;
+      border: none; padding: 8px 14px; border-radius: 20px; font-size: 12px; font-weight: 800;
+      display: flex; align-items: center; gap: 6px; cursor: pointer;
     }
-    .duty-btn.online {
-      background: rgba(0, 210, 106, 0.15);
-      border: 1.5px solid var(--z-green);
-      color: var(--z-green);
-    }
-    .duty-btn.offline {
-      background: rgba(255, 50, 105, 0.15);
-      border: 1.5px solid var(--z-pink);
-      color: var(--z-pink);
-    }
-    .duty-dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-    }
+    .duty-btn.online { background: rgba(0, 210, 106, 0.15); border: 1.5px solid var(--z-green); color: var(--z-green); }
+    .duty-btn.offline { background: rgba(255, 50, 105, 0.15); border: 1.5px solid var(--z-pink); color: var(--z-pink); }
+    .duty-dot { width: 8px; height: 8px; border-radius: 50%; }
     .online .duty-dot { background: var(--z-green); animation: pulse 1.5s infinite; }
     .offline .duty-dot { background: var(--z-pink); }
-    @keyframes pulse {
-      0% { transform: scale(1); opacity: 1; }
-      50% { transform: scale(1.3); opacity: 0.5; }
-      100% { transform: scale(1); opacity: 1; }
-    }
+    @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.4; } 100% { opacity: 1; } }
 
-    .logout-link {
-      color: var(--z-muted);
-      font-size: 11px;
-      cursor: pointer;
-      text-decoration: underline;
-    }
+    .logout-link { color: var(--z-muted); font-size: 11px; cursor: pointer; text-decoration: underline; margin-left: 8px; }
 
-    .tabs-bar {
-      display: flex;
-      background: #150226;
-      border-bottom: 1px solid var(--z-border);
-      padding: 0 16px;
-    }
-    .tab-item {
-      flex: 1;
-      text-align: center;
-      padding: 12px 0;
-      font-size: 13px;
-      font-weight: 700;
-      color: var(--z-muted);
-      cursor: pointer;
-      position: relative;
-    }
+    .tabs-bar { display: flex; background: #150226; border-bottom: 1px solid var(--z-border); padding: 0 16px; }
+    .tab-item { flex: 1; text-align: center; padding: 12px 0; font-size: 13px; font-weight: 700; color: var(--z-muted); cursor: pointer; position: relative; }
     .tab-item.active { color: #fff; }
-    .tab-item.active::after {
-      content: '';
-      position: absolute;
-      bottom: 0;
-      left: 20%;
-      right: 20%;
-      height: 3px;
-      background: var(--z-pink);
-      border-radius: 3px 3px 0 0;
-    }
+    .tab-item.active::after { content: ''; position: absolute; bottom: 0; left: 20%; right: 20%; height: 3px; background: var(--z-pink); border-radius: 3px 3px 0 0; }
 
-    .container {
-      max-width: 600px;
-      margin: 0 auto;
-      padding: 14px;
-    }
-
-    .order-card {
-      background: var(--z-card);
-      border: 1px solid var(--z-border);
-      border-radius: 16px;
-      padding: 16px;
-      margin-bottom: 14px;
-      box-shadow: 0 4px 16px rgba(0,0,0,0.3);
-    }
-    .order-card.new-alert {
-      border-color: var(--z-pink);
-      animation: alertGlow 1s infinite alternate;
-    }
-    @keyframes alertGlow {
-      from { box-shadow: 0 0 4px rgba(255, 50, 105, 0.3); }
-      to { box-shadow: 0 0 18px rgba(255, 50, 105, 0.8); }
-    }
-
-    .order-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 12px;
-      border-bottom: 1px solid var(--z-border);
-      padding-bottom: 10px;
-    }
+    .container { max-width: 600px; margin: 0 auto; padding: 14px; }
+    .order-card { background: var(--z-card); border: 1px solid var(--z-border); border-radius: 16px; padding: 16px; margin-bottom: 14px; }
+    .order-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; border-bottom: 1px solid var(--z-border); padding-bottom: 10px; }
     .order-id-txt { font-size: 16px; font-weight: 900; color: #fff; }
-    .status-badge {
-      font-size: 11px;
-      font-weight: 800;
-      padding: 4px 10px;
-      border-radius: 20px;
-      text-transform: uppercase;
-    }
+    .status-badge { font-size: 11px; font-weight: 800; padding: 4px 10px; border-radius: 20px; text-transform: uppercase; }
     .badge-placed { background: rgba(255, 199, 39, 0.15); color: var(--z-yellow); border: 1px solid var(--z-yellow); }
     .badge-picked { background: rgba(56, 189, 248, 0.15); color: #38bdf8; border: 1px solid #38bdf8; }
     .badge-delivered { background: rgba(0, 210, 106, 0.15); color: var(--z-green); border: 1px solid var(--z-green); }
 
-    .info-card {
-      background: var(--z-card-inner);
-      border-radius: 12px;
-      padding: 12px;
-      margin-bottom: 12px;
-    }
-    .cust-name {
-      font-size: 15px;
-      font-weight: 800;
-      color: #fff;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      margin-bottom: 6px;
-    }
-    .cust-loc {
-      font-size: 13px;
-      color: var(--z-muted);
-      line-height: 1.4;
-      display: flex;
-      align-items: flex-start;
-      gap: 6px;
-    }
+    .info-card { background: var(--z-card-inner); border-radius: 12px; padding: 12px; margin-bottom: 12px; }
+    .cust-name { font-size: 15px; font-weight: 800; color: #fff; margin-bottom: 4px; }
+    .cust-loc { font-size: 13px; color: var(--z-muted); }
 
-    .items-container {
-      background: rgba(0, 0, 0, 0.2);
-      border-radius: 10px;
-      padding: 10px 12px;
-      margin-bottom: 14px;
-      font-size: 12px;
-    }
-    .item-row {
-      display: flex;
-      justify-content: space-between;
-      color: #d1d5db;
-      margin-bottom: 4px;
-    }
-    .cod-bill {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-top: 8px;
-      padding-top: 8px;
-      border-top: 1px dashed var(--z-border);
-      font-size: 14px;
-      font-weight: 800;
-      color: #fff;
-    }
+    .items-container { background: rgba(0, 0, 0, 0.2); border-radius: 10px; padding: 10px 12px; margin-bottom: 14px; font-size: 12px; }
+    .item-row { display: flex; justify-content: space-between; color: #d1d5db; margin-bottom: 4px; }
+    .cod-bill { display: flex; justify-content: space-between; margin-top: 8px; padding-top: 8px; border-top: 1px dashed var(--z-border); font-size: 14px; font-weight: 800; color: #fff; }
 
-    .action-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-      margin-bottom: 10px;
-    }
-    .btn-call {
-      background: #1e293b;
-      color: #fff;
-      text-decoration: none;
-      padding: 12px;
-      border-radius: 10px;
-      font-size: 13px;
-      font-weight: 800;
-      text-align: center;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
-      border: 1px solid #334155;
-    }
-    .btn-maps {
-      background: #0284c7;
-      color: #fff;
-      text-decoration: none;
-      padding: 12px;
-      border-radius: 10px;
-      font-size: 13px;
-      font-weight: 800;
-      text-align: center;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
-    }
+    .action-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
+    .btn-call { background: #1e293b; color: #fff; text-decoration: none; padding: 12px; border-radius: 10px; font-size: 13px; font-weight: 800; text-align: center; border: 1px solid #334155; }
+    .btn-maps { background: #0284c7; color: #fff; text-decoration: none; padding: 12px; border-radius: 10px; font-size: 13px; font-weight: 800; text-align: center; }
 
-    .btn-stage {
-      width: 100%;
-      padding: 14px;
-      border-radius: 12px;
-      border: none;
-      font-size: 14px;
-      font-weight: 900;
-      text-transform: uppercase;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-    }
-    .btn-accept {
-      background: linear-gradient(90deg, #ff3269, #e01d51);
-      color: #fff;
-      box-shadow: 0 4px 14px rgba(255, 50, 105, 0.4);
-    }
-    .btn-deliver {
-      background: linear-gradient(90deg, #00d26a, #0c831f);
-      color: #fff;
-      box-shadow: 0 4px 14px rgba(0, 210, 106, 0.4);
-    }
+    .btn-stage { width: 100%; padding: 14px; border-radius: 12px; border: none; font-size: 14px; font-weight: 900; text-transform: uppercase; cursor: pointer; }
+    .btn-accept { background: linear-gradient(90deg, #ff3269, #e01d51); color: #fff; }
+    .btn-deliver { background: linear-gradient(90deg, #00d26a, #0c831f); color: #fff; }
 
-    .map-preview {
-      border-radius: 10px;
-      overflow: hidden;
-      margin-bottom: 12px;
-      height: 140px;
-      border: 1px solid var(--z-border);
-    }
-    .map-preview iframe {
-      width: 100%;
-      height: 100%;
-      border: none;
-    }
+    .map-preview { border-radius: 10px; overflow: hidden; margin-bottom: 12px; height: 140px; border: 1px solid var(--z-border); }
+    .map-preview iframe { width: 100%; height: 100%; border: none; }
 
     .incoming-overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(11, 2, 20, 0.95);
-      backdrop-filter: blur(10px);
-      display: none;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      padding: 20px;
-      z-index: 500;
-      animation: popIn 0.3s ease-out;
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(11, 2, 20, 0.95);
+      display: none; flex-direction: column; justify-content: center; align-items: center; padding: 20px; z-index: 500;
     }
-    @keyframes popIn {
-      from { transform: scale(0.8); opacity: 0; }
-      to { transform: scale(1); opacity: 1; }
-    }
-    .incoming-box {
-      background: var(--z-card);
-      border: 2px solid var(--z-pink);
-      border-radius: 20px;
-      width: 100%;
-      max-width: 400px;
-      padding: 24px;
-      text-align: center;
-      box-shadow: 0 0 30px rgba(255, 50, 105, 0.6);
-    }
-    .siren-icon {
-      font-size: 50px;
-      animation: wobble 0.6s infinite alternate;
-    }
-    @keyframes wobble {
-      from { transform: rotate(-15deg); }
-      to { transform: rotate(15deg); }
-    }
+    .incoming-box { background: var(--z-card); border: 2px solid var(--z-pink); border-radius: 20px; width: 100%; max-width: 380px; padding: 24px; text-align: center; }
   </style>
 </head>
 <body>
@@ -445,42 +140,68 @@
       <div class="brand-large">zepto</div>
       <div class="sub-brand">DELIVERY PARTNER APP</div>
 
-      <input type="tel" id="l-phone" class="login-input" placeholder="Registered Mobile Number" maxlength="10">
-      <input type="password" id="l-pin" class="login-input" placeholder="4-Digit Security PIN" maxlength="4">
+      <div class="form-group">
+        <label class="form-label">पंजीकृत मोबाइल नंबर</label>
+        <input type="tel" id="l-phone" class="login-input" placeholder="10 अंकों का नंबर" maxlength="10">
+      </div>
+      <div class="form-group">
+        <label class="form-label">सुरक्षा पिन</label>
+        <input type="password" id="l-pin" class="login-input" placeholder="4-Digit PIN" maxlength="4">
+      </div>
 
       <button class="btn-login" id="login-btn" onclick="riderLogin()">LOGIN AS RIDER</button>
       <div id="login-err" style="color: #ff3269; font-size: 12px; margin-top: 10px; font-weight: 700;"></div>
       
-      <div class="switch-link" onclick="toggleAuth(false)">नया राइडर? काम के लिए आवेदन करें (Register)</div>
+      <div class="switch-link" onclick="toggleAuth(false)">नया राइडर? KYC के साथ आवेदन करें (Register)</div>
     </div>
   </div>
 
-  <!-- 2. REGISTRATION SCREEN -->
+  <!-- 2. REGISTRATION SCREEN (Strict Details) -->
   <div class="auth-overlay" id="reg-box" style="display: none;">
     <div class="login-card">
       <div class="brand-large">zepto</div>
-      <div class="sub-brand">JOIN DELIVERY FLEET</div>
+      <div class="sub-brand">OFFICIAL RIDER ONBOARDING</div>
 
-      <input type="text" id="r-name" class="login-input" placeholder="आपका पूरा नाम (Full Name)">
-      <input type="tel" id="r-phone" class="login-input" placeholder="मोबाइल नंबर (10 Digit Mobile)" maxlength="10">
-      <input type="text" id="r-vehicle" class="login-input" placeholder="गाड़ी का नंबर (Bike / Scooter No)">
-      <input type="password" id="r-pin" class="login-input" placeholder="लॉगिन के लिए 4 अंकों का गुप्त PIN" maxlength="4">
+      <div class="form-group">
+        <label class="form-label">पूरा नाम (आधार कार्ड अनुसार) *</label>
+        <input type="text" id="r-name" class="login-input" placeholder="जैसे: Rahul Kumar">
+      </div>
 
-      <button class="btn-login" id="reg-btn" onclick="riderRegister()">आवेदन सबमिट करें (Apply)</button>
+      <div class="form-group">
+        <label class="form-label">सत्यापित मोबाइल नंबर *</label>
+        <input type="tel" id="r-phone" class="login-input" placeholder="10 अंकों का वैध मोबाइल नंबर" maxlength="10">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">गाड़ी का वैध नंबर (RC Number) *</label>
+        <input type="text" id="r-vehicle" class="login-input" placeholder="जैसे: UP25AB1234" style="text-transform: uppercase;">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">आधार प्रमाणित स्थायी पता *</label>
+        <textarea id="r-address" class="login-input" rows="2" placeholder="मकान नं, गली, लैंडमार्क, पिनकोड..."></textarea>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">लॉगिन हेतु 4-अंकों का गुप्त PIN बनाएं *</label>
+        <input type="password" id="r-pin" class="login-input" placeholder="4-Digit Secret PIN" maxlength="4">
+      </div>
+
+      <button class="btn-login" id="reg-btn" onclick="riderRegister()">सत्यापित करें एवं आवेदन भेजें</button>
       <div id="reg-msg" style="font-size: 12px; margin-top: 10px; font-weight: 700;"></div>
 
       <div class="switch-link" onclick="toggleAuth(true)">पहले से अकाउंट है? Login करें</div>
     </div>
   </div>
 
-  <!-- 3. RIDER DASHBOARD -->
+  <!-- 3. DASHBOARD -->
   <div id="main-dashboard" style="display: none;">
     <header>
       <div class="brand-wrap">
         <div class="brand-title">zepto</div>
         <div class="rider-badge" id="rider-name-tag">Rider</div>
       </div>
-      <div class="header-actions">
+      <div style="display: flex; align-items: center;">
         <button class="duty-btn online" id="duty-btn" onclick="toggleDuty()">
           <div class="duty-dot"></div>
           <span id="duty-text">ONLINE</span>
@@ -502,18 +223,15 @@
     </div>
   </div>
 
-  <!-- Big Siren Modal -->
+  <!-- Siren Modal -->
   <div class="incoming-overlay" id="incoming-modal">
     <div class="incoming-box">
-      <div class="siren-icon">🚨</div>
-      <h2 style="font-size: 22px; font-weight: 900; margin: 10px 0; color: var(--z-pink);">NEW ORDER ASSIGNED!</h2>
+      <div style="font-size: 50px;">🚨</div>
+      <h2 style="font-size: 20px; font-weight: 900; margin: 10px 0; color: var(--z-pink);">NEW ORDER ASSIGNED!</h2>
       <div style="font-size: 14px; color: #fff; margin-bottom: 4px;" id="inc-order-id">#ORD-00</div>
       <div style="font-size: 13px; color: var(--z-muted); margin-bottom: 14px;" id="inc-cust-name">Customer: --</div>
       <div style="font-size: 20px; font-weight: 900; color: var(--z-green); margin-bottom: 20px;" id="inc-total">₹0</div>
-
-      <button class="btn-stage btn-accept" onclick="acceptIncomingOrder()">
-        ⚡ ACCEPT & STOP SIREN
-      </button>
+      <button class="btn-stage btn-accept" onclick="acceptIncomingOrder()">⚡ ACCEPT & STOP SIREN</button>
     </div>
   </div>
 
@@ -546,52 +264,84 @@
       document.getElementById('reg-msg').innerText = '';
     }
 
-    // New Rider Registration
+    // STRICT VALIDATION ON REGISTRATION
     async function riderRegister() {
       const name = document.getElementById('r-name').value.trim();
       const phone = document.getElementById('r-phone').value.trim();
-      const vehicle = document.getElementById('r-vehicle').value.trim();
+      let vehicle = document.getElementById('r-vehicle').value.trim().toUpperCase().replace(/\s+/g, '');
+      const address = document.getElementById('r-address').value.trim();
       const pin = document.getElementById('r-pin').value.trim();
       const msg = document.getElementById('reg-msg');
       const btn = document.getElementById('reg-btn');
 
-      if (!name || !phone || !pin) {
+      // 1. Name Check (At least 3 characters)
+      if (name.length < 3) {
         msg.style.color = '#ff3269';
-        msg.innerText = 'कृपया नाम, मोबाइल नंबर और पिन भरें!';
+        msg.innerText = 'कृपया आधार कार्ड के अनुसार पूरा नाम लिखें!';
+        return;
+      }
+
+      // 2. Mobile Validation (Indian 10-digit, starts with 6-9)
+      const phoneRegex = /^[6-9]\d{9}$/;
+      if (!phoneRegex.test(phone)) {
+        msg.style.color = '#ff3269';
+        msg.innerText = 'अमान्य मोबाइल नंबर! 10 अंकों का सही नंबर डालें।';
+        return;
+      }
+
+      // 3. Vehicle Number Validation (e.g., UP25AB1234 or DL1A1234)
+      const vehicleRegex = /^[A-Z]{2}[0-9]{1,2}[A-Z]{1,3}[0-9]{4}$/;
+      if (!vehicleRegex.test(vehicle)) {
+        msg.style.color = '#ff3269';
+        msg.innerText = 'गाड़ी का नंबर गलत है! (उदा: UP25AB1234 बिना स्पेस के डालें)';
+        return;
+      }
+
+      // 4. Address Check (Minimum 15 characters for genuine address)
+      if (address.length < 15) {
+        msg.style.color = '#ff3269';
+        msg.innerText = 'कृपया आधार प्रमाणित पूरा पता लिखें (मकान, गली, पिनकोड सहित)!';
+        return;
+      }
+
+      // 5. PIN Check (Exactly 4 digits)
+      if (!/^\d{4}$/.test(pin)) {
+        msg.style.color = '#ff3269';
+        msg.innerText = 'पिन केवल 4 अंकों की संख्या होनी चाहिए!';
         return;
       }
 
       btn.disabled = true;
-      btn.innerText = 'Submitting Application...';
+      btn.innerText = 'सत्यापन किया जा रहा है...';
 
       try {
         const { error } = await _supabase.from('riders').insert([{
           rider_name: name,
           phone: phone,
           vehicle_no: vehicle,
+          address: address,
           pin: pin,
           status: 'PENDING',
           is_online: false
         }]);
 
         if (error) {
-          if (error.message.includes('unique')) throw new Error('यह मोबाइल नंबर पहले से रजिस्टर्ड है!');
+          if (error.message.includes('unique')) throw new Error('यह मोबाइल नंबर पहले से पंजीकृत है!');
           throw error;
         }
 
         msg.style.color = '#00d26a';
-        msg.innerText = '✓ आवेदन सबमिट हो गया! एडमिन द्वारा अप्रूवल मिलने के बाद आप लॉगिन कर सकेंगे।';
-        setTimeout(() => toggleAuth(true), 3000);
+        msg.innerText = '✓ विवरण सफलतापूर्वक सबमिट हुआ! एडमिन सत्यापन (Approve) के बाद आप काम शुरू कर सकेंगे।';
+        setTimeout(() => toggleAuth(true), 3500);
       } catch (e) {
         msg.style.color = '#ff3269';
         msg.innerText = e.message;
       } finally {
         btn.disabled = false;
-        btn.innerText = 'आवेदन सबमिट करें (Apply)';
+        btn.innerText = 'सत्यापित करें एवं आवेदन भेजें';
       }
     }
 
-    // Rider Login
     async function riderLogin() {
       const phone = document.getElementById('l-phone').value.trim();
       const pin = document.getElementById('l-pin').value.trim();
@@ -599,29 +349,20 @@
       const btn = document.getElementById('login-btn');
 
       if (!phone || !pin) {
-        err.innerText = 'मोबाइल नंबर और 4 अंकों का पिन डालें!';
+        err.innerText = 'मोबाइल नंबर और 4 अंकों का पिन दर्ज करें!';
         return;
       }
 
       btn.disabled = true;
-      btn.innerText = 'Verifying...';
+      btn.innerText = 'सत्यापित हो रहा है...';
 
       try {
         const { data, error } = await _supabase
-          .from('riders')
-          .select('*')
-          .eq('phone', phone)
-          .eq('pin', pin)
-          .single();
+          .from('riders').select('*').eq('phone', phone).eq('pin', pin).single();
 
-        if (error || !data) throw new Error('गलत मोबाइल नंबर या पिन!');
-
-        if (data.status === 'PENDING') {
-          throw new Error('आपकी आईडी अभी PENDING है। एडमिन द्वारा अप्रूव होने का इंतज़ार करें।');
-        }
-        if (data.status === 'REJECTED') {
-          throw new Error('आपकी आईडी को ब्लॉक/रिजेक्ट कर दिया गया है।');
-        }
+        if (error || !data) throw new Error('अमान्य मोबाइल नंबर या पिन!');
+        if (data.status === 'PENDING') throw new Error('आपकी आईडी अभी PENDING है। स्टोर एडमिन द्वारा अप्रूवल की प्रतीक्षा करें।');
+        if (data.status === 'REJECTED') throw new Error('आपकी आईडी को स्टोर द्वारा ब्लॉक कर दिया गया है।');
 
         loggedInRider = data;
         localStorage.setItem('zepto_logged_rider', JSON.stringify(data));
@@ -638,15 +379,14 @@
       document.getElementById('login-box').style.display = 'none';
       document.getElementById('reg-box').style.display = 'none';
       document.getElementById('main-dashboard').style.display = 'block';
-      document.getElementById('rider-name-tag').innerText = loggedInRider.rider_name || 'Partner';
-
+      document.getElementById('rider-name-tag').innerText = loggedInRider.rider_name;
       initAudio();
       requestWakeLock();
       initRealtime();
     }
 
     function logoutRider() {
-      if (confirm('क्या आप लॉगआउट करना चाहते हैं?')) {
+      if (confirm('क्या आप ड्यूटी लॉगआउट करना चाहते हैं?')) {
         stopSiren();
         releaseWakeLock();
         localStorage.removeItem('zepto_logged_rider');
@@ -700,17 +440,10 @@
       isOnline = !isOnline;
       const btn = document.getElementById('duty-btn');
       const text = document.getElementById('duty-text');
-
       if (isOnline) {
-        btn.className = 'duty-btn online';
-        text.innerText = 'ONLINE';
-        requestWakeLock();
-        playBeep();
+        btn.className = 'duty-btn online'; text.innerText = 'ONLINE'; requestWakeLock(); playBeep();
       } else {
-        btn.className = 'duty-btn offline';
-        text.innerText = 'OFFLINE';
-        releaseWakeLock();
-        stopSiren();
+        btn.className = 'duty-btn offline'; text.innerText = 'OFFLINE'; releaseWakeLock(); stopSiren();
       }
     }
 
@@ -723,7 +456,6 @@
           if (isOnline && (!newOrder.assigned_rider_id || newOrder.assigned_rider_id === loggedInRider.id)) {
             ordersCache.unshift(newOrder);
             renderUI();
-
             activeIncomingOrderId = newOrder.id;
             document.getElementById('inc-order-id').innerText = `Order #ORD-${newOrder.id}`;
             document.getElementById('inc-cust-name').innerText = `Customer: ${newOrder.customer_name}`;
@@ -735,10 +467,7 @@
         .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'orders' }, payload => {
           const updated = payload.new;
           const idx = ordersCache.findIndex(o => o.id === updated.id);
-          if (idx !== -1) {
-            ordersCache[idx] = updated;
-            renderUI();
-          }
+          if (idx !== -1) { ordersCache[idx] = updated; renderUI(); }
         })
         .subscribe();
     }
@@ -746,18 +475,14 @@
     async function fetchMyOrders() {
       try {
         const { data, error } = await _supabase
-          .from('orders')
-          .select('*')
+          .from('orders').select('*')
           .or(`assigned_rider_id.is.null,assigned_rider_id.eq.${loggedInRider.id}`)
           .order('id', { ascending: false });
-
         if (error) throw error;
         ordersCache = data || [];
         document.getElementById('loader').style.display = 'none';
         renderUI();
-      } catch (err) {
-        console.error(err);
-      }
+      } catch (err) { console.error(err); }
     }
 
     function switchTab(tab) {
@@ -776,13 +501,8 @@
       document.getElementById('count-delivered').innerText = delivered.length;
 
       const list = currentTab === 'active' ? active : delivered;
-
       if (list.length === 0) {
-        container.innerHTML = `
-          <div style="text-align: center; padding: 60px 0; color: var(--z-muted); font-size: 13px;">
-            ${currentTab === 'active' ? 'No active orders right now.' : 'No delivered orders in this shift.'}
-          </div>
-        `;
+        container.innerHTML = `<div style="text-align: center; padding: 60px 0; color: var(--z-muted); font-size: 13px;">${currentTab === 'active' ? 'No active orders.' : 'No delivered orders.'}</div>`;
         return;
       }
 
@@ -795,54 +515,31 @@
           ? order.items.map(i => `<div class="item-row"><span>${i.name} × ${i.qty}</span><span>₹${i.subtotal}</span></div>`).join('')
           : 'Items missing';
 
-        let badgeClass = 'badge-placed';
-        let badgeTxt = 'READY FOR PICKUP';
-        if (isPicked) { badgeClass = 'badge-picked'; badgeTxt = 'ON THE WAY'; }
-        if (isDone) { badgeClass = 'badge-delivered'; badgeTxt = 'DELIVERED'; }
+        let badgeClass = isPicked ? 'badge-picked' : (isDone ? 'badge-delivered' : 'badge-placed');
+        let badgeTxt = isPicked ? 'ON THE WAY' : (isDone ? 'DELIVERED' : 'READY FOR PICKUP');
 
         return `
-          <div class="order-card ${isNew ? 'new-alert' : ''}">
+          <div class="order-card">
             <div class="order-header">
               <div class="order-id-txt">#ORD-${order.id}</div>
               <div class="status-badge ${badgeClass}">${badgeTxt}</div>
             </div>
-
             <div class="info-card">
-              <div class="cust-name"><span>👤</span> ${order.customer_name}</div>
-              <div class="cust-loc"><span>📍</span> <span>${order.delivery_address}</span></div>
+              <div class="cust-name">👤 ${order.customer_name}</div>
+              <div class="cust-loc">📍 ${order.delivery_address}</div>
             </div>
-
             <div class="items-container">
               <div style="font-weight: 700; color: var(--z-muted); margin-bottom: 6px;">ITEMS IN BAG:</div>
               ${itemsHTML}
-              <div class="cod-bill">
-                <span>Collect Cash (COD):</span>
-                <span style="color: var(--z-green);">₹${order.total_amount}</span>
-              </div>
+              <div class="cod-bill"><span>Collect Cash (COD):</span><span style="color: var(--z-green);">₹${order.total_amount}</span></div>
             </div>
-
-            ${isPicked ? `
-              <div class="map-preview">
-                <iframe src="https://maps.google.com/maps?q=${encodeURIComponent(order.delivery_address)}&t=&z=15&ie=UTF8&iwloc=&output=embed"></iframe>
-              </div>
-            ` : ''}
-
+            ${isPicked ? `<div class="map-preview"><iframe src="https://maps.google.com/maps?q=${encodeURIComponent(order.delivery_address)}&t=&z=15&ie=UTF8&iwloc=&output=embed"></iframe></div>` : ''}
             <div class="action-grid">
               <a class="btn-call" href="tel:${order.customer_phone}">📞 Call</a>
               <a class="btn-maps" target="_blank" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(order.delivery_address)}">🗺️ Open Map</a>
             </div>
-
-            ${isNew ? `
-              <button class="btn-stage btn-accept" onclick="acceptOrderLock(${order.id})">
-                ⚡ Accept & Pick Up Order
-              </button>
-            ` : ''}
-
-            ${isPicked ? `
-              <button class="btn-stage btn-deliver" onclick="markDelivered(${order.id})">
-                ✓ Mark as Delivered
-              </button>
-            ` : ''}
+            ${isNew ? `<button class="btn-stage btn-accept" onclick="acceptOrderLock(${order.id})">⚡ Accept & Pick Up Order</button>` : ''}
+            ${isPicked ? `<button class="btn-stage btn-deliver" onclick="markDelivered(${order.id})">✓ Mark as Delivered</button>` : ''}
           </div>
         `;
       }).join('');
@@ -850,36 +547,13 @@
 
     async function acceptOrderLock(orderId) {
       stopSiren();
-      try {
-        const { error } = await _supabase
-          .from('orders')
-          .update({
-            status: 'Out for Delivery',
-            assigned_rider_id: loggedInRider.id
-          })
-          .eq('id', orderId);
-
-        if (error) throw error;
-        await fetchMyOrders();
-      } catch (e) {
-        alert('Update error: ' + e.message);
-      }
+      await _supabase.from('orders').update({ status: 'Out for Delivery', assigned_rider_id: loggedInRider.id }).eq('id', orderId);
+      await fetchMyOrders();
     }
-
     async function markDelivered(orderId) {
-      try {
-        const { error } = await _supabase
-          .from('orders')
-          .update({ status: 'Delivered' })
-          .eq('id', orderId);
-
-        if (error) throw error;
-        await fetchMyOrders();
-      } catch (e) {
-        alert('Delivered error: ' + e.message);
-      }
+      await _supabase.from('orders').update({ status: 'Delivered' }).eq('id', orderId);
+      await fetchMyOrders();
     }
-
     async function acceptIncomingOrder() {
       document.getElementById('incoming-modal').style.display = 'none';
       stopSiren();
