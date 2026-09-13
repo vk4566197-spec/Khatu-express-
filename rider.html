@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Khatu Express - Rider Partner</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+    body {
+      background-color: #f1f5f9;
+      color: #0f172a;
+      padding-bottom: 30px;
+    }
+    header {
+      background-color: #0f172a;
+      color: #38bdf8;
+      padding: 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    }
+    header h1 {
+      font-size: 18px;
+      font-weight: 800;
+      color: white;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .badge {
+      background: #22c55e;
+      color: white;
+      font-size: 11px;
+      padding: 3px 8px;
+      border-radius: 12px;
+      font-weight: 700;
+    }
+    .refresh-btn {
+      background: #334155;
+      color: white;
+      border: none;
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 12px;
+      cursor: pointer;
+      font-weight: 600;
+    }
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 14px;
+    }
+    .order-card {
+      background: white;
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 14px;
+      border: 1px solid #e2e8f0;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.04);
+    }
+    .order-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px dashed #e2e8f0;
+      padding-bottom: 10px;
+      margin-bottom: 12px;
+    }
+    .order-id {
+      font-weight: 800;
+      font-size: 15px;
+      color: #0f172a;
+    }
+    .order-status {
+      font-size: 11px;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 20px;
+      text-transform: uppercase;
+    }
+    .status-placed { background: #fef3c7; color: #b45309; }
+    .status-picked { background: #e0f2fe; color: #0369a1; }
+    .status-delivered { background: #dcfce7; color: #15803d; }
+
+    .cust-info {
+      margin-bottom: 12px;
+    }
+    .cust-name {
+      font-size: 15px;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+    .cust-address {
+      font-size: 13px;
+      color: #475569;
+      line-height: 1.4;
+      background: #f8fafc;
+      padding: 8px 10px;
+      border-radius: 6px;
+      margin-top: 6px;
+      border-left: 3px solid #0c831f;
+    }
+    .items-box {
+      background: #f8fafc;
+      border-radius: 8px;
+      padding: 10px;
+      font-size: 13px;
+      margin-bottom: 12px;
+    }
+    .item-line {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 4px;
+    }
+    .total-bill {
+      display: flex;
+      justify-content: space-between;
+      font-weight: 800;
+      font-size: 15px;
+      margin-top: 8px;
+      padding-top: 8px;
+      border-top: 1px solid #e2e8f0;
+    }
+
+    .action-row {
+      display: flex;
+      gap: 8px;
+      margin-top: 12px;
+    }
+    .btn-call {
+      flex: 1;
+      background: #0284c7;
+      color: white;
+      text-decoration: none;
+      padding: 10px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 700;
+      text-align: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+    .btn-map {
+      flex: 1;
+      background: #0f172a;
+      color: white;
+      text-decoration: none;
+      padding: 10px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 700;
+      text-align: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+    .status-select {
+      width: 100%;
+      padding: 10px;
+      border-radius: 8px;
+      border: 1px solid #cbd5e1;
+      font-size: 13px;
+      font-weight: 700;
+      background: white;
+      margin-top: 10px;
+      outline: none;
+      cursor: pointer;
+    }
+    .empty-msg {
+      text-align: center;
+      color: #64748b;
+      margin-top: 40px;
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>🛵 Khatu Rider <span class="badge">LIVE</span></h1>
+    <button class="refresh-btn" onclick="fetchOrders()">🔄 Refresh</button>
+  </header>
+
+  <div class="container">
+    <div id="loader" class="empty-msg">ऑर्डर्स लोड हो रहे हैं...</div>
+    <div id="orders-container"></div>
+  </div>
+
+  <script>
+    const SUPABASE_URL = 'https://mpeikimhkjuinqkjaumr.supabase.co';
+    const SUPABASE_KEY = 'sb_publishable_2_wD-pbi_pNf8niiHxFbYA_saCIhApN';
+
+    const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    async function fetchOrders() {
+      const loader = document.getElementById('loader');
+      const container = document.getElementById('orders-container');
+
+      try {
+        const { data, error } = await _supabase
+          .from('orders')
+          .select('*')
+          .order('id', { ascending: false });
+
+        if (error) throw error;
+
+        loader.style.display = 'none';
+
+        if (!data || data.length === 0) {
+          container.innerHTML = '<div class="empty-msg">अभी कोई नया ऑर्डर नहीं है।</div>';
+          return;
+        }
+
+        container.innerHTML = data.map(order => {
+          const itemsList = Array.isArray(order.items) 
+            ? order.items.map(i => `<div class="item-line"><span>${i.name} × ${i.qty}</span><span>₹${i.subtotal}</span></div>`).join('')
+            : 'सामान की जानकारी उपलब्ध नहीं';
+
+          let statusClass = 'status-placed';
+          if (order.status === 'Out for Delivery' || order.status === 'Picked Up') statusClass = 'status-picked';
+          if (order.status === 'Delivered') statusClass = 'status-delivered';
+
+          return `
+            <div class="order-card">
+              <div class="order-top">
+                <div class="order-id">Order #${order.id}</div>
+                <div class="order-status ${statusClass}">${order.status}</div>
+              </div>
+
+              <div class="cust-info">
+                <div class="cust-name">👤 ${order.customer_name}</div>
+                <div class="cust-address">📍 <b>Delivery Address:</b><br>${order.delivery_address}</div>
+              </div>
+
+              <div class="items-box">
+                <div style="font-weight:700; margin-bottom: 6px; color:#64748b;">ऑर्डर का सामान:</div>
+                ${itemsList}
+                <div class="total-bill">
+                  <span>Cash on Delivery:</span>
+                  <span style="color:#0c831f;">₹${order.total_amount}</span>
+                </div>
+              </div>
+
+              <div class="action-row">
+                <a class="btn-call" href="tel:${order.customer_phone}">📞 Call Customer</a>
+                <a class="btn-map" target="_blank" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(order.delivery_address)}">🗺️ Maps</a>
+              </div>
+
+              <select class="status-select" onchange="updateOrderStatus(${order.id}, this.value)">
+                <option value="" disabled selected>स्थिति बदलें (Update Status)</option>
+                <option value="Order Placed" ${order.status === 'Order Placed' ? 'selected' : ''}>Order Placed (नया ऑर्डर)</option>
+                <option value="Out for Delivery" ${order.status === 'Out for Delivery' ? 'selected' : ''}>Out for Delivery (रास्ते में)</option>
+                <option value="Delivered" ${order.status === 'Delivered' ? 'selected' : ''}>Delivered (सफलतापूर्वक दिया)</option>
+              </select>
+            </div>
+          `;
+        }).join('');
+
+      } catch (err) {
+        loader.innerText = 'ऑर्डर्स लोड करने में समस्या: ' + err.message;
+      }
+    }
+
+    async function updateOrderStatus(orderId, newStatus) {
+      try {
+        const { error } = await _supabase
+          .from('orders')
+          .update({ status: newStatus })
+          .eq('id', orderId);
+
+        if (error) throw error;
+        alert(`Order #${orderId} का स्टेटस '${newStatus}' कर दिया गया है!`);
+        fetchOrders();
+      } catch (err) {
+        alert('स्टेटस अपडेट नहीं हो पाया: ' + err.message);
+      }
+    }
+
+    // 10 सेकंड में ऑटो-रिफ्रेश ताकि नए ऑर्डर तुरंत दिखें
+    setInterval(fetchOrders, 10000);
+
+    fetchOrders();
+  </script>
+</body>
+</html>
