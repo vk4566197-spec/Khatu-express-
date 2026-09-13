@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Zepto Store Control Panel (Admin)</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0d0118;
+      --card: #1b052f;
+      --card-alt: #260942;
+      --pink: #ff3269;
+      --green: #00d26a;
+      --yellow: #ffc727;
+      --border: #3c0c66;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
+    body { background: var(--bg); color: #fff; padding: 20px 14px; max-width: 900px; margin: 0 auto; }
+    
+    header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; padding-bottom: 14px; border-bottom: 1px solid var(--border); }
+    .logo { font-size: 24px; font-weight: 900; background: linear-gradient(90deg, #ff3269, #ff758c); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .badge-admin { background: #3c0c66; color: #38bdf8; font-size: 11px; padding: 4px 10px; border-radius: 6px; font-weight: 800; }
+    
+    .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 24px; }
+    .stat-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 14px; text-align: center; }
+    .stat-val { font-size: 22px; font-weight: 900; margin-top: 4px; }
+
+    .section-title { font-size: 16px; font-weight: 800; margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between; }
+    
+    .rider-card { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 14px; margin-bottom: 12px; display: flex; flex-direction: column; gap: 8px; }
+    .rider-head { display: flex; justify-content: space-between; align-items: center; }
+    .rider-name { font-size: 15px; font-weight: 800; }
+    .tag { font-size: 10px; font-weight: 800; padding: 3px 8px; border-radius: 12px; }
+    .tag-pending { background: rgba(255,199,39,0.15); color: var(--yellow); border: 1px solid var(--yellow); }
+    .tag-approved { background: rgba(0,210,106,0.15); color: var(--green); border: 1px solid var(--green); }
+    
+    .rider-details { font-size: 12px; color: #a193b8; display: flex; gap: 14px; flex-wrap: wrap; }
+    .btn-row { display: flex; gap: 8px; margin-top: 6px; }
+    .btn-action { flex: 1; padding: 9px; border-radius: 8px; border: none; font-size: 12px; font-weight: 800; cursor: pointer; }
+    .btn-approve { background: var(--green); color: #000; }
+    .btn-reject { background: #334155; color: #ff3269; border: 1px solid #475569; }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div style="display: flex; align-items: center; gap: 8px;">
+      <span class="logo">zepto</span>
+      <span class="badge-admin">STORE ADMIN PANEL</span>
+    </div>
+    <button onclick="loadAdminData()" style="background:none; border:none; color:#38bdf8; font-weight:bold; font-size:12px; cursor:pointer;">🔄 Refresh</button>
+  </header>
+
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div style="font-size: 11px; color: #a193b8;">Pending Approvals</div>
+      <div class="stat-val" style="color: var(--yellow);" id="stat-pending">0</div>
+    </div>
+    <div class="stat-card">
+      <div style="font-size: 11px; color: #a193b8;">Approved Riders</div>
+      <div class="stat-val" style="color: var(--green);" id="stat-approved">0</div>
+    </div>
+    <div class="stat-card">
+      <div style="font-size: 11px; color: #a193b8;">Active Orders</div>
+      <div class="stat-val" style="color: var(--pink);" id="stat-orders">0</div>
+    </div>
+  </div>
+
+  <div class="section-title">
+    <span>🛵 Delivery Partner Requests & Status</span>
+  </div>
+  <div id="riders-list">डेटा लोड हो रहा है...</div>
+
+  <script>
+    const SUPABASE_URL = 'https://mpeikimhkjuinqkjaumr.supabase.co';
+    const SUPABASE_KEY = 'sb_publishable_2_wD-pbi_pNf8niiHxFbYA_saCIhApN';
+    const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    async function loadAdminData() {
+      const { data: riders } = await _supabase.from('riders').select('*').order('id', { ascending: false });
+      const { data: orders } = await _supabase.from('orders').select('id, status').neq('status', 'Delivered');
+
+      document.getElementById('stat-orders').innerText = orders?.length || 0;
+      if (!riders) return;
+
+      const pending = riders.filter(r => r.status === 'PENDING');
+      const approved = riders.filter(r => r.status === 'APPROVED');
+
+      document.getElementById('stat-pending').innerText = pending.length;
+      document.getElementById('stat-approved').innerText = approved.length;
+
+      const container = document.getElementById('riders-list');
+      if (riders.length === 0) {
+        container.innerHTML = '<div style="color: #64748b; font-size: 13px;">कोई राइडर नहीं मिला।</div>';
+        return;
+      }
+
+      container.innerHTML = riders.map(r => {
+        const isPending = r.status === 'PENDING';
+        return `
+          <div class="rider-card">
+            <div class="rider-head">
+              <div class="rider-name">${r.rider_name}</div>
+              <div class="tag ${isPending ? 'tag-pending' : 'tag-approved'}">
+                ${isPending ? 'PENDING APPROVAL' : 'APPROVED & ACTIVE'}
+              </div>
+            </div>
+            <div class="rider-details">
+              <span>📞 ${r.phone}</span>
+              <span>🔑 PIN: ${r.pin}</span>
+              <span>🛵 Bike: ${r.vehicle_no || 'Not Given'}</span>
+              <span>⚡ Status: ${r.is_online ? '🟢 Online' : '⚪ Offline'}</span>
+            </div>
+            <div class="btn-row">
+              ${isPending ? `
+                <button class="btn-action btn-approve" onclick="updateRiderStatus(${r.id}, 'APPROVED')">✓ काम पर रखें (Approve ID)</button>
+                <button class="btn-action btn-reject" onclick="updateRiderStatus(${r.id}, 'REJECTED')">✕ Reject</button>
+              ` : `
+                <button class="btn-action btn-reject" onclick="updateRiderStatus(${r.id}, 'PENDING')">🚫 Block / Suspend ID</button>
+              `}
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    async function updateRiderStatus(id, newStatus) {
+      await _supabase.from('riders').update({ status: newStatus }).eq('id', id);
+      loadAdminData();
+    }
+
+    loadAdminData();
+  </script>
+</body>
+</html>
