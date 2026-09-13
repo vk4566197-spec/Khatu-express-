@@ -4,11 +4,28 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Zepto | 10 Min Grocery Delivery</title>
+
+  <!-- PWA Install Setup -->
+  <link rel="manifest" href="manifest-customer.json">
+  <meta name="theme-color" content="#3c006b">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('sw.js')
+          .then(reg => console.log('Customer SW Registered!', reg))
+          .catch(err => console.log('Customer SW Registration Failed:', err));
+      });
+    }
+  </script>
+
   <!-- Supabase CDN -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <!-- Google Fonts: Inter -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  
   <style>
     :root {
       --zepto-purple: #3c006b;
@@ -27,7 +44,7 @@
       box-sizing: border-box;
       margin: 0;
       padding: 0;
-      font-family: 'Inter', -apple-system, sans-serif;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       -webkit-tap-highlight-color: transparent;
     }
 
@@ -159,7 +176,7 @@
       padding: 14px 12px;
     }
 
-    /* Grid Items (Zepto Card Style) */
+    /* Product Grid */
     .grid {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
@@ -259,7 +276,7 @@
       cursor: pointer;
     }
 
-    /* Past Orders Section (Max 4 FIFO) */
+    /* Past Orders (Max 4 FIFO) */
     .history-section {
       margin-top: 25px;
       border-top: 1px solid #e2e8f0;
@@ -284,9 +301,7 @@
       justify-content: space-between;
       align-items: center;
     }
-    .hist-info {
-      flex: 1;
-    }
+    .hist-info { flex: 1; }
     .hist-id {
       font-size: 12px;
       font-weight: 800;
@@ -332,7 +347,7 @@
       white-space: nowrap;
     }
 
-    /* Zepto Floating Cart Bar */
+    /* Floating Cart Bar */
     .floating-cart-bar {
       position: fixed;
       bottom: 16px;
@@ -356,23 +371,11 @@
       from { transform: translateY(40px); opacity: 0; }
       to { transform: translateY(0); opacity: 1; }
     }
-    .cart-summary-text {
-      font-size: 13px;
-      font-weight: 700;
-    }
-    .cart-amount {
-      font-size: 16px;
-      font-weight: 900;
-    }
-    .view-cart-link {
-      font-size: 13px;
-      font-weight: 800;
-      display: flex;
-      align-items: center;
-      gap: 4px;
-    }
+    .cart-summary-text { font-size: 13px; font-weight: 700; }
+    .cart-amount { font-size: 16px; font-weight: 900; }
+    .view-cart-link { font-size: 13px; font-weight: 800; display: flex; align-items: center; gap: 4px; }
 
-    /* Bottom Sheets (Modal) */
+    /* Modals / Bottom Sheets */
     .modal-overlay {
       position: fixed;
       top: 0;
@@ -406,11 +409,7 @@
       padding-bottom: 10px;
       border-bottom: 1px solid var(--border-color);
     }
-    .sheet-title {
-      font-size: 16px;
-      font-weight: 800;
-      color: var(--zepto-dark);
-    }
+    .sheet-title { font-size: 16px; font-weight: 800; color: var(--zepto-dark); }
     .sheet-close {
       background: #f1f3f6;
       border: none;
@@ -421,7 +420,6 @@
       cursor: pointer;
     }
 
-    /* Cart Items in Sheet */
     .cart-item-row {
       display: flex;
       justify-content: space-between;
@@ -436,11 +434,7 @@
       margin: 14px 0;
       font-size: 13px;
     }
-    .bill-row {
-      display: flex;
-      justify-content: space-between;
-      margin-bottom: 6px;
-    }
+    .bill-row { display: flex; justify-content: space-between; margin-bottom: 6px; }
     .bill-row.total {
       font-weight: 900;
       font-size: 15px;
@@ -450,13 +444,7 @@
       color: #0f172a;
     }
 
-    /* Inputs */
-    .input-group {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      margin-top: 10px;
-    }
+    .input-group { display: flex; flex-direction: column; gap: 10px; margin-top: 10px; }
     .zepto-input {
       width: 100%;
       padding: 12px;
@@ -465,9 +453,7 @@
       font-size: 13px;
       outline: none;
     }
-    .zepto-input:focus {
-      border-color: var(--zepto-purple);
-    }
+    .zepto-input:focus { border-color: var(--zepto-purple); }
     .btn-checkout {
       background: linear-gradient(90deg, #ff3269, #e01d51);
       color: white;
@@ -481,10 +467,7 @@
       margin-top: 14px;
       box-shadow: 0 4px 14px rgba(255, 50, 105, 0.3);
     }
-    .btn-checkout:disabled {
-      background: #cbd5e1;
-      box-shadow: none;
-    }
+    .btn-checkout:disabled { background: #cbd5e1; box-shadow: none; }
 
     /* Live Tracking Header Bar */
     .live-track-banner {
@@ -544,7 +527,7 @@
 </head>
 <body>
 
-  <!-- Zepto Brand Header -->
+  <!-- Zepto Top Header -->
   <header>
     <div class="top-bar">
       <div class="brand-box">
@@ -561,7 +544,7 @@
     </div>
   </header>
 
-  <!-- Categories Horizontal Filter -->
+  <!-- Categories Horizontal Bar -->
   <div class="cat-bar" id="category-chips">
     <div class="cat-chip active" onclick="setCategory('All', this)">All Items</div>
   </div>
@@ -585,7 +568,7 @@
     </div>
     <div class="grid" id="product-list"></div>
 
-    <!-- Past Orders Section (Max 4 Record FIFO) -->
+    <!-- Past Orders Section (Max 4 FIFO) -->
     <div class="history-section" id="past-orders-section">
       <div class="section-title">
         <span>🕒</span> Recent Orders (Last 4)
@@ -677,7 +660,6 @@
     let selectedCat = 'All';
     let currentOrderId = localStorage.getItem('zepto_active_order') || null;
 
-    // Load App
     async function initApp() {
       renderPastOrdersUI();
       try {
@@ -851,7 +833,6 @@
       document.getElementById('bill-grand-total').innerText = `₹${total}`;
     }
 
-    // Place Order to Supabase
     async function placeOrder() {
       const name = document.getElementById('c-name').value.trim();
       const phone = document.getElementById('c-phone').value.trim();
@@ -892,7 +873,6 @@
         currentOrderId = newOrder.id;
         localStorage.setItem('zepto_active_order', newOrder.id);
 
-        // Save into Past Orders (Max 4 FIFO)
         saveOrderToHistory({
           id: newOrder.id,
           total_amount: totalAmount,
@@ -900,7 +880,6 @@
           date: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
         });
 
-        // Reset Cart
         cart = {};
         updateCartBar();
         renderProducts(allProducts);
@@ -909,7 +888,6 @@
         btn.disabled = false;
         btn.innerText = 'Place Delivery Order';
 
-        // Start Live Tracking
         startTracking(newOrder.id);
         openTrackModal();
 
@@ -920,12 +898,11 @@
       }
     }
 
-    // Past Orders FIFO (Max 4) Logic
     function saveOrderToHistory(orderObj) {
       let history = JSON.parse(localStorage.getItem('zepto_order_history') || '[]');
-      history.unshift(orderObj); // नया ऑर्डर सबसे ऊपर जोड़ें
+      history.unshift(orderObj);
       if (history.length > 4) {
-        history = history.slice(0, 4); // केवल अंतिम 4 ऑर्डर रखें, पुराना हटा दें
+        history = history.slice(0, 4);
       }
       localStorage.setItem('zepto_order_history', JSON.stringify(history));
       renderPastOrdersUI();
@@ -957,9 +934,8 @@
       }).join('');
     }
 
-    // 1-Click Repeat Order (Re-order)
     function repeatOrder(items) {
-      cart = {}; // कार्ट रीसेट करें
+      cart = {};
       items.forEach(oldItem => {
         const product = allProducts.find(p => p.id === oldItem.id) || {
           id: oldItem.id,
@@ -973,10 +949,9 @@
 
       renderProducts(allProducts);
       updateCartBar();
-      openCartModal(); // सीधे चेकआउट विंडो खोलें
+      openCartModal();
     }
 
-    // Live Tracking Polling
     function startTracking(orderId) {
       document.getElementById('live-order-banner').style.display = 'flex';
       document.getElementById('t-order-id').innerText = `Order #${orderId}`;
