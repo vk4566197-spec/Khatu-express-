@@ -3,164 +3,173 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Zepto Store Control Panel (Admin)</title>
+  <title>👑 Admin Control Panel | BABA FOOD DELIVERY🏹</title>
+  <link rel="icon" type="image/png" href="logo.png">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
   <style>
     :root {
-      --bg: #0b0114;
-      --card: #180429;
-      --card-alt: #23083b;
+      --primary: #3c006b;
       --pink: #ff3269;
-      --green: #00d26a;
-      --yellow: #ffc727;
-      --blue: #38bdf8;
-      --border: #380b59;
-      --text-muted: #a493b8;
+      --green: #0c831f;
+      --bg: #f8fafc;
+      --card-bg: #ffffff;
+      --border: #e2e8f0;
+      --text: #0f172a;
+      --muted: #64748b;
     }
+
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
-    body { background: var(--bg); color: #fff; padding: 18px 14px 60px 14px; max-width: 900px; margin: 0 auto; }
-    
-    header {
-      display: flex; justify-content: space-between; align-items: center;
-      margin-bottom: 20px; padding-bottom: 14px; border-bottom: 1px solid var(--border);
+    body { background-color: var(--bg); color: var(--text); padding-bottom: 60px; }
+
+    /* Header */
+    .admin-header {
+      background: linear-gradient(135deg, var(--primary), #1e0038);
+      color: white; padding: 18px 20px; display: flex; justify-content: space-between; align-items: center;
+      position: sticky; top: 0; z-index: 100; box-shadow: 0 4px 12px rgba(0,0,0,0.15);
     }
-    .logo {
-      font-size: 24px; font-weight: 900;
-      background: linear-gradient(90deg, #ff3269, #ff758c);
-      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-    }
-    .badge-admin {
-      background: #380b59; color: var(--blue); font-size: 11px;
-      padding: 4px 10px; border-radius: 6px; font-weight: 800; letter-spacing: 0.5px;
-    }
-    .btn-refresh {
-      background: #23083b; border: 1px solid var(--border); color: var(--blue);
-      padding: 6px 12px; border-radius: 8px; font-weight: 700; font-size: 12px; cursor: pointer;
+    .header-left { display: flex; align-items: center; gap: 12px; }
+    .brand-logo { width: 44px; height: 44px; border-radius: 50%; border: 2px solid #ff758c; object-fit: cover; background: #fff; }
+    .brand-title { font-size: 16px; font-weight: 900; color: #fff; }
+    .brand-subtitle { font-size: 11px; color: #fdf4ff; }
+    .refresh-btn {
+      background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3);
+      color: white; padding: 8px 14px; border-radius: 8px; font-weight: 700; font-size: 12px; cursor: pointer;
     }
 
-    /* Top Stats */
-    .stats-title { font-size: 12px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; margin-bottom: 10px; }
-    .stats-grid {
-      display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 14px;
-    }
-    @media (min-width: 600px) {
-      .stats-grid { grid-template-columns: repeat(4, 1fr); }
-    }
-    .stat-card {
-      background: var(--card); border: 1px solid var(--border); border-radius: 12px;
-      padding: 14px 12px; text-align: left; position: relative;
-    }
-    .stat-card.highlight { border-color: var(--pink); box-shadow: 0 0 15px rgba(255, 50, 105, 0.15); }
-    .stat-lbl { font-size: 11px; color: var(--text-muted); font-weight: 600; }
-    .stat-val { font-size: 24px; font-weight: 900; margin-top: 4px; }
-    .stat-sub { font-size: 10px; color: #64748b; margin-top: 2px; }
+    .container { max-width: 1000px; margin: 20px auto; padding: 0 16px; }
 
-    /* Tabs */
-    .tabs-bar {
-      display: flex; gap: 8px; margin-bottom: 16px; border-bottom: 1px solid var(--border); padding-bottom: 10px;
+    /* Metrics Summary Cards */
+    .metrics-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 20px; }
+    .m-card {
+      background: var(--card-bg); padding: 14px; border-radius: 12px; border: 1px solid var(--border);
+      text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.02);
     }
+    .m-val { font-size: 22px; font-weight: 900; color: var(--primary); }
+    .m-label { font-size: 11px; font-weight: 700; color: var(--muted); margin-top: 4px; }
+
+    /* Filter Tabs */
+    .tabs-wrap {
+      display: flex; gap: 10px; overflow-x: auto; scrollbar-width: none;
+      background: #fff; padding: 8px; border-radius: 12px; border: 1px solid var(--border); margin-bottom: 20px;
+    }
+    .tabs-wrap::-webkit-scrollbar { display: none; }
     .tab-btn {
-      background: var(--card); border: 1px solid var(--border); color: var(--text-muted);
-      padding: 8px 16px; border-radius: 20px; font-size: 12px; font-weight: 800; cursor: pointer;
+      flex: 1; min-width: 110px; padding: 10px 14px; border-radius: 8px; border: none;
+      background: transparent; font-size: 13px; font-weight: 800; color: var(--muted); cursor: pointer; text-align: center;
+      transition: all 0.2s;
     }
     .tab-btn.active {
-      background: var(--pink); border-color: var(--pink); color: #fff;
+      background: var(--primary); color: #fff; box-shadow: 0 4px 10px rgba(60, 0, 107, 0.2);
     }
 
-    /* Orders List */
-    .order-row {
-      background: var(--card); border: 1px solid var(--border); border-radius: 14px;
-      padding: 14px; margin-bottom: 12px; position: relative;
-    }
-    .order-top {
-      display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;
-    }
-    .order-seq-badge {
-      background: rgba(255, 50, 105, 0.15); color: var(--pink);
-      border: 1px solid var(--pink); font-size: 11px; font-weight: 900;
-      padding: 3px 8px; border-radius: 6px; margin-right: 6px;
-    }
-    .tag-status {
-      font-size: 10px; font-weight: 800; padding: 3px 8px; border-radius: 12px; text-transform: uppercase;
-    }
-    .tag-placed { background: rgba(255,199,39,0.15); color: var(--yellow); border: 1px solid var(--yellow); }
-    .tag-picked { background: rgba(56,189,248,0.15); color: var(--blue); border: 1px solid var(--blue); }
-    .tag-done { background: rgba(0,210,106,0.15); color: var(--green); border: 1px solid var(--green); }
-
-    .order-box {
-      background: rgba(0,0,0,0.25); border-radius: 10px; padding: 10px 12px; font-size: 12px; line-height: 1.5; color: #d1d5db;
-    }
-    .order-items-list {
-      margin-top: 6px; padding-top: 6px; border-top: 1px dashed #334155; color: #94a3b8; font-size: 11px;
+    /* Date Header */
+    .date-divider {
+      background: #e2e8f0; color: #334155; font-size: 12px; font-weight: 800;
+      padding: 6px 14px; border-radius: 20px; display: inline-block; margin: 18px 0 12px 0;
     }
 
-    /* Rider Cards */
-    .rider-card {
-      background: var(--card); border: 1px solid var(--border); border-radius: 14px;
-      padding: 14px; margin-bottom: 12px;
+    /* Order Card */
+    .order-card {
+      background: var(--card-bg); border-radius: 14px; border: 1px solid var(--border);
+      padding: 16px; margin-bottom: 14px; box-shadow: 0 2px 8px rgba(0,0,0,0.04);
     }
-    .rider-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+    .card-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
+    .order-num { font-size: 14px; font-weight: 900; color: var(--text); }
+    .order-time { font-size: 11px; color: var(--muted); }
+    
+    .status-badge {
+      font-size: 11px; font-weight: 800; padding: 4px 10px; border-radius: 20px; text-transform: uppercase;
+    }
+    .status-pending { background: #fef3c7; color: #b45309; }
+    .status-running { background: #e0f2fe; color: #0369a1; }
+    .status-delivered { background: #dcfce7; color: #15803d; }
+    .status-upi { background: #f3e8ff; color: #6b21a8; }
+
+    .cust-info {
+      background: #f8fafc; border-radius: 10px; padding: 10px 12px; margin: 10px 0;
+      font-size: 12px; line-height: 1.6; border: 1px solid #edf2f7;
+    }
+    .cust-name { font-weight: 800; color: #1e293b; font-size: 13px; }
+
+    .items-list { font-size: 13px; color: #334155; margin: 12px 0; padding-left: 6px; }
+    .item-line { display: flex; justify-content: space-between; padding: 4px 0; border-bottom: 1px dashed #f1f5f9; }
+
+    .utr-tag {
+      display: inline-block; background: #faf5ff; border: 1px solid #d8b4fe;
+      color: #6b21a8; padding: 3px 8px; border-radius: 6px; font-weight: 800; font-size: 11px; margin-top: 6px;
+    }
+
+    .card-actions {
+      display: flex; gap: 8px; margin-top: 14px; flex-wrap: wrap; align-items: center;
+      padding-top: 12px; border-top: 1px solid #f1f5f9;
+    }
     .btn-action {
-      flex: 1; padding: 9px; border-radius: 8px; border: none; font-size: 12px; font-weight: 800; cursor: pointer;
+      padding: 8px 14px; border-radius: 8px; border: none; font-size: 12px;
+      font-weight: 800; cursor: pointer; display: flex; align-items: center; gap: 4px;
     }
-    .btn-approve { background: var(--green); color: #000; }
-    .btn-reject { background: #334155; color: var(--pink); border: 1px solid #475569; }
+    .btn-pack { background: #0284c7; color: white; }
+    .btn-deliver { background: var(--green); color: white; }
+    .btn-delete {
+      background: #fee2e2; color: #dc2626; border: 1px solid #fca5a5;
+      margin-left: auto;
+    }
+    .btn-delete:hover { background: #dc2626; color: white; }
+
+    @media (max-width: 600px) {
+      .metrics-row { grid-template-columns: repeat(2, 1fr); }
+      .btn-delete { margin-left: 0; width: 100%; justify-content: center; }
+    }
   </style>
 </head>
 <body>
 
-  <header>
-    <div style="display: flex; align-items: center; gap: 8px;">
-      <span class="logo">zepto</span>
-      <span class="badge-admin">HQ CONTROL PANEL</span>
+  <div class="admin-header">
+    <div class="header-left">
+      <img class="brand-logo" src="logo.png" alt="Logo" onerror="this.style.display='none'">
+      <div>
+        <div class="brand-title">👑 𝐁𝐀𝐁𝐀 𝐅𝐎𝐎𝐃 🏹</div>
+        <div class="brand-subtitle">Live Admin & Order Controller</div>
+      </div>
     </div>
-    <button class="btn-refresh" onclick="loadDashboard()">🔄 Refresh Data</button>
-  </header>
-
-  <!-- Metric Overview -->
-  <div class="stats-title">📊 आज का रिपोर्ट कार्ड (Today's Live Counters)</div>
-  <div class="stats-grid">
-    <div class="stat-card highlight">
-      <div class="stat-lbl">आज के कुल ऑर्डर</div>
-      <div class="stat-val" style="color: var(--pink);" id="stat-today-count">0</div>
-      <div class="stat-sub" id="stat-today-total">Total: ₹0</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-lbl">आज डिलीवर हुए</div>
-      <div class="stat-val" style="color: var(--green);" id="stat-today-delivered">0</div>
-      <div class="stat-sub">सफलतापूर्वक पूर्ण</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-lbl">रास्ते में / तैयार (Active)</div>
-      <div class="stat-val" style="color: var(--yellow);" id="stat-today-active">0</div>
-      <div class="stat-sub">चल रहे ऑर्डर्स</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-lbl">पेंडिंग राइडर सत्यापन</div>
-      <div class="stat-val" style="color: var(--blue);" id="stat-riders-pending">0</div>
-      <div class="stat-sub" id="stat-riders-approved">0 Approved</div>
-    </div>
+    <button class="refresh-btn" onclick="fetchOrders()">🔄 Refresh</button>
   </div>
 
-  <!-- Tabs Navigation -->
-  <div class="tabs-bar">
-    <button class="tab-btn active" id="tab-btn-orders" onclick="switchView('orders')">
-      📦 आज के ऑर्डर्स (<span id="tab-count-orders">0</span>)
-    </button>
-    <button class="tab-btn" id="tab-btn-riders" onclick="switchView('riders')">
-      🛵 राइडर सत्यापन (<span id="tab-count-riders">0</span>)
-    </button>
-  </div>
+  <div class="container">
+    <!-- Live Numbers -->
+    <div class="metrics-row">
+      <div class="m-card">
+        <div class="m-val" id="cnt-all">0</div>
+        <div class="m-label">Total (4 Days)</div>
+      </div>
+      <div class="m-card">
+        <div class="m-val" id="cnt-pending" style="color: #b45309;">0</div>
+        <div class="m-label">Pending / New</div>
+      </div>
+      <div class="m-card">
+        <div class="m-val" id="cnt-running" style="color: #0369a1;">0</div>
+        <div class="m-label">Running 🛵</div>
+      </div>
+      <div class="m-card">
+        <div class="m-val" id="cnt-delivered" style="color: var(--green);">0</div>
+        <div class="m-label">Delivered 🎉</div>
+      </div>
+    </div>
 
-  <!-- Tab 1: Today's Orders with Counting -->
-  <div id="view-orders">
-    <div id="orders-list" style="font-size: 13px; color: var(--text-muted);">डेटा लोड हो रहा है...</div>
-  </div>
+    <!-- Filter Tabs (Pending, Running, Delivered, All) -->
+    <div class="tabs-wrap">
+      <button class="tab-btn active" onclick="switchTab('ALL', this)">All Orders</button>
+      <button class="tab-btn" onclick="switchTab('PENDING', this)">⏳ Pending</button>
+      <button class="tab-btn" onclick="switchTab('RUNNING', this)">🛵 Running</button>
+      <button class="tab-btn" onclick="switchTab('DELIVERED', this)">✅ Delivered</button>
+    </div>
 
-  <!-- Tab 2: Rider Verification -->
-  <div id="view-riders" style="display: none;">
-    <div id="riders-list" style="font-size: 13px; color: var(--text-muted);">राइडर्स लोड हो रहे हैं...</div>
+    <!-- Orders Feed Grouped by Date -->
+    <div id="orders-container">
+      <div style="text-align: center; color: var(--muted); padding: 40px;">ऑर्डर्स लोड हो रहे हैं...</div>
+    </div>
   </div>
 
   <script>
@@ -168,166 +177,202 @@
     const SUPABASE_KEY = 'sb_publishable_2_wD-pbi_pNf8niiHxFbYA_saCIhApN';
     const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    let allOrders = [];
-    let allRiders = [];
-    let currentView = 'orders';
+    let rawOrders = [];
+    let currentTab = 'ALL';
 
-    async function loadDashboard() {
+    async function fetchOrders() {
       try {
-        const { data: orders } = await _supabase
+        // पिछले 4 दिनों की सीमा तय करें
+        const fourDaysAgo = new Date();
+        fourDaysAgo.setDate(fourDaysAgo.getDate() - 4);
+        fourDaysAgo.setHours(0, 0, 0, 0);
+
+        const { data, error } = await _supabase
           .from('orders')
           .select('*')
+          .gte('created_at', fourDaysAgo.toISOString())
           .order('id', { ascending: false });
 
-        const { data: riders } = await _supabase
-          .from('riders')
-          .select('*')
-          .order('id', { ascending: false });
-
-        allOrders = orders || [];
-        allRiders = riders || [];
-
-        renderMetrics();
-        if (currentView === 'orders') renderOrders();
-        else renderRiders();
+        if (error) throw error;
+        rawOrders = data || [];
+        updateMetrics();
+        renderOrders();
       } catch (err) {
-        console.error('Error loading data:', err);
+        document.getElementById('orders-container').innerHTML = 
+          `<div style="text-align:center; color:#dc2626; padding:30px;">डेटा लोड करने में समस्या: ${err.message}</div>`;
       }
     }
 
-    // Filter Today's Orders (Local Date)
-    function getTodayOrders() {
-      const todayStr = new Date().toISOString().split('T')[0];
-      return allOrders.filter(o => {
-        if (!o.created_at) return true; // अगर टाइमस्टैम्प न हो तो शामिल करें
-        return o.created_at.startsWith(todayStr);
+    function updateMetrics() {
+      let pending = 0, running = 0, delivered = 0;
+      rawOrders.forEach(o => {
+        const s = (o.status || '').toLowerCase();
+        if (s.includes('placed') || s.includes('paid online') || s.includes('pending')) pending++;
+        else if (s.includes('out') || s.includes('picked') || s.includes('running')) running++;
+        else if (s.includes('delivered')) delivered++;
       });
+      document.getElementById('cnt-all').innerText = rawOrders.length;
+      document.getElementById('cnt-pending').innerText = pending;
+      document.getElementById('cnt-running').innerText = running;
+      document.getElementById('cnt-delivered').innerText = delivered;
     }
 
-    function renderMetrics() {
-      const todayOrders = getTodayOrders();
-      const todayCount = todayOrders.length;
-      const todayDelivered = todayOrders.filter(o => o.status === 'Delivered').length;
-      const todayActive = todayOrders.filter(o => o.status !== 'Delivered').length;
-      const todaySales = todayOrders.reduce((sum, o) => sum + (Number(o.total_amount) || 0), 0);
+    function switchTab(tab, btn) {
+      currentTab = tab;
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      if (btn) btn.classList.add('active');
+      renderOrders();
+    }
 
-      const pendingRiders = allRiders.filter(r => r.status === 'PENDING').length;
-      const approvedRiders = allRiders.filter(r => r.status === 'APPROVED').length;
-
-      document.getElementById('stat-today-count').innerText = todayCount;
-      document.getElementById('stat-today-total').innerText = `Total Sale: ₹${todaySales}`;
-      document.getElementById('stat-today-delivered').innerText = todayDelivered;
-      document.getElementById('stat-today-active').innerText = todayActive;
-
-      document.getElementById('stat-riders-pending').innerText = pendingRiders;
-      document.getElementById('stat-riders-approved').innerText = `${approvedRiders} Approved`;
-
-      document.getElementById('tab-count-orders').innerText = todayCount;
-      document.getElementById('tab-count-riders').innerText = pendingRiders;
+    function filterByTab(orders) {
+      if (currentTab === 'PENDING') {
+        return orders.filter(o => {
+          const s = (o.status || '').toLowerCase();
+          return s.includes('placed') || s.includes('paid online') || s.includes('pending');
+        });
+      }
+      if (currentTab === 'RUNNING') {
+        return orders.filter(o => {
+          const s = (o.status || '').toLowerCase();
+          return s.includes('out') || s.includes('picked') || s.includes('running');
+        });
+      }
+      if (currentTab === 'DELIVERED') {
+        return orders.filter(o => (o.status || '').toLowerCase().includes('delivered'));
+      }
+      return orders;
     }
 
     function renderOrders() {
-      const container = document.getElementById('orders-list');
-      const todayOrders = getTodayOrders();
+      const container = document.getElementById('orders-container');
+      const filtered = filterByTab(rawOrders);
 
-      if (todayOrders.length === 0) {
-        container.innerHTML = '<div style="text-align: center; padding: 40px; color: #64748b;">आज अभी तक कोई ऑर्डर नहीं आया है।</div>';
+      if (filtered.length === 0) {
+        container.innerHTML = '<div style="text-align:center; color:var(--muted); padding:40px; font-weight:700;">इस टैब में कोई ऑर्डर नहीं है।</div>';
         return;
       }
 
-      const totalLen = todayOrders.length;
-      container.innerHTML = todayOrders.map((o, idx) => {
-        const orderNumber = totalLen - idx; // उल्टे क्रम में काउंट: #1, #2, #3...
-        const isDone = o.status === 'Delivered';
-        const isPicked = o.status === 'Out for Delivery' || o.status === 'Picked Up';
+      // ऑर्डर्स को तारीख अनुसार ग्रुप करें (Date by Date)
+      const groupedByDate = {};
+      filtered.forEach(order => {
+        const dateStr = order.created_at ? new Date(order.created_at).toLocaleDateString('hi-IN', {
+          weekday: 'short', day: 'numeric', month: 'short', year: 'numeric'
+        }) : 'Recent Orders';
+        
+        if (!groupedByDate[dateStr]) groupedByDate[dateStr] = [];
+        groupedByDate[dateStr].push(order);
+      });
 
-        let tagClass = 'tag-placed';
-        if (isPicked) tagClass = 'tag-picked';
-        if (isDone) tagClass = 'tag-done';
+      let html = '';
+      for (const [date, orders] of Object.entries(groupedByDate)) {
+        html += `<div class="date-divider">📅 ${date} (${orders.length} Orders)</div>`;
+        orders.forEach(order => {
+          const timeStr = order.created_at ? new Date(order.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '';
+          
+          let badgeClass = 'status-pending';
+          if ((order.status || '').includes('Out')) badgeClass = 'status-running';
+          else if ((order.status || '').includes('Delivered')) badgeClass = 'status-delivered';
+          else if ((order.status || '').includes('Paid')) badgeClass = 'status-upi';
 
-        const itemsSummary = Array.isArray(o.items)
-          ? o.items.map(i => `${i.name} (${i.qty})`).join(', ')
-          : 'सामान उपलब्ध नहीं';
+          const itemsSummary = Array.isArray(order.items) 
+            ? order.items.map(i => `<div class="item-line"><span>${i.name} × ${i.qty}</span><b>₹${i.subtotal || (i.price * i.qty)}</b></div>`).join('')
+            : 'कोई आइटम विवरण नहीं';
 
-        return `
-          <div class="order-row">
-            <div class="order-top">
-              <div>
-                <span class="order-seq-badge">ऑर्डर संख्या #${orderNumber}</span>
-                <span style="font-weight: 800; font-size: 13px;">#ORD-${o.id}</span>
+          html += `
+            <div class="order-card" id="card-${order.id}">
+              <div class="card-top">
+                <div>
+                  <div class="order-num">ORD #${order.id}</div>
+                  <div class="order-time">⏰ ${timeStr} | Mode: <b>${order.payment_mode || 'COD'}</b></div>
+                </div>
+                <span class="status-badge ${badgeClass}">${order.status || 'Placed'}</span>
               </div>
-              <span class="tag-status ${tagClass}">${o.status}</span>
-            </div>
 
-            <div class="order-box">
-              <div>👤 <b>ग्राहक:</b> ${o.customer_name} &nbsp;|&nbsp; 📞 <a href="tel:${o.customer_phone}" style="color: var(--blue); text-decoration: none;">${o.customer_phone}</a></div>
-              <div>📍 <b>डिलीवरी पता:</b> ${o.delivery_address}</div>
-              <div style="margin-top: 4px; font-weight: 800; color: var(--green);">💵 कुल राशि (COD): ₹${o.total_amount}</div>
-              <div class="order-items-list">
-                🛒 <b>सामान:</b> ${itemsSummary}
+              <div class="cust-info">
+                <div class="cust-name">👤 ${order.customer_name || 'N/A'} (📞 <a href="tel:${order.customer_phone}">${order.customer_phone}</a>)</div>
+                <div style="color: #475569; margin-top: 2px;">📍 ${order.delivery_address || 'पता दर्ज नहीं'}</div>
+                ${order.transaction_id ? `<div class="utr-tag">🔑 UTR No: ${order.transaction_id}</div>` : ''}
+              </div>
+
+              <div class="items-list">${itemsSummary}</div>
+
+              <div style="display:flex; justify-content:space-between; align-items:center; font-size:14px; font-weight:900;">
+                <span>Total Amount:</span>
+                <span style="color:var(--green); font-size:16px;">₹${order.total_amount}</span>
+              </div>
+
+              <!-- Controls / Action Buttons -->
+              <div class="card-actions">
+                ${order.status !== 'Out for Delivery' && order.status !== 'Delivered' ? `
+                  <button class="btn-action btn-pack" onclick="updateOrderStatus(${order.id}, 'Out for Delivery')">
+                    🛵 Dispatch / Out for Delivery
+                  </button>
+                ` : ''}
+
+                ${order.status !== 'Delivered' ? `
+                  <button class="btn-action btn-deliver" onclick="updateOrderStatus(${order.id}, 'Delivered')">
+                    ✅ Mark Delivered
+                  </button>
+                ` : ''}
+
+                <!-- Fake Order Direct Permanent Delete Button -->
+                <button class="btn-action btn-delete" onclick="deleteFakeOrder(${order.id})">
+                  🗑️ Delete Fake Order
+                </button>
               </div>
             </div>
-          </div>
-        `;
-      }).join('');
-    }
-
-    function renderRiders() {
-      const container = document.getElementById('riders-list');
-      if (allRiders.length === 0) {
-        container.innerHTML = '<div style="text-align: center; padding: 40px; color: #64748b;">कोई राइडर पंजीकृत नहीं है।</div>';
-        return;
+          `;
+        });
       }
-
-      container.innerHTML = allRiders.map(r => {
-        const isPending = r.status === 'PENDING';
-        return `
-          <div class="rider-card">
-            <div class="rider-top">
-              <div style="font-size: 15px; font-weight: 800;">${r.rider_name}</div>
-              <span class="tag-status ${isPending ? 'tag-placed' : 'tag-done'}">
-                ${isPending ? 'PENDING' : 'APPROVED'}
-              </span>
-            </div>
-            <div class="order-box">
-              <div>📞 <b>मोबाइल:</b> ${r.phone}</div>
-              <div>🛵 <b>गाड़ी नंबर:</b> ${r.vehicle_no || 'उपलब्ध नहीं'}</div>
-              <div>🏠 <b>पता:</b> ${r.address || 'उपलब्ध नहीं'}</div>
-              <div>🔑 <b>पिन:</b> ${r.pin}</div>
-            </div>
-            <div style="display: flex; gap: 8px; margin-top: 10px;">
-              ${isPending ? `
-                <button class="btn-action btn-approve" onclick="updateRider(${r.id}, 'APPROVED')">✓ काम पर रखें (Approve)</button>
-                <button class="btn-action btn-reject" onclick="updateRider(${r.id}, 'REJECTED')">✕ Reject</button>
-              ` : `
-                <button class="btn-action btn-reject" onclick="updateRider(${r.id}, 'PENDING')">🚫 Block / Suspend</button>
-              `}
-            </div>
-          </div>
-        `;
-      }).join('');
+      container.innerHTML = html;
     }
 
-    async function updateRider(id, status) {
-      await _supabase.from('riders').update({ status }).eq('id', id);
-      loadDashboard();
+    // ऑर्डर स्टेटस बदलने के लिए
+    async function updateOrderStatus(orderId, newStatus) {
+      if (!confirm(`क्या आप ऑर्डर #${orderId} का स्टेटस "${newStatus}" करना चाहते हैं?`)) return;
+      try {
+        const { error } = await _supabase
+          .from('orders')
+          .update({ status: newStatus })
+          .eq('id', orderId);
+
+        if (error) throw error;
+        // लोकल डेटा अपडेट करें
+        const target = rawOrders.find(o => o.id === orderId);
+        if (target) target.status = newStatus;
+        updateMetrics();
+        renderOrders();
+      } catch (e) {
+        alert('अपडेट नहीं हो पाया: ' + e.message);
+      }
     }
 
-    function switchView(view) {
-      currentView = view;
-      document.getElementById('tab-btn-orders').className = view === 'orders' ? 'tab-btn active' : 'tab-btn';
-      document.getElementById('tab-btn-riders').className = view === 'riders' ? 'tab-btn active' : 'tab-btn';
+    // फ़ेक ऑर्डर हमेशा के लिए डेटाबेस से हटाने के लिए (Full Control)
+    async function deleteFakeOrder(orderId) {
+      const confirmDelete = confirm(`⚠️ क्या आप वाकई ऑर्डर #${orderId} को पूरे सिस्टम से हमेशा के लिए हटाना (Delete) चाहते हैं?`);
+      if (!confirmDelete) return;
 
-      document.getElementById('view-orders').style.display = view === 'orders' ? 'block' : 'none';
-      document.getElementById('view-riders').style.display = view === 'riders' ? 'block' : 'none';
+      try {
+        const { error } = await _supabase
+          .from('orders')
+          .delete()
+          .eq('id', orderId);
 
-      if (view === 'orders') renderOrders();
-      else renderRiders();
+        if (error) throw error;
+        
+        // लिस्ट से तुरंत हटाएँ
+        rawOrders = rawOrders.filter(o => o.id !== orderId);
+        updateMetrics();
+        renderOrders();
+        alert(`ऑर्डर #${orderId} पूरे सिस्टम से डिलीट कर दिया गया है!`);
+      } catch (err) {
+        alert('ऑर्डर डिलीट करने में त्रुटि: ' + err.message);
+      }
     }
 
-    loadDashboard();
-    // हर 8 सेकंड में बैकग्राउंड में डेटा रिफ्रेश
-    setInterval(loadDashboard, 8000);
+    // ऑटो-रिफ्रेश हर 10 सेकंड पर
+    fetchOrders();
+    setInterval(fetchOrders, 10000);
   </script>
 </body>
 </html>
