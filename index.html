@@ -88,9 +88,7 @@
       display: block !important;
       margin-bottom: 8px;
       cursor: pointer;
-      transition: transform 0.2s;
     }
-    .drawer-logo-img:active { transform: scale(0.95); }
     .drawer-brand { font-size: 15px; font-weight: 900; color: #ff758c; line-height: 1.2; }
     .drawer-menu-list { padding: 16px 0; flex: 1; overflow-y: auto; }
     .drawer-item {
@@ -99,7 +97,7 @@
       border-bottom: 1px solid #f8fafc;
     }
 
-    /* Top Area */
+    /* Top Hero Area */
     .top-hero-area {
       background: linear-gradient(180deg, #f4ecfb 0%, #fbf9fe 100%);
       padding: 12px 16px 14px 16px; border-bottom: 1px solid #eee5f7;
@@ -278,7 +276,7 @@
       cursor: pointer; width: 100%; margin-top: 10px; box-shadow: 0 4px 14px rgba(255, 50, 105, 0.3);
     }
 
-    /* Live Tracking Progress */
+    /* Live Tracking Steps */
     .track-steps {
       display: flex; flex-direction: column; gap: 16px; margin: 18px 0 10px 18px;
       position: relative; border-left: 2px solid #e2e8f0; padding-left: 18px;
@@ -305,7 +303,6 @@
   <div class="drawer-overlay" id="drawer-overlay" onclick="toggleDrawer(false)"></div>
   <div class="side-drawer" id="side-drawer">
     <div class="drawer-header">
-      <!-- लोगो पर क्लिक करने से पूरा बड़ा लोगो खुलेगा -->
       <img class="drawer-logo-img" src="logo.png" alt="Logo" title="Tap to view full logo" onclick="openLogoPreview()" onerror="this.style.display='none'">
       <div class="drawer-brand">👑 𝐁𝐀𝐁𝐀 𝐅𝐎𝐎𝐃 𝐃𝐄𝐋𝐈𝐕𝐄𝐑𝐘🏹</div>
       <div style="font-size: 11px; color: #fdf4ff; margin-top: 2px;">Fast Express Delivery</div>
@@ -806,9 +803,20 @@
       if (!/^[6-9]\d{9}$/.test(phone)) { alert('कृपया 10 अंकों का सही मोबाइल नंबर डालें!'); return; }
       if (address.length < 4) { alert('कृपया डिलीवरी का पता दर्ज करें!'); return; }
 
+      // UPI वैलिडेशन और डुप्लीकेट UTR जांच
       if (selectedPaymentMode === 'UPI') {
         if (!/^\d{12}$/.test(utr)) {
-          alert('कृपया भुगतान पूरा करें और बैंक से प्राप्त 12 अंकों का सही UTR / Transaction No दर्ज करें। बिना भुगतान के ऑर्डर प्लेस नहीं होगा!');
+          alert('कृपया 12 अंकों का सही बैंक UTR नंबर डालें!');
+          return;
+        }
+
+        const { data: existingUtr } = await _supabase
+          .from('orders')
+          .select('id')
+          .eq('transaction_id', utr);
+
+        if (existingUtr && existingUtr.length > 0) {
+          alert('⚠️ यह UTR नंबर पहले ही इस्तेमाल हो चुका है! कृपया सही ट्रांजेक्शन नंबर डालें।');
           return;
         }
       }
@@ -816,12 +824,14 @@
       const { finalToPay } = calculateTotals();
       const entries = Object.values(cart);
       const orderItems = entries.map(({ item, qty }) => ({
-        id: item.id, name: item.name, price: item.price, unit: item.unit, qty, subtotal: item.price * qty
+        id: item.id, name: item.name, price: item.price, unit: item.unit, qty, subtotal: item.price * qty, image_url: item.image_url
       }));
 
       const btn = document.getElementById('order-submit-btn');
       btn.disabled = true;
       btn.innerText = 'Verifying & Saving Order...';
+
+      const initialStatus = selectedPaymentMode === 'UPI' ? 'Payment Verification Pending' : 'Order Placed';
 
       try {
         const { data, error } = await _supabase
@@ -832,7 +842,7 @@
             delivery_address: address,
             items: orderItems,
             total_amount: finalToPay,
-            status: selectedPaymentMode === 'UPI' ? 'Paid Online (UPI)' : 'Order Placed',
+            status: initialStatus,
             payment_mode: selectedPaymentMode,
             transaction_id: selectedPaymentMode === 'UPI' ? utr : null
           }])
@@ -888,9 +898,9 @@
 
         s1.className = 't-step'; s2.className = 't-step'; s3.className = 't-step';
 
-        if (data.status === 'Order Placed' || data.status === 'Paid Online (UPI)') {
+        if (data.status === 'Order Placed' || data.status === 'Paid Online (UPI)' || data.status === 'Payment Verification Pending') {
           s1.className = 't-step active';
-          stripTitle.innerText = data.status === 'Paid Online (UPI)' ? 'Paid Online (Packing)' : 'Order Accepted (Packing)';
+          stripTitle.innerText = data.status === 'Payment Verification Pending' ? 'Payment Verifying...' : 'Order Accepted (Packing)';
           stripSub.innerText = 'Kitchen is packing your items';
           mapBox.style.display = 'none';
         } else if (data.status === 'Out for Delivery' || data.status === 'Picked Up') {
@@ -951,7 +961,7 @@
       cart = {};
       items.forEach(oldItem => {
         const product = allProducts.find(p => p.id === oldItem.id) || {
-          id: oldItem.id, name: oldItem.name, price: oldItem.price, unit: oldItem.unit, image_url: ''
+          id: oldItem.id, name: oldItem.name, price: oldItem.price, unit: oldItem.unit, image_url: oldItem.image_url || ''
         };
         cart[product.id] = { item: product, qty: oldItem.qty };
       });
