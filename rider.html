@@ -3,235 +3,228 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Zepto Delivery Partner</title>
-  
-  <link rel="manifest" href="manifest.json">
-  <meta name="theme-color" content="#150226">
-  <script>
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('sw.js');
-      });
-    }
-  </script>
-
+  <title>👑 Baba Food Rider Partner</title>
+  <link rel="icon" type="image/png" href="logo.png">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-  
+
   <style>
     :root {
-      --z-bg: #0b0214;
-      --z-card: #19052b;
-      --z-card-inner: #24083d;
-      --z-pink: #ff3269;
-      --z-purple: #8b14d9;
-      --z-yellow: #ffc727;
-      --z-green: #00d26a;
-      --z-text: #ffffff;
-      --z-muted: #9e8fb2;
-      --z-border: #320d53;
+      --bg-dark: #121927;
+      --card-dark: #1e2837;
+      --card-white: #ffffff;
+      --accent-green: #10b981;
+      --accent-orange: #f97316;
+      --accent-purple: #8b5cf6;
+      --text-white: #ffffff;
+      --text-sub: #94a3b8;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
-    body { background-color: var(--z-bg); color: var(--z-text); padding-bottom: 90px; }
+    body { background-color: var(--bg-dark); color: var(--text-white); padding-bottom: 90px; }
 
-    .auth-overlay {
-      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      background: var(--z-bg); display: flex; flex-direction: column;
-      justify-content: center; align-items: center; padding: 20px; z-index: 1000;
-      overflow-y: auto;
+    /* Top Partner Store Header */
+    .top-bar {
+      background: #ffffff; color: #1e293b; padding: 12px 16px;
+      display: flex; justify-content: space-between; align-items: center;
     }
-    .login-card {
-      background: var(--z-card); border: 1px solid var(--z-border); border-radius: 20px;
-      padding: 24px 18px; width: 100%; max-width: 390px; text-align: center;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-    }
-    .brand-large {
-      font-size: 30px; font-weight: 900;
-      background: linear-gradient(90deg, #ff3269, #ff758c);
-      -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 4px;
-    }
-    .sub-brand { font-size: 12px; color: #38bdf8; font-weight: 700; letter-spacing: 1px; margin-bottom: 16px; }
+    .store-info { display: flex; align-items: center; gap: 10px; }
+    .store-icon { width: 34px; height: 34px; border-radius: 8px; background: #6b21a8; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 16px; }
+    .store-name { font-size: 13px; font-weight: 800; }
+    .store-id { font-size: 10px; color: #64748b; font-weight: 600; }
 
-    .form-group { text-align: left; margin-bottom: 10px; }
-    .form-label { font-size: 11px; font-weight: 700; color: #cbd5e1; margin-bottom: 4px; display: block; }
-    .login-input {
-      width: 100%; background: var(--z-card-inner); border: 1.5px solid var(--z-border);
-      color: white; padding: 11px 12px; border-radius: 10px; font-size: 13px; outline: none;
-    }
-    .login-input:focus { border-color: var(--z-pink); }
-    .login-input.error { border-color: #ef4444; }
-
-    .btn-login {
-      width: 100%; background: linear-gradient(90deg, #ff3269, #e01d51); color: white;
-      border: none; padding: 13px; border-radius: 10px; font-size: 14px; font-weight: 800;
-      cursor: pointer; margin-top: 10px; box-shadow: 0 4px 15px rgba(255, 50, 105, 0.4);
-    }
-    .switch-link { color: #38bdf8; font-size: 12px; margin-top: 14px; cursor: pointer; display: inline-block; text-decoration: underline; }
-
-    /* Dashboard Header */
-    header {
-      background: #150226; padding: 14px 16px; display: flex; justify-content: space-between;
-      align-items: center; border-bottom: 1px solid var(--z-border); position: sticky; top: 0; z-index: 100;
-    }
-    .brand-wrap { display: flex; align-items: center; gap: 8px; }
-    .brand-title { font-size: 20px; font-weight: 900; background: linear-gradient(90deg, #ff3269, #ff758c); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-    .rider-badge { background: #24083d; border: 1px solid var(--z-purple); color: #38bdf8; font-size: 10px; font-weight: 800; padding: 3px 8px; border-radius: 6px; text-transform: uppercase; }
+    .top-actions { display: flex; align-items: center; gap: 14px; }
     
-    .duty-btn {
-      border: none; padding: 8px 14px; border-radius: 20px; font-size: 12px; font-weight: 800;
-      display: flex; align-items: center; gap: 6px; cursor: pointer;
+    /* Duty Toggle Switch */
+    .switch { position: relative; display: inline-block; width: 44px; height: 24px; }
+    .switch input { opacity: 0; width: 0; height: 0; }
+    .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #cbd5e1; transition: .3s; border-radius: 24px; }
+    .slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: white; transition: .3s; border-radius: 50%; }
+    input:checked + .slider { background-color: var(--accent-green); }
+    input:checked + .slider:before { transform: translateX(20px); }
+
+    .help-btn { font-size: 12px; font-weight: 700; color: #475569; display: flex; align-items: center; gap: 4px; text-decoration: none; }
+
+    /* Shift & Break Info Box */
+    .shift-box {
+      background: #ffffff; color: #1e293b; padding: 12px 16px; border-bottom: 1px solid #f1f5f9;
+      display: flex; justify-content: space-between; align-items: center;
     }
-    .duty-btn.online { background: rgba(0, 210, 106, 0.15); border: 1.5px solid var(--z-green); color: var(--z-green); }
-    .duty-btn.offline { background: rgba(255, 50, 105, 0.15); border: 1.5px solid var(--z-pink); color: var(--z-pink); }
-    .duty-dot { width: 8px; height: 8px; border-radius: 50%; }
-    .online .duty-dot { background: var(--z-green); animation: pulse 1.5s infinite; }
-    .offline .duty-dot { background: var(--z-pink); }
-    @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.4; } 100% { opacity: 1; } }
+    .shift-left { display: flex; align-items: center; gap: 10px; }
+    .shift-icon { font-size: 20px; }
+    .shift-time { font-size: 15px; font-weight: 800; }
+    .shift-break { font-size: 11px; color: #64748b; font-weight: 600; }
+    .shift-right { text-align: right; }
+    .shift-done { font-size: 15px; font-weight: 800; }
+    .shift-status-lbl { font-size: 11px; color: #64748b; }
 
-    .logout-link { color: var(--z-muted); font-size: 11px; cursor: pointer; text-decoration: underline; margin-left: 8px; }
-
-    .tabs-bar { display: flex; background: #150226; border-bottom: 1px solid var(--z-border); padding: 0 16px; }
-    .tab-item { flex: 1; text-align: center; padding: 12px 0; font-size: 13px; font-weight: 700; color: var(--z-muted); cursor: pointer; position: relative; }
-    .tab-item.active { color: #fff; }
-    .tab-item.active::after { content: ''; position: absolute; bottom: 0; left: 20%; right: 20%; height: 3px; background: var(--z-pink); border-radius: 3px 3px 0 0; }
-
-    .container { max-width: 600px; margin: 0 auto; padding: 14px; }
-    .order-card { background: var(--z-card); border: 1px solid var(--z-border); border-radius: 16px; padding: 16px; margin-bottom: 14px; }
-    .order-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; border-bottom: 1px solid var(--z-border); padding-bottom: 10px; }
-    .order-id-txt { font-size: 16px; font-weight: 900; color: #fff; }
-    .status-badge { font-size: 11px; font-weight: 800; padding: 4px 10px; border-radius: 20px; text-transform: uppercase; }
-    .badge-placed { background: rgba(255, 199, 39, 0.15); color: var(--z-yellow); border: 1px solid var(--z-yellow); }
-    .badge-picked { background: rgba(56, 189, 248, 0.15); color: #38bdf8; border: 1px solid #38bdf8; }
-    .badge-delivered { background: rgba(0, 210, 106, 0.15); color: var(--z-green); border: 1px solid var(--z-green); }
-
-    .info-card { background: var(--z-card-inner); border-radius: 12px; padding: 12px; margin-bottom: 12px; }
-    .cust-name { font-size: 15px; font-weight: 800; color: #fff; margin-bottom: 4px; }
-    .cust-loc { font-size: 13px; color: var(--z-muted); }
-
-    .items-container { background: rgba(0, 0, 0, 0.2); border-radius: 10px; padding: 10px 12px; margin-bottom: 14px; font-size: 12px; }
-    .item-row { display: flex; justify-content: space-between; color: #d1d5db; margin-bottom: 4px; }
-    .cod-bill { display: flex; justify-content: space-between; margin-top: 8px; padding-top: 8px; border-top: 1px dashed var(--z-border); font-size: 14px; font-weight: 800; color: #fff; }
-
-    .action-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
-    .btn-call { background: #1e293b; color: #fff; text-decoration: none; padding: 12px; border-radius: 10px; font-size: 13px; font-weight: 800; text-align: center; border: 1px solid #334155; }
-    .btn-maps { background: #0284c7; color: #fff; text-decoration: none; padding: 12px; border-radius: 10px; font-size: 13px; font-weight: 800; text-align: center; }
-
-    .btn-stage { width: 100%; padding: 14px; border-radius: 12px; border: none; font-size: 14px; font-weight: 900; text-transform: uppercase; cursor: pointer; }
-    .btn-accept { background: linear-gradient(90deg, #ff3269, #e01d51); color: #fff; }
-    .btn-deliver { background: linear-gradient(90deg, #00d26a, #0c831f); color: #fff; }
-
-    .map-preview { border-radius: 10px; overflow: hidden; margin-bottom: 12px; height: 140px; border: 1px solid var(--z-border); }
-    .map-preview iframe { width: 100%; height: 100%; border: none; }
-
-    .incoming-overlay {
-      position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(11, 2, 20, 0.95);
-      display: none; flex-direction: column; justify-content: center; align-items: center; padding: 20px; z-index: 500;
+    .slot-banner {
+      background: #fff7ed; color: #9a3412; padding: 10px 16px; font-size: 12px; font-weight: 700;
+      display: flex; justify-content: space-between; align-items: center;
     }
-    .incoming-box { background: var(--z-card); border: 2px solid var(--z-pink); border-radius: 20px; width: 100%; max-width: 380px; padding: 24px; text-align: center; }
+    .slot-banner a { color: #ea580c; text-decoration: none; font-weight: 800; }
+
+    /* Promo Carousel Card */
+    .promo-card {
+      background: #fdf2f8; color: #831843; border-radius: 12px; margin: 14px 16px; padding: 12px 14px;
+      display: flex; justify-content: space-between; align-items: center; border: 1px solid #fbcfe8;
+    }
+    .promo-info h4 { font-size: 12px; font-weight: 800; margin-bottom: 2px; }
+    .promo-info p { font-size: 10px; color: #9d174d; }
+    .btn-refer { background: #be185d; color: white; border: none; padding: 6px 12px; border-radius: 6px; font-size: 11px; font-weight: 700; }
+
+    /* Dark Status Waiting Pill */
+    .waiting-pill {
+      background: linear-gradient(180deg, #243042 0%, #1a2332 100%);
+      margin: 14px 16px; padding: 16px; border-radius: 14px; text-align: center;
+      display: flex; align-items: center; justify-content: center; gap: 10px;
+      border: 1px solid #334155; box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    }
+    .waiting-pill.active-duty { border-color: var(--accent-green); }
+    .waiting-text { font-size: 15px; font-weight: 800; color: #f8fafc; }
+
+    .section-title { font-size: 15px; font-weight: 800; color: #f8fafc; margin: 18px 16px 10px 16px; }
+
+    /* Total Earnings White Card */
+    .earnings-card {
+      background: var(--card-white); color: #0f172a; border-radius: 16px; margin: 0 16px;
+      padding: 18px 16px; box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+    }
+    .main-earning { font-size: 26px; font-weight: 900; margin-bottom: 14px; }
+    .earning-meta-grid { display: grid; grid-template-columns: repeat(3, 1fr); border-top: 1px solid #f1f5f9; padding-top: 12px; }
+    .meta-col { display: flex; flex-direction: column; gap: 2px; }
+    .meta-top { font-size: 15px; font-weight: 800; display: flex; align-items: center; gap: 4px; }
+    .meta-sub { font-size: 10px; font-weight: 700; color: #64748b; }
+
+    /* Active Orders Queue Area */
+    .orders-queue-box { margin: 16px; }
+    .rider-order-card {
+      background: var(--card-dark); border: 1px solid #334155; border-radius: 14px;
+      padding: 16px; margin-bottom: 12px;
+    }
+    .r-card-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+    .r-badge { background: #0284c7; color: white; padding: 4px 8px; border-radius: 6px; font-size: 11px; font-weight: 800; }
+    .r-address { font-size: 12px; color: #cbd5e1; margin: 8px 0; line-height: 1.4; }
+    .btn-action-rider {
+      background: var(--accent-green); color: white; border: none; width: 100%;
+      padding: 12px; border-radius: 10px; font-size: 13px; font-weight: 800; cursor: pointer; margin-top: 8px;
+    }
+
+    /* Fixed Bottom Navigation Bar */
+    .bottom-nav {
+      position: fixed; bottom: 0; left: 0; width: 100%; height: 62px;
+      background: #ffffff; border-top: 1px solid #e2e8f0; display: flex;
+      justify-content: space-around; align-items: center; z-index: 200;
+    }
+    .b-item { display: flex; flex-direction: column; align-items: center; gap: 3px; font-size: 10px; font-weight: 700; color: #64748b; text-decoration: none; cursor: pointer; }
+    .b-item.active { color: #ef4444; }
+    .b-icon { font-size: 18px; }
   </style>
 </head>
 <body>
 
-  <!-- 1. LOGIN SCREEN -->
-  <div class="auth-overlay" id="login-box">
-    <div class="login-card">
-      <div class="brand-large">zepto</div>
-      <div class="sub-brand">DELIVERY PARTNER APP</div>
-
-      <div class="form-group">
-        <label class="form-label">पंजीकृत मोबाइल नंबर</label>
-        <input type="tel" id="l-phone" class="login-input" placeholder="10 अंकों का नंबर" maxlength="10">
+  <!-- Store Header -->
+  <div class="top-bar">
+    <div class="store-info">
+      <div class="store-icon">👑</div>
+      <div>
+        <div class="store-name">DEL-KHATU SHYAM</div>
+        <div class="store-id">BABA18-R5533</div>
       </div>
-      <div class="form-group">
-        <label class="form-label">सुरक्षा पिन</label>
-        <input type="password" id="l-pin" class="login-input" placeholder="4-Digit PIN" maxlength="4">
-      </div>
-
-      <button class="btn-login" id="login-btn" onclick="riderLogin()">LOGIN AS RIDER</button>
-      <div id="login-err" style="color: #ff3269; font-size: 12px; margin-top: 10px; font-weight: 700;"></div>
-      
-      <div class="switch-link" onclick="toggleAuth(false)">नया राइडर? KYC के साथ आवेदन करें (Register)</div>
+    </div>
+    <div class="top-actions">
+      <label class="switch">
+        <input type="checkbox" id="duty-toggle" checked onchange="toggleDuty(this.checked)">
+        <span class="slider"></span>
+      </label>
+      <a class="help-btn" href="tel:9711107063">❓ Help</a>
     </div>
   </div>
 
-  <!-- 2. REGISTRATION SCREEN (Strict Details) -->
-  <div class="auth-overlay" id="reg-box" style="display: none;">
-    <div class="login-card">
-      <div class="brand-large">zepto</div>
-      <div class="sub-brand">OFFICIAL RIDER ONBOARDING</div>
-
-      <div class="form-group">
-        <label class="form-label">पूरा नाम (आधार कार्ड अनुसार) *</label>
-        <input type="text" id="r-name" class="login-input" placeholder="जैसे: Rahul Kumar">
+  <!-- Shift Details Bar -->
+  <div class="shift-box">
+    <div class="shift-left">
+      <span class="shift-icon">⏱️</span>
+      <div>
+        <div class="shift-time">1:00 pm - 3:00 pm</div>
+        <div class="shift-break">8 min break left</div>
       </div>
-
-      <div class="form-group">
-        <label class="form-label">सत्यापित मोबाइल नंबर *</label>
-        <input type="tel" id="r-phone" class="login-input" placeholder="10 अंकों का वैध मोबाइल नंबर" maxlength="10">
-      </div>
-
-      <div class="form-group">
-        <label class="form-label">गाड़ी का वैध नंबर (RC Number) *</label>
-        <input type="text" id="r-vehicle" class="login-input" placeholder="जैसे: UP25AB1234" style="text-transform: uppercase;">
-      </div>
-
-      <div class="form-group">
-        <label class="form-label">आधार प्रमाणित स्थायी पता *</label>
-        <textarea id="r-address" class="login-input" rows="2" placeholder="मकान नं, गली, लैंडमार्क, पिनकोड..."></textarea>
-      </div>
-
-      <div class="form-group">
-        <label class="form-label">लॉगिन हेतु 4-अंकों का गुप्त PIN बनाएं *</label>
-        <input type="password" id="r-pin" class="login-input" placeholder="4-Digit Secret PIN" maxlength="4">
-      </div>
-
-      <button class="btn-login" id="reg-btn" onclick="riderRegister()">सत्यापित करें एवं आवेदन भेजें</button>
-      <div id="reg-msg" style="font-size: 12px; margin-top: 10px; font-weight: 700;"></div>
-
-      <div class="switch-link" onclick="toggleAuth(true)">पहले से अकाउंट है? Login करें</div>
+    </div>
+    <div class="shift-right">
+      <div class="shift-done" id="minutes-active">13 min</div>
+      <div class="shift-status-lbl">Completed</div>
     </div>
   </div>
 
-  <!-- 3. DASHBOARD -->
-  <div id="main-dashboard" style="display: none;">
-    <header>
-      <div class="brand-wrap">
-        <div class="brand-title">zepto</div>
-        <div class="rider-badge" id="rider-name-tag">Rider</div>
-      </div>
-      <div style="display: flex; align-items: center;">
-        <button class="duty-btn online" id="duty-btn" onclick="toggleDuty()">
-          <div class="duty-dot"></div>
-          <span id="duty-text">ONLINE</span>
-        </button>
-        <span class="logout-link" onclick="logoutRider()">Exit</span>
-      </div>
-    </header>
+  <div class="slot-banner">
+    <span>Book more to earn more 🤑</span>
+    <a href="javascript:void(0)" onclick="alert('सभी स्लॉट पहले से बुक हैं!')">Book Now ❯</a>
+  </div>
 
-    <div class="tabs-bar">
-      <div class="tab-item active" id="tab-active" onclick="switchTab('active')">My Active (<span id="count-active">0</span>)</div>
-      <div class="tab-item" id="tab-delivered" onclick="switchTab('delivered')">Delivered (<span id="count-delivered">0</span>)</div>
+  <!-- Referral Promo Card -->
+  <div class="promo-card">
+    <div class="promo-info">
+      <h4>Rider Referral Bonus is Live 🎉</h4>
+      <p>Invite friends & earn ₹200 on first 10 orders</p>
     </div>
+    <button class="btn-refer" onclick="alert('रेफ़रल लिंक जल्द उपलब्ध होगा!')">Refer Now ❯</button>
+  </div>
 
-    <div class="container">
-      <div id="loader" style="text-align:center; padding: 40px; font-size: 13px; color: var(--z-muted);">
-        Connecting to Dark Store Dispatcher...
+  <!-- Waiting / On Duty Status Bar -->
+  <div class="waiting-pill active-duty" id="waiting-pill">
+    <span style="font-size: 18px;">🛍️</span>
+    <span class="waiting-text" id="duty-text">Waiting for Order...</span>
+  </div>
+
+  <!-- Total Earnings Card -->
+  <div class="section-title">Total Earnings</div>
+  <div class="earnings-card">
+    <div class="main-earning" id="rider-earning-text">₹120 <span style="font-size: 15px; font-weight: 600; color: #64748b;">in 2 hrs</span></div>
+    
+    <div class="earning-meta-grid">
+      <div class="meta-col">
+        <div class="meta-top">⏱️ 2</div>
+        <div class="meta-sub">Login Hrs ❯</div>
       </div>
-      <div id="orders-list"></div>
+      <div class="meta-col">
+        <div class="meta-top">📅 1/2</div>
+        <div class="meta-sub">Slots Done ❯</div>
+      </div>
+      <div class="meta-col">
+        <div class="meta-top">🛍️ <span id="orders-done-count">5</span></div>
+        <div class="meta-sub">Order Done ❯</div>
+      </div>
     </div>
   </div>
 
-  <!-- Siren Modal -->
-  <div class="incoming-overlay" id="incoming-modal">
-    <div class="incoming-box">
-      <div style="font-size: 50px;">🚨</div>
-      <h2 style="font-size: 20px; font-weight: 900; margin: 10px 0; color: var(--z-pink);">NEW ORDER ASSIGNED!</h2>
-      <div style="font-size: 14px; color: #fff; margin-bottom: 4px;" id="inc-order-id">#ORD-00</div>
-      <div style="font-size: 13px; color: var(--z-muted); margin-bottom: 14px;" id="inc-cust-name">Customer: --</div>
-      <div style="font-size: 20px; font-weight: 900; color: var(--z-green); margin-bottom: 20px;" id="inc-total">₹0</div>
-      <button class="btn-stage btn-accept" onclick="acceptIncomingOrder()">⚡ ACCEPT & STOP SIREN</button>
+  <!-- Live Orders to Pick Up / Deliver -->
+  <div class="section-title">Active Delivery Tasks</div>
+  <div class="orders-queue-box" id="rider-orders-list">
+    <div style="text-align:center; color: var(--text-sub); padding: 20px; font-size: 12px;">कोई पेंडिंग ऑर्डर नहीं है।</div>
+  </div>
+
+  <!-- Bottom Navigation Bar -->
+  <div class="bottom-nav">
+    <div class="b-item active">
+      <div class="b-icon">🏠</div>
+      <span>Home</span>
+    </div>
+    <div class="b-item" onclick="alert('कुल कमाई: ₹120')">
+      <div class="b-icon">👛</div>
+      <span>Earnings</span>
+    </div>
+    <div class="b-item" onclick="alert('आपका आज का स्लॉट एक्टिव है!')">
+      <div class="b-icon">📅</div>
+      <span>Slots</span>
+    </div>
+    <div class="b-item" onclick="alert('रेफर करें और कमाएँ!')">
+      <div class="b-icon">🎁</div>
+      <span>Refer & Earn</span>
+    </div>
+    <div class="b-item" onclick="alert('Rider: Vishal\nVehicle: Hero Maestro')">
+      <div class="b-icon">👤</div>
+      <span>Profile</span>
     </div>
   </div>
 
@@ -240,328 +233,82 @@
     const SUPABASE_KEY = 'sb_publishable_2_wD-pbi_pNf8niiHxFbYA_saCIhApN';
     const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    let loggedInRider = null;
-    let ordersCache = [];
-    let currentTab = 'active';
     let isOnline = true;
-    let audioCtx = null;
-    let sirenTimer = null;
-    let activeIncomingOrderId = null;
-    let wakeLock = null;
 
-    window.addEventListener('load', () => {
-      const saved = localStorage.getItem('zepto_logged_rider');
-      if (saved) {
-        loggedInRider = JSON.parse(saved);
-        startRiderApp();
-      }
-    });
-
-    function toggleAuth(showLogin) {
-      document.getElementById('login-box').style.display = showLogin ? 'flex' : 'none';
-      document.getElementById('reg-box').style.display = showLogin ? 'none' : 'flex';
-      document.getElementById('login-err').innerText = '';
-      document.getElementById('reg-msg').innerText = '';
-    }
-
-    // STRICT VALIDATION ON REGISTRATION
-    async function riderRegister() {
-      const name = document.getElementById('r-name').value.trim();
-      const phone = document.getElementById('r-phone').value.trim();
-      let vehicle = document.getElementById('r-vehicle').value.trim().toUpperCase().replace(/\s+/g, '');
-      const address = document.getElementById('r-address').value.trim();
-      const pin = document.getElementById('r-pin').value.trim();
-      const msg = document.getElementById('reg-msg');
-      const btn = document.getElementById('reg-btn');
-
-      // 1. Name Check (At least 3 characters)
-      if (name.length < 3) {
-        msg.style.color = '#ff3269';
-        msg.innerText = 'कृपया आधार कार्ड के अनुसार पूरा नाम लिखें!';
-        return;
-      }
-
-      // 2. Mobile Validation (Indian 10-digit, starts with 6-9)
-      const phoneRegex = /^[6-9]\d{9}$/;
-      if (!phoneRegex.test(phone)) {
-        msg.style.color = '#ff3269';
-        msg.innerText = 'अमान्य मोबाइल नंबर! 10 अंकों का सही नंबर डालें।';
-        return;
-      }
-
-      // 3. Vehicle Number Validation (e.g., UP25AB1234 or DL1A1234)
-      const vehicleRegex = /^[A-Z]{2}[0-9]{1,2}[A-Z]{1,3}[0-9]{4}$/;
-      if (!vehicleRegex.test(vehicle)) {
-        msg.style.color = '#ff3269';
-        msg.innerText = 'गाड़ी का नंबर गलत है! (उदा: UP25AB1234 बिना स्पेस के डालें)';
-        return;
-      }
-
-      // 4. Address Check (Minimum 15 characters for genuine address)
-      if (address.length < 15) {
-        msg.style.color = '#ff3269';
-        msg.innerText = 'कृपया आधार प्रमाणित पूरा पता लिखें (मकान, गली, पिनकोड सहित)!';
-        return;
-      }
-
-      // 5. PIN Check (Exactly 4 digits)
-      if (!/^\d{4}$/.test(pin)) {
-        msg.style.color = '#ff3269';
-        msg.innerText = 'पिन केवल 4 अंकों की संख्या होनी चाहिए!';
-        return;
-      }
-
-      btn.disabled = true;
-      btn.innerText = 'सत्यापन किया जा रहा है...';
-
-      try {
-        const { error } = await _supabase.from('riders').insert([{
-          rider_name: name,
-          phone: phone,
-          vehicle_no: vehicle,
-          address: address,
-          pin: pin,
-          status: 'PENDING',
-          is_online: false
-        }]);
-
-        if (error) {
-          if (error.message.includes('unique')) throw new Error('यह मोबाइल नंबर पहले से पंजीकृत है!');
-          throw error;
-        }
-
-        msg.style.color = '#00d26a';
-        msg.innerText = '✓ विवरण सफलतापूर्वक सबमिट हुआ! एडमिन सत्यापन (Approve) के बाद आप काम शुरू कर सकेंगे।';
-        setTimeout(() => toggleAuth(true), 3500);
-      } catch (e) {
-        msg.style.color = '#ff3269';
-        msg.innerText = e.message;
-      } finally {
-        btn.disabled = false;
-        btn.innerText = 'सत्यापित करें एवं आवेदन भेजें';
-      }
-    }
-
-    async function riderLogin() {
-      const phone = document.getElementById('l-phone').value.trim();
-      const pin = document.getElementById('l-pin').value.trim();
-      const err = document.getElementById('login-err');
-      const btn = document.getElementById('login-btn');
-
-      if (!phone || !pin) {
-        err.innerText = 'मोबाइल नंबर और 4 अंकों का पिन दर्ज करें!';
-        return;
-      }
-
-      btn.disabled = true;
-      btn.innerText = 'सत्यापित हो रहा है...';
-
-      try {
-        const { data, error } = await _supabase
-          .from('riders').select('*').eq('phone', phone).eq('pin', pin).single();
-
-        if (error || !data) throw new Error('अमान्य मोबाइल नंबर या पिन!');
-        if (data.status === 'PENDING') throw new Error('आपकी आईडी अभी PENDING है। स्टोर एडमिन द्वारा अप्रूवल की प्रतीक्षा करें।');
-        if (data.status === 'REJECTED') throw new Error('आपकी आईडी को स्टोर द्वारा ब्लॉक कर दिया गया है।');
-
-        loggedInRider = data;
-        localStorage.setItem('zepto_logged_rider', JSON.stringify(data));
-        startRiderApp();
-      } catch (e) {
-        err.innerText = e.message;
-      } finally {
-        btn.disabled = false;
-        btn.innerText = 'LOGIN AS RIDER';
-      }
-    }
-
-    function startRiderApp() {
-      document.getElementById('login-box').style.display = 'none';
-      document.getElementById('reg-box').style.display = 'none';
-      document.getElementById('main-dashboard').style.display = 'block';
-      document.getElementById('rider-name-tag').innerText = loggedInRider.rider_name;
-      initAudio();
-      requestWakeLock();
-      initRealtime();
-    }
-
-    function logoutRider() {
-      if (confirm('क्या आप ड्यूटी लॉगआउट करना चाहते हैं?')) {
-        stopSiren();
-        releaseWakeLock();
-        localStorage.removeItem('zepto_logged_rider');
-        location.reload();
-      }
-    }
-
-    function initAudio() {
-      if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-      if (audioCtx.state === 'suspended') audioCtx.resume();
-    }
-
-    async function requestWakeLock() {
-      if ('wakeLock' in navigator) {
-        try { wakeLock = await navigator.wakeLock.request('screen'); } catch (e) {}
-      }
-    }
-    function releaseWakeLock() {
-      if (wakeLock) { wakeLock.release().then(() => { wakeLock = null; }); }
-    }
-
-    function playBeep() {
-      if (!isOnline || !audioCtx) return;
-      try {
-        const osc = audioCtx.createOscillator();
-        const gain = audioCtx.createGain();
-        osc.type = 'sawtooth';
-        osc.frequency.setValueAtTime(850, audioCtx.currentTime);
-        osc.frequency.exponentialRampToValueAtTime(1500, audioCtx.currentTime + 0.25);
-        gain.gain.setValueAtTime(0.4, audioCtx.currentTime);
-        gain.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
-        osc.connect(gain);
-        gain.connect(audioCtx.destination);
-        osc.start();
-        osc.stop(audioCtx.currentTime + 0.3);
-        if ('vibrate' in navigator) navigator.vibrate([300, 100, 300]);
-      } catch (e) {}
-    }
-
-    function startSiren() {
-      if (sirenTimer) return;
-      playBeep();
-      sirenTimer = setInterval(playBeep, 650);
-    }
-    function stopSiren() {
-      if (sirenTimer) { clearInterval(sirenTimer); sirenTimer = null; }
-    }
-
-    function toggleDuty() {
-      initAudio();
-      isOnline = !isOnline;
-      const btn = document.getElementById('duty-btn');
+    function toggleDuty(online) {
+      isOnline = online;
+      const pill = document.getElementById('waiting-pill');
       const text = document.getElementById('duty-text');
-      if (isOnline) {
-        btn.className = 'duty-btn online'; text.innerText = 'ONLINE'; requestWakeLock(); playBeep();
+      if (online) {
+        pill.className = 'waiting-pill active-duty';
+        text.innerText = 'Waiting for Order...';
+        loadRiderOrders();
       } else {
-        btn.className = 'duty-btn offline'; text.innerText = 'OFFLINE'; releaseWakeLock(); stopSiren();
+        pill.className = 'waiting-pill';
+        text.innerText = 'You are Offline';
+        document.getElementById('rider-orders-list').innerHTML = 
+          '<div style="text-align:center; color: var(--text-sub); padding: 20px; font-size: 12px;">आप ऑफ़लाइन हैं। ऑर्डर प्राप्त करने के लिए ऑनलाइन टॉगल ऑन करें।</div>';
       }
     }
 
-    function initRealtime() {
-      fetchMyOrders();
-      _supabase
-        .channel('rider:dispatch')
-        .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'orders' }, payload => {
-          const newOrder = payload.new;
-          if (isOnline && (!newOrder.assigned_rider_id || newOrder.assigned_rider_id === loggedInRider.id)) {
-            ordersCache.unshift(newOrder);
-            renderUI();
-            activeIncomingOrderId = newOrder.id;
-            document.getElementById('inc-order-id').innerText = `Order #ORD-${newOrder.id}`;
-            document.getElementById('inc-cust-name').innerText = `Customer: ${newOrder.customer_name}`;
-            document.getElementById('inc-total').innerText = `COD: ₹${newOrder.total_amount}`;
-            document.getElementById('incoming-modal').style.display = 'flex';
-            startSiren();
-          }
-        })
-        .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'orders' }, payload => {
-          const updated = payload.new;
-          const idx = ordersCache.findIndex(o => o.id === updated.id);
-          if (idx !== -1) { ordersCache[idx] = updated; renderUI(); }
-        })
-        .subscribe();
-    }
-
-    async function fetchMyOrders() {
+    async function loadRiderOrders() {
+      if (!isOnline) return;
       try {
         const { data, error } = await _supabase
-          .from('orders').select('*')
-          .or(`assigned_rider_id.is.null,assigned_rider_id.eq.${loggedInRider.id}`)
+          .from('orders')
+          .select('*')
+          .or('status.eq.Out for Delivery,status.eq.Order Placed,status.eq.Paid Online (UPI)')
           .order('id', { ascending: false });
+
         if (error) throw error;
-        ordersCache = data || [];
-        document.getElementById('loader').style.display = 'none';
-        renderUI();
-      } catch (err) { console.error(err); }
+        renderTasks(data || []);
+      } catch (e) {
+        console.log(e);
+      }
     }
 
-    function switchTab(tab) {
-      currentTab = tab;
-      document.getElementById('tab-active').className = tab === 'active' ? 'tab-item active' : 'tab-item';
-      document.getElementById('tab-delivered').className = tab === 'delivered' ? 'tab-item active' : 'tab-item';
-      renderUI();
-    }
-
-    function renderUI() {
-      const container = document.getElementById('orders-list');
-      const active = ordersCache.filter(o => o.status !== 'Delivered');
-      const delivered = ordersCache.filter(o => o.status === 'Delivered');
-
-      document.getElementById('count-active').innerText = active.length;
-      document.getElementById('count-delivered').innerText = delivered.length;
-
-      const list = currentTab === 'active' ? active : delivered;
-      if (list.length === 0) {
-        container.innerHTML = `<div style="text-align: center; padding: 60px 0; color: var(--z-muted); font-size: 13px;">${currentTab === 'active' ? 'No active orders.' : 'No delivered orders.'}</div>`;
+    function renderTasks(orders) {
+      const container = document.getElementById('rider-orders-list');
+      if (orders.length === 0) {
+        container.innerHTML = '<div style="text-align:center; color: var(--text-sub); padding: 20px; font-size: 12px;">Waiting for Order... कोई नया ऑर्डर नहीं है।</div>';
         return;
       }
 
-      container.innerHTML = list.map(order => {
-        const isNew = order.status === 'Order Placed';
-        const isPicked = order.status === 'Out for Delivery' || order.status === 'Picked Up';
-        const isDone = order.status === 'Delivered';
-
-        const itemsHTML = Array.isArray(order.items)
-          ? order.items.map(i => `<div class="item-row"><span>${i.name} × ${i.qty}</span><span>₹${i.subtotal}</span></div>`).join('')
-          : 'Items missing';
-
-        let badgeClass = isPicked ? 'badge-picked' : (isDone ? 'badge-delivered' : 'badge-placed');
-        let badgeTxt = isPicked ? 'ON THE WAY' : (isDone ? 'DELIVERED' : 'READY FOR PICKUP');
-
-        return `
-          <div class="order-card">
-            <div class="order-header">
-              <div class="order-id-txt">#ORD-${order.id}</div>
-              <div class="status-badge ${badgeClass}">${badgeTxt}</div>
-            </div>
-            <div class="info-card">
-              <div class="cust-name">👤 ${order.customer_name}</div>
-              <div class="cust-loc">📍 ${order.delivery_address}</div>
-            </div>
-            <div class="items-container">
-              <div style="font-weight: 700; color: var(--z-muted); margin-bottom: 6px;">ITEMS IN BAG:</div>
-              ${itemsHTML}
-              <div class="cod-bill"><span>Collect Cash (COD):</span><span style="color: var(--z-green);">₹${order.total_amount}</span></div>
-            </div>
-            ${isPicked ? `<div class="map-preview"><iframe src="https://maps.google.com/maps?q=${encodeURIComponent(order.delivery_address)}&t=&z=15&ie=UTF8&iwloc=&output=embed"></iframe></div>` : ''}
-            <div class="action-grid">
-              <a class="btn-call" href="tel:${order.customer_phone}">📞 Call</a>
-              <a class="btn-maps" target="_blank" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(order.delivery_address)}">🗺️ Open Map</a>
-            </div>
-            ${isNew ? `<button class="btn-stage btn-accept" onclick="acceptOrderLock(${order.id})">⚡ Accept & Pick Up Order</button>` : ''}
-            ${isPicked ? `<button class="btn-stage btn-deliver" onclick="markDelivered(${order.id})">✓ Mark as Delivered</button>` : ''}
+      container.innerHTML = orders.map(o => `
+        <div class="rider-order-card">
+          <div class="r-card-head">
+            <span style="font-weight:900; font-size:14px;">ORD #${o.id}</span>
+            <span class="r-badge">${o.status}</span>
           </div>
-        `;
-      }).join('');
+          <div style="font-size:13px; font-weight:700;">👤 ${o.customer_name} (📞 <a style="color:#38bdf8;" href="tel:${o.customer_phone}">${o.customer_phone}</a>)</div>
+          <div class="r-address">📍 ${o.delivery_address}</div>
+          <div style="font-size:13px; font-weight:800; color:var(--accent-green); margin:6px 0;">To Collect: ₹${o.total_amount} (${o.payment_mode || 'COD'})</div>
+
+          ${o.status !== 'Out for Delivery' ? `
+            <button class="btn-action-rider" style="background:#0284c7;" onclick="updateStatus(${o.id}, 'Out for Delivery')">
+              🛵 Pick Up & Start Delivery
+            </button>
+          ` : `
+            <button class="btn-action-rider" onclick="updateStatus(${o.id}, 'Delivered')">
+              ✅ Mark Delivered Successfully
+            </button>
+          `}
+        </div>
+      `).join('');
     }
 
-    async function acceptOrderLock(orderId) {
-      stopSiren();
-      await _supabase.from('orders').update({ status: 'Out for Delivery', assigned_rider_id: loggedInRider.id }).eq('id', orderId);
-      await fetchMyOrders();
-    }
-    async function markDelivered(orderId) {
-      await _supabase.from('orders').update({ status: 'Delivered' }).eq('id', orderId);
-      await fetchMyOrders();
-    }
-    async function acceptIncomingOrder() {
-      document.getElementById('incoming-modal').style.display = 'none';
-      stopSiren();
-      if (activeIncomingOrderId) {
-        await acceptOrderLock(activeIncomingOrderId);
-        activeIncomingOrderId = null;
+    async function updateStatus(id, newStatus) {
+      if (!confirm(`ऑर्डर #${id} को "${newStatus}" मार्क करें?`)) return;
+      const { error } = await _supabase.from('orders').update({ status: newStatus }).eq('id', id);
+      if (!error) {
+        loadRiderOrders();
+      } else {
+        alert('त्रुटि: ' + error.message);
       }
     }
+
+    loadRiderOrders();
+    setInterval(loadRiderOrders, 5000);
   </script>
 </body>
 </html>
