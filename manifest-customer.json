@@ -1,23 +1,23 @@
 {
-  "id": "/customer-app",
-  "name": "Zepto Grocery Customer",
-  "short_name": "Zepto",
-  "start_url": "./index.html",
-  "scope": "./",
+  "name": "👑 𝐁𝐀𝐁𝐀 𝐅𝐎𝐎𝐃 𝐃𝐄𝐋𝐈𝐕𝐄𝐑𝐘🏹",
+  "short_name": "𝐁𝐀𝐁𝐀 𝐅𝐎𝐎𝐃",
+  "start_url": "index.html",
   "display": "standalone",
-  "background_color": "#20003b",
-  "theme_color": "#3c006b",
+  "background_color": "#f4ecfb",
+  "theme_color": "#f4ecfb",
   "orientation": "portrait",
   "icons": [
     {
-      "src": "https://cdn-icons-png.flaticon.com/512/3081/3081840.png",
+      "src": "logo.png",
       "sizes": "192x192",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     },
     {
-      "src": "https://cdn-icons-png.flaticon.com/512/3081/3081840.png",
+      "src": "logo.png",
       "sizes": "512x512",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     }
   ]
 }
