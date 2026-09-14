@@ -105,7 +105,7 @@
     }
     .r-card-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
     .r-badge { background: #0284c7; color: white; padding: 4px 8px; border-radius: 6px; font-size: 11px; font-weight: 800; }
-    .r-address { font-size: 12px; color: #cbd5e1; margin: 8px 0; line-height: 1.4; }
+    .r-address { font-size: 12px; color: #cbd5e1; margin: 8px 0; line-height: 1.4; white-space: pre-line; }
     .btn-action-rider {
       background: var(--accent-green); color: white; border: none; width: 100%;
       padding: 12px; border-radius: 10px; font-size: 13px; font-weight: 800; cursor: pointer; margin-top: 8px;
@@ -115,7 +115,7 @@
     .bottom-nav {
       position: fixed; bottom: 0; left: 0; width: 100%; height: 62px;
       background: #ffffff; border-top: 1px solid #e2e8f0; display: flex;
-      justify-content: space-around; align-items: center; z-index: 200;
+      justify-content: space-around; align-items: center; z-index: 100;
     }
     .b-item { display: flex; flex-direction: column; align-items: center; gap: 3px; font-size: 10px; font-weight: 700; color: #64748b; text-decoration: none; cursor: pointer; }
     .b-item.active { color: #ef4444; }
@@ -226,6 +226,71 @@
     .btn-submit-photo {
       background: #e11d48; color: white; border: none; width: 100%;
       padding: 15px; border-radius: 10px; font-size: 16px; font-weight: 800; cursor: pointer;
+    }
+
+    /* ========================================================= */
+    /* SCREEN 3: "On the Way" Live Map Navigation Screen (117924.jpg) */
+    /* ========================================================= */
+    .way-screen {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: #f1f5f9; z-index: 700; display: none; flex-direction: column;
+    }
+    .way-screen.active { display: flex; }
+
+    .way-map-container {
+      position: relative; width: 100%; height: 58%; background: #e2e8f0; overflow: hidden;
+    }
+    .way-map-iframe { width: 100%; height: 100%; border: none; }
+
+    /* Top Floating SOS and Help Pill */
+    .way-top-bar {
+      position: absolute; top: 16px; right: 16px; display: flex; align-items: center; gap: 10px; z-index: 10;
+    }
+    .btn-sos {
+      background: #e11d48; color: white; font-size: 13px; font-weight: 900;
+      width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center;
+      justify-content: center; box-shadow: 0 4px 12px rgba(225, 29, 72, 0.4); border: none;
+    }
+    .btn-help-pill {
+      background: #ffffff; color: #1e293b; font-size: 13px; font-weight: 800;
+      padding: 10px 18px; border-radius: 24px; display: flex; align-items: center; gap: 6px;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.12); text-decoration: none; border: none;
+    }
+
+    /* Floating Turn-By-Turn Navigation Button (Purple) */
+    .btn-floating-navigate {
+      position: absolute; bottom: 20px; right: 16px; width: 48px; height: 48px;
+      background: #7e22ce; color: white; border-radius: 50%; display: flex;
+      align-items: center; justify-content: center; font-size: 22px; cursor: pointer;
+      box-shadow: 0 4px 14px rgba(126, 34, 206, 0.4); text-decoration: none; z-index: 10;
+    }
+
+    /* Bottom Address Sheet (White) */
+    .way-bottom-sheet {
+      flex: 1; background: #ffffff; border-radius: 24px 24px 0 0;
+      padding: 14px 20px 24px 20px; display: flex; flex-direction: column; justify-content: space-between;
+      box-shadow: 0 -4px 20px rgba(0,0,0,0.08); margin-top: -16px; z-index: 20; color: #0f172a;
+    }
+    .sheet-handle-pill {
+      width: 40px; height: 4px; background: #cbd5e1; border-radius: 4px; margin: 0 auto 12px auto;
+    }
+    .way-title {
+      font-size: 20px; font-weight: 900; text-align: center; color: #1e293b; margin-bottom: 12px;
+    }
+    .way-address-box {
+      display: flex; gap: 12px; align-items: flex-start; margin-bottom: auto;
+    }
+    .way-nav-arrow-circle {
+      width: 36px; height: 36px; border-radius: 50%; background: #e0f2fe; color: #0284c7;
+      display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0;
+    }
+    .way-addr-label { font-size: 11px; font-weight: 700; color: #64748b; margin-bottom: 2px; }
+    .way-addr-content { font-size: 13px; font-weight: 800; color: #0f172a; line-height: 1.4; max-height: 80px; overflow-y: auto; }
+
+    .btn-mark-arrived {
+      background: #e11d48; color: white; border: none; width: 100%;
+      padding: 15px; border-radius: 12px; font-size: 15px; font-weight: 900;
+      cursor: pointer; box-shadow: 0 4px 14px rgba(225, 29, 72, 0.35);
     }
   </style>
 </head>
@@ -386,6 +451,47 @@
     </div>
   </div>
 
+  <!-- ============================================================== -->
+  <!-- SCREEN 3: "On the Way" Live Map Screen (Screenshot 117924.jpg) -->
+  <!-- ============================================================== -->
+  <div class="way-screen" id="way-screen">
+    <div class="way-map-container">
+      <!-- Top Action Floating Controls -->
+      <div class="way-top-bar">
+        <button class="btn-sos" onclick="alert('🚨 आपातकालीन अलर्ट एडमिन को भेज दिया गया है!')">SOS</button>
+        <a class="btn-help-pill" href="tel:9711107063">
+          <span>🎧</span> Help
+        </a>
+      </div>
+
+      <!-- Live Google Map View Frame -->
+      <iframe class="way-map-iframe" id="way-map-frame" src=""></iframe>
+
+      <!-- Floating Purple Navigation Button (Opens Native Google Maps App) -->
+      <a class="btn-floating-navigate" id="native-maps-intent-btn" href="#" target="_blank" title="Start Google Maps Navigation">
+        ↗
+      </a>
+    </div>
+
+    <!-- Bottom Address Sheet -->
+    <div class="way-bottom-sheet">
+      <div class="sheet-handle-pill"></div>
+      <div class="way-title">On the Way</div>
+
+      <div class="way-address-box">
+        <div class="way-nav-arrow-circle">➤</div>
+        <div>
+          <div class="way-addr-label">Customer Address</div>
+          <div class="way-addr-content" id="way-customer-address">Loading customer address...</div>
+        </div>
+      </div>
+
+      <button class="btn-mark-arrived" id="btn-mark-arrived" onclick="handleMarkArrived()">
+        Mark Arrived
+      </button>
+    </div>
+  </div>
+
   <script>
     const SUPABASE_URL = 'https://mpeikimhkjuinqkjaumr.supabase.co';
     const SUPABASE_KEY = 'sb_publishable_2_wD-pbi_pNf8niiHxFbYA_saCIhApN';
@@ -496,14 +602,15 @@
               🛍️ Pick up Order (Go to Bin)
             </button>
           ` : `
-            <button class="btn-action-rider" onclick="markDelivered(${o.id})">
-              ✅ Mark Delivered Successfully
+            <button class="btn-action-rider" style="background:#e11d48;" onclick='openWayScreen(${JSON.stringify(o)})'>
+              🛵 Open Live Route (On the Way)
             </button>
           `}
         </div>
       `).join('');
     }
 
+    // SCREEN 1 Handlers
     function openBinScreen(order) {
       currentSelectedOrder = order;
       document.getElementById('bin-order-hash').innerText = `#BABA${order.id}DSNI19442A`;
@@ -526,6 +633,7 @@
       document.getElementById('camera-file-input').click();
     }
 
+    // SCREEN 2 Handlers
     function handlePhotoTaken(input) {
       if (input.files && input.files[0]) {
         const reader = new FileReader();
@@ -561,11 +669,13 @@
         .eq('id', currentSelectedOrder.id);
 
       if (!error) {
-        alert(`✅ ऑर्डर #${currentSelectedOrder.id} का फ़ोटो सबमिट हो गया और डिलीवरी शुरू हो गई!`);
         document.getElementById('photo-screen').classList.remove('active');
         document.getElementById('bin-screen').classList.remove('active');
         btn.innerText = 'Submit Photo';
         btn.disabled = false;
+        
+        // सीधे "On the Way" लाइव मैप स्क्रीन खोलें
+        openWayScreen(currentSelectedOrder);
         loadRiderOrders();
       } else {
         alert('त्रुटि: ' + error.message);
@@ -574,14 +684,58 @@
       }
     }
 
-    async function markDelivered(id) {
-      if (!confirm(`क्या ऑर्डर #${id} ग्राहक को डिलीवर कर दिया गया है?`)) return;
-      const { error } = await _supabase.from('orders').update({ status: 'Delivered' }).eq('id', id);
+    // ============================================
+    // SCREEN 3: "On the Way" Navigation Screen Logic
+    // ============================================
+    function openWayScreen(order) {
+      currentSelectedOrder = order;
+
+      const addressText = order.delivery_address || 'Address Not Provided';
+      document.getElementById('way-customer-address').innerText = addressText;
+
+      // URL में से Google Maps कोऑर्डिनेट्स निकालना या सर्च क्वेरी बनाना
+      let queryLoc = addressText;
+      const match = addressText.match(/https:\/\/maps\.google\.com\/\?q=([^\s]+)/);
+      if (match) {
+        queryLoc = match[1];
+      }
+
+      // Embed Map Iframe
+      document.getElementById('way-map-frame').src = 
+        `https://maps.google.com/maps?q=${encodeURIComponent(queryLoc)}&t=&z=16&ie=UTF8&iwloc=&output=embed`;
+
+      // Native Turn-by-Turn Navigation Link
+      document.getElementById('native-maps-intent-btn').href = 
+        `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(queryLoc)}`;
+
+      document.getElementById('way-screen').classList.add('active');
+    }
+
+    async function handleMarkArrived() {
+      if (!currentSelectedOrder) return;
+
+      const confirmDelivered = confirm(`क्या आप ग्राहक (${currentSelectedOrder.customer_name}) के पते पर पहुँच चुके हैं और ऑर्डर डिलीवर करना चाहते हैं?`);
+      if (!confirmDelivered) return;
+
+      const btn = document.getElementById('btn-mark-arrived');
+      btn.innerText = 'Updating Status...';
+      btn.disabled = true;
+
+      const { error } = await _supabase
+        .from('orders')
+        .update({ status: 'Delivered' })
+        .eq('id', currentSelectedOrder.id);
+
       if (!error) {
-        alert(`🎉 बधाई हो! ऑर्डर #${id} डिलीवर हो गया!`);
+        alert(`🎉 बधाई हो! ऑर्डर #${currentSelectedOrder.id} सफलतापूर्वक डिलीवर हो गया!`);
+        document.getElementById('way-screen').classList.remove('active');
+        btn.innerText = 'Mark Arrived';
+        btn.disabled = false;
         loadRiderOrders();
       } else {
         alert('त्रुटि: ' + error.message);
+        btn.innerText = 'Mark Arrived';
+        btn.disabled = false;
       }
     }
 
