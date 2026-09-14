@@ -38,6 +38,29 @@
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
     body { background-color: var(--bg-page); color: var(--text-main); padding-bottom: 120px; }
 
+    /* Fullscreen Logo Preview Modal */
+    .logo-modal-overlay {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0, 0, 0, 0.88); z-index: 9999; display: none;
+      align-items: center; justify-content: center; flex-direction: column;
+      backdrop-filter: blur(4px);
+    }
+    .logo-modal-overlay.active { display: flex; }
+    .full-logo-view {
+      width: 85%; max-width: 340px; border-radius: 50%;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+      border: 3px solid #ff758c; animation: popIn 0.25s ease-out;
+    }
+    .btn-close-preview {
+      position: absolute; top: 25px; right: 25px; background: #fff;
+      color: #000; border: none; width: 38px; height: 38px; border-radius: 50%;
+      font-size: 20px; font-weight: 900; cursor: pointer;
+    }
+    @keyframes popIn {
+      from { transform: scale(0.6); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+
     /* Side Drawer */
     .drawer-overlay {
       position: fixed; top: 0; left: 0; width: 100%; height: 100%;
@@ -51,20 +74,24 @@
     }
     .side-drawer.active { left: 0; }
     
-    /* Drawer Menu Header - 11x11 Logo Size */
     .drawer-header {
       background: linear-gradient(135deg, var(--zepto-purple), #240046);
-      color: white; padding: 20px 16px;
+      color: white; padding: 22px 16px;
     }
     .drawer-logo-img {
-      width: 44px;
-      height: 44px;
-      border-radius: 50%;
-      object-fit: cover;
+      width: 85px !important;
+      height: 85px !important;
+      border-radius: 50% !important;
+      object-fit: cover !important;
       background: #fff;
-      border: 2px solid #ff758c;
+      border: 3px solid #ff758c;
+      display: block !important;
+      margin-bottom: 8px;
+      cursor: pointer;
+      transition: transform 0.2s;
     }
-    .drawer-brand { font-size: 14px; font-weight: 900; color: #ff758c; line-height: 1.2; }
+    .drawer-logo-img:active { transform: scale(0.95); }
+    .drawer-brand { font-size: 15px; font-weight: 900; color: #ff758c; line-height: 1.2; }
     .drawer-menu-list { padding: 16px 0; flex: 1; overflow-y: auto; }
     .drawer-item {
       display: flex; align-items: center; gap: 12px; padding: 14px 20px;
@@ -79,32 +106,33 @@
     }
     .location-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
     .menu-trigger-btn {
-      background: #fff; border: 1px solid #e7daf5; width: 36px; height: 36px;
+      background: #fff; border: 1px solid #e7daf5; width: 40px; height: 40px;
       border-radius: 10px; display: flex; align-items: center; justify-content: center;
-      font-size: 18px; cursor: pointer;
+      font-size: 20px; cursor: pointer;
     }
     .eta-badge { font-size: 17px; font-weight: 900; color: #111; display: flex; align-items: center; gap: 4px; }
     .address-line { font-size: 11px; font-weight: 600; color: #475569; margin-top: 1px; }
 
-    /* Store Header Pill - 8x8 Logo & Text Size */
-    .store-pills-row { display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; margin-bottom: 12px; }
+    .store-pills-row { display: flex; gap: 10px; overflow-x: auto; scrollbar-width: none; margin-bottom: 12px; align-items: center; }
     .store-pills-row::-webkit-scrollbar { display: none; }
     .store-pill {
-      background: #fff; padding: 5px 10px; border-radius: 10px;
-      border: 1px solid #e7daf5; white-space: nowrap; display: flex; align-items: center; gap: 5px;
+      background: #fff; padding: 6px 14px; border-radius: 14px;
+      border: 1.5px solid #e7daf5; white-space: nowrap; display: flex; align-items: center; gap: 8px;
     }
     .store-pill.active { border-color: var(--zepto-purple); color: var(--zepto-purple); }
     
     .pill-logo-compact {
-      width: 32px;
-      height: 32px;
-      border-radius: 50%;
-      object-fit: cover;
+      width: 50px !important;
+      height: 50px !important;
+      border-radius: 50% !important;
+      object-fit: cover !important;
+      border: 1.5px solid var(--zepto-purple);
+      display: inline-block !important;
     }
     .pill-text-compact {
-      font-size: 11px;
-      font-weight: 800;
-      line-height: 1.1;
+      font-size: 14px !important;
+      font-weight: 900 !important;
+      line-height: 1.2;
     }
 
     .search-box-wrap { position: relative; margin-bottom: 12px; }
@@ -228,7 +256,7 @@
     }
     .pay-opt.selected { border-color: var(--zepto-pink); background: #fff0f4; color: var(--zepto-pink); }
 
-    /* UPI Gate Area */
+    /* UPI Dynamic Gate */
     .upi-gate-card {
       background: #faf5ff; border: 1.5px dashed var(--zepto-purple);
       border-radius: 12px; padding: 14px; text-align: center; margin-bottom: 12px; display: none;
@@ -266,17 +294,21 @@
 </head>
 <body>
 
-  <!-- Side Drawer (11x11 Logo Size) -->
+  <!-- Fullscreen Logo Modal -->
+  <div class="logo-modal-overlay" id="logo-preview-modal" onclick="closeLogoPreview()">
+    <button class="btn-close-preview" onclick="closeLogoPreview()">✕</button>
+    <img class="full-logo-view" src="logo.png" alt="Full Logo" onclick="event.stopPropagation()">
+    <div style="color: #fff; font-weight: 800; font-size: 15px; margin-top: 14px;">👑 𝐁𝐀𝐁𝐀 𝐅𝐎𝐎𝐃 𝐃𝐄𝐋𝐈𝐕𝐄𝐑𝐘🏹</div>
+  </div>
+
+  <!-- Side Drawer -->
   <div class="drawer-overlay" id="drawer-overlay" onclick="toggleDrawer(false)"></div>
   <div class="side-drawer" id="side-drawer">
     <div class="drawer-header">
-      <div style="display: flex; align-items: center; gap: 10px;">
-        <img class="drawer-logo-img" src="logo.png" alt="Logo" onerror="this.style.display='none'">
-        <div>
-          <div class="drawer-brand">👑 𝐁𝐀𝐁𝐀 𝐅𝐎𝐎𝐃 𝐃𝐄𝐋𝐈𝐕𝐄𝐑𝐘🏹</div>
-          <div style="font-size: 10px; color: #fdf4ff; margin-top: 2px;">Fast Express Delivery</div>
-        </div>
-      </div>
+      <!-- लोगो पर क्लिक करने से पूरा बड़ा लोगो खुलेगा -->
+      <img class="drawer-logo-img" src="logo.png" alt="Logo" title="Tap to view full logo" onclick="openLogoPreview()" onerror="this.style.display='none'">
+      <div class="drawer-brand">👑 𝐁𝐀𝐁𝐀 𝐅𝐎𝐎𝐃 𝐃𝐄𝐋𝐈𝐕𝐄𝐑𝐘🏹</div>
+      <div style="font-size: 11px; color: #fdf4ff; margin-top: 2px;">Fast Express Delivery</div>
     </div>
     <div class="drawer-menu-list">
       <div class="drawer-item" onclick="toggleDrawer(false); scrollToHistory();">
@@ -310,7 +342,7 @@
       <button class="menu-trigger-btn" onclick="openSupportModal()" title="Help & Support">🎧</button>
     </div>
 
-    <!-- Store Brand Pill (8x8 Logo & Text Size) -->
+    <!-- Store Brand Pill -->
     <div class="store-pills-row">
       <div class="store-pill active">
         <img class="pill-logo-compact" src="logo.png" alt="Logo" onerror="this.style.display='none'">
@@ -324,13 +356,13 @@
       </div>
     </div>
 
-    <!-- Search Input -->
+    <!-- Search Box -->
     <div class="search-box-wrap">
       <span class="search-icon-pos">🔍</span>
       <input type="text" id="search-input" class="search-bar-input" placeholder='Search items...' oninput="handleFilter()">
     </div>
 
-    <!-- Category Scroll -->
+    <!-- Categories -->
     <div class="category-scroll" id="category-chips">
       <div class="cat-item active" onclick="setCategory('All', this)">
         <div class="cat-icon-circle">🛍️</div>
@@ -377,7 +409,7 @@
     </div>
   </div>
 
-  <!-- Cart Bar -->
+  <!-- Cart Float Bar -->
   <div class="floating-cart-bar" id="cart-float-bar" onclick="openCartModal()">
     <div>
       <div class="cart-summary-text" id="float-qty-text">0 Items Added</div>
@@ -386,7 +418,7 @@
     <div style="font-size: 13px; font-weight: 800;">View Cart ➔</div>
   </div>
 
-  <!-- Navigation Bar -->
+  <!-- Bottom Nav -->
   <div class="bottom-nav-bar">
     <div class="nav-item active" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">
       <div class="nav-item-icon">🏠</div>
@@ -406,7 +438,7 @@
     </div>
   </div>
 
-  <!-- Cart Sheet Modal -->
+  <!-- Cart Modal -->
   <div class="modal-overlay" id="cart-modal" onclick="closeCartModal(event)">
     <div class="bottom-sheet" onclick="event.stopPropagation()">
       <div class="sheet-head">
@@ -446,7 +478,7 @@
         </div>
       </div>
 
-      <!-- UPI Dynamic QR Gate (Exact Cart Amount Accepted Automatically) -->
+      <!-- UPI Dynamic Gate -->
       <div class="upi-gate-card" id="upi-box">
         <div style="font-size: 14px; font-weight: 800; color: var(--zepto-purple);">
           स्कैन करके पेमेंट करें (₹<span id="upi-box-amount">0</span>):
@@ -546,6 +578,13 @@
       'All': '🛍️', 'Grocery': '🥦', 'Dairy': '🥛', 'Snacks': '🍿', 'Bakery': '🍞', 'Drinks': '🥤'
     };
 
+    function openLogoPreview() {
+      document.getElementById('logo-preview-modal').classList.add('active');
+    }
+    function closeLogoPreview() {
+      document.getElementById('logo-preview-modal').classList.remove('active');
+    }
+
     async function initApp() {
       renderPastOrdersUI();
       try {
@@ -565,7 +604,6 @@
       }
     }
 
-    // Dynamic QR Generator that locks exact bill amount
     function refreshUpiQr() {
       const { finalToPay } = calculateTotals();
       document.getElementById('upi-box-amount').innerText = finalToPay;
@@ -681,7 +719,6 @@
       updateCartBar();
       renderCartSheet();
       
-      // Auto update QR if UPI is active
       if (selectedPaymentMode === 'UPI') {
         refreshUpiQr();
       }
