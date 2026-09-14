@@ -24,9 +24,7 @@
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
     body { background-color: var(--bg-dark); color: var(--text-white); padding-bottom: 90px; }
 
-    /* ========================================= */
-    /* 1. AUTH SCREEN (LOGIN / REGISTER PORTAL)  */
-    /* ========================================= */
+    /* AUTH SCREEN */
     .auth-overlay {
       position: fixed; top: 0; left: 0; width: 100%; height: 100%;
       background: #0b0f19; z-index: 1000; display: none;
@@ -102,7 +100,6 @@
     }
     .slot-banner a { color: #ea580c; text-decoration: none; font-weight: 800; }
 
-    /* Promo Card */
     .promo-card {
       background: #fdf2f8; color: #831843; border-radius: 12px; margin: 14px 16px; padding: 12px 14px;
       display: flex; justify-content: space-between; align-items: center; border: 1px solid #fbcfe8;
@@ -145,7 +142,6 @@
       background: var(--accent-pink); color: #fff; box-shadow: 0 2px 8px rgba(225, 29, 72, 0.3);
     }
 
-    /* Date Divider Pill */
     .date-badge-pill {
       background: #334155; color: #38bdf8; font-size: 11px; font-weight: 800;
       padding: 4px 12px; border-radius: 20px; display: inline-block; margin: 8px 0 8px 0;
@@ -231,19 +227,59 @@
     .way-addr-content { font-size: 13px; font-weight: 800; color: #0f172a; line-height: 1.4; max-height: 80px; overflow-y: auto; }
     .btn-mark-arrived { background: #e11d48; color: white; border: none; width: 100%; padding: 15px; border-radius: 12px; font-size: 15px; font-weight: 900; cursor: pointer; }
 
+    /* ======================================================== */
+    /* COD SLIDE-TO-CONFIRM CASH COLLECTION BOTTOM MODAL        */
+    /* ======================================================== */
+    .cod-modal-overlay {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0, 0, 0, 0.8); z-index: 850; display: none;
+      align-items: flex-end; justify-content: center; backdrop-filter: blur(4px);
+    }
+    .cod-modal-overlay.active { display: flex; }
+    .cod-sheet {
+      background: #ffffff; width: 100%; max-width: 480px; border-radius: 26px 26px 0 0;
+      padding: 24px 20px 30px 20px; text-align: center; color: #0f172a;
+      animation: slideUp 0.25s ease-out;
+    }
+    .cod-cash-icon {
+      width: 65px; height: 65px; border-radius: 50%; background: #fef3c7;
+      color: #b45309; display: flex; align-items: center; justify-content: center;
+      font-size: 32px; margin: 0 auto 10px auto;
+    }
+    .cod-collect-banner {
+      background: #f8fafc; border: 2px dashed #cbd5e1; border-radius: 14px;
+      padding: 16px; margin: 16px 0;
+    }
+
+    /* Swipe / Slide-to-Confirm Button Track */
+    .slider-track {
+      position: relative; width: 100%; height: 58px; background: #e2e8f0;
+      border-radius: 30px; overflow: hidden; display: flex; align-items: center;
+      justify-content: center; user-select: none; touch-action: none;
+    }
+    .slider-track-text {
+      font-size: 13px; font-weight: 800; color: #475569; pointer-events: none;
+      letter-spacing: 0.5px;
+    }
+    .slider-thumb {
+      position: absolute; left: 4px; top: 4px; width: 50px; height: 50px;
+      background: var(--accent-green); border-radius: 50%; display: flex;
+      align-items: center; justify-content: center; color: white; font-size: 22px;
+      font-weight: 900; cursor: grab; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+      transition: background 0.2s;
+    }
+
     /* SCREEN 4: Delivery Success Modal */
-    .success-modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.75); z-index: 800; display: none; align-items: flex-end; justify-content: center; backdrop-filter: blur(4px); }
+    .success-modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.75); z-index: 900; display: none; align-items: flex-end; justify-content: center; backdrop-filter: blur(4px); }
     .success-modal-overlay.active { display: flex; }
     .success-sheet { background: #ffffff; width: 100%; max-width: 480px; border-radius: 24px 24px 0 0; padding: 24px 20px 30px 20px; text-align: center; color: #0f172a; }
     .success-check-circle { width: 70px; height: 70px; border-radius: 50%; background: #dcfce7; color: var(--accent-green); display: flex; align-items: center; justify-content: center; font-size: 36px; margin: 0 auto 12px auto; }
     .success-amount-pill { background: #f8fafc; border: 1.5px dashed #cbd5e1; border-radius: 12px; padding: 12px; margin: 16px 0; font-size: 14px; font-weight: 800; }
 
-    /* ========================================= */
-    /* 2. PROFILE & SUPPORT DRAWER MODAL        */
-    /* ========================================= */
+    /* PROFILE & SUPPORT DRAWER */
     .profile-modal-overlay {
       position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(0, 0, 0, 0.7); z-index: 900; display: none;
+      background: rgba(0, 0, 0, 0.7); z-index: 950; display: none;
       align-items: flex-end; justify-content: center; backdrop-filter: blur(4px);
     }
     .profile-modal-overlay.active { display: flex; }
@@ -252,29 +288,17 @@
       padding: 24px 20px 30px 20px; color: #0f172a;
     }
     .profile-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; border-bottom: 1px solid #f1f5f9; padding-bottom: 12px; }
-    .profile-info-box {
-      background: #f8fafc; border-radius: 14px; padding: 14px; border: 1px solid #e2e8f0; margin-bottom: 16px;
-    }
+    .profile-info-box { background: #f8fafc; border-radius: 14px; padding: 14px; border: 1px solid #e2e8f0; margin-bottom: 16px; }
     .p-row { display: flex; justify-content: space-between; font-size: 13px; padding: 5px 0; }
     .p-label { color: #64748b; font-weight: 700; }
     .p-val { font-weight: 900; color: #0f172a; }
-
-    .btn-help-link {
-      display: flex; align-items: center; justify-content: center; gap: 8px;
-      width: 100%; padding: 13px; border-radius: 10px; font-size: 13px; font-weight: 800;
-      text-decoration: none; margin-bottom: 10px;
-    }
-    .btn-logout {
-      background: #fee2e2; color: #dc2626; border: 1.5px solid #fca5a5; width: 100%;
-      padding: 13px; border-radius: 10px; font-size: 14px; font-weight: 900; cursor: pointer; margin-top: 6px;
-    }
+    .btn-help-link { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 13px; border-radius: 10px; font-size: 13px; font-weight: 800; text-decoration: none; margin-bottom: 10px; }
+    .btn-logout { background: #fee2e2; color: #dc2626; border: 1.5px solid #fca5a5; width: 100%; padding: 13px; border-radius: 10px; font-size: 14px; font-weight: 900; cursor: pointer; margin-top: 6px; }
   </style>
 </head>
 <body>
 
-  <!-- ============================================ -->
-  <!-- 1. AUTH SCREEN (LOGIN & REGISTER)            -->
-  <!-- ============================================ -->
+  <!-- 1. AUTH SCREEN -->
   <div class="auth-overlay" id="auth-overlay">
     <div class="auth-box">
       <img class="auth-logo" src="logo.png" alt="Logo" onerror="this.style.display='none'">
@@ -292,7 +316,7 @@
         <button class="btn-auth-submit" onclick="handleRiderLogin()">🛵 Login to Duty</button>
       </div>
 
-      <!-- Registration Form (Goes to Admin for Approval) -->
+      <!-- Registration Form -->
       <div id="auth-register-form" class="auth-input-group" style="display: none;">
         <input type="text" id="reg-name" class="auth-input" placeholder="Full Name (आपका पूरा नाम) *">
         <input type="tel" id="reg-phone" class="auth-input" placeholder="10-digit Mobile Number *" maxlength="10">
@@ -300,16 +324,11 @@
         <button class="btn-auth-submit" style="background:#0284c7;" onclick="handleRiderRegister()">
           📝 Submit Request to Admin
         </button>
-        <div style="font-size: 11px; color: #94a3b8; text-align: center; margin-top: 4px;">
-          नोट: रिक्वेस्ट सबमिट होने के बाद एडमिन द्वारा अप्रूवल मिलने पर ही आप लॉगिन कर पाएँगे।
-        </div>
       </div>
     </div>
   </div>
 
-  <!-- ============================================ -->
-  <!-- 2. MAIN RIDER APP INTERFACE                  -->
-  <!-- ============================================ -->
+  <!-- 2. MAIN RIDER INTERFACE -->
   <div id="rider-main-app">
     <!-- Top Store Header -->
     <div class="top-bar">
@@ -329,7 +348,7 @@
       </div>
     </div>
 
-    <!-- Live Shift & Login Timers -->
+    <!-- Live Shift Timers -->
     <div class="shift-box">
       <div class="shift-left">
         <span class="shift-icon">⏱️</span>
@@ -357,13 +376,13 @@
       <button class="btn-refer" onclick="alert('रेफ़रल लिंक जल्द उपलब्ध होगा!')">Refer Now ❯</button>
     </div>
 
-    <!-- Waiting / Duty Pill -->
+    <!-- Waiting Pill -->
     <div class="waiting-pill active-duty" id="waiting-pill">
       <span style="font-size: 18px;">🛍️</span>
       <span class="waiting-text" id="duty-text">Waiting for Order...</span>
     </div>
 
-    <!-- Total Earnings Card -->
+    <!-- Earnings Card -->
     <div class="earnings-card">
       <div class="main-earning" id="live-total-earning">₹0 <span style="font-size: 14px; font-weight: 600; color: #64748b;">earned</span></div>
       
@@ -383,7 +402,7 @@
       </div>
     </div>
 
-    <!-- Segments: Active Tasks vs Completed History -->
+    <!-- Segments -->
     <div class="segment-wrap">
       <button class="seg-btn active" id="seg-active" onclick="switchOrderTab('ACTIVE')">Active Tasks 🛵</button>
       <button class="seg-btn" id="seg-delivered" onclick="switchOrderTab('DELIVERED')">Completed (2 Days) ✅</button>
@@ -394,7 +413,7 @@
       <div style="text-align:center; color: var(--text-sub); padding: 20px; font-size: 12px;">Waiting for Order... कोई नया ऑर्डर नहीं है।</div>
     </div>
 
-    <!-- Bottom Navigation -->
+    <!-- Bottom Nav -->
     <div class="bottom-nav">
       <div class="b-item active" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">
         <div class="b-icon">🏠</div>
@@ -489,7 +508,33 @@
         </div>
       </div>
       <button class="btn-mark-arrived" id="btn-mark-arrived" onclick="handleMarkArrived()">
-        Mark Arrived & Deliver
+        Mark Arrived
+      </button>
+    </div>
+  </div>
+
+  <!-- ======================================================== -->
+  <!-- COD SLIDE-TO-CONFIRM CASH COLLECTION BOTTOM MODAL        -->
+  <!-- ======================================================== -->
+  <div class="cod-modal-overlay" id="cod-modal">
+    <div class="cod-sheet">
+      <div class="cod-cash-icon">💵</div>
+      <div style="font-size: 19px; font-weight: 900;">Collect Cash Payment</div>
+      <div style="font-size: 12px; color: #64748b; margin-top: 2px;">डिलीवरी देने से पहले ग्राहक से नकद प्राप्त करें</div>
+
+      <div class="cod-collect-banner">
+        <div style="font-size: 11px; font-weight: 800; color: #64748b;">AMOUNT TO COLLECT:</div>
+        <div style="font-size: 32px; font-weight: 900; color: var(--accent-green); margin-top: 4px;" id="cod-amount-display">₹0</div>
+      </div>
+
+      <!-- Slide to Confirm Track -->
+      <div class="slider-track" id="slider-track">
+        <span class="slider-track-text">Slide to Confirm Cash ➔</span>
+        <div class="slider-thumb" id="slider-thumb">➔</div>
+      </div>
+
+      <button onclick="closeCodModal()" style="background:none; border:none; color:#64748b; font-size:12px; font-weight:800; margin-top:14px; cursor:pointer;">
+        ✕ Cancel
       </button>
     </div>
   </div>
@@ -502,7 +547,7 @@
       <div style="font-size: 12px; color: #64748b;" id="success-order-id">ORD #00 Delivered to customer</div>
       <div class="success-amount-pill">
         <div style="font-size: 11px; color: #64748b; margin-bottom: 2px;">COLLECTED PAYMENT</div>
-        <div style="font-size: 22px; font-weight: 900; color: var(--accent-green);" id="success-cash-text">₹0 (COD)</div>
+        <div style="font-size: 22px; font-weight: 900; color: var(--accent-green);" id="success-cash-text">₹0</div>
       </div>
       <button class="btn-action-rider" style="background: #0f172a; padding: 14px;" onclick="closeSuccessModal()">
         Next Task ➔
@@ -510,9 +555,7 @@
     </div>
   </div>
 
-  <!-- ============================================ -->
-  <!-- 3. PROFILE & LOGOUT & HELP MODAL             -->
-  <!-- ============================================ -->
+  <!-- PROFILE & SUPPORT MODAL -->
   <div class="profile-modal-overlay" id="profile-modal" onclick="closeProfileModal(event)">
     <div class="profile-sheet" onclick="event.stopPropagation()">
       <div class="profile-head">
@@ -542,11 +585,9 @@
       <a class="btn-help-link" style="background: #25D366; color:white;" target="_blank" href="https://wa.me/919711107063?text=Rider%20Support%20Needed">
         🟢 WhatsApp Support (9711107063)
       </a>
-
       <a class="btn-help-link" style="background: #0284c7; color:white;" href="tel:9711107063">
         📞 Call Admin Helpline
       </a>
-
       <button class="btn-logout" onclick="handleRiderLogout()">
         🚪 Logout from App
       </button>
@@ -567,9 +608,7 @@
     let currentViewTab = 'ACTIVE';
     let rawAllOrders = [];
 
-    // ============================================
-    // AUTHENTICATION LOGIC (LOGIN / REGISTRATION)
-    // ============================================
+    // AUTHENTICATION
     function checkAuthStatus() {
       if (!loggedInRider) {
         document.getElementById('auth-overlay').classList.add('active');
@@ -579,7 +618,7 @@
         document.getElementById('top-rider-id').innerText = `RIDER-${loggedInRider.id}`;
         document.getElementById('prof-name').innerText = loggedInRider.name;
         document.getElementById('prof-phone').innerText = loggedInRider.phone;
-        document.getElementById('prof-vehicle').innerText = loggedInRider.vehicle_no || 'Hero Maestro';
+        document.getElementById('prof-vehicle').innerText = loggedInRider.vehicle_no || 'Standard';
         document.getElementById('prof-status').innerText = loggedInRider.status || 'Active';
         loadRiderOrders();
       }
@@ -599,7 +638,6 @@
       }
     }
 
-    // New Registration (Sent to Admin Panel as Pending)
     async function handleRiderRegister() {
       const name = document.getElementById('reg-name').value.trim();
       const phone = document.getElementById('reg-phone').value.trim();
@@ -609,24 +647,19 @@
       if (!/^[6-9]\d{9}$/.test(phone)) { alert('कृपया 10 अंकों का सही मोबाइल नंबर दर्ज करें!'); return; }
 
       try {
-        // चेक करें पहले से रजिस्टर्ड तो नहीं
         const { data: existing } = await _supabase.from('riders').select('*').eq('phone', phone);
         if (existing && existing.length > 0) {
-          alert('⚠️ यह फोन नंबर पहले से रजिस्टर्ड है! कृपया लॉगिन टैब पर जाएँ।');
+          alert('⚠️ यह फोन नंबर पहले से रजिस्टर्ड है! कृपया लॉगिन करें।');
           switchAuthTab('LOGIN');
           return;
         }
 
         const { error } = await _supabase.from('riders').insert([{
-          name: name,
-          phone: phone,
-          vehicle_no: vehicle || 'Standard',
-          status: 'Pending' // सीधे पेंडिंग जाएगा
+          name: name, phone: phone, vehicle_no: vehicle || 'Standard', status: 'Pending'
         }]);
-
         if (error) throw error;
 
-        alert('✅ आपका रजिस्ट्रेशन सफलतापूर्वक सबमिट हो गया है!\n\nएडमिन द्वारा आपके फॉर्म को चेक करके Approve करने के बाद ही आप लॉगिन कर पाएँगे।');
+        alert('✅ रजिस्ट्रेशन सबमिट हो गया! एडमिन द्वारा अप्रूवल मिलने के बाद आप लॉगिन कर पाएँगे।');
         switchAuthTab('LOGIN');
         document.getElementById('login-phone').value = phone;
       } catch (err) {
@@ -634,59 +667,50 @@
       }
     }
 
-    // Rider Login (Verification from Database)
     async function handleRiderLogin() {
       const phone = document.getElementById('login-phone').value.trim();
-      if (!/^[6-9]\d{9}$/.test(phone)) { alert('कृपया अपना 10 अंकों का रजिस्टर्ड मोबाइल नंबर डालें!'); return; }
+      if (!/^[6-9]\d{9}$/.test(phone)) { alert('कृपया अपना 10 अंकों का मोबाइल नंबर डालें!'); return; }
 
       try {
         const { data, error } = await _supabase.from('riders').select('*').eq('phone', phone).single();
         if (error || !data) {
-          alert('❌ यह मोबाइल नंबर रजिस्टर्ड नहीं है! कृपया "New Registration" टैब पर जाकर रिक्वेस्ट भेजें।');
+          alert('❌ यह नंबर रजिस्टर्ड नहीं है! कृपया पहले New Registration करें।');
           return;
         }
-
         if (data.status === 'Pending') {
-          alert('⏳ आपका अकाउंट अभी पेंडिंग है!\n\nएडमिन ने अभी इसे Approve नहीं किया है। अप्रूव होते ही आप लॉगिन कर पाएँगे।');
+          alert('⏳ आपका अकाउंट पेंडिंग है! एडमिन द्वारा अप्रूवल का इंतज़ार करें।');
           return;
         }
-
         if (data.status === 'Blocked' || data.status === 'Deactivated') {
-          alert('🚫 आपका अकाउंट एडमिन द्वारा Deactivate/Block कर दिया गया है। हेल्पलाइन पर संपर्क करें।');
+          alert('🚫 आपका अकाउंट डिएक्टिवेट है। एडमिन से संपर्क करें।');
           return;
         }
 
-        // सफलता: लॉगिन डेटा सेव करें
         loggedInRider = data;
         localStorage.setItem('baba_logged_rider', JSON.stringify(data));
-        alert(`🎉 स्वागत है, ${data.name}! आप ड्यूटी पर ऑनलाइन हैं।`);
+        alert(`🎉 स्वागत है, ${data.name}!`);
         checkAuthStatus();
       } catch (e) {
         alert('लॉगिन एरर: ' + e.message);
       }
     }
 
-    // Rider Logout
     function handleRiderLogout() {
-      if (!confirm('क्या आप वाकई अपनी आईडी से Logout करना चाहते हैं?')) return;
+      if (!confirm('क्या आप वाकई Logout करना चाहते हैं?')) return;
       localStorage.removeItem('baba_logged_rider');
       loggedInRider = null;
       closeProfileModal();
       checkAuthStatus();
     }
 
-    // Profile Modal Helpers
     function openProfileModal() { document.getElementById('profile-modal').classList.add('active'); }
     function closeProfileModal(e) { if(e && e.target !== e.currentTarget) return; document.getElementById('profile-modal').classList.remove('active'); }
 
-    // ============================================
-    // Real Siren Logic
-    // ============================================
+    // SIREN SOUND
     function playLoudEmergencySiren() {
       try {
         if (!sharedAudioCtx) sharedAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
         if (sharedAudioCtx.state === 'suspended') sharedAudioCtx.resume();
-
         const now = sharedAudioCtx.currentTime;
         for (let i = 0; i < 5; i++) {
           const osc = sharedAudioCtx.createOscillator();
@@ -696,7 +720,6 @@
           osc.frequency.setValueAtTime(650, cycleStart);
           osc.frequency.linearRampToValueAtTime(980, cycleStart + 0.22);
           osc.frequency.linearRampToValueAtTime(650, cycleStart + 0.44);
-
           gain.gain.setValueAtTime(0.8, cycleStart);
           gain.gain.linearRampToValueAtTime(0.01, cycleStart + 0.44);
           osc.connect(gain);
@@ -710,7 +733,7 @@
       }
     }
 
-    // Persistent Timers
+    // PERSISTENT TIMERS
     let shiftStartTime = localStorage.getItem('baba_shift_start') || Date.now();
     localStorage.setItem('baba_shift_start', shiftStartTime);
 
@@ -749,7 +772,7 @@
       renderTasks();
     }
 
-    // Load 2-Day Rolling Orders
+    // ORDERS LOADER
     async function loadRiderOrders() {
       if (!isOnline || !loggedInRider) return;
       try {
@@ -778,13 +801,11 @@
               processedOrders.add(o.id);
             }
           });
-
           if (hasNewOrder) {
             localStorage.setItem('baba_processed_orders', JSON.stringify([...processedOrders]));
             playLoudEmergencySiren();
           }
         }
-
         renderTasks();
       } catch (e) {
         console.log("Rider load error:", e);
@@ -793,7 +814,6 @@
 
     function renderTasks() {
       const container = document.getElementById('rider-orders-list');
-
       let deliveredCount = 0;
       let totalEarnings = 0;
       rawAllOrders.forEach(o => {
@@ -882,11 +902,10 @@
           `;
         });
       }
-
       container.innerHTML = html;
     }
 
-    // SCREEN 1 Handlers
+    // SCREEN 1
     function openBinScreen(order) {
       currentSelectedOrder = order;
       document.getElementById('bin-order-hash').innerText = `#BABA${order.id}DSNI19442A`;
@@ -900,10 +919,9 @@
       `).join('');
       document.getElementById('bin-screen').classList.add('active');
     }
-
     function triggerNativeCamera() { document.getElementById('camera-file-input').click(); }
 
-    // SCREEN 2 Handlers
+    // SCREEN 2
     function handlePhotoTaken(input) {
       if (input.files && input.files[0]) {
         const reader = new FileReader();
@@ -916,7 +934,6 @@
         reader.readAsDataURL(input.files[0]);
       }
     }
-
     function retakePhoto() { document.getElementById('camera-file-input').click(); }
     function closePhotoScreen() { document.getElementById('photo-screen').classList.remove('active'); }
 
@@ -941,7 +958,7 @@
       }
     }
 
-    // SCREEN 3 Handlers
+    // SCREEN 3 (WAY SCREEN)
     function openWayScreen(order) {
       currentSelectedOrder = order;
       const addressText = order.delivery_address || 'Address Not Provided';
@@ -955,25 +972,104 @@
       document.getElementById('way-screen').classList.add('active');
     }
 
-    async function handleMarkArrived() {
+    // Mark Arrived Trigger
+    function handleMarkArrived() {
       if (!currentSelectedOrder) return;
-      const btn = document.getElementById('btn-mark-arrived');
-      btn.innerText = 'Confirming Delivery...';
-      btn.disabled = true;
 
-      const { error } = await _supabase.from('orders').update({ status: 'Delivered' }).eq('id', currentSelectedOrder.id);
-      if (!error) {
+      // अगर ऑर्डर कैश ऑन डिलीवरी (COD) है, तो स्लाइडर खोलें
+      if (currentSelectedOrder.payment_mode === 'COD') {
+        document.getElementById('cod-amount-display').innerText = `₹${currentSelectedOrder.total_amount}`;
+        initCodSlider();
+        document.getElementById('cod-modal').classList.add('active');
+      } else {
+        // अगर ऑनलाइन पेमेंट पहले ही हो चुका है
+        if (confirm(`ऑर्डर ऑनलाइन पेड है (₹${currentSelectedOrder.total_amount})। क्या डिलीवर मार्क करें?`)) {
+          finalizeOrderDelivery();
+        }
+      }
+    }
+
+    function closeCodModal() {
+      document.getElementById('cod-modal').classList.remove('active');
+    }
+
+    // ============================================
+    // SLIDE-TO-CONFIRM TOUCH/MOUSE DRAG LOGIC
+    // ============================================
+    function initCodSlider() {
+      const track = document.getElementById('slider-track');
+      const thumb = document.getElementById('slider-thumb');
+      let isDragging = false;
+      let startX = 0;
+      let maxSlide = track.clientWidth - thumb.clientWidth - 8;
+
+      thumb.style.left = '4px';
+      thumb.innerText = '➔';
+      thumb.style.background = 'var(--accent-green)';
+
+      const onStart = (e) => {
+        isDragging = true;
+        startX = (e.touches ? e.touches[0].clientX : e.clientX) - thumb.offsetLeft;
+      };
+
+      const onMove = (e) => {
+        if (!isDragging) return;
+        maxSlide = track.clientWidth - thumb.clientWidth - 8;
+        let currentX = (e.touches ? e.touches[0].clientX : e.clientX) - startX;
+
+        if (currentX < 4) currentX = 4;
+        if (currentX > maxSlide) currentX = maxSlide;
+
+        thumb.style.left = currentX + 'px';
+
+        // अगर पूरा दाएँ स्वाइप हो गया (90% से ज्यादा)
+        if (currentX >= maxSlide * 0.92) {
+          isDragging = false;
+          thumb.style.left = maxSlide + 'px';
+          thumb.innerText = '✓';
+          thumb.style.background = '#059669';
+          setTimeout(() => {
+            closeCodModal();
+            finalizeOrderDelivery();
+          }, 250);
+        }
+      };
+
+      const onEnd = () => {
+        if (!isDragging) return;
+        isDragging = false;
+        maxSlide = track.clientWidth - thumb.clientWidth - 8;
+        if (parseInt(thumb.style.left) < maxSlide * 0.9) {
+          thumb.style.transition = 'left 0.2s ease';
+          thumb.style.left = '4px';
+          setTimeout(() => thumb.style.transition = '', 200);
+        }
+      };
+
+      thumb.onmousedown = onStart;
+      window.onmousemove = onMove;
+      window.onmouseup = onEnd;
+
+      thumb.ontouchstart = onStart;
+      window.ontouchmove = onMove;
+      window.ontouchend = onEnd;
+    }
+
+    // FINAL ORDER DELIVERY SUBMIT
+    async function finalizeOrderDelivery() {
+      if (!currentSelectedOrder) return;
+      try {
+        const { error } = await _supabase.from('orders').update({ status: 'Delivered' }).eq('id', currentSelectedOrder.id);
+        if (error) throw error;
+
         document.getElementById('way-screen').classList.remove('active');
-        btn.innerText = 'Mark Arrived & Deliver';
-        btn.disabled = false;
         document.getElementById('success-order-id').innerText = `ORD #${currentSelectedOrder.id} Delivered to ${currentSelectedOrder.customer_name || 'Customer'}`;
         document.getElementById('success-cash-text').innerText = `₹${currentSelectedOrder.total_amount} (${currentSelectedOrder.payment_mode || 'COD'})`;
         document.getElementById('success-modal').classList.add('active');
+
         loadRiderOrders();
-      } else {
-        alert('त्रुटि: ' + error.message);
-        btn.innerText = 'Mark Arrived & Deliver';
-        btn.disabled = false;
+      } catch (err) {
+        alert('डिलीवरी अपडेट एरर: ' + err.message);
       }
     }
 
