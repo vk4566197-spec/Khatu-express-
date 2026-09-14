@@ -24,6 +24,16 @@
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
     body { background-color: var(--bg-dark); color: var(--text-white); padding-bottom: 90px; }
 
+    /* Sound/Alert Permission Strip */
+    .audio-notice-bar {
+      background: #7e22ce; color: #fff; padding: 8px 16px; font-size: 11px;
+      font-weight: 800; display: flex; justify-content: space-between; align-items: center;
+    }
+    .btn-sound-allow {
+      background: #fff; color: #7e22ce; border: none; padding: 4px 10px;
+      border-radius: 6px; font-weight: 900; font-size: 11px; cursor: pointer;
+    }
+
     /* Top Partner Store Header */
     .top-bar {
       background: #ffffff; color: #1e293b; padding: 12px 16px;
@@ -115,7 +125,7 @@
     .bottom-nav {
       position: fixed; bottom: 0; left: 0; width: 100%; height: 62px;
       background: #ffffff; border-top: 1px solid #e2e8f0; display: flex;
-      justify-content: space-around; align-items: center; z-index: 100;
+      justify-content: space-around; align-items: center; z-index: 200;
     }
     .b-item { display: flex; flex-direction: column; align-items: center; gap: 3px; font-size: 10px; font-weight: 700; color: #64748b; text-decoration: none; cursor: pointer; }
     .b-item.active { color: #ef4444; }
@@ -228,9 +238,7 @@
       padding: 15px; border-radius: 10px; font-size: 16px; font-weight: 800; cursor: pointer;
     }
 
-    /* ========================================================= */
-    /* SCREEN 3: "On the Way" Live Map Navigation Screen (117924.jpg) */
-    /* ========================================================= */
+    /* SCREEN 3: "On the Way" Live Map Screen */
     .way-screen {
       position: fixed; top: 0; left: 0; width: 100%; height: 100%;
       background: #f1f5f9; z-index: 700; display: none; flex-direction: column;
@@ -242,7 +250,6 @@
     }
     .way-map-iframe { width: 100%; height: 100%; border: none; }
 
-    /* Top Floating SOS and Help Pill */
     .way-top-bar {
       position: absolute; top: 16px; right: 16px; display: flex; align-items: center; gap: 10px; z-index: 10;
     }
@@ -257,7 +264,6 @@
       box-shadow: 0 4px 14px rgba(0,0,0,0.12); text-decoration: none; border: none;
     }
 
-    /* Floating Turn-By-Turn Navigation Button (Purple) */
     .btn-floating-navigate {
       position: absolute; bottom: 20px; right: 16px; width: 48px; height: 48px;
       background: #7e22ce; color: white; border-radius: 50%; display: flex;
@@ -265,7 +271,6 @@
       box-shadow: 0 4px 14px rgba(126, 34, 206, 0.4); text-decoration: none; z-index: 10;
     }
 
-    /* Bottom Address Sheet (White) */
     .way-bottom-sheet {
       flex: 1; background: #ffffff; border-radius: 24px 24px 0 0;
       padding: 14px 20px 24px 20px; display: flex; flex-direction: column; justify-content: space-between;
@@ -295,6 +300,12 @@
   </style>
 </head>
 <body>
+
+  <!-- Audio & Notification Permission Bar -->
+  <div class="audio-notice-bar" id="audio-notice-bar">
+    <span>🔊 बैकग्राउंड सायरन ऑन करने के लिए यहाँ दबाएँ:</span>
+    <button class="btn-sound-allow" onclick="unlockAudioAndNotifications()">ACTIVATE SIREN</button>
+  </div>
 
   <!-- Top Store Header -->
   <div class="top-bar">
@@ -417,7 +428,7 @@
     </div>
 
     <div class="bin-items-row" id="bin-items-container"></div>
-    <div class="bin-floating-bell" onclick="playOrderBell()">🔔</div>
+    <div class="bin-floating-bell" onclick="playLoudEmergencySiren()">🚨</div>
 
     <div class="bin-bottom-bar">
       <input type="file" id="camera-file-input" accept="image/*" capture="environment" style="display:none;" onchange="handlePhotoTaken(this)">
@@ -451,12 +462,9 @@
     </div>
   </div>
 
-  <!-- ============================================================== -->
-  <!-- SCREEN 3: "On the Way" Live Map Screen (Screenshot 117924.jpg) -->
-  <!-- ============================================================== -->
+  <!-- SCREEN 3: "On the Way" Live Map Screen -->
   <div class="way-screen" id="way-screen">
     <div class="way-map-container">
-      <!-- Top Action Floating Controls -->
       <div class="way-top-bar">
         <button class="btn-sos" onclick="alert('🚨 आपातकालीन अलर्ट एडमिन को भेज दिया गया है!')">SOS</button>
         <a class="btn-help-pill" href="tel:9711107063">
@@ -464,16 +472,13 @@
         </a>
       </div>
 
-      <!-- Live Google Map View Frame -->
       <iframe class="way-map-iframe" id="way-map-frame" src=""></iframe>
 
-      <!-- Floating Purple Navigation Button (Opens Native Google Maps App) -->
       <a class="btn-floating-navigate" id="native-maps-intent-btn" href="#" target="_blank" title="Start Google Maps Navigation">
         ↗
       </a>
     </div>
 
-    <!-- Bottom Address Sheet -->
     <div class="way-bottom-sheet">
       <div class="sheet-handle-pill"></div>
       <div class="way-title">On the Way</div>
@@ -500,6 +505,83 @@
     let isOnline = true;
     let knownOrderIds = new Set();
     let currentSelectedOrder = null;
+    let audioUnlocked = false;
+    let sharedAudioCtx = null;
+
+    // ============================================
+    // Real Two-Tone Delivery Siren (Police/Ambulance Siren Sound)
+    // ============================================
+    function playLoudEmergencySiren() {
+      try {
+        if (!sharedAudioCtx) {
+          sharedAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+        if (sharedAudioCtx.state === 'suspended') {
+          sharedAudioCtx.resume();
+        }
+
+        const now = sharedAudioCtx.currentTime;
+        const sirenCycles = 6; // 6 बार तेज़ सायरन बजेगा
+
+        for (let i = 0; i < sirenCycles; i++) {
+          const osc = sharedAudioCtx.createOscillator();
+          const gain = sharedAudioCtx.createGain();
+
+          osc.type = 'sawtooth'; // सायरन की धारदार आवाज़
+
+          const cycleStart = now + (i * 0.45);
+          // सायरन की पिच 650Hz से 980Hz तक घूमेगी (Two-tone Woo-Waa)
+          osc.frequency.setValueAtTime(650, cycleStart);
+          osc.frequency.linearRampToValueAtTime(980, cycleStart + 0.22);
+          osc.frequency.linearRampToValueAtTime(650, cycleStart + 0.44);
+
+          gain.gain.setValueAtTime(0.8, cycleStart);
+          gain.gain.linearRampToValueAtTime(0.01, cycleStart + 0.44);
+
+          osc.connect(gain);
+          gain.connect(sharedAudioCtx.destination);
+
+          osc.start(cycleStart);
+          osc.stop(cycleStart + 0.45);
+        }
+
+        // मोबाइल वाइब्रेशन (Vibrate Pattern)
+        if (navigator.vibrate) {
+          navigator.vibrate([400, 200, 400, 200, 600]);
+        }
+      } catch (err) {
+        console.log("Audio Error:", err);
+      }
+    }
+
+    // यूट्यूब या बैकग्राउंड में रहने पर भी सिस्टम नोटिफिकेशन व सायरन एक्टिवेट करना
+    function unlockAudioAndNotifications() {
+      try {
+        sharedAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        sharedAudioCtx.resume().then(() => {
+          audioUnlocked = true;
+          document.getElementById('audio-notice-bar').style.display = 'none';
+          playLoudEmergencySiren(); // टेस्ट सायरन बजेगा
+        });
+
+        if ('Notification' in window && Notification.permission !== 'granted') {
+          Notification.requestPermission();
+        }
+      } catch (e) {
+        alert('ऑडियो अनलॉक हो गया है!');
+      }
+    }
+
+    // बैकग्राउंड नोटिफिकेशन पुश करना
+    function pushBackgroundAlert(order) {
+      if ('Notification' in window && Notification.permission === 'granted') {
+        new Notification('🚨 नया फूड ऑर्डर आया! (ORD #' + order.id + ')', {
+          body: `${order.customer_name} का ऑर्डर पिकअप करें! राशि: ₹${order.total_amount}`,
+          icon: 'logo.png',
+          requireInteraction: true
+        });
+      }
+    }
 
     // Live Login and Shift Timers
     let loginSeconds = parseInt(localStorage.getItem('baba_login_secs') || '0');
@@ -516,28 +598,6 @@
         document.getElementById('live-login-hrs').innerText = hrs;
       }
     }, 1000);
-
-    // Audio Alert
-    function playOrderBell() {
-      try {
-        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        for (let i = 0; i < 3; i++) {
-          setTimeout(() => {
-            const osc = audioCtx.createOscillator();
-            const gain = audioCtx.createGain();
-            osc.type = 'sine';
-            osc.frequency.setValueAtTime(880, audioCtx.currentTime);
-            gain.gain.setValueAtTime(0.6, audioCtx.currentTime);
-            osc.connect(gain);
-            gain.connect(audioCtx.destination);
-            osc.start();
-            osc.stop(audioCtx.currentTime + 0.22);
-          }, i * 300);
-        }
-      } catch (e) {
-        console.log(e);
-      }
-    }
 
     function toggleDuty(online) {
       isOnline = online;
@@ -567,9 +627,11 @@
         if (error) throw error;
         const orders = data || [];
 
+        // अगर कोई नया ऑर्डर आया, तो यूट्यूब/बैकग्राउंड पर भी सायरन और नोटिफिकेशन बजे
         orders.forEach(o => {
-          if (!knownOrderIds.has(o.id)) {
-            playOrderBell();
+          if (!knownOrderIds.has(o.id) && (o.status === 'Order Placed' || o.status === 'Paid Online (UPI)')) {
+            playLoudEmergencySiren();
+            pushBackgroundAlert(o);
             knownOrderIds.add(o.id);
           }
         });
@@ -674,7 +736,6 @@
         btn.innerText = 'Submit Photo';
         btn.disabled = false;
         
-        // सीधे "On the Way" लाइव मैप स्क्रीन खोलें
         openWayScreen(currentSelectedOrder);
         loadRiderOrders();
       } else {
@@ -684,27 +745,22 @@
       }
     }
 
-    // ============================================
-    // SCREEN 3: "On the Way" Navigation Screen Logic
-    // ============================================
+    // SCREEN 3 Handlers
     function openWayScreen(order) {
       currentSelectedOrder = order;
 
       const addressText = order.delivery_address || 'Address Not Provided';
       document.getElementById('way-customer-address').innerText = addressText;
 
-      // URL में से Google Maps कोऑर्डिनेट्स निकालना या सर्च क्वेरी बनाना
       let queryLoc = addressText;
       const match = addressText.match(/https:\/\/maps\.google\.com\/\?q=([^\s]+)/);
       if (match) {
         queryLoc = match[1];
       }
 
-      // Embed Map Iframe
       document.getElementById('way-map-frame').src = 
         `https://maps.google.com/maps?q=${encodeURIComponent(queryLoc)}&t=&z=16&ie=UTF8&iwloc=&output=embed`;
 
-      // Native Turn-by-Turn Navigation Link
       document.getElementById('native-maps-intent-btn').href = 
         `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(queryLoc)}`;
 
@@ -739,8 +795,15 @@
       }
     }
 
+    // पहली बार स्क्रीन पर कहीं भी क्लिक करने पर ऑडियो अनलॉक होगा
+    window.addEventListener('click', () => {
+      if (!audioUnlocked) {
+        unlockAudioAndNotifications();
+      }
+    }, { once: true });
+
     loadRiderOrders();
-    setInterval(loadRiderOrders, 5000);
+    setInterval(loadRiderOrders, 4000);
   </script>
 </body>
 </html>
