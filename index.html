@@ -415,7 +415,7 @@
     <div style="font-size: 13px; font-weight: 800;">View Cart ➔</div>
   </div>
 
-  <!-- Bottom Nav -->
+  <!-- Bottom Navigation -->
   <div class="bottom-nav-bar">
     <div class="nav-item active" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">
       <div class="nav-item-icon">🏠</div>
@@ -500,11 +500,17 @@
         <input type="tel" id="upi-utr" class="zepto-input" placeholder="12-अंकों का UTR No." maxlength="12" style="background: #fff; text-align: center; font-weight: 800; letter-spacing: 1px;">
       </div>
 
-      <!-- Checkout Form -->
+      <!-- Checkout Form with Live GPS Location Support -->
       <div class="input-group">
         <input type="text" id="c-name" class="zepto-input" placeholder="आपका नाम (Full Name) *">
         <input type="tel" id="c-phone" class="zepto-input" placeholder="10-digit Mobile (6-9 से शुरू) *" maxlength="10">
-        <input type="text" id="c-address" class="zepto-input" placeholder="डिलीवरी पता (Short Landmark) *">
+        
+        <!-- Live GPS Button -->
+        <button type="button" onclick="getCurrentLocation()" style="background:#f1f5f9; border:1.5px solid #cbd5e1; padding:9px; border-radius:10px; font-size:12px; font-weight:800; color:#334155; display:flex; align-items:center; justify-content:center; gap:6px; cursor:pointer;">
+          📍 Use My Current Location (GPS)
+        </button>
+
+        <textarea id="c-address" class="zepto-input" rows="2" placeholder="डिलीवरी पता (House/Flat No, Landmark) *"></textarea>
         <button class="btn-checkout" id="order-submit-btn" onclick="placeOrder()">Place Delivery Order</button>
       </div>
     </div>
@@ -580,6 +586,33 @@
     }
     function closeLogoPreview() {
       document.getElementById('logo-preview-modal').classList.remove('active');
+    }
+
+    // GPS Current Location Logic
+    function getCurrentLocation() {
+      if (!navigator.geolocation) {
+        alert('आपके ब्राउज़र में लोकेशन सपोर्ट नहीं है!');
+        return;
+      }
+      
+      const addrBox = document.getElementById('c-address');
+      addrBox.placeholder = 'Fetching GPS location...';
+
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const lat = position.coords.latitude;
+          const lng = position.coords.longitude;
+          const mapsLink = `https://maps.google.com/?q=${lat},${lng}`;
+          if (!addrBox.value.includes('http')) {
+            addrBox.value = (addrBox.value ? addrBox.value + '\n' : '') + `📍 GPS: ${mapsLink}`;
+          }
+          alert('✅ आपकी सटीक लोकेशन ले ली गई है!');
+        },
+        (error) => {
+          alert('लोकेशन परमिशन बंद है! कृपया ब्राउज़र सेटिंग्स में लोकेशन Allow करें।');
+        },
+        { enableHighAccuracy: true, timeout: 10000 }
+      );
     }
 
     async function initApp() {
