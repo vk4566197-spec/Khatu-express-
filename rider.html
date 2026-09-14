@@ -24,16 +24,6 @@
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
     body { background-color: var(--bg-dark); color: var(--text-white); padding-bottom: 90px; }
 
-    /* Sound/Alert Permission Strip */
-    .audio-notice-bar {
-      background: #7e22ce; color: #fff; padding: 8px 16px; font-size: 11px;
-      font-weight: 800; display: flex; justify-content: space-between; align-items: center;
-    }
-    .btn-sound-allow {
-      background: #fff; color: #7e22ce; border: none; padding: 4px 10px;
-      border-radius: 6px; font-weight: 900; font-size: 11px; cursor: pointer;
-    }
-
     /* Top Partner Store Header */
     .top-bar {
       background: #ffffff; color: #1e293b; padding: 12px 16px;
@@ -56,7 +46,7 @@
 
     .help-btn { font-size: 12px; font-weight: 700; color: #475569; display: flex; align-items: center; gap: 4px; text-decoration: none; }
 
-    /* Shift Details Bar with Live Counter */
+    /* Shift Details Bar with Persistent Counter */
     .shift-box {
       background: #ffffff; color: #1e293b; padding: 12px 16px; border-bottom: 1px solid #f1f5f9;
       display: flex; justify-content: space-between; align-items: center;
@@ -301,12 +291,6 @@
 </head>
 <body>
 
-  <!-- Audio & Notification Permission Bar -->
-  <div class="audio-notice-bar" id="audio-notice-bar">
-    <span>🔊 बैकग्राउंड सायरन ऑन करने के लिए यहाँ दबाएँ:</span>
-    <button class="btn-sound-allow" onclick="unlockAudioAndNotifications()">ACTIVATE SIREN</button>
-  </div>
-
   <!-- Top Store Header -->
   <div class="top-bar">
     <div class="store-info">
@@ -335,7 +319,7 @@
       </div>
     </div>
     <div class="shift-right">
-      <div class="shift-done" id="live-shift-timer">00m 00s</div>
+      <div class="shift-done" id="live-shift-timer">--m --s</div>
       <div class="shift-status-lbl">Completed</div>
     </div>
   </div>
@@ -503,14 +487,14 @@
     const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
     let isOnline = true;
-    let knownOrderIds = new Set();
+    let isFirstTimeLoad = true; // पेज लोड होने पर सायरन बजने से रोकने के लिए
+    let processedOrders = new Set(JSON.parse(localStorage.getItem('baba_processed_orders') || '[]'));
     let currentSelectedOrder = null;
-    let audioUnlocked = false;
     let sharedAudioCtx = null;
 
-    // ============================================
-    // Real Two-Tone Delivery Siren (Police/Ambulance Siren Sound)
-    // ============================================
+    // ============================================================
+    // Real Two-Tone Delivery Siren (सिर्फ और सिर्फ नए लाइव ऑर्डर पर बजेगा)
+    // ============================================================
     function playLoudEmergencySiren() {
       try {
         if (!sharedAudioCtx) {
@@ -521,16 +505,14 @@
         }
 
         const now = sharedAudioCtx.currentTime;
-        const sirenCycles = 6; // 6 बार तेज़ सायरन बजेगा
+        const sirenCycles = 5;
 
         for (let i = 0; i < sirenCycles; i++) {
           const osc = sharedAudioCtx.createOscillator();
           const gain = sharedAudioCtx.createGain();
 
-          osc.type = 'sawtooth'; // सायरन की धारदार आवाज़
-
+          osc.type = 'sawtooth';
           const cycleStart = now + (i * 0.45);
-          // सायरन की पिच 650Hz से 980Hz तक घूमेगी (Two-tone Woo-Waa)
           osc.frequency.setValueAtTime(650, cycleStart);
           osc.frequency.linearRampToValueAtTime(980, cycleStart + 0.22);
           osc.frequency.linearRampToValueAtTime(650, cycleStart + 0.44);
@@ -545,59 +527,38 @@
           osc.stop(cycleStart + 0.45);
         }
 
-        // मोबाइल वाइब्रेशन (Vibrate Pattern)
         if (navigator.vibrate) {
           navigator.vibrate([400, 200, 400, 200, 600]);
         }
       } catch (err) {
-        console.log("Audio Error:", err);
+        console.log("Audio Siren Error:", err);
       }
     }
 
-    // यूट्यूब या बैकग्राउंड में रहने पर भी सिस्टम नोटिफिकेशन व सायरन एक्टिवेट करना
-    function unlockAudioAndNotifications() {
-      try {
-        sharedAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        sharedAudioCtx.resume().then(() => {
-          audioUnlocked = true;
-          document.getElementById('audio-notice-bar').style.display = 'none';
-          playLoudEmergencySiren(); // टेस्ट सायरन बजेगा
-        });
-
-        if ('Notification' in window && Notification.permission !== 'granted') {
-          Notification.requestPermission();
-        }
-      } catch (e) {
-        alert('ऑडियो अनलॉक हो गया है!');
-      }
+    // ============================================================
+    // Persistent Live Shift & Login Timer (रिफ्रेश पर 0 नहीं होगा)
+    // ============================================================
+    let shiftStartTime = localStorage.getItem('baba_shift_start');
+    if (!shiftStartTime) {
+      shiftStartTime = Date.now();
+      localStorage.setItem('baba_shift_start', shiftStartTime);
+    } else {
+      shiftStartTime = parseInt(shiftStartTime);
     }
 
-    // बैकग्राउंड नोटिफिकेशन पुश करना
-    function pushBackgroundAlert(order) {
-      if ('Notification' in window && Notification.permission === 'granted') {
-        new Notification('🚨 नया फूड ऑर्डर आया! (ORD #' + order.id + ')', {
-          body: `${order.customer_name} का ऑर्डर पिकअप करें! राशि: ₹${order.total_amount}`,
-          icon: 'logo.png',
-          requireInteraction: true
-        });
-      }
-    }
-
-    // Live Login and Shift Timers
-    let loginSeconds = parseInt(localStorage.getItem('baba_login_secs') || '0');
-    setInterval(() => {
+    function updateLiveTimers() {
       if (isOnline) {
-        loginSeconds++;
-        localStorage.setItem('baba_login_secs', loginSeconds);
-
-        const m = Math.floor(loginSeconds / 60);
-        const s = loginSeconds % 60;
+        const elapsedSecs = Math.floor((Date.now() - shiftStartTime) / 1000);
+        const m = Math.floor(elapsedSecs / 60);
+        const s = elapsedSecs % 60;
         document.getElementById('live-shift-timer').innerText = `${m}m ${s}s`;
 
-        const hrs = (loginSeconds / 3600).toFixed(1);
+        const hrs = (elapsedSecs / 3600).toFixed(1);
         document.getElementById('live-login-hrs').innerText = hrs;
       }
-    }, 1000);
+    }
+    setInterval(updateLiveTimers, 1000);
+    updateLiveTimers();
 
     function toggleDuty(online) {
       isOnline = online;
@@ -615,6 +576,9 @@
       }
     }
 
+    // ============================================================
+    // Real-time Orders Sync & No-Fake Siren Check
+    // ============================================================
     async function loadRiderOrders() {
       if (!isOnline) return;
       try {
@@ -627,14 +591,26 @@
         if (error) throw error;
         const orders = data || [];
 
-        // अगर कोई नया ऑर्डर आया, तो यूट्यूब/बैकग्राउंड पर भी सायरन और नोटिफिकेशन बजे
-        orders.forEach(o => {
-          if (!knownOrderIds.has(o.id) && (o.status === 'Order Placed' || o.status === 'Paid Online (UPI)')) {
+        // पहली बार लोड होने पर सिर्फ पुराने ऑर्डर्स को याद रखें, सायरन न बजाएँ
+        if (isFirstTimeLoad) {
+          orders.forEach(o => processedOrders.add(o.id));
+          localStorage.setItem('baba_processed_orders', JSON.stringify([...processedOrders]));
+          isFirstTimeLoad = false;
+        } else {
+          // अब अगर सचमुच कोई नया ऑर्डर ग्राहक द्वारा किया गया है तभी सायरन बजे
+          let hasNewOrder = false;
+          orders.forEach(o => {
+            if (!processedOrders.has(o.id)) {
+              hasNewOrder = true;
+              processedOrders.add(o.id);
+            }
+          });
+
+          if (hasNewOrder) {
+            localStorage.setItem('baba_processed_orders', JSON.stringify([...processedOrders]));
             playLoudEmergencySiren();
-            pushBackgroundAlert(o);
-            knownOrderIds.add(o.id);
           }
-        });
+        }
 
         renderTasks(orders);
       } catch (e) {
@@ -795,10 +771,11 @@
       }
     }
 
-    // पहली बार स्क्रीन पर कहीं भी क्लिक करने पर ऑडियो अनलॉक होगा
+    // स्क्रीन पर पहली बार टच करने पर ऑडियो सिस्टम रेडी हो जाएगा
     window.addEventListener('click', () => {
-      if (!audioUnlocked) {
-        unlockAudioAndNotifications();
+      if (!sharedAudioCtx) {
+        sharedAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        sharedAudioCtx.resume();
       }
     }, { once: true });
 
