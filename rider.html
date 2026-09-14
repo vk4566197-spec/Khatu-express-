@@ -115,15 +115,13 @@
     .bottom-nav {
       position: fixed; bottom: 0; left: 0; width: 100%; height: 62px;
       background: #ffffff; border-top: 1px solid #e2e8f0; display: flex;
-      justify-content: space-around; align-items: center; z-index: 100;
+      justify-content: space-around; align-items: center; z-index: 200;
     }
     .b-item { display: flex; flex-direction: column; align-items: center; gap: 3px; font-size: 10px; font-weight: 700; color: #64748b; text-decoration: none; cursor: pointer; }
     .b-item.active { color: #ef4444; }
     .b-icon { font-size: 18px; }
 
-    /* ========================================================= */
-    /* SCREEN 1: "Go to the Bin" Pickup Screen (Screenshot Match) */
-    /* ========================================================= */
+    /* SCREEN 1: "Go to the Bin" View */
     .bin-screen {
       position: fixed; top: 0; left: 0; width: 100%; height: 100%;
       background: #f8fafc; z-index: 500; display: none; flex-direction: column;
@@ -182,9 +180,7 @@
       cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;
     }
 
-    /* =================================================================== */
-    /* SCREEN 2: "Take Photo of Items in Bag" Camera View (Screenshot Match)*/
-    /* =================================================================== */
+    /* SCREEN 2: "Take Photo of Items in Bag" View */
     .photo-screen {
       position: fixed; top: 0; left: 0; width: 100%; height: 100%;
       background: #000; z-index: 600; display: none; flex-direction: column;
@@ -338,9 +334,7 @@
     </div>
   </div>
 
-  <!-- ============================================================== -->
-  <!-- SCREEN 1: "Go to the Bin" View (117921.jpg Match)               -->
-  <!-- ============================================================== -->
+  <!-- SCREEN 1: "Go to the Bin" View -->
   <div class="bin-screen" id="bin-screen">
     <div class="bin-header">
       <div class="bin-title">Go to the Bin</div>
@@ -357,25 +351,18 @@
       <span>⌄</span>
     </div>
 
-    <!-- Items Grid from Order -->
     <div class="bin-items-row" id="bin-items-container"></div>
-
-    <!-- Floating Bell Icon -->
     <div class="bin-floating-bell" onclick="playOrderBell()">🔔</div>
 
     <div class="bin-bottom-bar">
-      <!-- Hidden Native Camera Input -->
       <input type="file" id="camera-file-input" accept="image/*" capture="environment" style="display:none;" onchange="handlePhotoTaken(this)">
-      
       <button class="btn-take-photo-trigger" onclick="triggerNativeCamera()">
         📷 Take Photo & Pick Up
       </button>
     </div>
   </div>
 
-  <!-- ============================================================== -->
-  <!-- SCREEN 2: "Take Photo of Items in Bag" View (117922.jpg Match)  -->
-  <!-- ============================================================== -->
+  <!-- SCREEN 2: "Take Photo of Items in Bag" View -->
   <div class="photo-screen" id="photo-screen">
     <div class="photo-nav">
       <button class="btn-photo-close" onclick="closePhotoScreen()">✕</button>
@@ -408,9 +395,7 @@
     let knownOrderIds = new Set();
     let currentSelectedOrder = null;
 
-    // ============================================
-    // Live Login and Completed Shift Timers
-    // ============================================
+    // Live Login and Shift Timers
     let loginSeconds = parseInt(localStorage.getItem('baba_login_secs') || '0');
     setInterval(() => {
       if (isOnline) {
@@ -426,9 +411,7 @@
       }
     }, 1000);
 
-    // ============================================
-    // Sound & Beep for New Order
-    // ============================================
+    // Audio Alert
     function playOrderBell() {
       try {
         const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -472,15 +455,14 @@
         const { data, error } = await _supabase
           .from('orders')
           .select('*')
-          .or('status.eq.Out for Delivery,status.eq.Order Placed,status.eq.Paid Online (UPI)')
+          .neq('status', 'Delivered')
           .order('id', { ascending: false });
 
         if (error) throw error;
         const orders = data || [];
 
-        // अगर नया ऑर्डर आया तो बीप/घंटी बजाएँ
         orders.forEach(o => {
-          if (!knownOrderIds.has(o.id) && (o.status === 'Order Placed' || o.status === 'Paid Online (UPI)')) {
+          if (!knownOrderIds.has(o.id)) {
             playOrderBell();
             knownOrderIds.add(o.id);
           }
@@ -488,7 +470,7 @@
 
         renderTasks(orders);
       } catch (e) {
-        console.log(e);
+        console.log("Rider load error:", e);
       }
     }
 
@@ -522,9 +504,6 @@
       `).join('');
     }
 
-    // ============================================
-    // SCREEN 1: "Go to the Bin" Screen Handlers
-    // ============================================
     function openBinScreen(order) {
       currentSelectedOrder = order;
       document.getElementById('bin-order-hash').innerText = `#BABA${order.id}DSNI19442A`;
@@ -547,9 +526,6 @@
       document.getElementById('camera-file-input').click();
     }
 
-    // ============================================
-    // SCREEN 2: "Take Photo of Items in Bag" Handlers
-    // ============================================
     function handlePhotoTaken(input) {
       if (input.files && input.files[0]) {
         const reader = new FileReader();
