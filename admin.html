@@ -24,6 +24,7 @@
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
     body { background-color: var(--bg); color: var(--text); padding-bottom: 60px; }
 
+    /* Header */
     .admin-header {
       background: linear-gradient(135deg, var(--primary), #1e0038);
       color: white; padding: 18px 20px; display: flex; justify-content: space-between; align-items: center;
@@ -38,8 +39,24 @@
       color: white; padding: 8px 14px; border-radius: 8px; font-weight: 700; font-size: 12px; cursor: pointer;
     }
 
-    .container { max-width: 1000px; margin: 20px auto; padding: 0 16px; }
+    .container { max-width: 1050px; margin: 20px auto; padding: 0 16px; }
 
+    /* Master Section Nav: Orders vs Riders */
+    .master-nav {
+      display: flex; gap: 10px; margin-bottom: 18px;
+    }
+    .master-btn {
+      flex: 1; padding: 12px; border-radius: 12px; border: 2px solid transparent;
+      font-size: 14px; font-weight: 900; cursor: pointer; text-align: center;
+      background: #ffffff; color: var(--muted); box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+      transition: all 0.2s ease;
+    }
+    .master-btn.active {
+      background: var(--primary); color: #fff; border-color: #6b21a8;
+      box-shadow: 0 4px 14px rgba(60, 0, 107, 0.25);
+    }
+
+    /* Metrics Summary Cards */
     .metrics-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 20px; }
     .m-card {
       background: var(--card-bg); padding: 14px; border-radius: 12px; border: 1px solid var(--border);
@@ -48,6 +65,7 @@
     .m-val { font-size: 22px; font-weight: 900; color: var(--primary); }
     .m-label { font-size: 11px; font-weight: 700; color: var(--muted); margin-top: 4px; }
 
+    /* Filter Tabs */
     .tabs-wrap {
       display: flex; gap: 10px; overflow-x: auto; scrollbar-width: none;
       background: #fff; padding: 8px; border-radius: 12px; border: 1px solid var(--border); margin-bottom: 20px;
@@ -62,12 +80,14 @@
       background: var(--primary); color: #fff; box-shadow: 0 4px 10px rgba(60, 0, 107, 0.2);
     }
 
+    /* Date Divider */
     .date-divider {
       background: #e2e8f0; color: #334155; font-size: 12px; font-weight: 800;
       padding: 6px 14px; border-radius: 20px; display: inline-block; margin: 18px 0 12px 0;
     }
 
-    .order-card {
+    /* Order Card */
+    .order-card, .rider-card {
       background: var(--card-bg); border-radius: 14px; border: 1px solid var(--border);
       padding: 16px; margin-bottom: 14px; box-shadow: 0 2px 8px rgba(0,0,0,0.04);
     }
@@ -82,6 +102,8 @@
     .status-running { background: #e0f2fe; color: #0369a1; }
     .status-delivered { background: #dcfce7; color: #15803d; }
     .status-upi { background: #f3e8ff; color: #6b21a8; }
+    .status-active { background: #dcfce7; color: #15803d; }
+    .status-blocked { background: #fee2e2; color: #b91c1c; }
 
     .cust-info {
       background: #f8fafc; border-radius: 10px; padding: 10px 12px; margin: 10px 0;
@@ -107,14 +129,31 @@
     }
     .btn-pack { background: #0284c7; color: white; }
     .btn-deliver { background: var(--green); color: white; }
+    .btn-approve { background: var(--green); color: white; }
+    .btn-deactivate { background: #ea580c; color: white; }
     .btn-delete {
       background: #fee2e2; color: #dc2626; border: 1px solid #fca5a5;
       margin-left: auto;
     }
     .btn-delete:hover { background: #dc2626; color: white; }
 
-    @media (max-width: 600px) {
+    /* New Rider Register Form Box */
+    .add-rider-box {
+      background: #fff; padding: 18px; border-radius: 14px; border: 1.5px dashed #cbd5e1;
+      margin-bottom: 20px;
+    }
+    .add-rider-title { font-size: 14px; font-weight: 900; color: var(--primary); margin-bottom: 12px; }
+    .rider-grid-form {
+      display: grid; grid-template-columns: repeat(3, 1fr) auto; gap: 10px; align-items: center;
+    }
+    .admin-input {
+      width: 100%; padding: 10px 12px; border-radius: 8px; border: 1.5px solid #cbd5e1;
+      font-size: 13px; outline: none; font-weight: 600;
+    }
+
+    @media (max-width: 680px) {
       .metrics-row { grid-template-columns: repeat(2, 1fr); }
+      .rider-grid-form { grid-template-columns: 1fr; }
       .btn-delete { margin-left: 0; width: 100%; justify-content: center; }
     }
   </style>
@@ -126,42 +165,94 @@
       <img class="brand-logo" src="logo.png" alt="Logo" onerror="this.style.display='none'">
       <div>
         <div class="brand-title">👑 𝐁𝐀𝐁𝐀 𝐅𝐎𝐎𝐃 🏹</div>
-        <div class="brand-subtitle">Live Admin & Order Controller</div>
+        <div class="brand-subtitle">Live Admin, Orders & Rider Controller</div>
       </div>
     </div>
-    <button class="refresh-btn" onclick="fetchOrders()">🔄 Refresh</button>
+    <button class="refresh-btn" onclick="refreshCurrentSection()">🔄 Refresh</button>
   </div>
 
   <div class="container">
-    <div class="metrics-row">
-      <div class="m-card">
-        <div class="m-val" id="cnt-all">0</div>
-        <div class="m-label">Total (4 Days)</div>
+    
+    <!-- Top Master Switch: Orders or Riders -->
+    <div class="master-nav">
+      <button class="master-btn active" id="btn-sec-orders" onclick="switchMasterSection('ORDERS')">
+        📦 Orders Control (4 Days)
+      </button>
+      <button class="master-btn" id="btn-sec-riders" onclick="switchMasterSection('RIDERS')">
+        🛵 Rider Partners & Approvals
+      </button>
+    </div>
+
+    <!-- ============================================== -->
+    <!-- SECTION 1: ORDERS CONTROLLER                   -->
+    <!-- ============================================== -->
+    <div id="section-orders">
+      <!-- Live Numbers -->
+      <div class="metrics-row">
+        <div class="m-card">
+          <div class="m-val" id="cnt-all">0</div>
+          <div class="m-label">Total (4 Days)</div>
+        </div>
+        <div class="m-card">
+          <div class="m-val" id="cnt-pending" style="color: #b45309;">0</div>
+          <div class="m-label">Pending / New</div>
+        </div>
+        <div class="m-card">
+          <div class="m-val" id="cnt-running" style="color: #0369a1;">0</div>
+          <div class="m-label">Running 🛵</div>
+        </div>
+        <div class="m-card">
+          <div class="m-val" id="cnt-delivered" style="color: var(--green);">0</div>
+          <div class="m-label">Delivered 🎉</div>
+        </div>
       </div>
-      <div class="m-card">
-        <div class="m-val" id="cnt-pending" style="color: #b45309;">0</div>
-        <div class="m-label">Pending / New</div>
+
+      <!-- Filter Tabs -->
+      <div class="tabs-wrap">
+        <button class="tab-btn active" onclick="switchTab('ALL', this)">All Orders</button>
+        <button class="tab-btn" onclick="switchTab('PENDING', this)">⏳ Pending</button>
+        <button class="tab-btn" onclick="switchTab('RUNNING', this)">🛵 Running</button>
+        <button class="tab-btn" onclick="switchTab('DELIVERED', this)">✅ Delivered</button>
       </div>
-      <div class="m-card">
-        <div class="m-val" id="cnt-running" style="color: #0369a1;">0</div>
-        <div class="m-label">Running 🛵</div>
-      </div>
-      <div class="m-card">
-        <div class="m-val" id="cnt-delivered" style="color: var(--green);">0</div>
-        <div class="m-label">Delivered 🎉</div>
+
+      <!-- Orders Feed -->
+      <div id="orders-container">
+        <div style="text-align: center; color: var(--muted); padding: 40px;">ऑर्डर्स लोड हो रहे हैं...</div>
       </div>
     </div>
 
-    <div class="tabs-wrap">
-      <button class="tab-btn active" onclick="switchTab('ALL', this)">All Orders</button>
-      <button class="tab-btn" onclick="switchTab('PENDING', this)">⏳ Pending</button>
-      <button class="tab-btn" onclick="switchTab('RUNNING', this)">🛵 Running</button>
-      <button class="tab-btn" onclick="switchTab('DELIVERED', this)">✅ Delivered</button>
+    <!-- ============================================== -->
+    <!-- SECTION 2: RIDER MANAGEMENT (Accept/Deactivate)-->
+    <!-- ============================================== -->
+    <div id="section-riders" style="display: none;">
+      
+      <!-- Quick Register/Add Rider Form -->
+      <div class="add-rider-box">
+        <div class="add-rider-title">➕ Add or Approve New Rider Partner</div>
+        <div class="rider-grid-form">
+          <input type="text" id="new-rider-name" class="admin-input" placeholder="Rider Full Name *">
+          <input type="tel" id="new-rider-phone" class="admin-input" placeholder="10-digit Phone No. *" maxlength="10">
+          <input type="text" id="new-rider-vehicle" class="admin-input" placeholder="Vehicle No (e.g. UP25-XX-1234)">
+          <button class="btn-action btn-approve" style="padding: 10px 18px; font-weight:900;" onclick="registerRiderManually()">
+            + Add Rider
+          </button>
+        </div>
+      </div>
+
+      <!-- Riders Filter Tabs -->
+      <div class="tabs-wrap">
+        <button class="tab-btn active" id="rtab-all" onclick="filterRiders('ALL', this)">All Riders</button>
+        <button class="tab-btn" id="rtab-active" onclick="filterRiders('Active', this)">🟢 Active (Allowed)</button>
+        <button class="tab-btn" id="rtab-pending" onclick="filterRiders('Pending', this)">⏳ Pending Approval</button>
+        <button class="tab-btn" id="rtab-blocked" onclick="filterRiders('Blocked', this)">🔴 Deactivated / Blocked</button>
+      </div>
+
+      <!-- Riders List Container -->
+      <div id="riders-container">
+        <div style="text-align: center; color: var(--muted); padding: 30px;">राइडर्स सूची लोड हो रही है...</div>
+      </div>
     </div>
 
-    <div id="orders-container">
-      <div style="text-align: center; color: var(--muted); padding: 40px;">ऑर्डर्स लोड हो रहे हैं...</div>
-    </div>
   </div>
 
   <script>
@@ -170,8 +261,33 @@
     const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
     let rawOrders = [];
-    let currentTab = 'ALL';
+    let rawRiders = [];
+    let currentMasterSec = 'ORDERS';
+    let currentOrderTab = 'ALL';
+    let currentRiderTab = 'ALL';
 
+    function switchMasterSection(sec) {
+      currentMasterSec = sec;
+      document.getElementById('btn-sec-orders').className = sec === 'ORDERS' ? 'master-btn active' : 'master-btn';
+      document.getElementById('btn-sec-riders').className = sec === 'RIDERS' ? 'master-btn active' : 'master-btn';
+
+      document.getElementById('section-orders').style.display = sec === 'ORDERS' ? 'block' : 'none';
+      document.getElementById('section-riders').style.display = sec === 'RIDERS' ? 'block' : 'none';
+
+      refreshCurrentSection();
+    }
+
+    function refreshCurrentSection() {
+      if (currentMasterSec === 'ORDERS') {
+        fetchOrders();
+      } else {
+        fetchRiders();
+      }
+    }
+
+    // ============================================
+    // ORDERS CONTROLLER (4-DAY DATE ROLLING & DELETE)
+    // ============================================
     async function fetchOrders() {
       try {
         const fourDaysAgo = new Date();
@@ -209,26 +325,26 @@
     }
 
     function switchTab(tab, btn) {
-      currentTab = tab;
-      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      currentOrderTab = tab;
+      document.querySelectorAll('#section-orders .tab-btn').forEach(b => b.classList.remove('active'));
       if (btn) btn.classList.add('active');
       renderOrders();
     }
 
     function filterByTab(orders) {
-      if (currentTab === 'PENDING') {
+      if (currentOrderTab === 'PENDING') {
         return orders.filter(o => {
           const s = (o.status || '').toLowerCase();
           return s.includes('placed') || s.includes('paid online') || s.includes('pending');
         });
       }
-      if (currentTab === 'RUNNING') {
+      if (currentOrderTab === 'RUNNING') {
         return orders.filter(o => {
           const s = (o.status || '').toLowerCase();
           return s.includes('out') || s.includes('picked') || s.includes('running');
         });
       }
-      if (currentTab === 'DELIVERED') {
+      if (currentOrderTab === 'DELIVERED') {
         return orders.filter(o => (o.status || '').toLowerCase().includes('delivered'));
       }
       return orders;
@@ -318,11 +434,7 @@
     async function updateOrderStatus(orderId, newStatus) {
       if (!confirm(`क्या आप ऑर्डर #${orderId} का स्टेटस "${newStatus}" करना चाहते हैं?`)) return;
       try {
-        const { error } = await _supabase
-          .from('orders')
-          .update({ status: newStatus })
-          .eq('id', orderId);
-
+        const { error } = await _supabase.from('orders').update({ status: newStatus }).eq('id', orderId);
         if (error) throw error;
         const target = rawOrders.find(o => o.id === orderId);
         if (target) target.status = newStatus;
@@ -338,24 +450,170 @@
       if (!confirmDelete) return;
 
       try {
-        const { error } = await _supabase
-          .from('orders')
-          .delete()
-          .eq('id', orderId);
-
+        const { error } = await _supabase.from('orders').delete().eq('id', orderId);
         if (error) throw error;
-        
         rawOrders = rawOrders.filter(o => o.id !== orderId);
         updateMetrics();
         renderOrders();
-        alert(`ऑर्डर #${orderId} डिलीट कर दिया गया है!`);
+        alert(`✅ ऑर्डर #${orderId} पूरे सिस्टम से डिलीट हो गया!`);
       } catch (err) {
-        alert('ऑर्डर डिलीट करने में त्रुटि: ' + err.message);
+        alert('डिलीट करने में त्रुटि: ' + err.message);
       }
     }
 
+    // ============================================
+    // RIDER MANAGEMENT (ACCEPT / DEACTIVATE / BLOCK)
+    // ============================================
+    async function fetchRiders() {
+      try {
+        const { data, error } = await _supabase
+          .from('riders')
+          .select('*')
+          .order('id', { ascending: false });
+
+        if (error) {
+          // अगर riders टेबल नहीं बनी है तो उसे नोट करें
+          console.warn("Riders table notice:", error.message);
+        }
+        rawRiders = data || [];
+        renderRiders();
+      } catch (err) {
+        document.getElementById('riders-container').innerHTML = 
+          `<div style="text-align:center; color:#dc2626; padding:20px;">राइडर डेटा लोड करने में समस्या: ${err.message}</div>`;
+      }
+    }
+
+    function filterRiders(tab, btn) {
+      currentRiderTab = tab;
+      document.querySelectorAll('#section-riders .tab-btn').forEach(b => b.classList.remove('active'));
+      if (btn) btn.classList.add('active');
+      renderRiders();
+    }
+
+    function renderRiders() {
+      const container = document.getElementById('riders-container');
+      let filtered = rawRiders;
+
+      if (currentRiderTab !== 'ALL') {
+        filtered = rawRiders.filter(r => (r.status || 'Pending').toLowerCase() === currentRiderTab.toLowerCase());
+      }
+
+      if (filtered.length === 0) {
+        container.innerHTML = '<div style="text-align:center; color:var(--muted); padding:30px; font-weight:700;">इस श्रेणी में कोई राइडर पार्टनर नहीं मिला।</div>';
+        return;
+      }
+
+      container.innerHTML = filtered.map(r => {
+        const status = r.status || 'Pending';
+        let badgeClass = 'status-pending';
+        if (status === 'Active') badgeClass = 'status-active';
+        else if (status === 'Blocked' || status === 'Deactivated') badgeClass = 'status-blocked';
+
+        return `
+          <div class="rider-card">
+            <div class="card-top">
+              <div>
+                <div class="order-num">🛵 ${r.name || 'Unnamed Rider'}</div>
+                <div class="order-time">📞 Phone: <a href="tel:${r.phone}">${r.phone}</a> | Vehicle: <b>${r.vehicle_no || 'N/A'}</b></div>
+              </div>
+              <span class="status-badge ${badgeClass}">${status}</span>
+            </div>
+
+            <div style="font-size:12px; color:#64748b; margin:6px 0;">
+              ID: <b>RIDER-${r.id}</b> | Registered: ${r.created_at ? new Date(r.created_at).toLocaleDateString() : 'Active'}
+            </div>
+
+            <div class="card-actions">
+              ${status !== 'Active' ? `
+                <button class="btn-action btn-approve" onclick="updateRiderStatus(${r.id}, 'Active')">
+                  ✅ Approve & Activate
+                </button>
+              ` : `
+                <button class="btn-action btn-deactivate" onclick="updateRiderStatus(${r.id}, 'Blocked')">
+                  🚫 Deactivate / Block
+                </button>
+              `}
+
+              <button class="btn-action btn-delete" onclick="deleteRiderPermanently(${r.id})">
+                🗑️ Remove Rider
+              </button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // नया राइडर जोड़ें
+    async function registerRiderManually() {
+      const name = document.getElementById('new-rider-name').value.trim();
+      const phone = document.getElementById('new-rider-phone').value.trim();
+      const vehicle = document.getElementById('new-rider-vehicle').value.trim();
+
+      if (name.length < 2) { alert('कृपया राइडर का सही नाम डालें!'); return; }
+      if (!/^[6-9]\d{9}$/.test(phone)) { alert('कृपया 10 अंकों का वैध फोन नंबर डालें!'); return; }
+
+      try {
+        const { data, error } = await _supabase
+          .from('riders')
+          .insert([{
+            name: name,
+            phone: phone,
+            vehicle_no: vehicle || 'Standard',
+            status: 'Active'
+          }])
+          .select();
+
+        if (error) throw error;
+        alert(`✅ राइडर पार्टनर "${name}" को एक्टिवेट कर दिया गया है!`);
+        document.getElementById('new-rider-name').value = '';
+        document.getElementById('new-rider-phone').value = '';
+        document.getElementById('new-rider-vehicle').value = '';
+        fetchRiders();
+      } catch (e) {
+        alert('राइडर जोड़ने में समस्या: ' + e.message);
+      }
+    }
+
+    // राइडर स्टेटस अपडेट (Accept/Deactivate)
+    async function updateRiderStatus(riderId, newStatus) {
+      if (!confirm(`क्या आप राइडर ID #${riderId} का स्टेटस "${newStatus}" करना चाहते हैं?`)) return;
+      try {
+        const { error } = await _supabase
+          .from('riders')
+          .update({ status: newStatus })
+          .eq('id', riderId);
+
+        if (error) throw error;
+        alert(`राइडर स्टेटस बदलकर "${newStatus}" कर दिया गया!`);
+        fetchRiders();
+      } catch (e) {
+        alert('स्टेटस बदलने में एरर: ' + e.message);
+      }
+    }
+
+    // राइडर को पूरी तरह हटाना
+    async function deleteRiderPermanently(riderId) {
+      if (!confirm(`⚠️ क्या आप वाकई राइडर ID #${riderId} को पूरे सिस्टम से हटाना चाहते हैं?`)) return;
+      try {
+        const { error } = await _supabase
+          .from('riders')
+          .delete()
+          .eq('id', riderId);
+
+        if (error) throw error;
+        alert(`राइडर ID #${riderId} डिलीट कर दिया गया!`);
+        fetchRiders();
+      } catch (e) {
+        alert('डिलीट करने में एरर: ' + e.message);
+      }
+    }
+
+    // ऑटो-रिफ्रेश हर 10 सेकंड पर
     fetchOrders();
-    setInterval(fetchOrders, 10000);
+    setInterval(() => {
+      if (currentMasterSec === 'ORDERS') fetchOrders();
+      else fetchRiders();
+    }, 10000);
   </script>
 </body>
 </html>
