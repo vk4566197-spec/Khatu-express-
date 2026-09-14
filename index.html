@@ -50,11 +50,21 @@
       transition: left 0.3s ease; display: flex; flex-direction: column;
     }
     .side-drawer.active { left: 0; }
+    
+    /* Drawer Menu Header - 11x11 Logo Size */
     .drawer-header {
       background: linear-gradient(135deg, var(--zepto-purple), #240046);
-      color: white; padding: 22px 16px;
+      color: white; padding: 20px 16px;
     }
-    .drawer-brand { font-size: 15px; font-weight: 900; color: #ff758c; }
+    .drawer-logo-img {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      object-fit: cover;
+      background: #fff;
+      border: 2px solid #ff758c;
+    }
+    .drawer-brand { font-size: 14px; font-weight: 900; color: #ff758c; line-height: 1.2; }
     .drawer-menu-list { padding: 16px 0; flex: 1; overflow-y: auto; }
     .drawer-item {
       display: flex; align-items: center; gap: 12px; padding: 14px 20px;
@@ -76,13 +86,26 @@
     .eta-badge { font-size: 17px; font-weight: 900; color: #111; display: flex; align-items: center; gap: 4px; }
     .address-line { font-size: 11px; font-weight: 600; color: #475569; margin-top: 1px; }
 
+    /* Store Header Pill - 8x8 Logo & Text Size */
     .store-pills-row { display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; margin-bottom: 12px; }
     .store-pills-row::-webkit-scrollbar { display: none; }
     .store-pill {
-      background: #fff; padding: 6px 14px; border-radius: 12px; font-size: 12px;
-      font-weight: 800; border: 1px solid #e7daf5; white-space: nowrap; display: flex; align-items: center; gap: 6px;
+      background: #fff; padding: 5px 10px; border-radius: 10px;
+      border: 1px solid #e7daf5; white-space: nowrap; display: flex; align-items: center; gap: 5px;
     }
     .store-pill.active { border-color: var(--zepto-purple); color: var(--zepto-purple); }
+    
+    .pill-logo-compact {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+    .pill-text-compact {
+      font-size: 11px;
+      font-weight: 800;
+      line-height: 1.1;
+    }
 
     .search-box-wrap { position: relative; margin-bottom: 12px; }
     .search-bar-input {
@@ -211,7 +234,7 @@
       border-radius: 12px; padding: 14px; text-align: center; margin-bottom: 12px; display: none;
     }
     .qr-frame {
-      width: 140px; height: 140px; margin: 8px auto; background: #fff;
+      width: 170px; height: 170px; margin: 8px auto; background: #fff;
       padding: 6px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.08);
     }
     .qr-frame img { width: 100%; height: 100%; }
@@ -227,7 +250,7 @@
       cursor: pointer; width: 100%; margin-top: 10px; box-shadow: 0 4px 14px rgba(255, 50, 105, 0.3);
     }
 
-    /* Live Tracking Steps */
+    /* Live Tracking Progress */
     .track-steps {
       display: flex; flex-direction: column; gap: 16px; margin: 18px 0 10px 18px;
       position: relative; border-left: 2px solid #e2e8f0; padding-left: 18px;
@@ -243,15 +266,17 @@
 </head>
 <body>
 
-  <!-- Side Drawer -->
+  <!-- Side Drawer (11x11 Logo Size) -->
   <div class="drawer-overlay" id="drawer-overlay" onclick="toggleDrawer(false)"></div>
   <div class="side-drawer" id="side-drawer">
     <div class="drawer-header">
-      <div style="display: flex; align-items: center; gap: 8px;">
-        <img src="logo.png" alt="Logo" style="width: 32px; height: 32px; border-radius: 6px; background: #fff;" onerror="this.style.display='none'">
-        <div class="drawer-brand">👑 𝐁𝐀𝐁𝐀 𝐅𝐎𝐎𝐃 𝐃𝐄𝐋𝐈𝐕𝐄𝐑𝐘🏹</div>
+      <div style="display: flex; align-items: center; gap: 10px;">
+        <img class="drawer-logo-img" src="logo.png" alt="Logo" onerror="this.style.display='none'">
+        <div>
+          <div class="drawer-brand">👑 𝐁𝐀𝐁𝐀 𝐅𝐎𝐎𝐃 𝐃𝐄𝐋𝐈𝐕𝐄𝐑𝐘🏹</div>
+          <div style="font-size: 10px; color: #fdf4ff; margin-top: 2px;">Fast Express Delivery</div>
+        </div>
       </div>
-      <div style="font-size: 11px; color: #fdf4ff; margin-top: 4px;">Fast Express Food Delivery</div>
     </div>
     <div class="drawer-menu-list">
       <div class="drawer-item" onclick="toggleDrawer(false); scrollToHistory();">
@@ -285,14 +310,18 @@
       <button class="menu-trigger-btn" onclick="openSupportModal()" title="Help & Support">🎧</button>
     </div>
 
-    <!-- Store Brand Pill -->
+    <!-- Store Brand Pill (8x8 Logo & Text Size) -->
     <div class="store-pills-row">
       <div class="store-pill active">
-        <img src="logo.png" alt="Logo" style="width: 20px; height: 20px; border-radius: 4px; object-fit: cover;" onerror="this.style.display='none'">
-        <span>👑 𝐁𝐀𝐁𝐀 𝐅𝐎𝐎𝐃 𝐃𝐄𝐋𝐈𝐕𝐄𝐑𝐘🏹</span>
+        <img class="pill-logo-compact" src="logo.png" alt="Logo" onerror="this.style.display='none'">
+        <span class="pill-text-compact">👑 𝐁𝐀𝐁𝐀 𝐅𝐎𝐎𝐃 𝐃𝐄𝐋𝐈𝐕𝐄𝐑𝐘🏹</span>
       </div>
-      <div class="store-pill">Express Kitchen</div>
-      <div class="store-pill">Fresh Mart</div>
+      <div class="store-pill">
+        <span class="pill-text-compact">Express Kitchen</span>
+      </div>
+      <div class="store-pill">
+        <span class="pill-text-compact">Fresh Mart</span>
+      </div>
     </div>
 
     <!-- Search Input -->
@@ -417,29 +446,29 @@
         </div>
       </div>
 
-      <!-- UPI Verification Box -->
+      <!-- UPI Dynamic QR Gate (Exact Cart Amount Accepted Automatically) -->
       <div class="upi-gate-card" id="upi-box">
-        <div style="font-size: 13px; font-weight: 800; color: var(--zepto-purple);">
-          स्कैन करें या UPI ऐप खोलें:
+        <div style="font-size: 14px; font-weight: 800; color: var(--zepto-purple);">
+          स्कैन करके पेमेंट करें (₹<span id="upi-box-amount">0</span>):
         </div>
         <div style="font-size: 11px; color: #64748b; margin-top: 2px;">
           UPI ID: <b>7037647464-3@axl</b>
         </div>
         
         <div class="qr-frame">
-          <img id="upi-qr-img" src="" alt="UPI QR">
+          <img id="upi-qr-img" src="" alt="Dynamic UPI QR">
         </div>
 
         <div style="margin: 8px 0;">
-          <a id="upi-intent-link" href="#" class="btn-checkout" style="padding: 9px; font-size: 12px; background: #2563eb; text-decoration: none; display: inline-block;">
+          <a id="upi-intent-link" href="#" class="btn-checkout" style="padding: 10px; font-size: 13px; background: #2563eb; text-decoration: none; display: inline-block;">
             ⚡ Google Pay / PhonePe पर Pay करें
           </a>
         </div>
 
         <div style="font-size: 11px; color: #475569; margin: 10px 0 6px 0;">
-          भुगतान करने के बाद बैंक मैसेज से <b>12-अंकों का UTR / Transaction No.</b> यहाँ दर्ज करें:
+          पेमेंट पूरा होने पर बैंक मैसेज से <b>12-अंकों का UTR No.</b> यहाँ डालें:
         </div>
-        <input type="tel" id="upi-utr" class="zepto-input" placeholder="12-अंकों का UTR No. (उदा: 423156789012)" maxlength="12" style="background: #fff; text-align: center; font-weight: 800; letter-spacing: 1px;">
+        <input type="tel" id="upi-utr" class="zepto-input" placeholder="12-अंकों का UTR No." maxlength="12" style="background: #fff; text-align: center; font-weight: 800; letter-spacing: 1px;">
       </div>
 
       <!-- Checkout Form -->
@@ -536,6 +565,16 @@
       }
     }
 
+    // Dynamic QR Generator that locks exact bill amount
+    function refreshUpiQr() {
+      const { finalToPay } = calculateTotals();
+      document.getElementById('upi-box-amount').innerText = finalToPay;
+      
+      const upiUrl = `upi://pay?pa=${STORE_UPI_ID}&pn=BabaFoodDelivery&am=${finalToPay}&cu=INR&tn=FoodOrder`;
+      document.getElementById('upi-qr-img').src = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(upiUrl)}`;
+      document.getElementById('upi-intent-link').href = upiUrl;
+    }
+
     function selectPaymentMode(mode) {
       selectedPaymentMode = mode;
       document.getElementById('opt-cod').className = mode === 'COD' ? 'pay-opt selected' : 'pay-opt';
@@ -545,12 +584,7 @@
       const btn = document.getElementById('order-submit-btn');
 
       if (mode === 'UPI') {
-        const { finalToPay } = calculateTotals();
-        const upiString = `upi://pay?pa=${STORE_UPI_ID}&pn=BabaFoodDelivery&am=${finalToPay}&cu=INR&tn=FoodOrder`;
-        
-        document.getElementById('upi-qr-img').src = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(upiString)}`;
-        document.getElementById('upi-intent-link').href = upiString;
-        
+        refreshUpiQr();
         upiBox.style.display = 'block';
         btn.innerText = 'Verify UTR & Place Order';
       } else {
@@ -646,7 +680,11 @@
 
       updateCartBar();
       renderCartSheet();
-      if (selectedPaymentMode === 'UPI') selectPaymentMode('UPI');
+      
+      // Auto update QR if UPI is active
+      if (selectedPaymentMode === 'UPI') {
+        refreshUpiQr();
+      }
     }
 
     function calculateTotals() {
