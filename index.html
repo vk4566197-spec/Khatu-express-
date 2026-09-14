@@ -20,7 +20,7 @@
 
   <!-- Supabase CDN -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <!-- Google Fonts: Inter -->
+  <!-- Inter Font -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   
@@ -285,7 +285,21 @@
       border-top: 1px dashed #cbd5e1; color: #0f172a;
     }
 
-    .input-group { display: flex; flex-direction: column; gap: 8px; margin-top: 10px; }
+    /* Payment Mode Selector */
+    .pay-methods-title { font-size: 12px; font-weight: 800; color: #475569; margin-top: 10px; }
+    .pay-methods-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 6px 0 12px 0;
+    }
+    .pay-opt {
+      border: 1.5px solid #cbd5e1; border-radius: 10px; padding: 10px 8px;
+      text-align: center; cursor: pointer; font-size: 12px; font-weight: 800;
+      color: #334155; transition: all 0.2s;
+    }
+    .pay-opt.selected {
+      border-color: var(--zepto-pink); background: #fff0f4; color: var(--zepto-pink);
+    }
+
+    .input-group { display: flex; flex-direction: column; gap: 8px; }
     .zepto-input {
       width: 100%; padding: 11px 12px; border-radius: 10px; border: 1.5px solid #cbd5e1;
       font-size: 13px; outline: none;
@@ -293,7 +307,7 @@
     .btn-checkout {
       background: linear-gradient(90deg, #ff3269, #e01d51); color: white; border: none;
       padding: 14px; border-radius: 10px; font-size: 14px; font-weight: 800;
-      cursor: pointer; width: 100%; margin-top: 12px; box-shadow: 0 4px 14px rgba(255, 50, 105, 0.3);
+      cursor: pointer; width: 100%; margin-top: 10px; box-shadow: 0 4px 14px rgba(255, 50, 105, 0.3);
     }
 
     /* Live Tracking Progress UI */
@@ -317,7 +331,7 @@
   <div class="side-drawer" id="side-drawer">
     <div class="drawer-header">
       <div class="drawer-brand">zepto</div>
-      <div style="font-size: 11px; color: #fdf4ff; margin-top: 2px;">Grocery Express Store</div>
+      <div style="font-size: 11px; color: #fdf4ff; margin-top: 2px;">Grocery Express Dark Store</div>
     </div>
     <div class="drawer-menu-list">
       <div class="drawer-item" onclick="toggleDrawer(false); scrollToHistory();">
@@ -326,14 +340,14 @@
       <div class="drawer-item" onclick="openSupportModal()">
         <span>💬</span> 24x7 Help & Support
       </div>
-      <a class="drawer-item" href="tel:9876543210">
-        <span>📞</span> Customer Care Call
+      <a class="drawer-item" href="tel:9711107063">
+        <span>📞</span> Helpline: 9711107063
       </a>
-      <a class="drawer-item" target="_blank" href="https://wa.me/919876543210?text=Hello%20Zepto%20Support">
-        <span>🟢</span> WhatsApp Support
+      <a class="drawer-item" target="_blank" href="https://wa.me/919711107063?text=Hello%20Zepto%20Support">
+        <span>🟢</span> WhatsApp: 9711107063
       </a>
       <div class="drawer-item" onclick="alert('डिलीवरी समय: सुबह 7:00 AM से रात 11:00 PM तक!')">
-        <span>ℹ️</span> Delivery Hours & FAQs
+        <span>ℹ️</span> Store Hours & FAQs
       </div>
     </div>
   </div>
@@ -452,7 +466,7 @@
 
       <div id="cart-items-box"></div>
 
-      <!-- Price Breakdown with Free Delivery & ₹49 Discount -->
+      <!-- Price Breakdown -->
       <div class="bill-box">
         <div class="bill-row">
           <span>Items Total</span>
@@ -469,6 +483,17 @@
         <div class="bill-row total">
           <span>To Pay</span>
           <span id="bill-grand-total">₹0</span>
+        </div>
+      </div>
+
+      <!-- Payment Method Selection -->
+      <div class="pay-methods-title">💳 भुगतान का तरीका चुनें (Payment Mode):</div>
+      <div class="pay-methods-grid">
+        <div class="pay-opt selected" id="opt-cod" onclick="selectPaymentMode('COD')">
+          💵 Cash on Delivery
+        </div>
+        <div class="pay-opt" id="opt-upi" onclick="selectPaymentMode('UPI')">
+          📱 Online UPI (GPay/PhonePe)
         </div>
       </div>
 
@@ -507,7 +532,7 @@
     </div>
   </div>
 
-  <!-- Help & Support Modal -->
+  <!-- Help & Support Modal (Updated with 9711107063) -->
   <div class="modal-overlay" id="support-modal" onclick="closeSupportModal(event)">
     <div class="bottom-sheet" onclick="event.stopPropagation()">
       <div class="sheet-head">
@@ -517,15 +542,15 @@
 
       <div style="padding: 10px 0; font-size: 13px; line-height: 1.6; color: #334155;">
         <div style="font-weight: 800; font-size: 15px; margin-bottom: 6px;">ऑर्डर में कोई समस्या है?</div>
-        <div>हमारी कस्टमर केयर टीम आपकी सहायता के लिए तैयार है।</div>
+        <div>हेल्पलाइन नंबर: <b>+91 9711107063</b> पर संपर्क करें।</div>
       </div>
 
       <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 10px;">
-        <a class="btn-checkout" style="background: #25D366; text-decoration: none; text-align: center;" target="_blank" href="https://wa.me/919876543210?text=Need%20Help%20With%20My%20Zepto%20Order">
-          💬 Chat on WhatsApp
+        <a class="btn-checkout" style="background: #25D366; text-decoration: none; text-align: center;" target="_blank" href="https://wa.me/919711107063?text=Need%20Help%20With%20My%20Zepto%20Order">
+          💬 Chat on WhatsApp (9711107063)
         </a>
-        <a class="btn-checkout" style="background: var(--zepto-purple); text-decoration: none; text-align: center;" href="tel:9876543210">
-          📞 Call Support Executive
+        <a class="btn-checkout" style="background: var(--zepto-purple); text-decoration: none; text-align: center;" href="tel:9711107063">
+          📞 Call Support (9711107063)
         </a>
       </div>
     </div>
@@ -540,6 +565,7 @@
     let cart = {}; 
     let selectedCat = 'All';
     let currentOrderId = localStorage.getItem('zepto_active_order') || null;
+    let selectedPaymentMode = 'COD'; // डिफ़ॉल्ट COD
 
     const catEmojiMap = {
       'All': '🛍️', 'Grocery': '🥦', 'Dairy': '🥛', 'Snacks': '🍿', 'Bakery': '🍞', 'Drinks': '🥤'
@@ -562,6 +588,16 @@
       } catch (err) {
         document.getElementById('loader').innerText = 'Error loading items: ' + err.message;
       }
+    }
+
+    // Payment Mode Selection
+    function selectPaymentMode(mode) {
+      selectedPaymentMode = mode;
+      document.getElementById('opt-cod').className = mode === 'COD' ? 'pay-opt selected' : 'pay-opt';
+      document.getElementById('opt-upi').className = mode === 'UPI' ? 'pay-opt selected' : 'pay-opt';
+      
+      const btn = document.getElementById('order-submit-btn');
+      btn.innerText = mode === 'UPI' ? 'Pay Online via UPI ➔' : 'Place Delivery Order';
     }
 
     // Drawer Menu Toggle
@@ -654,7 +690,6 @@
       renderCartSheet();
     }
 
-    // Dynamic Calculation: Free delivery on 249+, ₹49 discount on 399+
     function calculateTotals() {
       const entries = Object.values(cart);
       const itemsTotal = entries.reduce((s, e) => s + (e.qty * e.item.price), 0);
@@ -742,6 +777,12 @@
         id: item.id, name: item.name, price: item.price, unit: item.unit, qty, subtotal: item.price * qty
       }));
 
+      // UPI Payment Intent
+      if (selectedPaymentMode === 'UPI') {
+        const upiUri = `upi://pay?pa=9711107063@okbizaxis&pn=ZeptoStore&am=${finalToPay}&cu=INR&tn=ZeptoOrder`;
+        window.location.href = upiUri;
+      }
+
       const btn = document.getElementById('order-submit-btn');
       btn.disabled = true;
       btn.innerText = 'Confirming Order in 10s...';
@@ -755,7 +796,7 @@
             delivery_address: address,
             items: orderItems,
             total_amount: finalToPay,
-            status: 'Order Placed'
+            status: selectedPaymentMode === 'UPI' ? 'Paid Online (UPI)' : 'Order Placed'
           }])
           .select();
 
@@ -780,7 +821,6 @@
         btn.disabled = false;
         btn.innerText = 'Place Delivery Order';
 
-        // Start live tracking and open modal immediately
         startTracking(newOrder.id);
         openTrackModal();
 
@@ -810,7 +850,7 @@
 
         s1.className = 't-step'; s2.className = 't-step'; s3.className = 't-step';
 
-        if (data.status === 'Order Placed') {
+        if (data.status === 'Order Placed' || data.status === 'Paid Online (UPI)') {
           s1.className = 't-step active';
           stripTitle.innerText = 'Order Accepted (Packing)';
           stripSub.innerText = 'Dark store is packing your items';
@@ -837,7 +877,7 @@
       setInterval(checkStatus, 4000);
     }
 
-    // Past Orders (FIFO 4)
+    // Past Orders
     function saveOrderToHistory(orderObj) {
       let history = JSON.parse(localStorage.getItem('zepto_order_history') || '[]');
       history.unshift(orderObj);
