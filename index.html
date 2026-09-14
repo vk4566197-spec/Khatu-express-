@@ -288,6 +288,33 @@
     }
     .t-step.active { color: #0f172a; font-weight: 800; }
     .t-step.active::after { background: var(--zepto-green); box-shadow: 0 0 0 4px #dcfce7; }
+
+    /* Past Order Card Styling */
+    .past-order-box {
+      background: #fff; border-radius: 14px; border: 1.5px solid var(--border-color);
+      padding: 14px; margin-bottom: 12px; box-shadow: 0 2px 6px rgba(0,0,0,0.03);
+    }
+    .past-order-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+    .past-order-id { font-size: 13px; font-weight: 900; color: #0f172a; }
+    .past-order-time { font-size: 11px; color: var(--text-muted); font-weight: 600; }
+    .past-item-preview-line { font-size: 12px; color: #475569; margin-bottom: 10px; line-height: 1.4; }
+    .past-actions-row { display: flex; gap: 8px; align-items: center; }
+    .btn-past-details {
+      flex: 1; background: #f8fafc; border: 1.5px solid #cbd5e1; color: #334155;
+      font-size: 12px; font-weight: 800; padding: 7px 10px; border-radius: 8px; cursor: pointer; text-align: center;
+    }
+    .btn-past-repeat {
+      flex: 1; background: #fff0f4; border: 1.5px solid var(--zepto-pink); color: var(--zepto-pink);
+      font-size: 12px; font-weight: 800; padding: 7px 10px; border-radius: 8px; cursor: pointer; text-align: center;
+    }
+
+    /* Receipt Modal Details Items List */
+    .receipt-item-row {
+      display: flex; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px solid #f1f5f9;
+    }
+    .receipt-item-img {
+      width: 44px; height: 44px; border-radius: 8px; object-fit: contain; background: #faf8fd; border: 1px solid #eee;
+    }
   </style>
 </head>
 <body>
@@ -309,7 +336,7 @@
     </div>
     <div class="drawer-menu-list">
       <div class="drawer-item" onclick="toggleDrawer(false); scrollToHistory();">
-        <span>🕒</span> Past Orders
+        <span>🕒</span> Past Orders & Receipts
       </div>
       <div class="drawer-item" onclick="openSupportModal()">
         <span>💬</span> 24x7 Help & Support
@@ -395,13 +422,14 @@
     </div>
     <div class="grid" id="product-list"></div>
 
-    <!-- Past Orders Section -->
-    <div id="past-orders-section" style="margin-top: 30px; border-top: 1px solid #eee; padding-top: 18px;">
-      <div style="font-size: 15px; font-weight: 800; color: #111; margin-bottom: 12px;">
-        🕒 Recent Orders (Last 4)
+    <!-- Past Orders Section (Full Details View) -->
+    <div id="past-orders-section" style="margin-top: 35px; border-top: 2px dashed #eee; padding-top: 22px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
+        <div style="font-size: 16px; font-weight: 900; color: #111;">🕒 Past Orders & Invoices</div>
+        <span style="font-size: 11px; color: #64748b; font-weight: 700;">Tap to view details</span>
       </div>
       <div id="history-container">
-        <div style="font-size: 12px; color: #94a3b8; padding: 10px 0;">No past orders yet.</div>
+        <div style="font-size: 12px; color: #94a3b8; padding: 10px 0;">No past orders found.</div>
       </div>
     </div>
   </div>
@@ -505,7 +533,6 @@
         <input type="text" id="c-name" class="zepto-input" placeholder="आपका नाम (Full Name) *">
         <input type="tel" id="c-phone" class="zepto-input" placeholder="10-digit Mobile (6-9 से शुरू) *" maxlength="10">
         
-        <!-- Live GPS Button -->
         <button type="button" onclick="getCurrentLocation()" style="background:#f1f5f9; border:1.5px solid #cbd5e1; padding:9px; border-radius:10px; font-size:12px; font-weight:800; color:#334155; display:flex; align-items:center; justify-content:center; gap:6px; cursor:pointer;">
           📍 Use My Current Location (GPS)
         </button>
@@ -538,6 +565,38 @@
       </div>
 
       <button class="btn-checkout" style="background: #0f172a; margin-top: 20px;" onclick="toggleTrackModal(false)">Close Tracking</button>
+    </div>
+  </div>
+
+  <!-- Full Past Order Details / Receipt Modal -->
+  <div class="modal-overlay" id="receipt-modal" onclick="closeReceiptModal(event)">
+    <div class="bottom-sheet" onclick="event.stopPropagation()">
+      <div class="sheet-head">
+        <div>
+          <div class="sheet-title" id="rcpt-title">Order Receipt #ORD-00</div>
+          <div style="font-size: 11px; color: #64748b;" id="rcpt-date-mode">Placed on -- | COD</div>
+        </div>
+        <button class="sheet-close" onclick="closeReceiptModal()">✕</button>
+      </div>
+
+      <div style="font-size: 12px; font-weight: 800; color: #334155; margin-bottom: 6px;">ITEMS ORDERED</div>
+      <div id="rcpt-items-list" style="max-height: 220px; overflow-y: auto;"></div>
+
+      <div style="background: #f8fafc; border-radius: 12px; padding: 12px; margin: 14px 0; border: 1px solid #e2e8f0;">
+        <div style="font-size: 11px; font-weight: 800; color: #64748b; margin-bottom: 4px;">DELIVERY ADDRESS</div>
+        <div style="font-size: 12px; font-weight: 700; color: #1e293b; white-space: pre-line;" id="rcpt-address">--</div>
+      </div>
+
+      <div class="bill-box" style="margin: 0 0 14px 0;">
+        <div class="bill-row total">
+          <span>Total Paid</span>
+          <span style="color: var(--zepto-green); font-size: 17px;" id="rcpt-total-amount">₹0</span>
+        </div>
+      </div>
+
+      <button class="btn-checkout" id="rcpt-repeat-btn" style="background: var(--zepto-purple);">
+        🔁 Repeat This Entire Order
+      </button>
     </div>
   </div>
 
@@ -836,7 +895,6 @@
       if (!/^[6-9]\d{9}$/.test(phone)) { alert('कृपया 10 अंकों का सही मोबाइल नंबर डालें!'); return; }
       if (address.length < 4) { alert('कृपया डिलीवरी का पता दर्ज करें!'); return; }
 
-      // UPI वैलिडेशन और डुप्लीकेट UTR जांच
       if (selectedPaymentMode === 'UPI') {
         if (!/^\d{12}$/.test(utr)) {
           alert('कृपया 12 अंकों का सही बैंक UTR नंबर डालें!');
@@ -887,11 +945,15 @@
         currentOrderId = newOrder.id;
         localStorage.setItem('zepto_active_order', newOrder.id);
 
+        // Save Full Order Details to Local History
         saveOrderToHistory({
           id: newOrder.id,
           total_amount: finalToPay,
           items: orderItems,
-          date: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+          customer_name: name,
+          delivery_address: address,
+          payment_mode: selectedPaymentMode,
+          date: new Date().toLocaleDateString('hi-IN', { day: 'numeric', month: 'short' }) + ', ' + new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
         });
 
         cart = {};
@@ -961,33 +1023,87 @@
     function saveOrderToHistory(orderObj) {
       let history = JSON.parse(localStorage.getItem('zepto_order_history') || '[]');
       history.unshift(orderObj);
-      if (history.length > 4) history = history.slice(0, 4);
+      if (history.length > 8) history = history.slice(0, 8);
       localStorage.setItem('zepto_order_history', JSON.stringify(history));
       renderPastOrdersUI();
     }
 
+    // Render Past Orders List with Full Receipt Trigger
     function renderPastOrdersUI() {
       const container = document.getElementById('history-container');
       const history = JSON.parse(localStorage.getItem('zepto_order_history') || '[]');
 
       if (history.length === 0) {
-        container.innerHTML = '<div style="font-size: 12px; color: #94a3b8; padding: 10px 0;">No past orders yet.</div>';
+        container.innerHTML = '<div style="font-size: 12px; color: #94a3b8; padding: 10px 0;">No past orders found.</div>';
         return;
       }
 
-      container.innerHTML = history.map(order => {
-        const summary = order.items.map(i => `${i.name} (${i.qty})`).join(', ');
+      container.innerHTML = history.map((order, index) => {
+        const itemCount = Array.isArray(order.items) ? order.items.reduce((s, i) => s + (i.qty || 1), 0) : 0;
+        const itemNames = Array.isArray(order.items) ? order.items.map(i => `${i.name} (${i.qty})`).join(', ') : 'Items';
+
         return `
-          <div class="history-card" style="background:#fff; border-radius:12px; border:1px solid var(--border-color); padding:12px; margin-bottom:10px; display:flex; justify-content:space-between; align-items:center;">
-            <div>
-              <div style="font-size: 12px; font-weight: 800;">Order #${order.id} <span style="font-size:10px; color:#64748b;">${order.date || ''}</span></div>
-              <div style="font-size: 11px; color: #64748b; margin-top:2px;">${summary}</div>
-              <div style="font-size: 13px; font-weight: 800; color: var(--zepto-green); margin-top:2px;">₹${order.total_amount}</div>
+          <div class="past-order-box">
+            <div class="past-order-top">
+              <span class="past-order-id">ORD #${order.id}</span>
+              <span class="past-order-time">📅 ${order.date || ''}</span>
             </div>
-            <button class="btn-repeat" onclick='repeatOrder(${JSON.stringify(order.items)})' style="background:#fff; border:1.5px solid var(--zepto-purple); color:var(--zepto-purple); font-size:12px; font-weight:800; padding:6px 12px; border-radius:8px; cursor:pointer;">🔁 Repeat</button>
+            
+            <div class="past-item-preview-line">
+              <b>${itemCount} Items:</b> ${itemNames}
+            </div>
+
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+              <span style="font-size:11px; color:#64748b;">Paid via <b>${order.payment_mode || 'COD'}</b></span>
+              <span style="font-size:15px; font-weight:900; color:var(--zepto-green);">₹${order.total_amount}</span>
+            </div>
+
+            <div class="past-actions-row">
+              <button class="btn-past-details" onclick='openReceiptModal(${JSON.stringify(order)})'>
+                📄 View Receipt Details
+              </button>
+              <button class="btn-past-repeat" onclick='repeatOrder(${JSON.stringify(order.items)})'>
+                🔁 Repeat
+              </button>
+            </div>
           </div>
         `;
       }).join('');
+    }
+
+    // Open Detailed Receipt Sheet
+    function openReceiptModal(order) {
+      document.getElementById('rcpt-title').innerText = `Order Receipt #ORD-${order.id}`;
+      document.getElementById('rcpt-date-mode').innerText = `Date: ${order.date || ''} | Mode: ${order.payment_mode || 'COD'}`;
+      document.getElementById('rcpt-address').innerText = order.delivery_address || 'Home Address';
+      document.getElementById('rcpt-total-amount').innerText = `₹${order.total_amount}`;
+
+      const itemsListContainer = document.getElementById('rcpt-items-list');
+      const items = Array.isArray(order.items) ? order.items : [];
+
+      itemsListContainer.innerHTML = items.map(item => `
+        <div class="receipt-item-row">
+          <img class="receipt-item-img" src="${item.image_url || 'https://via.placeholder.com/60'}" alt="${item.name}">
+          <div style="flex:1;">
+            <div style="font-size:13px; font-weight:800; color:#1e293b;">${item.name}</div>
+            <div style="font-size:11px; color:#64748b;">Rate: ₹${item.price} × ${item.qty}</div>
+          </div>
+          <div style="font-size:14px; font-weight:900; color:#0f172a;">
+            ₹${item.subtotal || (item.price * item.qty)}
+          </div>
+        </div>
+      `).join('');
+
+      document.getElementById('rcpt-repeat-btn').onclick = () => {
+        closeReceiptModal();
+        repeatOrder(order.items);
+      };
+
+      document.getElementById('receipt-modal').classList.add('active');
+    }
+
+    function closeReceiptModal() {
+      document.getElementById('receipt-modal').classList.remove('active');
     }
 
     function repeatOrder(items) {
