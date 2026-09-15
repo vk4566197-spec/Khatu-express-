@@ -600,12 +600,19 @@
 
     async function toggleProductStock(prodId, setOutOfStock) {
       try {
-        const { error } = await _supabase
+        const { data, error } = await _supabase
           .from('products')
           .update({ is_out_of_stock: setOutOfStock })
-          .eq('id', prodId);
+          .eq('id', prodId)
+          .select();
 
         if (error) throw error;
+
+        if (!data || data.length === 0) {
+          alert("⚠️ डेटाबेस में अपडेट नहीं हो पाया! कृपया Supabase SQL में RLS बंद करें।");
+          return;
+        }
+
         const target = rawProducts.find(p => p.id === prodId);
         if (target) target.is_out_of_stock = setOutOfStock;
         updateProductStats();
