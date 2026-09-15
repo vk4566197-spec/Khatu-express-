@@ -41,15 +41,16 @@
 
     .container { max-width: 1050px; margin: 20px auto; padding: 0 16px; }
 
-    /* Master Section Nav: Orders vs Riders */
+    /* Master Section Nav: Orders, Products, Riders */
     .master-nav {
-      display: flex; gap: 10px; margin-bottom: 18px;
+      display: flex; gap: 10px; margin-bottom: 18px; overflow-x: auto; scrollbar-width: none;
     }
+    .master-nav::-webkit-scrollbar { display: none; }
     .master-btn {
-      flex: 1; padding: 12px; border-radius: 12px; border: 2px solid transparent;
-      font-size: 14px; font-weight: 900; cursor: pointer; text-align: center;
+      flex: 1; min-width: 140px; padding: 12px 10px; border-radius: 12px; border: 2px solid transparent;
+      font-size: 13px; font-weight: 900; cursor: pointer; text-align: center;
       background: #ffffff; color: var(--muted); box-shadow: 0 2px 6px rgba(0,0,0,0.04);
-      transition: all 0.2s ease;
+      transition: all 0.2s ease; white-space: nowrap;
     }
     .master-btn.active {
       background: var(--primary); color: #fff; border-color: #6b21a8;
@@ -74,20 +75,19 @@
     .tab-btn {
       flex: 1; min-width: 110px; padding: 10px 14px; border-radius: 8px; border: none;
       background: transparent; font-size: 13px; font-weight: 800; color: var(--muted); cursor: pointer; text-align: center;
-      transition: all 0.2s;
+      transition: all 0.2s; white-space: nowrap;
     }
     .tab-btn.active {
       background: var(--primary); color: #fff; box-shadow: 0 4px 10px rgba(60, 0, 107, 0.2);
     }
 
-    /* Date Divider */
     .date-divider {
       background: #e2e8f0; color: #334155; font-size: 12px; font-weight: 800;
       padding: 6px 14px; border-radius: 20px; display: inline-block; margin: 18px 0 12px 0;
     }
 
-    /* Order Card */
-    .order-card, .rider-card {
+    /* Cards Common */
+    .order-card, .rider-card, .product-admin-card {
       background: var(--card-bg); border-radius: 14px; border: 1px solid var(--border);
       padding: 16px; margin-bottom: 14px; box-shadow: 0 2px 8px rgba(0,0,0,0.04);
     }
@@ -137,23 +137,40 @@
     }
     .btn-delete:hover { background: #dc2626; color: white; }
 
-    /* New Rider Register Form Box */
-    .add-rider-box {
-      background: #fff; padding: 18px; border-radius: 14px; border: 1.5px dashed #cbd5e1;
-      margin-bottom: 20px;
-    }
-    .add-rider-title { font-size: 14px; font-weight: 900; color: var(--primary); margin-bottom: 12px; }
-    .rider-grid-form {
-      display: grid; grid-template-columns: repeat(3, 1fr) auto; gap: 10px; align-items: center;
-    }
+    /* Search and Form Inputs */
     .admin-input {
       width: 100%; padding: 10px 12px; border-radius: 8px; border: 1.5px solid #cbd5e1;
       font-size: 13px; outline: none; font-weight: 600;
     }
+    .admin-search-box {
+      margin-bottom: 16px; position: relative;
+    }
+    .admin-search-box input {
+      padding-left: 38px; border-radius: 12px; background: #fff;
+    }
+    .admin-search-icon {
+      position: absolute; left: 12px; top: 50%; transform: translateY(-50%); font-size: 15px; color: var(--muted);
+    }
+
+    /* Product Grid Admin Card */
+    .product-admin-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 14px;
+    }
+    .prod-thumb-box {
+      width: 60px; height: 60px; border-radius: 8px; background: #f1f5f9;
+      object-fit: contain; border: 1px solid #e2e8f0; flex-shrink: 0;
+    }
+    .stock-badge-green { background: #dcfce7; color: #15803d; font-size: 11px; font-weight: 800; padding: 3px 8px; border-radius: 6px; }
+    .stock-badge-red { background: #fee2e2; color: #b91c1c; font-size: 11px; font-weight: 800; padding: 3px 8px; border-radius: 6px; }
+
+    .toggle-stock-btn {
+      padding: 7px 12px; border-radius: 8px; border: none; font-size: 11px; font-weight: 800; cursor: pointer;
+    }
+    .btn-mark-out { background: #fee2e2; color: #b91c1c; border: 1px solid #fca5a5; }
+    .btn-mark-in { background: #dcfce7; color: #15803d; border: 1px solid #86efac; }
 
     @media (max-width: 680px) {
       .metrics-row { grid-template-columns: repeat(2, 1fr); }
-      .rider-grid-form { grid-template-columns: 1fr; }
       .btn-delete { margin-left: 0; width: 100%; justify-content: center; }
     }
   </style>
@@ -165,7 +182,7 @@
       <img class="brand-logo" src="logo.png" alt="Logo" onerror="this.style.display='none'">
       <div>
         <div class="brand-title">👑 𝐁𝐀𝐁𝐀 𝐅𝐎𝐎𝐃 🏹</div>
-        <div class="brand-subtitle">Live Admin, Orders & Rider Controller</div>
+        <div class="brand-subtitle">Live Admin, Orders, Products & Riders</div>
       </div>
     </div>
     <button class="refresh-btn" onclick="refreshCurrentSection()">🔄 Refresh</button>
@@ -173,10 +190,13 @@
 
   <div class="container">
     
-    <!-- Top Master Switch: Orders or Riders -->
+    <!-- Top Master Switch -->
     <div class="master-nav">
       <button class="master-btn active" id="btn-sec-orders" onclick="switchMasterSection('ORDERS')">
         📦 Orders Control (4 Days)
+      </button>
+      <button class="master-btn" id="btn-sec-products" onclick="switchMasterSection('PRODUCTS')">
+        🛍️ Products & Stock Manager
       </button>
       <button class="master-btn" id="btn-sec-riders" onclick="switchMasterSection('RIDERS')">
         🛵 Rider Partners & Approvals
@@ -187,7 +207,6 @@
     <!-- SECTION 1: ORDERS CONTROLLER                   -->
     <!-- ============================================== -->
     <div id="section-orders">
-      <!-- Live Numbers -->
       <div class="metrics-row">
         <div class="m-card">
           <div class="m-val" id="cnt-all">0</div>
@@ -207,7 +226,6 @@
         </div>
       </div>
 
-      <!-- Filter Tabs -->
       <div class="tabs-wrap">
         <button class="tab-btn active" onclick="switchTab('ALL', this)">All Orders</button>
         <button class="tab-btn" onclick="switchTab('PENDING', this)">⏳ Pending</button>
@@ -215,21 +233,59 @@
         <button class="tab-btn" onclick="switchTab('DELIVERED', this)">✅ Delivered</button>
       </div>
 
-      <!-- Orders Feed -->
       <div id="orders-container">
         <div style="text-align: center; color: var(--muted); padding: 40px;">ऑर्डर्स लोड हो रहे हैं...</div>
       </div>
     </div>
 
     <!-- ============================================== -->
-    <!-- SECTION 2: RIDER MANAGEMENT (Accept/Deactivate)-->
+    <!-- SECTION 2: PRODUCTS & STOCK MANAGER            -->
+    <!-- ============================================== -->
+    <div id="section-products" style="display: none;">
+      
+      <!-- Add New Product Form -->
+      <div class="order-card" style="border: 1.5px dashed var(--primary); background: #fdf8ff;">
+        <div style="font-size: 14px; font-weight: 900; color: var(--primary); margin-bottom: 12px;">
+          ➕ Add New Item to Customer App
+        </div>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)) auto; gap: 10px; align-items: center;">
+          <input type="text" id="np-name" class="admin-input" placeholder="Item Name (e.g. Samosa) *">
+          <input type="number" id="np-price" class="admin-input" placeholder="Price ₹ *">
+          <input type="text" id="np-unit" class="admin-input" placeholder="Unit (e.g. 2 pcs / 1 plate)">
+          <input type="text" id="np-cat" class="admin-input" placeholder="Category (Snacks/Bakery)">
+          <input type="text" id="np-img" class="admin-input" placeholder="Image URL">
+          <button class="btn-action btn-pack" style="background: var(--primary); padding: 10px 18px;" onclick="addNewProduct()">
+            + Add Item
+          </button>
+        </div>
+      </div>
+
+      <!-- Search Bar for Products -->
+      <div class="admin-search-box">
+        <span class="admin-search-icon">🔍</span>
+        <input type="text" id="prod-search-input" class="admin-input" placeholder="Search products by name or category..." oninput="handleProductSearch()">
+      </div>
+
+      <!-- Stock Status Filter Tabs -->
+      <div class="tabs-wrap">
+        <button class="tab-btn active" id="ptab-all" onclick="filterProductTab('ALL', this)">All Items (<span id="cnt-prod-all">0</span>)</button>
+        <button class="tab-btn" id="ptab-in" onclick="filterProductTab('IN_STOCK', this)">🟢 In Stock (<span id="cnt-prod-in">0</span>)</button>
+        <button class="tab-btn" id="ptab-out" onclick="filterProductTab('OUT_OF_STOCK', this)">🔴 Out of Stock (<span id="cnt-prod-out">0</span>)</button>
+      </div>
+
+      <!-- Product List Grid -->
+      <div class="product-admin-grid" id="products-admin-list">
+        <div style="text-align: center; color: var(--muted); padding: 30px; grid-column: 1/-1;">आइटम लोड हो रहे हैं...</div>
+      </div>
+    </div>
+
+    <!-- ============================================== -->
+    <!-- SECTION 3: RIDER MANAGEMENT                    -->
     <!-- ============================================== -->
     <div id="section-riders" style="display: none;">
-      
-      <!-- Quick Register/Add Rider Form -->
-      <div class="add-rider-box">
-        <div class="add-rider-title">➕ Add or Approve New Rider Partner</div>
-        <div class="rider-grid-form">
+      <div class="order-card" style="border: 1.5px dashed #cbd5e1;">
+        <div style="font-size: 14px; font-weight: 900; color: var(--primary); margin-bottom: 12px;">➕ Add / Register Rider Partner</div>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)) auto; gap: 10px; align-items: center;">
           <input type="text" id="new-rider-name" class="admin-input" placeholder="Rider Full Name *">
           <input type="tel" id="new-rider-phone" class="admin-input" placeholder="10-digit Phone No. *" maxlength="10">
           <input type="text" id="new-rider-vehicle" class="admin-input" placeholder="Vehicle No (e.g. UP25-XX-1234)">
@@ -239,7 +295,6 @@
         </div>
       </div>
 
-      <!-- Riders Filter Tabs -->
       <div class="tabs-wrap">
         <button class="tab-btn active" id="rtab-all" onclick="filterRiders('ALL', this)">All Riders</button>
         <button class="tab-btn" id="rtab-active" onclick="filterRiders('Active', this)">🟢 Active (Allowed)</button>
@@ -247,7 +302,6 @@
         <button class="tab-btn" id="rtab-blocked" onclick="filterRiders('Blocked', this)">🔴 Deactivated / Blocked</button>
       </div>
 
-      <!-- Riders List Container -->
       <div id="riders-container">
         <div style="text-align: center; color: var(--muted); padding: 30px;">राइडर्स सूची लोड हो रही है...</div>
       </div>
@@ -261,32 +315,35 @@
     const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
     let rawOrders = [];
+    let rawProducts = [];
     let rawRiders = [];
+
     let currentMasterSec = 'ORDERS';
     let currentOrderTab = 'ALL';
+    let currentProdTab = 'ALL';
     let currentRiderTab = 'ALL';
 
     function switchMasterSection(sec) {
       currentMasterSec = sec;
       document.getElementById('btn-sec-orders').className = sec === 'ORDERS' ? 'master-btn active' : 'master-btn';
+      document.getElementById('btn-sec-products').className = sec === 'PRODUCTS' ? 'master-btn active' : 'master-btn';
       document.getElementById('btn-sec-riders').className = sec === 'RIDERS' ? 'master-btn active' : 'master-btn';
 
       document.getElementById('section-orders').style.display = sec === 'ORDERS' ? 'block' : 'none';
+      document.getElementById('section-products').style.display = sec === 'PRODUCTS' ? 'block' : 'none';
       document.getElementById('section-riders').style.display = sec === 'RIDERS' ? 'block' : 'none';
 
       refreshCurrentSection();
     }
 
     function refreshCurrentSection() {
-      if (currentMasterSec === 'ORDERS') {
-        fetchOrders();
-      } else {
-        fetchRiders();
-      }
+      if (currentMasterSec === 'ORDERS') fetchOrders();
+      else if (currentMasterSec === 'PRODUCTS') fetchProducts();
+      else fetchRiders();
     }
 
     // ============================================
-    // ORDERS CONTROLLER (4-DAY DATE ROLLING & DELETE)
+    // 1. ORDERS CONTROLLER
     // ============================================
     async function fetchOrders() {
       try {
@@ -295,10 +352,7 @@
         fourDaysAgo.setHours(0, 0, 0, 0);
 
         const { data, error } = await _supabase
-          .from('orders')
-          .select('*')
-          .gte('created_at', fourDaysAgo.toISOString())
-          .order('id', { ascending: false });
+          .from('orders').select('*').gte('created_at', fourDaysAgo.toISOString()).order('id', { ascending: false });
 
         if (error) throw error;
         rawOrders = data || [];
@@ -446,35 +500,178 @@
     }
 
     async function deleteFakeOrder(orderId) {
-      const confirmDelete = confirm(`⚠️ क्या आप वाकई ऑर्डर #${orderId} को पूरे सिस्टम से हमेशा के लिए हटाना (Delete) चाहते हैं?`);
-      if (!confirmDelete) return;
-
+      if (!confirm(`⚠️ क्या आप वाकई ऑर्डर #${orderId} को पूरे सिस्टम से डिलीट करना चाहते हैं?`)) return;
       try {
         const { error } = await _supabase.from('orders').delete().eq('id', orderId);
         if (error) throw error;
         rawOrders = rawOrders.filter(o => o.id !== orderId);
         updateMetrics();
         renderOrders();
-        alert(`✅ ऑर्डर #${orderId} पूरे सिस्टम से डिलीट हो गया!`);
+        alert(`✅ ऑर्डर #${orderId} डिलीट हो गया!`);
       } catch (err) {
         alert('डिलीट करने में त्रुटि: ' + err.message);
       }
     }
 
     // ============================================
-    // RIDER MANAGEMENT (ACCEPT / DEACTIVATE / BLOCK)
+    // 2. PRODUCTS & STOCK MANAGER (OUT OF STOCK)
+    // ============================================
+    async function fetchProducts() {
+      try {
+        const { data, error } = await _supabase
+          .from('products').select('*').order('id', { ascending: true });
+
+        if (error) throw error;
+        rawProducts = data || [];
+        updateProductStats();
+        renderProductsAdmin();
+      } catch (err) {
+        document.getElementById('products-admin-list').innerHTML = 
+          `<div style="text-align:center; color:#dc2626; padding:20px; grid-column:1/-1;">आइटम लोड करने में समस्या: ${err.message}</div>`;
+      }
+    }
+
+    function updateProductStats() {
+      const inStock = rawProducts.filter(p => !p.is_out_of_stock).length;
+      const outStock = rawProducts.filter(p => p.is_out_of_stock).length;
+      document.getElementById('cnt-prod-all').innerText = rawProducts.length;
+      document.getElementById('cnt-prod-in').innerText = inStock;
+      document.getElementById('cnt-prod-out').innerText = outStock;
+    }
+
+    function filterProductTab(tab, btn) {
+      currentProdTab = tab;
+      document.querySelectorAll('#section-products .tab-btn').forEach(b => b.classList.remove('active'));
+      if (btn) btn.classList.add('active');
+      renderProductsAdmin();
+    }
+
+    function handleProductSearch() {
+      renderProductsAdmin();
+    }
+
+    function renderProductsAdmin() {
+      const container = document.getElementById('products-admin-list');
+      const q = (document.getElementById('prod-search-input').value || '').toLowerCase().trim();
+
+      let list = rawProducts.filter(p => {
+        const matchQ = (p.name || '').toLowerCase().includes(q) || (p.category || '').toLowerCase().includes(q);
+        if (currentProdTab === 'IN_STOCK') return matchQ && !p.is_out_of_stock;
+        if (currentProdTab === 'OUT_OF_STOCK') return matchQ && p.is_out_of_stock;
+        return matchQ;
+      });
+
+      if (list.length === 0) {
+        container.innerHTML = '<div style="text-align:center; color:var(--muted); padding:30px; grid-column:1/-1; font-weight:700;">कोई प्रोडक्ट नहीं मिला।</div>';
+        return;
+      }
+
+      container.innerHTML = list.map(p => {
+        const isOut = p.is_out_of_stock === true;
+        return `
+          <div class="product-admin-card" style="${isOut ? 'opacity: 0.75; border-color: #fca5a5;' : ''}">
+            <div style="display:flex; gap:12px; align-items:center;">
+              <img class="prod-thumb-box" src="${p.image_url || 'https://via.placeholder.com/80'}" alt="${p.name}">
+              <div style="flex:1;">
+                <div style="font-size:14px; font-weight:800; color:#0f172a;">${p.name}</div>
+                <div style="font-size:11px; color:#64748b;">${p.unit || '1 unit'} | ${p.category || 'General'}</div>
+                <div style="font-size:15px; font-weight:900; color:var(--primary); margin-top:2px;">₹${p.price}</div>
+              </div>
+              <div>
+                <span class="${isOut ? 'stock-badge-red' : 'stock-badge-green'}">
+                  ${isOut ? '🔴 Out of Stock' : '🟢 In Stock'}
+                </span>
+              </div>
+            </div>
+
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-top:12px; padding-top:10px; border-top:1px solid #f1f5f9;">
+              <button class="toggle-stock-btn ${isOut ? 'btn-mark-in' : 'btn-mark-out'}" onclick="toggleProductStock(${p.id}, ${!isOut})">
+                ${isOut ? '✓ Set In Stock' : '✕ Set Out of Stock'}
+              </button>
+              
+              <button onclick="deleteProduct(${p.id})" style="background:none; border:none; color:#dc2626; font-size:12px; font-weight:800; cursor:pointer;">
+                🗑️ Delete
+              </button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    async function toggleProductStock(prodId, setOutOfStock) {
+      try {
+        const { error } = await _supabase
+          .from('products')
+          .update({ is_out_of_stock: setOutOfStock })
+          .eq('id', prodId);
+
+        if (error) throw error;
+        const target = rawProducts.find(p => p.id === prodId);
+        if (target) target.is_out_of_stock = setOutOfStock;
+        updateProductStats();
+        renderProductsAdmin();
+      } catch (err) {
+        alert('स्टॉक बदलने में त्रुटि: ' + err.message);
+      }
+    }
+
+    async function addNewProduct() {
+      const name = document.getElementById('np-name').value.trim();
+      const price = parseFloat(document.getElementById('np-price').value);
+      const unit = document.getElementById('np-unit').value.trim();
+      const cat = document.getElementById('np-cat').value.trim();
+      const img = document.getElementById('np-img').value.trim();
+
+      if (!name || isNaN(price)) {
+        alert('कृपया आइटम का नाम और सही मूल्य (Price) डालें!');
+        return;
+      }
+
+      try {
+        const { data, error } = await _supabase.from('products').insert([{
+          name: name,
+          price: price,
+          unit: unit || '1 unit',
+          category: cat || 'Snacks',
+          image_url: img || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=120',
+          is_out_of_stock: false
+        }]).select();
+
+        if (error) throw error;
+        alert(`✅ नया आइटम "${name}" सफलतापूर्वक जुड़ गया!`);
+        document.getElementById('np-name').value = '';
+        document.getElementById('np-price').value = '';
+        document.getElementById('np-unit').value = '';
+        document.getElementById('np-cat').value = '';
+        document.getElementById('np-img').value = '';
+        fetchProducts();
+      } catch (e) {
+        alert('आइटम जोड़ने में त्रुटि: ' + e.message);
+      }
+    }
+
+    async function deleteProduct(prodId) {
+      if (!confirm('क्या आप वाकई इस प्रोडक्ट को हटाना चाहते हैं?')) return;
+      try {
+        const { error } = await _supabase.from('products').delete().eq('id', prodId);
+        if (error) throw error;
+        rawProducts = rawProducts.filter(p => p.id !== prodId);
+        updateProductStats();
+        renderProductsAdmin();
+      } catch (e) {
+        alert('डिलीट नहीं हो पाया: ' + e.message);
+      }
+    }
+
+    // ============================================
+    // 3. RIDER MANAGEMENT
     // ============================================
     async function fetchRiders() {
       try {
         const { data, error } = await _supabase
-          .from('riders')
-          .select('*')
-          .order('id', { ascending: false });
+          .from('riders').select('*').order('id', { ascending: false });
 
-        if (error) {
-          // अगर riders टेबल नहीं बनी है तो उसे नोट करें
-          console.warn("Riders table notice:", error.message);
-        }
+        if (error) console.warn("Riders table error:", error.message);
         rawRiders = data || [];
         renderRiders();
       } catch (err) {
@@ -543,7 +740,6 @@
       }).join('');
     }
 
-    // नया राइडर जोड़ें
     async function registerRiderManually() {
       const name = document.getElementById('new-rider-name').value.trim();
       const phone = document.getElementById('new-rider-phone').value.trim();
@@ -553,18 +749,11 @@
       if (!/^[6-9]\d{9}$/.test(phone)) { alert('कृपया 10 अंकों का वैध फोन नंबर डालें!'); return; }
 
       try {
-        const { data, error } = await _supabase
-          .from('riders')
-          .insert([{
-            name: name,
-            phone: phone,
-            vehicle_no: vehicle || 'Standard',
-            status: 'Active'
-          }])
-          .select();
-
+        const { error } = await _supabase.from('riders').insert([{
+          name: name, phone: phone, vehicle_no: vehicle || 'Standard', status: 'Active'
+        }]);
         if (error) throw error;
-        alert(`✅ राइडर पार्टनर "${name}" को एक्टिवेट कर दिया गया है!`);
+        alert(`✅ राइडर पार्टनर "${name}" को जोड़ दिया गया है!`);
         document.getElementById('new-rider-name').value = '';
         document.getElementById('new-rider-phone').value = '';
         document.getElementById('new-rider-vehicle').value = '';
@@ -574,15 +763,10 @@
       }
     }
 
-    // राइडर स्टेटस अपडेट (Accept/Deactivate)
     async function updateRiderStatus(riderId, newStatus) {
       if (!confirm(`क्या आप राइडर ID #${riderId} का स्टेटस "${newStatus}" करना चाहते हैं?`)) return;
       try {
-        const { error } = await _supabase
-          .from('riders')
-          .update({ status: newStatus })
-          .eq('id', riderId);
-
+        const { error } = await _supabase.from('riders').update({ status: newStatus }).eq('id', riderId);
         if (error) throw error;
         alert(`राइडर स्टेटस बदलकर "${newStatus}" कर दिया गया!`);
         fetchRiders();
@@ -591,15 +775,10 @@
       }
     }
 
-    // राइडर को पूरी तरह हटाना
     async function deleteRiderPermanently(riderId) {
       if (!confirm(`⚠️ क्या आप वाकई राइडर ID #${riderId} को पूरे सिस्टम से हटाना चाहते हैं?`)) return;
       try {
-        const { error } = await _supabase
-          .from('riders')
-          .delete()
-          .eq('id', riderId);
-
+        const { error } = await _supabase.from('riders').delete().eq('id', riderId);
         if (error) throw error;
         alert(`राइडर ID #${riderId} डिलीट कर दिया गया!`);
         fetchRiders();
@@ -608,11 +787,9 @@
       }
     }
 
-    // ऑटो-रिफ्रेश हर 10 सेकंड पर
     fetchOrders();
     setInterval(() => {
       if (currentMasterSec === 'ORDERS') fetchOrders();
-      else fetchRiders();
     }, 10000);
   </script>
 </body>
