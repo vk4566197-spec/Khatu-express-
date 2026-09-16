@@ -38,60 +38,28 @@
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
     body { background-color: var(--bg-page); color: var(--text-main); padding-bottom: 120px; }
 
-    /* Fullscreen Logo Preview Modal */
-    .logo-modal-overlay {
+    /* Modals Common */
+    .modal-overlay {
       position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(0, 0, 0, 0.88); z-index: 9999; display: none;
-      align-items: center; justify-content: center; flex-direction: column;
-      backdrop-filter: blur(4px);
+      background: rgba(0,0,0,0.6); display: none; justify-content: flex-end;
+      flex-direction: column; z-index: 300;
     }
-    .logo-modal-overlay.active { display: flex; }
-    .full-logo-view {
-      width: 85%; max-width: 340px; border-radius: 50%;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.6);
-      border: 3px solid #ff758c; animation: popIn 0.25s ease-out;
+    .modal-overlay.active { display: flex; }
+    .bottom-sheet {
+      background: white; border-radius: 20px 20px 0 0; padding: 20px 18px 30px 18px;
+      max-height: 85vh; overflow-y: auto;
     }
-    .btn-close-preview {
-      position: absolute; top: 25px; right: 25px; background: #fff;
-      color: #000; border: none; width: 38px; height: 38px; border-radius: 50%;
-      font-size: 20px; font-weight: 900; cursor: pointer;
+    .sheet-head {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: 14px; padding-bottom: 10px; border-bottom: 1px solid #f0edf4;
     }
-    @keyframes popIn {
-      from { transform: scale(0.6); opacity: 0; }
-      to { transform: scale(1); opacity: 1; }
+    .sheet-title { font-size: 16px; font-weight: 900; color: var(--zepto-purple); }
+    .sheet-close {
+      background: #f1f3f6; border: none; width: 28px; height: 28px;
+      border-radius: 50%; font-weight: bold; cursor: pointer;
     }
 
-    /* Side Drawer */
-    .drawer-overlay {
-      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(0, 0, 0, 0.5); z-index: 500; display: none;
-    }
-    .drawer-overlay.active { display: block; }
-    .side-drawer {
-      position: fixed; top: 0; left: -290px; width: 280px; height: 100%;
-      background: #fff; z-index: 501; box-shadow: 4px 0 20px rgba(0,0,0,0.15);
-      transition: left 0.3s ease; display: flex; flex-direction: column;
-    }
-    .side-drawer.active { left: 0; }
-    
-    .drawer-header {
-      background: linear-gradient(135deg, var(--zepto-purple), #240046);
-      color: white; padding: 22px 16px;
-    }
-    .drawer-logo-img {
-      width: 85px !important; height: 85px !important; border-radius: 50% !important;
-      object-fit: cover !important; background: #fff; border: 3px solid #ff758c;
-      display: block !important; margin-bottom: 8px; cursor: pointer;
-    }
-    .drawer-brand { font-size: 15px; font-weight: 900; color: #ff758c; line-height: 1.2; }
-    .drawer-menu-list { padding: 16px 0; flex: 1; overflow-y: auto; }
-    .drawer-item {
-      display: flex; align-items: center; gap: 12px; padding: 14px 20px;
-      font-size: 13px; font-weight: 700; color: #1e293b; cursor: pointer; text-decoration: none;
-      border-bottom: 1px solid #f8fafc;
-    }
-
-    /* Top Hero Header (Dynamic Theme) */
+    /* Top Hero Header */
     .top-hero-area {
       background: linear-gradient(180deg, var(--zepto-header-bg) 0%, #fbf9fe 100%);
       padding: 12px 16px 14px 16px; border-bottom: 1px solid #eee5f7;
@@ -223,7 +191,7 @@
     .t-step.active { color: #0f172a; font-weight: 800; }
     .t-step.active::after { background: var(--zepto-green); box-shadow: 0 0 0 4px #dcfce7; }
 
-    /* Past Orders & Invoices */
+    /* Past Orders */
     .past-order-box { background: #fff; border-radius: 14px; border: 1.5px solid var(--border-color); padding: 14px; margin-bottom: 12px; }
     .past-order-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
     .past-order-id { font-size: 13px; font-weight: 900; color: #0f172a; }
@@ -236,7 +204,7 @@
     .receipt-item-row { display: flex; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px solid #f1f5f9; }
     .receipt-item-img { width: 44px; height: 44px; border-radius: 8px; object-fit: contain; background: #faf8fd; border: 1px solid #eee; }
 
-    /* Chat System */
+    /* Live Chat */
     .chat-drawer { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #f8fafc; z-index: 500; display: none; flex-direction: column; }
     .chat-drawer.active { display: flex; }
     .chat-top-header { background: var(--zepto-purple); color: white; padding: 16px; display: flex; justify-content: space-between; align-items: center; }
@@ -254,45 +222,11 @@
 </head>
 <body>
 
-  <!-- Fullscreen Logo Modal -->
-  <div class="logo-modal-overlay" id="logo-preview-modal" onclick="closeLogoPreview()">
-    <button class="btn-close-preview" onclick="closeLogoPreview()">✕</button>
-    <img class="full-logo-view" src="logo.png" alt="Full Logo" onclick="event.stopPropagation()">
-    <div style="color: #fff; font-weight: 800; font-size: 15px; margin-top: 14px;">👑 𝐁𝐀𝐁𝐀 𝐅𝐎𝐎𝐃 𝐃𝐄𝐋𝐈𝐕𝐄𝐑𝐘🏹</div>
-  </div>
-
-  <!-- Side Drawer -->
-  <div class="drawer-overlay" id="drawer-overlay" onclick="toggleDrawer(false)"></div>
-  <div class="side-drawer" id="side-drawer">
-    <div class="drawer-header">
-      <img class="drawer-logo-img" src="logo.png" alt="Logo" title="Tap to view full logo" onclick="openLogoPreview()" onerror="this.style.display='none'">
-      <div class="drawer-brand">👑 𝐁𝐀𝐁𝐀 𝐅𝐎𝐎𝐃 𝐃𝐄𝐋𝐈𝐕𝐄𝐑𝐘🏹</div>
-      <div style="font-size: 11px; color: #fdf4ff; margin-top: 2px;">Fast Express Delivery</div>
-    </div>
-    <div class="drawer-menu-list">
-      <div class="drawer-item" onclick="toggleDrawer(false); scrollToHistory();">
-        <span>🕒</span> Past Orders & Receipts
-      </div>
-      <div class="drawer-item" onclick="openSupportModal()">
-        <span>💬</span> 24x7 Help & Support
-      </div>
-      <a class="drawer-item" href="tel:9711107063">
-        <span>📞</span> Helpline: 9711107063
-      </a>
-      <a class="drawer-item" target="_blank" href="https://wa.me/919711107063?text=Hello%20Baba%20Food%20Delivery%20Support">
-        <span>🟢</span> WhatsApp: 9711107063
-      </a>
-      <div class="drawer-item" onclick="alert('डिलीवरी समय: सुबह 7:00 AM से रात 11:00 PM तक!')">
-        <span>ℹ️</span> Store Hours & FAQs
-      </div>
-    </div>
-  </div>
-
   <!-- Top Hero Header -->
   <div class="top-hero-area">
     <div class="location-row">
       <div style="display: flex; align-items: center; gap: 10px;">
-        <button class="menu-trigger-btn" onclick="toggleDrawer(true)">☰</button>
+        <button class="menu-trigger-btn" onclick="alert(' एक्सप्रेस डिलीवरी')">☰</button>
         <div>
           <div class="eta-badge">⚡ 10 minutes</div>
           <div class="address-line">📍 Delivery to Home & Nearby</div>
@@ -305,12 +239,6 @@
       <div class="store-pill active">
         <img class="pill-logo-compact" src="logo.png" alt="Logo" onerror="this.style.display='none'">
         <span class="pill-text-compact">👑 𝐁𝐀𝐁𝐀 𝐅𝐎𝐎𝐃 𝐃𝐄𝐋𝐈𝐕𝐄𝐑𝐘🏹</span>
-      </div>
-      <div class="store-pill">
-        <span class="pill-text-compact">Express Kitchen</span>
-      </div>
-      <div class="store-pill">
-        <span class="pill-text-compact">Fresh Mart</span>
       </div>
     </div>
 
@@ -327,7 +255,7 @@
     </div>
   </div>
 
-  <!-- Dynamic Live Promo Banner from Admin -->
+  <!-- Dynamic Promo Banner -->
   <div class="promo-banner">
     <div class="promo-text">
       <h3 id="dyn-banner-title">₹249+ पर <span style="color: var(--zepto-green);">Free Delivery</span> 🚚</h3>
@@ -374,7 +302,7 @@
     <div style="font-size: 13px; font-weight: 800;">View Cart ➔</div>
   </div>
 
-  <!-- Bottom Nav -->
+  <!-- Bottom Navigation -->
   <div class="bottom-nav-bar">
     <div class="nav-item active" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">
       <div class="nav-item-icon">🏠</div>
@@ -382,7 +310,7 @@
     </div>
     <div class="nav-item" onclick="openTrackModal()">
       <div class="nav-item-icon">🛵</div>
-      <span>Track Order</span>
+      <span>Track</span>
     </div>
     <div class="nav-item" onclick="scrollToHistory()">
       <div class="nav-item-icon">🕒</div>
@@ -462,7 +390,7 @@
     </div>
   </div>
 
-  <!-- Live Status Modal WITH LIVE CHAT BUTTON -->
+  <!-- Live Status Modal -->
   <div class="modal-overlay" id="track-modal" onclick="closeTrackModal(event)">
     <div class="bottom-sheet" onclick="event.stopPropagation()">
       <div class="sheet-head">
@@ -491,7 +419,7 @@
     </div>
   </div>
 
-  <!-- CHAT DRAWER -->
+  <!-- Chat Drawer -->
   <div class="chat-drawer" id="chat-drawer">
     <div class="chat-top-header">
       <div style="display:flex; align-items:center; gap:10px;">
@@ -504,11 +432,7 @@
       <a href="tel:9711107063" style="color:white; text-decoration:none; font-size:18px;">📞</a>
     </div>
 
-    <div class="chat-messages-area" id="chat-messages">
-      <div style="text-align:center; font-size:11px; color:#94a3b8; margin:10px 0;">
-        ऑर्डर डिलीवरी से संबंधित चैट यहाँ दिखेगी।
-      </div>
-    </div>
+    <div class="chat-messages-area" id="chat-messages"></div>
 
     <div class="quick-chips-row">
       <div class="quick-chip" onclick="sendQuickMessage('भैया जल्दी आना प्लीज (Please deliver fast)')">⚡ Please deliver fast</div>
@@ -648,12 +572,12 @@
       root.style.setProperty('--zepto-header-bg', appConfig.header_bg);
       root.style.setProperty('--zepto-purple', appConfig.primary_purple);
 
-      document.getElementById('dyn-banner-title').innerHTML = appConfig.banner_title;
-      document.getElementById('dyn-banner-sub').innerText = appConfig.banner_subtitle;
-      document.getElementById('dyn-banner-icon').innerText = appConfig.banner_icon || '🎁';
-      document.getElementById('bill-free-del-rule').innerText = `Free on ₹${appConfig.min_free_delivery}+`;
-      document.getElementById('bill-disc-rule').innerText = `Offer (₹${appConfig.discount_min_order}+ Order)`;
-      document.getElementById('bill-disc-amount').innerText = `-₹${appConfig.discount_amount}`;
+      if(document.getElementById('dyn-banner-title')) document.getElementById('dyn-banner-title').innerHTML = appConfig.banner_title;
+      if(document.getElementById('dyn-banner-sub')) document.getElementById('dyn-banner-sub').innerText = appConfig.banner_subtitle;
+      if(document.getElementById('dyn-banner-icon')) document.getElementById('dyn-banner-icon').innerText = appConfig.banner_icon || '🎁';
+      if(document.getElementById('bill-free-del-rule')) document.getElementById('bill-free-del-rule').innerText = `Free on ₹${appConfig.min_free_delivery}+`;
+      if(document.getElementById('bill-disc-rule')) document.getElementById('bill-disc-rule').innerText = `Offer (₹${appConfig.discount_min_order}+ Order)`;
+      if(document.getElementById('bill-disc-amount')) document.getElementById('bill-disc-amount').innerText = `-₹${appConfig.discount_amount}`;
 
       renderCartSheet();
     }
@@ -702,11 +626,6 @@
       }
     }
 
-    function toggleDrawer(open) {
-      document.getElementById('side-drawer').className = open ? 'side-drawer active' : 'side-drawer';
-      document.getElementById('drawer-overlay').className = open ? 'drawer-overlay active' : 'drawer-overlay';
-    }
-
     function renderCategories() {
       const bar = document.getElementById('category-chips');
       const cats = ['All', ...new Set(allProducts.map(p => p.category).filter(Boolean))];
@@ -747,7 +666,7 @@
         const card = document.createElement('div');
         card.className = 'product-card';
         const qty = cart[p.id]?.qty || 0;
-        const isOutOfStock = p.is_out_of_stock === true;
+        const isOutOfStock = Boolean(p.is_out_of_stock);
 
         card.innerHTML = `
           <div>
@@ -790,7 +709,9 @@
       if (cart[id].qty <= 0) delete cart[id];
 
       const box = document.getElementById(`btn-box-${id}`);
-      if (box) box.innerHTML = renderButton(id, cart[id]?.qty || 0, false);
+      if (box) {
+        box.innerHTML = renderButton(id, cart[id]?.qty || 0, false);
+      }
 
       updateCartBar();
       renderCartSheet();
@@ -799,11 +720,16 @@
 
     function calculateTotals() {
       const entries = Object.values(cart);
-      const itemsTotal = entries.reduce((s, e) => s + (e.qty * e.item.price), 0);
+      const itemsTotal = entries.reduce((s, e) => s + (e.qty * Number(e.item.price)), 0);
       const totalQty = entries.reduce((s, e) => s + e.qty, 0);
 
-      let deliveryCharge = (itemsTotal >= appConfig.min_free_delivery || itemsTotal === 0) ? 0 : appConfig.delivery_charge;
-      let discount = (itemsTotal >= appConfig.discount_min_order) ? appConfig.discount_amount : 0;
+      const minFree = Number(appConfig.min_free_delivery) || 249;
+      const delCharge = Number(appConfig.delivery_charge) || 25;
+      const minDisc = Number(appConfig.discount_min_order) || 399;
+      const discAmt = Number(appConfig.discount_amount) || 49;
+
+      let deliveryCharge = (itemsTotal >= minFree || itemsTotal === 0) ? 0 : delCharge;
+      let discount = (itemsTotal >= minDisc) ? discAmt : 0;
       let finalToPay = Math.max(0, itemsTotal + deliveryCharge - discount);
 
       return { itemsTotal, totalQty, deliveryCharge, discount, finalToPay };
@@ -823,6 +749,7 @@
 
     function renderCartSheet() {
       const box = document.getElementById('cart-items-box');
+      if (!box) return;
       const entries = Object.values(cart);
 
       if (entries.length === 0) {
@@ -831,11 +758,13 @@
         document.getElementById('bill-delivery-charge').innerText = '₹0';
         document.getElementById('row-discount').style.display = 'none';
         document.getElementById('bill-grand-total').innerText = '₹0';
-        document.getElementById('order-submit-btn').disabled = true;
+        const submitBtn = document.getElementById('order-submit-btn');
+        if (submitBtn) submitBtn.disabled = true;
         return;
       }
 
-      document.getElementById('order-submit-btn').disabled = false;
+      const submitBtn = document.getElementById('order-submit-btn');
+      if (submitBtn) submitBtn.disabled = false;
       const { itemsTotal, deliveryCharge, discount, finalToPay } = calculateTotals();
 
       box.innerHTML = entries.map(({ item, qty }) => `
@@ -893,6 +822,8 @@
 
       const { finalToPay } = calculateTotals();
       const entries = Object.values(cart);
+      if (entries.length === 0) { alert('आपकी कार्ट खाली है!'); return; }
+
       const orderItems = entries.map(({ item, qty }) => ({
         id: item.id, name: item.name, price: item.price, unit: item.unit, qty, subtotal: item.price * qty, image_url: item.image_url
       }));
@@ -998,7 +929,7 @@
       setInterval(checkStatus, 4000);
     }
 
-    // LIVE CHAT FUNCTIONS
+    // LIVE CHAT
     function openLiveChatModal() {
       if (!currentOrderId) { alert('कोई सक्रिय ऑर्डर नहीं है!'); return; }
       document.getElementById('chat-drawer').classList.add('active');
@@ -1159,7 +1090,7 @@
     function closeTrackModal(e) { toggleTrackModal(false); }
 
     function toggleSupportModal(show) { document.getElementById('support-modal').className = show ? 'modal-overlay active' : 'modal-overlay'; }
-    function openSupportModal() { toggleDrawer(false); toggleSupportModal(true); }
+    function openSupportModal() { toggleSupportModal(true); }
     function closeSupportModal(e) { toggleSupportModal(false); }
 
     function scrollToHistory() { document.getElementById('past-orders-section').scrollIntoView({ behavior: 'smooth' }); }
