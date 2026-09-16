@@ -24,7 +24,6 @@
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
     body { background-color: var(--bg); color: var(--text); padding-bottom: 60px; }
 
-    /* Header */
     .admin-header {
       background: linear-gradient(135deg, var(--primary), #1e0038);
       color: white; padding: 18px 20px; display: flex; justify-content: space-between; align-items: center;
@@ -41,7 +40,7 @@
 
     .container { max-width: 1050px; margin: 20px auto; padding: 0 16px; }
 
-    /* Master Section Nav: Orders, Products, Riders */
+    /* Master Section Nav */
     .master-nav {
       display: flex; gap: 10px; margin-bottom: 18px; overflow-x: auto; scrollbar-width: none;
     }
@@ -57,51 +56,19 @@
       box-shadow: 0 4px 14px rgba(60, 0, 107, 0.25);
     }
 
-    /* Metrics Summary Cards */
-    .metrics-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 20px; }
-    .m-card {
-      background: var(--card-bg); padding: 14px; border-radius: 12px; border: 1px solid var(--border);
-      text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.02);
-    }
-    .m-val { font-size: 22px; font-weight: 900; color: var(--primary); }
-    .m-label { font-size: 11px; font-weight: 700; color: var(--muted); margin-top: 4px; }
-
-    /* Filter Tabs */
-    .tabs-wrap {
-      display: flex; gap: 10px; overflow-x: auto; scrollbar-width: none;
-      background: #fff; padding: 8px; border-radius: 12px; border: 1px solid var(--border); margin-bottom: 20px;
-    }
-    .tabs-wrap::-webkit-scrollbar { display: none; }
-    .tab-btn {
-      flex: 1; min-width: 110px; padding: 10px 14px; border-radius: 8px; border: none;
-      background: transparent; font-size: 13px; font-weight: 800; color: var(--muted); cursor: pointer; text-align: center;
-      transition: all 0.2s; white-space: nowrap;
-    }
-    .tab-btn.active {
-      background: var(--primary); color: #fff; box-shadow: 0 4px 10px rgba(60, 0, 107, 0.2);
-    }
-
-    .date-divider {
-      background: #e2e8f0; color: #334155; font-size: 12px; font-weight: 800;
-      padding: 6px 14px; border-radius: 20px; display: inline-block; margin: 18px 0 12px 0;
-    }
-
-    /* Cards Common */
-    .order-card, .rider-card, .product-admin-card {
+    /* Common Card Styles */
+    .order-card, .rider-card, .product-admin-card, .settings-card {
       background: var(--card-bg); border-radius: 14px; border: 1px solid var(--border);
-      padding: 16px; margin-bottom: 14px; box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+      padding: 18px; margin-bottom: 14px; box-shadow: 0 2px 8px rgba(0,0,0,0.04);
     }
     .card-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
     .order-num { font-size: 14px; font-weight: 900; color: var(--text); }
     .order-time { font-size: 11px; color: var(--muted); }
-    
-    .status-badge {
-      font-size: 11px; font-weight: 800; padding: 4px 10px; border-radius: 20px; text-transform: uppercase;
-    }
+
+    .status-badge { font-size: 11px; font-weight: 800; padding: 4px 10px; border-radius: 20px; text-transform: uppercase; }
     .status-pending { background: #fef3c7; color: #b45309; }
     .status-running { background: #e0f2fe; color: #0369a1; }
     .status-delivered { background: #dcfce7; color: #15803d; }
-    .status-upi { background: #f3e8ff; color: #6b21a8; }
     .status-active { background: #dcfce7; color: #15803d; }
     .status-blocked { background: #fee2e2; color: #b91c1c; }
 
@@ -110,14 +77,8 @@
       font-size: 12px; line-height: 1.6; border: 1px solid #edf2f7;
     }
     .cust-name { font-weight: 800; color: #1e293b; font-size: 13px; }
-
-    .items-list { font-size: 13px; color: #334155; margin: 12px 0; padding-left: 6px; }
+    .items-list { font-size: 13px; color: #334155; margin: 12px 0; }
     .item-line { display: flex; justify-content: space-between; padding: 4px 0; border-bottom: 1px dashed #f1f5f9; }
-
-    .utr-tag {
-      display: inline-block; background: #faf5ff; border: 1px solid #d8b4fe;
-      color: #6b21a8; padding: 3px 8px; border-radius: 6px; font-weight: 800; font-size: 11px; margin-top: 6px;
-    }
 
     .card-actions {
       display: flex; gap: 8px; margin-top: 14px; flex-wrap: wrap; align-items: center;
@@ -131,25 +92,11 @@
     .btn-deliver { background: var(--green); color: white; }
     .btn-approve { background: var(--green); color: white; }
     .btn-deactivate { background: #ea580c; color: white; }
-    .btn-delete {
-      background: #fee2e2; color: #dc2626; border: 1px solid #fca5a5;
-      margin-left: auto;
-    }
-    .btn-delete:hover { background: #dc2626; color: white; }
+    .btn-delete { background: #fee2e2; color: #dc2626; border: 1px solid #fca5a5; margin-left: auto; }
 
-    /* Search and Form Inputs */
     .admin-input {
       width: 100%; padding: 10px 12px; border-radius: 8px; border: 1.5px solid #cbd5e1;
       font-size: 13px; outline: none; font-weight: 600;
-    }
-    .admin-search-box {
-      margin-bottom: 16px; position: relative;
-    }
-    .admin-search-box input {
-      padding-left: 38px; border-radius: 12px; background: #fff;
-    }
-    .admin-search-icon {
-      position: absolute; left: 12px; top: 50%; transform: translateY(-50%); font-size: 15px; color: var(--muted);
     }
 
     /* Product Grid Admin Card */
@@ -162,16 +109,23 @@
     }
     .stock-badge-green { background: #dcfce7; color: #15803d; font-size: 11px; font-weight: 800; padding: 3px 8px; border-radius: 6px; }
     .stock-badge-red { background: #fee2e2; color: #b91c1c; font-size: 11px; font-weight: 800; padding: 3px 8px; border-radius: 6px; }
-
-    .toggle-stock-btn {
-      padding: 7px 12px; border-radius: 8px; border: none; font-size: 11px; font-weight: 800; cursor: pointer;
-    }
+    .toggle-stock-btn { padding: 7px 12px; border-radius: 8px; border: none; font-size: 11px; font-weight: 800; cursor: pointer; }
     .btn-mark-out { background: #fee2e2; color: #b91c1c; border: 1px solid #fca5a5; }
     .btn-mark-in { background: #dcfce7; color: #15803d; border: 1px solid #86efac; }
 
-    @media (max-width: 680px) {
-      .metrics-row { grid-template-columns: repeat(2, 1fr); }
-      .btn-delete { margin-left: 0; width: 100%; justify-content: center; }
+    /* Settings Form Grid */
+    .settings-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; margin-top: 14px;
+    }
+    .form-group { display: flex; flex-direction: column; gap: 6px; }
+    .form-label { font-size: 12px; font-weight: 800; color: #334155; }
+    .color-picker-wrap { display: flex; align-items: center; gap: 10px; }
+    .color-box { width: 44px; height: 38px; border: none; border-radius: 8px; cursor: pointer; background: transparent; }
+
+    .btn-save-settings {
+      background: linear-gradient(90deg, #10b981, #059669); color: white; border: none;
+      padding: 14px 24px; border-radius: 10px; font-size: 14px; font-weight: 900;
+      cursor: pointer; box-shadow: 0 4px 14px rgba(16, 185, 129, 0.3); margin-top: 20px; width: 100%;
     }
   </style>
 </head>
@@ -182,7 +136,7 @@
       <img class="brand-logo" src="logo.png" alt="Logo" onerror="this.style.display='none'">
       <div>
         <div class="brand-title">👑 𝐁𝐀𝐁𝐀 𝐅𝐎𝐎𝐃 🏹</div>
-        <div class="brand-subtitle">Live Admin, Orders, Products & Riders</div>
+        <div class="brand-subtitle">Live Admin & Full Customer App Controller</div>
       </div>
     </div>
     <button class="refresh-btn" onclick="refreshCurrentSection()">🔄 Refresh</button>
@@ -193,13 +147,16 @@
     <!-- Top Master Switch -->
     <div class="master-nav">
       <button class="master-btn active" id="btn-sec-orders" onclick="switchMasterSection('ORDERS')">
-        📦 Orders Control (4 Days)
+        📦 Orders Control
+      </button>
+      <button class="master-btn" id="btn-sec-settings" onclick="switchMasterSection('SETTINGS')">
+        🎨 App Control & Offers
       </button>
       <button class="master-btn" id="btn-sec-products" onclick="switchMasterSection('PRODUCTS')">
-        🛍️ Products & Stock Manager
+        🛍️ Products & Stock
       </button>
       <button class="master-btn" id="btn-sec-riders" onclick="switchMasterSection('RIDERS')">
-        🛵 Rider Partners & Approvals
+        🛵 Rider Partners
       </button>
     </div>
 
@@ -207,104 +164,116 @@
     <!-- SECTION 1: ORDERS CONTROLLER                   -->
     <!-- ============================================== -->
     <div id="section-orders">
-      <div class="metrics-row">
-        <div class="m-card">
-          <div class="m-val" id="cnt-all">0</div>
-          <div class="m-label">Total (4 Days)</div>
-        </div>
-        <div class="m-card">
-          <div class="m-val" id="cnt-pending" style="color: #b45309;">0</div>
-          <div class="m-label">Pending / New</div>
-        </div>
-        <div class="m-card">
-          <div class="m-val" id="cnt-running" style="color: #0369a1;">0</div>
-          <div class="m-label">Running 🛵</div>
-        </div>
-        <div class="m-card">
-          <div class="m-val" id="cnt-delivered" style="color: var(--green);">0</div>
-          <div class="m-label">Delivered 🎉</div>
-        </div>
-      </div>
-
-      <div class="tabs-wrap">
-        <button class="tab-btn active" onclick="switchTab('ALL', this)">All Orders</button>
-        <button class="tab-btn" onclick="switchTab('PENDING', this)">⏳ Pending</button>
-        <button class="tab-btn" onclick="switchTab('RUNNING', this)">🛵 Running</button>
-        <button class="tab-btn" onclick="switchTab('DELIVERED', this)">✅ Delivered</button>
-      </div>
-
       <div id="orders-container">
         <div style="text-align: center; color: var(--muted); padding: 40px;">ऑर्डर्स लोड हो रहे हैं...</div>
       </div>
     </div>
 
     <!-- ============================================== -->
-    <!-- SECTION 2: PRODUCTS & STOCK MANAGER            -->
+    <!-- SECTION 2: CUSTOMER APP THEME & OFFERS MANAGER -->
+    <!-- ============================================== -->
+    <div id="section-settings" style="display: none;">
+      <div class="settings-card">
+        <div style="font-size: 16px; font-weight: 900; color: var(--primary);">
+          🎨 Customer App Theme & Colors
+        </div>
+        <div style="font-size: 12px; color: var(--muted); margin-top: 2px;">
+          यहाँ से बदला गया कलर तुरंत कस्टमर ऐप में बटन, हेडर और कार्ट पर बदल जाएगा।
+        </div>
+
+        <div class="settings-grid">
+          <div class="form-group">
+            <span class="form-label">Accent / Button Color (बटन और कार्ट का रंग):</span>
+            <div class="color-picker-wrap">
+              <input type="color" id="set-theme-color" class="color-box" value="#ff3269">
+              <input type="text" id="set-theme-color-text" class="admin-input" value="#ff3269">
+            </div>
+          </div>
+          <div class="form-group">
+            <span class="form-label">Header Top Background (हेडर बैकग्राउंड रंग):</span>
+            <div class="color-picker-wrap">
+              <input type="color" id="set-header-bg" class="color-box" value="#f4ecfb">
+              <input type="text" id="set-header-bg-text" class="admin-input" value="#f4ecfb">
+            </div>
+          </div>
+          <div class="form-group">
+            <span class="form-label">Primary Brand Purple (ब्रांड का गहरा रंग):</span>
+            <div class="color-picker-wrap">
+              <input type="color" id="set-purple" class="color-box" value="#3c006b">
+              <input type="text" id="set-purple-text" class="admin-input" value="#3c006b">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="settings-card">
+        <div style="font-size: 16px; font-weight: 900; color: var(--primary);">
+          🎁 Discount Offers & Delivery Charges Control
+        </div>
+        <div style="font-size: 12px; color: var(--muted); margin-top: 2px;">
+          डिस्काउंट और डिलीवरी चार्ज तुरंत कस्टमर ऐप के बिल में लाइव लागू होंगे।
+        </div>
+
+        <div class="settings-grid">
+          <div class="form-group">
+            <span class="form-label">Banner Title (बैनर का मुख्य ऑफ़र):</span>
+            <input type="text" id="set-banner-title" class="admin-input" placeholder="₹249+ पर Free Delivery 🚚">
+          </div>
+          <div class="form-group">
+            <span class="form-label">Banner Subtitle (ऑफ़र सब-टाइटल):</span>
+            <input type="text" id="set-banner-sub" class="admin-input" placeholder="₹399+ के ऑर्डर पर ₹49 का भारी Discount!">
+          </div>
+          <div class="form-group">
+            <span class="form-label">Free Delivery Min Order (फ्री डिलीवरी के लिए न्यूनतम ऑर्डर ₹):</span>
+            <input type="number" id="set-free-del-min" class="admin-input" placeholder="249">
+          </div>
+          <div class="form-group">
+            <span class="form-label">Standard Delivery Charge (नॉर्मल डिलीवरी चार्ज ₹):</span>
+            <input type="number" id="set-del-charge" class="admin-input" placeholder="25">
+          </div>
+          <div class="form-group">
+            <span class="form-label">Discount Min Order (छूट के लिए न्यूनतम ऑर्डर ₹):</span>
+            <input type="number" id="set-disc-min" class="admin-input" placeholder="399">
+          </div>
+          <div class="form-group">
+            <span class="form-label">Discount Amount (ग्राहकों को मिलने वाली छूट ₹):</span>
+            <input type="number" id="set-disc-amt" class="admin-input" placeholder="49">
+          </div>
+        </div>
+
+        <button class="btn-save-settings" onclick="saveAppSettings()">
+          💾 Save & Update Customer App Live
+        </button>
+      </div>
+    </div>
+
+    <!-- ============================================== -->
+    <!-- SECTION 3: PRODUCTS & STOCK                    -->
     <!-- ============================================== -->
     <div id="section-products" style="display: none;">
-      
-      <!-- Add New Product Form -->
       <div class="order-card" style="border: 1.5px dashed var(--primary); background: #fdf8ff;">
         <div style="font-size: 14px; font-weight: 900; color: var(--primary); margin-bottom: 12px;">
           ➕ Add New Item to Customer App
         </div>
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)) auto; gap: 10px; align-items: center;">
-          <input type="text" id="np-name" class="admin-input" placeholder="Item Name (e.g. Samosa) *">
+          <input type="text" id="np-name" class="admin-input" placeholder="Item Name *">
           <input type="number" id="np-price" class="admin-input" placeholder="Price ₹ *">
-          <input type="text" id="np-unit" class="admin-input" placeholder="Unit (e.g. 2 pcs / 1 plate)">
-          <input type="text" id="np-cat" class="admin-input" placeholder="Category (Snacks/Bakery)">
+          <input type="text" id="np-unit" class="admin-input" placeholder="Unit (e.g. 2 pcs)">
+          <input type="text" id="np-cat" class="admin-input" placeholder="Category">
           <input type="text" id="np-img" class="admin-input" placeholder="Image URL">
           <button class="btn-action btn-pack" style="background: var(--primary); padding: 10px 18px;" onclick="addNewProduct()">
             + Add Item
           </button>
         </div>
       </div>
-
-      <!-- Search Bar for Products -->
-      <div class="admin-search-box">
-        <span class="admin-search-icon">🔍</span>
-        <input type="text" id="prod-search-input" class="admin-input" placeholder="Search products by name or category..." oninput="handleProductSearch()">
-      </div>
-
-      <!-- Stock Status Filter Tabs -->
-      <div class="tabs-wrap">
-        <button class="tab-btn active" id="ptab-all" onclick="filterProductTab('ALL', this)">All Items (<span id="cnt-prod-all">0</span>)</button>
-        <button class="tab-btn" id="ptab-in" onclick="filterProductTab('IN_STOCK', this)">🟢 In Stock (<span id="cnt-prod-in">0</span>)</button>
-        <button class="tab-btn" id="ptab-out" onclick="filterProductTab('OUT_OF_STOCK', this)">🔴 Out of Stock (<span id="cnt-prod-out">0</span>)</button>
-      </div>
-
-      <!-- Product List Grid -->
-      <div class="product-admin-grid" id="products-admin-list">
-        <div style="text-align: center; color: var(--muted); padding: 30px; grid-column: 1/-1;">आइटम लोड हो रहे हैं...</div>
-      </div>
+      <div class="product-admin-grid" id="products-admin-list"></div>
     </div>
 
     <!-- ============================================== -->
-    <!-- SECTION 3: RIDER MANAGEMENT                    -->
+    <!-- SECTION 4: RIDER MANAGEMENT                    -->
     <!-- ============================================== -->
     <div id="section-riders" style="display: none;">
-      <div class="order-card" style="border: 1.5px dashed #cbd5e1;">
-        <div style="font-size: 14px; font-weight: 900; color: var(--primary); margin-bottom: 12px;">➕ Add / Register Rider Partner</div>
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)) auto; gap: 10px; align-items: center;">
-          <input type="text" id="new-rider-name" class="admin-input" placeholder="Rider Full Name *">
-          <input type="tel" id="new-rider-phone" class="admin-input" placeholder="10-digit Phone No. *" maxlength="10">
-          <input type="text" id="new-rider-vehicle" class="admin-input" placeholder="Vehicle No (e.g. UP25-XX-1234)">
-          <button class="btn-action btn-approve" style="padding: 10px 18px; font-weight:900;" onclick="registerRiderManually()">
-            + Add Rider
-          </button>
-        </div>
-      </div>
-
-      <div class="tabs-wrap">
-        <button class="tab-btn active" id="rtab-all" onclick="filterRiders('ALL', this)">All Riders</button>
-        <button class="tab-btn" id="rtab-active" onclick="filterRiders('Active', this)">🟢 Active (Allowed)</button>
-        <button class="tab-btn" id="rtab-pending" onclick="filterRiders('Pending', this)">⏳ Pending Approval</button>
-        <button class="tab-btn" id="rtab-blocked" onclick="filterRiders('Blocked', this)">🔴 Deactivated / Blocked</button>
-      </div>
-
-      <div id="riders-container">
-        <div style="text-align: center; color: var(--muted); padding: 30px;">राइडर्स सूची लोड हो रही है...</div>
-      </div>
+      <div id="riders-container"></div>
     </div>
 
   </div>
@@ -317,19 +286,17 @@
     let rawOrders = [];
     let rawProducts = [];
     let rawRiders = [];
-
     let currentMasterSec = 'ORDERS';
-    let currentOrderTab = 'ALL';
-    let currentProdTab = 'ALL';
-    let currentRiderTab = 'ALL';
 
     function switchMasterSection(sec) {
       currentMasterSec = sec;
       document.getElementById('btn-sec-orders').className = sec === 'ORDERS' ? 'master-btn active' : 'master-btn';
+      document.getElementById('btn-sec-settings').className = sec === 'SETTINGS' ? 'master-btn active' : 'master-btn';
       document.getElementById('btn-sec-products').className = sec === 'PRODUCTS' ? 'master-btn active' : 'master-btn';
       document.getElementById('btn-sec-riders').className = sec === 'RIDERS' ? 'master-btn active' : 'master-btn';
 
       document.getElementById('section-orders').style.display = sec === 'ORDERS' ? 'block' : 'none';
+      document.getElementById('section-settings').style.display = sec === 'SETTINGS' ? 'block' : 'none';
       document.getElementById('section-products').style.display = sec === 'PRODUCTS' ? 'block' : 'none';
       document.getElementById('section-riders').style.display = sec === 'RIDERS' ? 'block' : 'none';
 
@@ -338,259 +305,124 @@
 
     function refreshCurrentSection() {
       if (currentMasterSec === 'ORDERS') fetchOrders();
+      else if (currentMasterSec === 'SETTINGS') loadAppSettings();
       else if (currentMasterSec === 'PRODUCTS') fetchProducts();
       else fetchRiders();
     }
 
     // ============================================
-    // 1. ORDERS CONTROLLER
+    // LOAD & SAVE APP SETTINGS (THEME & OFFERS)
+    // ============================================
+    async function loadAppSettings() {
+      const { data, error } = await _supabase.from('app_settings').select('*').eq('id', 1).single();
+      if (data) {
+        document.getElementById('set-theme-color').value = data.theme_color || '#ff3269';
+        document.getElementById('set-theme-color-text').value = data.theme_color || '#ff3269';
+        document.getElementById('set-header-bg').value = data.header_bg || '#f4ecfb';
+        document.getElementById('set-header-bg-text').value = data.header_bg || '#f4ecfb';
+        document.getElementById('set-purple').value = data.primary_purple || '#3c006b';
+        document.getElementById('set-purple-text').value = data.primary_purple || '#3c006b';
+
+        document.getElementById('set-banner-title').value = data.banner_title || '';
+        document.getElementById('set-banner-sub').value = data.banner_subtitle || '';
+        document.getElementById('set-free-del-min').value = data.min_free_delivery || 249;
+        document.getElementById('set-del-charge').value = data.delivery_charge || 25;
+        document.getElementById('set-disc-min').value = data.discount_min_order || 399;
+        document.getElementById('set-disc-amt').value = data.discount_amount || 49;
+      }
+    }
+
+    // Color Pickers sync
+    document.getElementById('set-theme-color').addEventListener('input', (e) => {
+      document.getElementById('set-theme-color-text').value = e.target.value;
+    });
+    document.getElementById('set-header-bg').addEventListener('input', (e) => {
+      document.getElementById('set-header-bg-text').value = e.target.value;
+    });
+    document.getElementById('set-purple').addEventListener('input', (e) => {
+      document.getElementById('set-purple-text').value = e.target.value;
+    });
+
+    async function saveAppSettings() {
+      const themeColor = document.getElementById('set-theme-color-text').value.trim();
+      const headerBg = document.getElementById('set-header-bg-text').value.trim();
+      const purpleColor = document.getElementById('set-purple-text').value.trim();
+      const bannerTitle = document.getElementById('set-banner-title').value.trim();
+      const bannerSub = document.getElementById('set-banner-sub').value.trim();
+      const minFreeDel = parseInt(document.getElementById('set-free-del-min').value) || 249;
+      const delCharge = parseInt(document.getElementById('set-del-charge').value) || 25;
+      const discMin = parseInt(document.getElementById('set-disc-min').value) || 399;
+      const discAmt = parseInt(document.getElementById('set-disc-amt').value) || 49;
+
+      const { error } = await _supabase.from('app_settings').upsert({
+        id: 1,
+        theme_color: themeColor,
+        header_bg: headerBg,
+        primary_purple: purpleColor,
+        banner_title: bannerTitle,
+        banner_subtitle: bannerSub,
+        min_free_delivery: minFreeDel,
+        delivery_charge: delCharge,
+        discount_min_order: discMin,
+        discount_amount: discAmt
+      });
+
+      if (!error) {
+        alert('🎉 बधाई हो! कस्टमर ऐप की थीम और डिस्काउंट ऑफ़र तुरंत लाइव अपडेट हो गए हैं!');
+      } else {
+        alert('सेव करने में समस्या: ' + error.message);
+      }
+    }
+
+    // ============================================
+    // ORDERS CONTROLLER
     // ============================================
     async function fetchOrders() {
-      try {
-        const fourDaysAgo = new Date();
-        fourDaysAgo.setDate(fourDaysAgo.getDate() - 4);
-        fourDaysAgo.setHours(0, 0, 0, 0);
-
-        const { data, error } = await _supabase
-          .from('orders').select('*').gte('created_at', fourDaysAgo.toISOString()).order('id', { ascending: false });
-
-        if (error) throw error;
-        rawOrders = data || [];
-        updateMetrics();
-        renderOrders();
-      } catch (err) {
-        document.getElementById('orders-container').innerHTML = 
-          `<div style="text-align:center; color:#dc2626; padding:30px;">डेटा लोड करने में समस्या: ${err.message}</div>`;
-      }
-    }
-
-    function updateMetrics() {
-      let pending = 0, running = 0, delivered = 0;
-      rawOrders.forEach(o => {
-        const s = (o.status || '').toLowerCase();
-        if (s.includes('placed') || s.includes('paid online') || s.includes('pending')) pending++;
-        else if (s.includes('out') || s.includes('picked') || s.includes('running')) running++;
-        else if (s.includes('delivered')) delivered++;
-      });
-      document.getElementById('cnt-all').innerText = rawOrders.length;
-      document.getElementById('cnt-pending').innerText = pending;
-      document.getElementById('cnt-running').innerText = running;
-      document.getElementById('cnt-delivered').innerText = delivered;
-    }
-
-    function switchTab(tab, btn) {
-      currentOrderTab = tab;
-      document.querySelectorAll('#section-orders .tab-btn').forEach(b => b.classList.remove('active'));
-      if (btn) btn.classList.add('active');
-      renderOrders();
-    }
-
-    function filterByTab(orders) {
-      if (currentOrderTab === 'PENDING') {
-        return orders.filter(o => {
-          const s = (o.status || '').toLowerCase();
-          return s.includes('placed') || s.includes('paid online') || s.includes('pending');
-        });
-      }
-      if (currentOrderTab === 'RUNNING') {
-        return orders.filter(o => {
-          const s = (o.status || '').toLowerCase();
-          return s.includes('out') || s.includes('picked') || s.includes('running');
-        });
-      }
-      if (currentOrderTab === 'DELIVERED') {
-        return orders.filter(o => (o.status || '').toLowerCase().includes('delivered'));
-      }
-      return orders;
-    }
-
-    function renderOrders() {
+      const { data } = await _supabase.from('orders').select('*').order('id', { ascending: false });
+      rawOrders = data || [];
       const container = document.getElementById('orders-container');
-      const filtered = filterByTab(rawOrders);
-
-      if (filtered.length === 0) {
-        container.innerHTML = '<div style="text-align:center; color:var(--muted); padding:40px; font-weight:700;">इस टैब में कोई ऑर्डर नहीं है।</div>';
+      if (rawOrders.length === 0) {
+        container.innerHTML = '<div style="text-align:center; color:var(--muted); padding:40px;">कोई ऑर्डर नहीं है।</div>';
         return;
       }
-
-      const groupedByDate = {};
-      filtered.forEach(order => {
-        const dateStr = order.created_at ? new Date(order.created_at).toLocaleDateString('hi-IN', {
-          weekday: 'short', day: 'numeric', month: 'short', year: 'numeric'
-        }) : 'Recent Orders';
-        
-        if (!groupedByDate[dateStr]) groupedByDate[dateStr] = [];
-        groupedByDate[dateStr].push(order);
-      });
-
-      let html = '';
-      for (const [date, orders] of Object.entries(groupedByDate)) {
-        html += `<div class="date-divider">📅 ${date} (${orders.length} Orders)</div>`;
-        orders.forEach(order => {
-          const timeStr = order.created_at ? new Date(order.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '';
-          
-          let badgeClass = 'status-pending';
-          if ((order.status || '').includes('Out')) badgeClass = 'status-running';
-          else if ((order.status || '').includes('Delivered')) badgeClass = 'status-delivered';
-          else if ((order.status || '').includes('Paid')) badgeClass = 'status-upi';
-
-          const itemsSummary = Array.isArray(order.items) 
-            ? order.items.map(i => `<div class="item-line"><span>${i.name} × ${i.qty}</span><b>₹${i.subtotal || (i.price * i.qty)}</b></div>`).join('')
-            : 'कोई आइटम विवरण नहीं';
-
-          html += `
-            <div class="order-card" id="card-${order.id}">
-              <div class="card-top">
-                <div>
-                  <div class="order-num">ORD #${order.id}</div>
-                  <div class="order-time">⏰ ${timeStr} | Mode: <b>${order.payment_mode || 'COD'}</b></div>
-                </div>
-                <span class="status-badge ${badgeClass}">${order.status || 'Placed'}</span>
-              </div>
-
-              <div class="cust-info">
-                <div class="cust-name">👤 ${order.customer_name || 'N/A'} (📞 <a href="tel:${order.customer_phone}">${order.customer_phone}</a>)</div>
-                <div style="color: #475569; margin-top: 2px;">📍 ${order.delivery_address || 'पता दर्ज नहीं'}</div>
-                ${order.transaction_id ? `<div class="utr-tag">🔑 UTR No: ${order.transaction_id}</div>` : ''}
-              </div>
-
-              <div class="items-list">${itemsSummary}</div>
-
-              <div style="display:flex; justify-content:space-between; align-items:center; font-size:14px; font-weight:900;">
-                <span>Total Amount:</span>
-                <span style="color:var(--green); font-size:16px;">₹${order.total_amount}</span>
-              </div>
-
-              <div class="card-actions">
-                ${order.status !== 'Out for Delivery' && order.status !== 'Delivered' ? `
-                  <button class="btn-action btn-pack" onclick="updateOrderStatus(${order.id}, 'Out for Delivery')">
-                    🛵 Dispatch / Out for Delivery
-                  </button>
-                ` : ''}
-
-                ${order.status !== 'Delivered' ? `
-                  <button class="btn-action btn-deliver" onclick="updateOrderStatus(${order.id}, 'Delivered')">
-                    ✅ Mark Delivered
-                  </button>
-                ` : ''}
-
-                <button class="btn-action btn-delete" onclick="deleteFakeOrder(${order.id})">
-                  🗑️ Delete Fake Order
-                </button>
-              </div>
-            </div>
-          `;
-        });
-      }
-      container.innerHTML = html;
-    }
-
-    async function updateOrderStatus(orderId, newStatus) {
-      if (!confirm(`क्या आप ऑर्डर #${orderId} का स्टेटस "${newStatus}" करना चाहते हैं?`)) return;
-      try {
-        const { error } = await _supabase.from('orders').update({ status: newStatus }).eq('id', orderId);
-        if (error) throw error;
-        const target = rawOrders.find(o => o.id === orderId);
-        if (target) target.status = newStatus;
-        updateMetrics();
-        renderOrders();
-      } catch (e) {
-        alert('अपडेट नहीं हो पाया: ' + e.message);
-      }
-    }
-
-    async function deleteFakeOrder(orderId) {
-      if (!confirm(`⚠️ क्या आप वाकई ऑर्डर #${orderId} को पूरे सिस्टम से डिलीट करना चाहते हैं?`)) return;
-      try {
-        const { error } = await _supabase.from('orders').delete().eq('id', orderId);
-        if (error) throw error;
-        rawOrders = rawOrders.filter(o => o.id !== orderId);
-        updateMetrics();
-        renderOrders();
-        alert(`✅ ऑर्डर #${orderId} डिलीट हो गया!`);
-      } catch (err) {
-        alert('डिलीट करने में त्रुटि: ' + err.message);
-      }
+      container.innerHTML = rawOrders.map(o => `
+        <div class="order-card">
+          <div class="card-top">
+            <div><span class="order-num">ORD #${o.id}</span> | <b>${o.payment_mode}</b></div>
+            <span class="status-badge ${o.status === 'Delivered' ? 'status-delivered' : 'status-pending'}">${o.status}</span>
+          </div>
+          <div class="cust-info">
+            👤 <b>${o.customer_name}</b> (📞 <a href="tel:${o.customer_phone}">${o.customer_phone}</a>)<br>
+            📍 ${o.delivery_address}
+          </div>
+          <div style="font-weight:900; color:var(--green); font-size:16px;">Total: ₹${o.total_amount}</div>
+        </div>
+      `).join('');
     }
 
     // ============================================
-    // 2. PRODUCTS & STOCK MANAGER (OUT OF STOCK)
+    // PRODUCTS & STOCK
     // ============================================
     async function fetchProducts() {
-      try {
-        const { data, error } = await _supabase
-          .from('products').select('*').order('id', { ascending: true });
-
-        if (error) throw error;
-        rawProducts = data || [];
-        updateProductStats();
-        renderProductsAdmin();
-      } catch (err) {
-        document.getElementById('products-admin-list').innerHTML = 
-          `<div style="text-align:center; color:#dc2626; padding:20px; grid-column:1/-1;">आइटम लोड करने में समस्या: ${err.message}</div>`;
-      }
-    }
-
-    function updateProductStats() {
-      const inStock = rawProducts.filter(p => !p.is_out_of_stock).length;
-      const outStock = rawProducts.filter(p => p.is_out_of_stock).length;
-      document.getElementById('cnt-prod-all').innerText = rawProducts.length;
-      document.getElementById('cnt-prod-in').innerText = inStock;
-      document.getElementById('cnt-prod-out').innerText = outStock;
-    }
-
-    function filterProductTab(tab, btn) {
-      currentProdTab = tab;
-      document.querySelectorAll('#section-products .tab-btn').forEach(b => b.classList.remove('active'));
-      if (btn) btn.classList.add('active');
-      renderProductsAdmin();
-    }
-
-    function handleProductSearch() {
-      renderProductsAdmin();
-    }
-
-    function renderProductsAdmin() {
+      const { data } = await _supabase.from('products').select('*').order('id', { ascending: true });
+      rawProducts = data || [];
       const container = document.getElementById('products-admin-list');
-      const q = (document.getElementById('prod-search-input').value || '').toLowerCase().trim();
-
-      let list = rawProducts.filter(p => {
-        const matchQ = (p.name || '').toLowerCase().includes(q) || (p.category || '').toLowerCase().includes(q);
-        if (currentProdTab === 'IN_STOCK') return matchQ && !p.is_out_of_stock;
-        if (currentProdTab === 'OUT_OF_STOCK') return matchQ && p.is_out_of_stock;
-        return matchQ;
-      });
-
-      if (list.length === 0) {
-        container.innerHTML = '<div style="text-align:center; color:var(--muted); padding:30px; grid-column:1/-1; font-weight:700;">कोई प्रोडक्ट नहीं मिला।</div>';
-        return;
-      }
-
-      container.innerHTML = list.map(p => {
+      container.innerHTML = rawProducts.map(p => {
         const isOut = p.is_out_of_stock === true;
         return `
-          <div class="product-admin-card" style="${isOut ? 'opacity: 0.75; border-color: #fca5a5;' : ''}">
+          <div class="product-admin-card" style="${isOut ? 'opacity:0.75; border-color:#fca5a5;' : ''}">
             <div style="display:flex; gap:12px; align-items:center;">
-              <img class="prod-thumb-box" src="${p.image_url || 'https://via.placeholder.com/80'}" alt="${p.name}">
+              <img class="prod-thumb-box" src="${p.image_url || 'https://via.placeholder.com/80'}">
               <div style="flex:1;">
-                <div style="font-size:14px; font-weight:800; color:#0f172a;">${p.name}</div>
-                <div style="font-size:11px; color:#64748b;">${p.unit || '1 unit'} | ${p.category || 'General'}</div>
-                <div style="font-size:15px; font-weight:900; color:var(--primary); margin-top:2px;">₹${p.price}</div>
+                <div style="font-weight:800;">${p.name}</div>
+                <div style="font-size:11px; color:#64748b;">${p.unit || '1 unit'}</div>
+                <div style="font-weight:900; color:var(--primary);">₹${p.price}</div>
               </div>
-              <div>
-                <span class="${isOut ? 'stock-badge-red' : 'stock-badge-green'}">
-                  ${isOut ? '🔴 Out of Stock' : '🟢 In Stock'}
-                </span>
-              </div>
+              <span class="${isOut ? 'stock-badge-red' : 'stock-badge-green'}">${isOut ? 'Out of Stock' : 'In Stock'}</span>
             </div>
-
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-top:12px; padding-top:10px; border-top:1px solid #f1f5f9;">
-              <button class="toggle-stock-btn ${isOut ? 'btn-mark-in' : 'btn-mark-out'}" onclick="toggleProductStock(${p.id}, ${!isOut})">
-                ${isOut ? '✓ Set In Stock' : '✕ Set Out of Stock'}
-              </button>
-              
-              <button onclick="deleteProduct(${p.id})" style="background:none; border:none; color:#dc2626; font-size:12px; font-weight:800; cursor:pointer;">
-                🗑️ Delete
+            <div style="display:flex; justify-content:space-between; margin-top:10px;">
+              <button class="toggle-stock-btn ${isOut ? 'btn-mark-in' : 'btn-mark-out'}" onclick="toggleStock(${p.id}, ${!isOut})">
+                ${isOut ? '✓ In Stock' : '✕ Out of Stock'}
               </button>
             </div>
           </div>
@@ -598,206 +430,50 @@
       }).join('');
     }
 
-    async function toggleProductStock(prodId, setOutOfStock) {
-      try {
-        const { data, error } = await _supabase
-          .from('products')
-          .update({ is_out_of_stock: setOutOfStock })
-          .eq('id', prodId)
-          .select();
-
-        if (error) throw error;
-
-        if (!data || data.length === 0) {
-          alert("⚠️ डेटाबेस में अपडेट नहीं हो पाया! कृपया Supabase SQL में RLS बंद करें।");
-          return;
-        }
-
-        const target = rawProducts.find(p => p.id === prodId);
-        if (target) target.is_out_of_stock = setOutOfStock;
-        updateProductStats();
-        renderProductsAdmin();
-      } catch (err) {
-        alert('स्टॉक बदलने में त्रुटि: ' + err.message);
-      }
+    async function toggleStock(id, status) {
+      await _supabase.from('products').update({ is_out_of_stock: status }).eq('id', id);
+      fetchProducts();
     }
 
     async function addNewProduct() {
       const name = document.getElementById('np-name').value.trim();
       const price = parseFloat(document.getElementById('np-price').value);
-      const unit = document.getElementById('np-unit').value.trim();
-      const cat = document.getElementById('np-cat').value.trim();
-      const img = document.getElementById('np-img').value.trim();
-
-      if (!name || isNaN(price)) {
-        alert('कृपया आइटम का नाम और सही मूल्य (Price) डालें!');
-        return;
-      }
-
-      try {
-        const { data, error } = await _supabase.from('products').insert([{
-          name: name,
-          price: price,
-          unit: unit || '1 unit',
-          category: cat || 'Snacks',
-          image_url: img || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=120',
-          is_out_of_stock: false
-        }]).select();
-
-        if (error) throw error;
-        alert(`✅ नया आइटम "${name}" सफलतापूर्वक जुड़ गया!`);
-        document.getElementById('np-name').value = '';
-        document.getElementById('np-price').value = '';
-        document.getElementById('np-unit').value = '';
-        document.getElementById('np-cat').value = '';
-        document.getElementById('np-img').value = '';
-        fetchProducts();
-      } catch (e) {
-        alert('आइटम जोड़ने में त्रुटि: ' + e.message);
-      }
-    }
-
-    async function deleteProduct(prodId) {
-      if (!confirm('क्या आप वाकई इस प्रोडक्ट को हटाना चाहते हैं?')) return;
-      try {
-        const { error } = await _supabase.from('products').delete().eq('id', prodId);
-        if (error) throw error;
-        rawProducts = rawProducts.filter(p => p.id !== prodId);
-        updateProductStats();
-        renderProductsAdmin();
-      } catch (e) {
-        alert('डिलीट नहीं हो पाया: ' + e.message);
-      }
+      if (!name || isNaN(price)) return alert('नाम और रेट डालें!');
+      await _supabase.from('products').insert([{ name, price, is_out_of_stock: false }]);
+      fetchProducts();
     }
 
     // ============================================
-    // 3. RIDER MANAGEMENT
+    // RIDERS
     // ============================================
     async function fetchRiders() {
-      try {
-        const { data, error } = await _supabase
-          .from('riders').select('*').order('id', { ascending: false });
-
-        if (error) console.warn("Riders table error:", error.message);
-        rawRiders = data || [];
-        renderRiders();
-      } catch (err) {
-        document.getElementById('riders-container').innerHTML = 
-          `<div style="text-align:center; color:#dc2626; padding:20px;">राइडर डेटा लोड करने में समस्या: ${err.message}</div>`;
-      }
-    }
-
-    function filterRiders(tab, btn) {
-      currentRiderTab = tab;
-      document.querySelectorAll('#section-riders .tab-btn').forEach(b => b.classList.remove('active'));
-      if (btn) btn.classList.add('active');
-      renderRiders();
-    }
-
-    function renderRiders() {
+      const { data } = await _supabase.from('riders').select('*').order('id', { ascending: false });
+      rawRiders = data || [];
       const container = document.getElementById('riders-container');
-      let filtered = rawRiders;
-
-      if (currentRiderTab !== 'ALL') {
-        filtered = rawRiders.filter(r => (r.status || 'Pending').toLowerCase() === currentRiderTab.toLowerCase());
-      }
-
-      if (filtered.length === 0) {
-        container.innerHTML = '<div style="text-align:center; color:var(--muted); padding:30px; font-weight:700;">इस श्रेणी में कोई राइडर पार्टनर नहीं मिला।</div>';
-        return;
-      }
-
-      container.innerHTML = filtered.map(r => {
-        const status = r.status || 'Pending';
-        let badgeClass = 'status-pending';
-        if (status === 'Active') badgeClass = 'status-active';
-        else if (status === 'Blocked' || status === 'Deactivated') badgeClass = 'status-blocked';
-
-        return `
-          <div class="rider-card">
-            <div class="card-top">
-              <div>
-                <div class="order-num">🛵 ${r.name || 'Unnamed Rider'}</div>
-                <div class="order-time">📞 Phone: <a href="tel:${r.phone}">${r.phone}</a> | Vehicle: <b>${r.vehicle_no || 'N/A'}</b></div>
-              </div>
-              <span class="status-badge ${badgeClass}">${status}</span>
-            </div>
-
-            <div style="font-size:12px; color:#64748b; margin:6px 0;">
-              ID: <b>RIDER-${r.id}</b> | Registered: ${r.created_at ? new Date(r.created_at).toLocaleDateString() : 'Active'}
-            </div>
-
-            <div class="card-actions">
-              ${status !== 'Active' ? `
-                <button class="btn-action btn-approve" onclick="updateRiderStatus(${r.id}, 'Active')">
-                  ✅ Approve & Activate
-                </button>
-              ` : `
-                <button class="btn-action btn-deactivate" onclick="updateRiderStatus(${r.id}, 'Blocked')">
-                  🚫 Deactivate / Block
-                </button>
-              `}
-
-              <button class="btn-action btn-delete" onclick="deleteRiderPermanently(${r.id})">
-                🗑️ Remove Rider
-              </button>
-            </div>
+      container.innerHTML = rawRiders.map(r => `
+        <div class="rider-card">
+          <div class="card-top">
+            <div><b>${r.name}</b> (📞 ${r.phone})</div>
+            <span class="status-badge ${r.status === 'Active' ? 'status-active' : 'status-blocked'}">${r.status}</span>
           </div>
-        `;
-      }).join('');
+          <div class="card-actions">
+            ${r.status !== 'Active' ? `
+              <button class="btn-action btn-approve" onclick="updateRider(${r.id}, 'Active')">✅ Approve</button>
+            ` : `
+              <button class="btn-action btn-deactivate" onclick="updateRider(${r.id}, 'Blocked')">🚫 Block</button>
+            `}
+          </div>
+        </div>
+      `).join('');
     }
 
-    async function registerRiderManually() {
-      const name = document.getElementById('new-rider-name').value.trim();
-      const phone = document.getElementById('new-rider-phone').value.trim();
-      const vehicle = document.getElementById('new-rider-vehicle').value.trim();
-
-      if (name.length < 2) { alert('कृपया राइडर का सही नाम डालें!'); return; }
-      if (!/^[6-9]\d{9}$/.test(phone)) { alert('कृपया 10 अंकों का वैध फोन नंबर डालें!'); return; }
-
-      try {
-        const { error } = await _supabase.from('riders').insert([{
-          name: name, phone: phone, vehicle_no: vehicle || 'Standard', status: 'Active'
-        }]);
-        if (error) throw error;
-        alert(`✅ राइडर पार्टनर "${name}" को जोड़ दिया गया है!`);
-        document.getElementById('new-rider-name').value = '';
-        document.getElementById('new-rider-phone').value = '';
-        document.getElementById('new-rider-vehicle').value = '';
-        fetchRiders();
-      } catch (e) {
-        alert('राइडर जोड़ने में समस्या: ' + e.message);
-      }
-    }
-
-    async function updateRiderStatus(riderId, newStatus) {
-      if (!confirm(`क्या आप राइडर ID #${riderId} का स्टेटस "${newStatus}" करना चाहते हैं?`)) return;
-      try {
-        const { error } = await _supabase.from('riders').update({ status: newStatus }).eq('id', riderId);
-        if (error) throw error;
-        alert(`राइडर स्टेटस बदलकर "${newStatus}" कर दिया गया!`);
-        fetchRiders();
-      } catch (e) {
-        alert('स्टेटस बदलने में एरर: ' + e.message);
-      }
-    }
-
-    async function deleteRiderPermanently(riderId) {
-      if (!confirm(`⚠️ क्या आप वाकई राइडर ID #${riderId} को पूरे सिस्टम से हटाना चाहते हैं?`)) return;
-      try {
-        const { error } = await _supabase.from('riders').delete().eq('id', riderId);
-        if (error) throw error;
-        alert(`राइडर ID #${riderId} डिलीट कर दिया गया!`);
-        fetchRiders();
-      } catch (e) {
-        alert('डिलीट करने में एरर: ' + e.message);
-      }
+    async function updateRider(id, st) {
+      await _supabase.from('riders').update({ status: st }).eq('id', id);
+      fetchRiders();
     }
 
     fetchOrders();
-    setInterval(() => {
-      if (currentMasterSec === 'ORDERS') fetchOrders();
-    }, 10000);
+    loadAppSettings();
   </script>
 </body>
 </html>
