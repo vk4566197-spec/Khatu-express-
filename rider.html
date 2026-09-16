@@ -69,9 +69,21 @@
     .store-name { font-size: 13px; font-weight: 800; }
     .store-id { font-size: 10px; color: #64748b; font-weight: 600; }
 
-    .top-actions { display: flex; align-items: center; gap: 14px; }
+    .top-actions { display: flex; align-items: center; gap: 12px; }
+
+    /* SOS Header Button */
+    .btn-sos-top {
+      background: #dc2626; color: white; border: none; font-size: 11px;
+      font-weight: 900; padding: 6px 10px; border-radius: 8px; cursor: pointer;
+      display: flex; align-items: center; gap: 4px; box-shadow: 0 2px 8px rgba(220, 38, 38, 0.3);
+      animation: pulseSos 1.8s infinite;
+    }
+    @keyframes pulseSos {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+    }
     
-    /* Duty Toggle Switch */
+    /* Duty Switch */
     .switch { position: relative; display: inline-block; width: 44px; height: 24px; }
     .switch input { opacity: 0; width: 0; height: 0; }
     .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #cbd5e1; transition: .3s; border-radius: 24px; }
@@ -81,7 +93,7 @@
 
     .help-btn { font-size: 12px; font-weight: 700; color: #475569; display: flex; align-items: center; gap: 4px; text-decoration: none; cursor: pointer; }
 
-    /* Shift Details Bar with Persistent Counter */
+    /* Shift Details Bar */
     .shift-box {
       background: #ffffff; color: #1e293b; padding: 12px 16px; border-bottom: 1px solid #f1f5f9;
       display: flex; justify-content: space-between; align-items: center;
@@ -98,7 +110,7 @@
       background: #fff7ed; color: #9a3412; padding: 10px 16px; font-size: 12px; font-weight: 700;
       display: flex; justify-content: space-between; align-items: center;
     }
-    .slot-banner a { color: #ea580c; text-decoration: none; font-weight: 800; }
+    .slot-banner a { color: #ea580c; text-decoration: none; font-weight: 800; cursor: pointer; }
 
     .promo-card {
       background: #fdf2f8; color: #831843; border-radius: 12px; margin: 14px 16px; padding: 12px 14px;
@@ -106,9 +118,8 @@
     }
     .promo-info h4 { font-size: 12px; font-weight: 800; margin-bottom: 2px; }
     .promo-info p { font-size: 10px; color: #9d174d; }
-    .btn-refer { background: #be185d; color: white; border: none; padding: 6px 12px; border-radius: 6px; font-size: 11px; font-weight: 700; }
+    .btn-refer { background: #be185d; color: white; border: none; padding: 6px 12px; border-radius: 6px; font-size: 11px; font-weight: 700; cursor: pointer; }
 
-    /* Status Pill */
     .waiting-pill {
       background: linear-gradient(180deg, #243042 0%, #1a2332 100%);
       margin: 14px 16px; padding: 16px; border-radius: 14px; text-align: center;
@@ -118,18 +129,16 @@
     .waiting-pill.active-duty { border-color: var(--accent-green); }
     .waiting-text { font-size: 15px; font-weight: 800; color: #f8fafc; }
 
-    /* Total Earnings Card */
     .earnings-card {
       background: var(--card-white); color: #0f172a; border-radius: 16px; margin: 0 16px 16px 16px;
       padding: 18px 16px; box-shadow: 0 4px 16px rgba(0,0,0,0.15);
     }
     .main-earning { font-size: 26px; font-weight: 900; margin-bottom: 14px; }
     .earning-meta-grid { display: grid; grid-template-columns: repeat(3, 1fr); border-top: 1px solid #f1f5f9; padding-top: 12px; }
-    .meta-col { display: flex; flex-direction: column; gap: 2px; }
+    .meta-col { display: flex; flex-direction: column; gap: 2px; cursor: pointer; }
     .meta-top { font-size: 14px; font-weight: 800; display: flex; align-items: center; gap: 4px; }
     .meta-sub { font-size: 10px; font-weight: 700; color: #64748b; }
 
-    /* Orders Segment Switcher */
     .segment-wrap {
       display: flex; gap: 8px; margin: 0 16px 14px 16px; background: #1e2837;
       padding: 4px; border-radius: 12px; border: 1px solid #334155;
@@ -147,7 +156,6 @@
       padding: 4px 12px; border-radius: 20px; display: inline-block; margin: 8px 0 8px 0;
     }
 
-    /* Orders Queue Area */
     .orders-queue-box { margin: 0 16px 16px 16px; }
     .rider-order-card {
       background: var(--card-dark); border: 1px solid #334155; border-radius: 14px;
@@ -162,7 +170,6 @@
       padding: 12px; border-radius: 10px; font-size: 13px; font-weight: 800; cursor: pointer; margin-top: 8px;
     }
 
-    /* Bottom Navigation Bar */
     .bottom-nav {
       position: fixed; bottom: 0; left: 0; width: 100%; height: 62px;
       background: #ffffff; border-top: 1px solid #e2e8f0; display: flex;
@@ -172,11 +179,10 @@
     .b-item.active { color: #ef4444; }
     .b-icon { font-size: 18px; }
 
-    /* SCREEN 1: "Go to the Bin" View */
+    /* SCREEN 1: Bin */
     .bin-screen {
       position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      background: #f8fafc; z-index: 500; display: none; flex-direction: column;
-      color: #0f172a;
+      background: #f8fafc; z-index: 500; display: none; flex-direction: column; color: #0f172a;
     }
     .bin-screen.active { display: flex; }
     .bin-header { padding: 22px 18px 12px 18px; display: flex; justify-content: space-between; align-items: center; }
@@ -189,11 +195,11 @@
     .bin-item-card { width: 72px; height: 72px; border: 1.5px solid #e2e8f0; border-radius: 12px; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #fff; position: relative; }
     .bin-item-card img { width: 44px; height: 44px; object-fit: contain; }
     .bin-item-qty { position: absolute; bottom: -8px; background: #fff; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 10px; font-weight: 900; padding: 1px 6px; }
-    .bin-floating-bell { position: absolute; bottom: 90px; right: 20px; background: #f3e8ff; border: 1px solid #d8b4fe; width: 50px; height: 50px; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 22px; cursor: pointer; box-shadow: 0 4px 12px rgba(107, 33, 168, 0.15); }
+    .bin-floating-bell { position: absolute; bottom: 90px; right: 20px; background: #f3e8ff; border: 1px solid #d8b4fe; width: 50px; height: 50px; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 22px; cursor: pointer; }
     .bin-bottom-bar { margin-top: auto; padding: 16px; background: #fff; border-top: 1px solid #e2e8f0; }
     .btn-take-photo-trigger { background: var(--zepto-pink); color: white; border: none; width: 100%; padding: 15px; border-radius: 12px; font-size: 15px; font-weight: 900; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; }
 
-    /* SCREEN 2: "Take Photo of Items in Bag" View */
+    /* SCREEN 2: Photo */
     .photo-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 600; display: none; flex-direction: column; }
     .photo-screen.active { display: flex; }
     .photo-nav { position: absolute; top: 0; left: 0; width: 100%; padding: 16px; display: flex; align-items: center; gap: 14px; color: white; z-index: 10; background: linear-gradient(180deg, rgba(0,0,0,0.7) 0%, transparent 100%); }
@@ -209,14 +215,14 @@
     .thumb-plus-btn { width: 60px; height: 60px; border-radius: 8px; border: 1px solid #e2e8f0; background: #f8fafc; display: flex; align-items: center; justify-content: center; font-size: 20px; color: #64748b; cursor: pointer; }
     .btn-submit-photo { background: #e11d48; color: white; border: none; width: 100%; padding: 15px; border-radius: 10px; font-size: 16px; font-weight: 800; cursor: pointer; }
 
-    /* SCREEN 3: "On the Way" Live Map Screen */
+    /* SCREEN 3: On The Way */
     .way-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #f1f5f9; z-index: 700; display: none; flex-direction: column; }
     .way-screen.active { display: flex; }
     .way-map-container { position: relative; width: 100%; height: 58%; background: #e2e8f0; overflow: hidden; }
     .way-map-iframe { width: 100%; height: 100%; border: none; }
     .way-top-bar { position: absolute; top: 16px; right: 16px; display: flex; align-items: center; gap: 10px; z-index: 10; }
-    .btn-sos { background: #e11d48; color: white; font-size: 13px; font-weight: 900; width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(225, 29, 72, 0.4); border: none; }
-    .btn-help-pill { background: #ffffff; color: #1e293b; font-size: 13px; font-weight: 800; padding: 10px 18px; border-radius: 24px; display: flex; align-items: center; gap: 6px; box-shadow: 0 4px 14px rgba(0,0,0,0.12); text-decoration: none; border: none; }
+    .btn-sos { background: #dc2626; color: white; font-size: 13px; font-weight: 900; width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(220, 38, 38, 0.4); border: none; cursor: pointer; }
+    .btn-help-pill { background: #ffffff; color: #1e293b; font-size: 13px; font-weight: 800; padding: 10px 18px; border-radius: 24px; display: flex; align-items: center; gap: 6px; box-shadow: 0 4px 14px rgba(0,0,0,0.12); text-decoration: none; border: none; cursor: pointer; }
     .btn-floating-navigate { position: absolute; bottom: 20px; right: 16px; width: 48px; height: 48px; background: #7e22ce; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 22px; cursor: pointer; box-shadow: 0 4px 14px rgba(126, 34, 206, 0.4); text-decoration: none; z-index: 10; }
     .way-bottom-sheet { flex: 1; background: #ffffff; border-radius: 24px 24px 0 0; padding: 14px 20px 24px 20px; display: flex; flex-direction: column; justify-content: space-between; box-shadow: 0 -4px 20px rgba(0,0,0,0.08); margin-top: -16px; z-index: 20; color: #0f172a; }
     .sheet-handle-pill { width: 40px; height: 4px; background: #cbd5e1; border-radius: 4px; margin: 0 auto 12px auto; }
@@ -227,7 +233,7 @@
     .way-addr-content { font-size: 13px; font-weight: 800; color: #0f172a; line-height: 1.4; max-height: 80px; overflow-y: auto; }
     .btn-mark-arrived { background: #e11d48; color: white; border: none; width: 100%; padding: 15px; border-radius: 12px; font-size: 15px; font-weight: 900; cursor: pointer; }
 
-    /* COD SLIDE-TO-CONFIRM MODAL */
+    /* COD Slide Modal */
     .cod-modal-overlay {
       position: fixed; top: 0; left: 0; width: 100%; height: 100%;
       background: rgba(0, 0, 0, 0.8); z-index: 850; display: none;
@@ -253,9 +259,7 @@
       border-radius: 30px; overflow: hidden; display: flex; align-items: center;
       justify-content: center; user-select: none; touch-action: none;
     }
-    .slider-track-text {
-      font-size: 13px; font-weight: 800; color: #475569; pointer-events: none;
-    }
+    .slider-track-text { font-size: 13px; font-weight: 800; color: #475569; pointer-events: none; }
     .slider-thumb {
       position: absolute; left: 4px; top: 4px; width: 50px; height: 50px;
       background: var(--accent-green); border-radius: 50%; display: flex;
@@ -263,14 +267,14 @@
       font-weight: 900; cursor: grab; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
     }
 
-    /* Delivery Success Modal */
+    /* Success Modal */
     .success-modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.75); z-index: 900; display: none; align-items: flex-end; justify-content: center; backdrop-filter: blur(4px); }
     .success-modal-overlay.active { display: flex; }
     .success-sheet { background: #ffffff; width: 100%; max-width: 480px; border-radius: 24px 24px 0 0; padding: 24px 20px 30px 20px; text-align: center; color: #0f172a; }
     .success-check-circle { width: 70px; height: 70px; border-radius: 50%; background: #dcfce7; color: var(--accent-green); display: flex; align-items: center; justify-content: center; font-size: 36px; margin: 0 auto 12px auto; }
     .success-amount-pill { background: #f8fafc; border: 1.5px dashed #cbd5e1; border-radius: 12px; padding: 12px; margin: 16px 0; font-size: 14px; font-weight: 800; }
 
-    /* PROFILE & SUPPORT DRAWER */
+    /* Profile Modal */
     .profile-modal-overlay {
       position: fixed; top: 0; left: 0; width: 100%; height: 100%;
       background: rgba(0, 0, 0, 0.7); z-index: 950; display: none;
@@ -290,8 +294,38 @@
     .btn-logout { background: #fee2e2; color: #dc2626; border: 1.5px solid #fca5a5; width: 100%; padding: 13px; border-radius: 10px; font-size: 14px; font-weight: 900; cursor: pointer; margin-top: 6px; }
 
     /* ======================================= */
-    /* RIDER CHAT DRAWER STYLES                */
+    /* SOS EMERGENCY POPUP MODAL (108 & 112)   */
     /* ======================================= */
+    .sos-modal-overlay {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(15, 23, 42, 0.85); z-index: 999; display: none;
+      align-items: center; justify-content: center; padding: 20px; backdrop-filter: blur(5px);
+    }
+    .sos-modal-overlay.active { display: flex; }
+    .sos-sheet {
+      background: #ffffff; width: 100%; max-width: 360px; border-radius: 20px;
+      padding: 22px 20px; text-align: center; color: #0f172a; border-top: 6px solid #dc2626;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+    }
+    .sos-icon-head { font-size: 42px; margin-bottom: 6px; }
+    .sos-title { font-size: 18px; font-weight: 900; color: #dc2626; }
+    .sos-desc { font-size: 12px; color: #64748b; margin: 4px 0 16px 0; }
+    .sos-btn-grid { display: flex; flex-direction: column; gap: 10px; }
+    .sos-call-btn {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 13px 16px; border-radius: 12px; font-size: 14px; font-weight: 900;
+      text-decoration: none; color: white; cursor: pointer; transition: 0.2s;
+    }
+    .sos-call-108 { background: linear-gradient(90deg, #ea580c, #c2410c); }
+    .sos-call-112 { background: linear-gradient(90deg, #dc2626, #991b1b); }
+    .sos-call-admin { background: #1e293b; }
+    .sos-close-btn {
+      background: #f1f5f9; border: none; width: 100%; padding: 11px;
+      border-radius: 10px; font-size: 13px; font-weight: 800; color: #475569;
+      cursor: pointer; margin-top: 12px;
+    }
+
+    /* Rider Chat Drawer */
     .chat-drawer {
       position: fixed; top: 0; left: 0; width: 100%; height: 100%;
       background: #0f172a; z-index: 960; display: none; flex-direction: column;
@@ -301,43 +335,16 @@
       background: #1e293b; color: white; padding: 16px;
       display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #334155;
     }
-    .chat-messages-area {
-      flex: 1; padding: 16px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px;
-    }
-    .msg-bubble {
-      max-width: 80%; padding: 10px 14px; border-radius: 14px; font-size: 13px; line-height: 1.4;
-      word-wrap: break-word; font-weight: 600;
-    }
-    .msg-rider-send {
-      align-self: flex-end; background: #0284c7; color: white; border-bottom-right-radius: 2px;
-    }
-    .msg-cust-receive {
-      align-self: flex-start; background: #1e293b; color: white; border: 1px solid #334155; border-bottom-left-radius: 2px;
-    }
-
-    .quick-chips-row {
-      display: flex; gap: 8px; padding: 8px 14px; overflow-x: auto;
-      scrollbar-width: none; background: #1e2837; border-top: 1px solid #334155;
-    }
+    .chat-messages-area { flex: 1; padding: 16px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
+    .msg-bubble { max-width: 80%; padding: 10px 14px; border-radius: 14px; font-size: 13px; line-height: 1.4; word-wrap: break-word; font-weight: 600; }
+    .msg-rider-send { align-self: flex-end; background: #0284c7; color: white; border-bottom-right-radius: 2px; }
+    .msg-cust-receive { align-self: flex-start; background: #1e293b; color: white; border: 1px solid #334155; border-bottom-left-radius: 2px; }
+    .quick-chips-row { display: flex; gap: 8px; padding: 8px 14px; overflow-x: auto; scrollbar-width: none; background: #1e2837; border-top: 1px solid #334155; }
     .quick-chips-row::-webkit-scrollbar { display: none; }
-    .quick-chip {
-      background: #334155; color: #e2e8f0; padding: 6px 12px; border-radius: 16px;
-      font-size: 11px; font-weight: 800; white-space: nowrap; cursor: pointer;
-    }
-
-    .chat-input-bar {
-      padding: 10px 14px; background: #1e2837; border-top: 1px solid #334155;
-      display: flex; gap: 8px; align-items: center;
-    }
-    .chat-input-box {
-      flex: 1; padding: 10px 14px; border-radius: 20px; border: 1px solid #475569;
-      background: #0f172a; color: white; font-size: 13px; outline: none;
-    }
-    .chat-send-btn {
-      background: var(--accent-green); color: white; border: none; width: 40px; height: 40px;
-      border-radius: 50%; display: flex; align-items: center; justify-content: center;
-      font-size: 16px; cursor: pointer;
-    }
+    .quick-chip { background: #334155; color: #e2e8f0; padding: 6px 12px; border-radius: 16px; font-size: 11px; font-weight: 800; white-space: nowrap; cursor: pointer; }
+    .chat-input-bar { padding: 10px 14px; background: #1e2837; border-top: 1px solid #334155; display: flex; gap: 8px; align-items: center; }
+    .chat-input-box { flex: 1; padding: 10px 14px; border-radius: 20px; border: 1px solid #475569; background: #0f172a; color: white; font-size: 13px; outline: none; }
+    .chat-send-btn { background: var(--accent-green); color: white; border: none; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 16px; cursor: pointer; }
   </style>
 </head>
 <body>
@@ -354,13 +361,11 @@
         <button class="auth-tab-btn" id="tab-btn-reg" onclick="switchAuthTab('REGISTER')">New Registration</button>
       </div>
 
-      <!-- Login Form -->
       <div id="auth-login-form" class="auth-input-group">
         <input type="tel" id="login-phone" class="auth-input" placeholder="Registered 10-digit Phone No." maxlength="10">
         <button class="btn-auth-submit" onclick="handleRiderLogin()">🛵 Login to Duty</button>
       </div>
 
-      <!-- Registration Form -->
       <div id="auth-register-form" class="auth-input-group" style="display: none;">
         <input type="text" id="reg-name" class="auth-input" placeholder="Full Name (आपका पूरा नाम) *">
         <input type="tel" id="reg-phone" class="auth-input" placeholder="10-digit Mobile Number *" maxlength="10">
@@ -383,6 +388,9 @@
         </div>
       </div>
       <div class="top-actions">
+        <!-- SOS Top Header Button -->
+        <button class="btn-sos-top" onclick="openSosModal()">🚨 SOS</button>
+
         <label class="switch">
           <input type="checkbox" id="duty-toggle" checked onchange="toggleDuty(this.checked)">
           <span class="slider"></span>
@@ -405,17 +413,19 @@
       </div>
     </div>
 
+    <!-- Active Slot Banner Button -->
     <div class="slot-banner">
       <span>Book more to earn more 🤑</span>
-      <a href="javascript:void(0)" onclick="alert('सभी स्लॉट पहले से बुक हैं!')">Book Now ❯</a>
+      <a onclick="showSlotDetails()">View My Slots ❯</a>
     </div>
 
+    <!-- Referral Bonus Button -->
     <div class="promo-card">
       <div class="promo-info">
         <h4>Rider Referral Bonus is Live 🎉</h4>
         <p>Invite friends & earn ₹200 on first 10 orders</p>
       </div>
-      <button class="btn-refer" onclick="alert('रेफ़रल लिंक जल्द उपलब्ध होगा!')">Refer Now ❯</button>
+      <button class="btn-refer" onclick="shareReferralLink()">Refer Now ❯</button>
     </div>
 
     <div class="waiting-pill active-duty" id="waiting-pill">
@@ -427,15 +437,15 @@
       <div class="main-earning" id="live-total-earning">₹0 <span style="font-size: 14px; font-weight: 600; color: #64748b;">earned</span></div>
       
       <div class="earning-meta-grid">
-        <div class="meta-col">
+        <div class="meta-col" onclick="showEarningsPopup()">
           <div class="meta-top">⏱️ <span id="live-login-hrs">0.0</span></div>
           <div class="meta-sub">Login Hrs ❯</div>
         </div>
-        <div class="meta-col">
+        <div class="meta-col" onclick="showSlotDetails()">
           <div class="meta-top">📅 2 Days</div>
           <div class="meta-sub">Active Cycle ❯</div>
         </div>
-        <div class="meta-col">
+        <div class="meta-col" onclick="switchOrderTab('DELIVERED')">
           <div class="meta-top">🛍️ <span id="orders-done-count">0</span></div>
           <div class="meta-sub">Delivered ❯</div>
         </div>
@@ -451,22 +461,23 @@
       <div style="text-align:center; color: var(--text-sub); padding: 20px; font-size: 12px;">Waiting for Order... कोई नया ऑर्डर नहीं है।</div>
     </div>
 
+    <!-- Fully Working Bottom Nav -->
     <div class="bottom-nav">
       <div class="b-item active" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">
         <div class="b-icon">🏠</div>
         <span>Home</span>
       </div>
-      <div class="b-item" onclick="alert('कुल कमाई: ' + document.getElementById('live-total-earning').innerText)">
+      <div class="b-item" onclick="showEarningsPopup()">
         <div class="b-icon">👛</div>
         <span>Earnings</span>
       </div>
-      <div class="b-item" onclick="alert('2 दिन का एक्टिव स्लॉट लाइव है!')">
+      <div class="b-item" onclick="showSlotDetails()">
         <div class="b-icon">📅</div>
         <span>Slots</span>
       </div>
-      <div class="b-item" onclick="openProfileModal()">
-        <div class="b-icon">❓</div>
-        <span>Help</span>
+      <div class="b-item" onclick="openSosModal()" style="color:#dc2626;">
+        <div class="b-icon">🚨</div>
+        <span>SOS Call</span>
       </div>
       <div class="b-item" onclick="openProfileModal()">
         <div class="b-icon">👤</div>
@@ -524,10 +535,10 @@
   <div class="way-screen" id="way-screen">
     <div class="way-map-container">
       <div class="way-top-bar">
-        <button class="btn-sos" onclick="alert('🚨 आपातकालीन अलर्ट एडमिन को भेज दिया गया है!')">SOS</button>
-        <a class="btn-help-pill" href="tel:9711107063">
+        <button class="btn-sos" onclick="openSosModal()">SOS</button>
+        <button class="btn-help-pill" onclick="openProfileModal()">
           <span>🎧</span> Help
-        </a>
+        </button>
       </div>
       <iframe class="way-map-iframe" id="way-map-frame" src=""></iframe>
       <a class="btn-floating-navigate" id="native-maps-intent-btn" href="#" target="_blank" title="Start Google Maps Navigation">
@@ -545,7 +556,6 @@
         </div>
       </div>
 
-      <!-- Live Chat in Route Screen -->
       <button onclick="openRiderChat(currentSelectedOrder.id)" style="background:#0284c7; color:white; border:none; width:100%; padding:11px; border-radius:10px; font-size:13px; font-weight:800; cursor:pointer; margin-bottom:8px;">
         💬 Chat with Customer
       </button>
@@ -556,9 +566,7 @@
     </div>
   </div>
 
-  <!-- ======================================================== -->
-  <!-- COD SLIDE-TO-CONFIRM CASH COLLECTION BOTTOM MODAL        -->
-  <!-- ======================================================== -->
+  <!-- COD SLIDE MODAL -->
   <div class="cod-modal-overlay" id="cod-modal">
     <div class="cod-sheet">
       <div class="cod-cash-icon">💵</div>
@@ -581,7 +589,7 @@
     </div>
   </div>
 
-  <!-- Delivery Success Modal -->
+  <!-- SUCCESS MODAL -->
   <div class="success-modal-overlay" id="success-modal">
     <div class="success-sheet">
       <div class="success-check-circle">✓</div>
@@ -624,9 +632,40 @@
     </div>
   </div>
 
-  <!-- ========================================== -->
-  <!-- RIDER CHAT DRAWER                          -->
-  <!-- ========================================== -->
+  <!-- ======================================= -->
+  <!-- SOS EMERGENCY MODAL (108 & 112)         -->
+  <!-- ======================================= -->
+  <div class="sos-modal-overlay" id="sos-modal" onclick="closeSosModal(event)">
+    <div class="sos-sheet" onclick="event.stopPropagation()">
+      <div class="sos-icon-head">🚨</div>
+      <div class="sos-title">EMERGENCY SOS</div>
+      <div class="sos-desc">सड़क दुर्घटना या आपातकालीन स्थिति में तुरंत कॉल करें:</div>
+
+      <div class="sos-btn-grid">
+        <!-- 108 Ambulance Call -->
+        <a class="sos-call-btn sos-call-108" href="tel:108">
+          <span>🚑 Ambulance (एम्बुलेंस)</span>
+          <span>Call 108 ➔</span>
+        </a>
+
+        <!-- 112 Police Emergency Call -->
+        <a class="sos-call-btn sos-call-112" href="tel:112">
+          <span>🚓 Police & All Emergency</span>
+          <span>Call 112 ➔</span>
+        </a>
+
+        <!-- Admin Urgent Help Call -->
+        <a class="sos-call-btn sos-call-admin" href="tel:9711107063">
+          <span>👑 Admin Helpline</span>
+          <span>9711107063 ➔</span>
+        </a>
+      </div>
+
+      <button class="sos-close-btn" onclick="closeSosModal()">✕ Cancel & Return</button>
+    </div>
+  </div>
+
+  <!-- RIDER CHAT DRAWER -->
   <div class="chat-drawer" id="rider-chat-drawer">
     <div class="chat-top-header">
       <div style="display:flex; align-items:center; gap:10px;">
@@ -768,7 +807,42 @@
     function openProfileModal() { document.getElementById('profile-modal').classList.add('active'); }
     function closeProfileModal(e) { if(e && e.target !== e.currentTarget) return; document.getElementById('profile-modal').classList.remove('active'); }
 
-    // SIREN SOUND
+    // ============================================
+    // SOS MODAL FUNCTIONS (108 & 112)
+    // ============================================
+    function openSosModal() {
+      document.getElementById('sos-modal').classList.add('active');
+    }
+    function closeSosModal(e) {
+      if (e && e.target !== e.currentTarget) return;
+      document.getElementById('sos-modal').classList.remove('active');
+    }
+
+    // ============================================
+    // WORKING BUTTON HELPERS (Earnings, Slots, Refer)
+    // ============================================
+    function showEarningsPopup() {
+      let count = 0;
+      let cash = 0;
+      rawAllOrders.forEach(o => {
+        if (o.status === 'Delivered') {
+          count++;
+          cash += Number(o.total_amount) || 0;
+        }
+      });
+      alert(`👛 Rider Earnings Overview\n\n• कुल डिलीवर किए गए ऑर्डर: ${count}\n• कुल कमाई राशि: ₹${cash}\n• चालू शिफ्ट घंटे: ${document.getElementById('live-login-hrs').innerText} hrs`);
+    }
+
+    function showSlotDetails() {
+      alert(`📅 Today's Rider Duty Slot\n\n• स्लॉट समय: 1:00 PM - 3:00 PM\n• स्टेटस: एक्टिव (On-Duty)\n• ब्रेक टाइम बचा: 8 मिनट\n• एक्टिव टाइम: ${document.getElementById('live-shift-timer').innerText}`);
+    }
+
+    function shareReferralLink() {
+      const code = loggedInRider ? `BABA${loggedInRider.id}` : 'BABA100';
+      const msg = `नमस्ते! Baba Food Delivery पार्टनर बनें और पहले 10 ऑर्डर पर ₹200 का बोनस पाएँ। मेरा रेफ़रल कोड है: ${code}`;
+      window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, '_blank');
+    }
+
     function playLoudEmergencySiren() {
       try {
         if (!sharedAudioCtx) sharedAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -795,7 +869,6 @@
       }
     }
 
-    // TIMERS
     let shiftStartTime = localStorage.getItem('baba_shift_start') || Date.now();
     localStorage.setItem('baba_shift_start', shiftStartTime);
 
@@ -834,7 +907,6 @@
       renderTasks();
     }
 
-    // 2-DAY ROLLING ORDERS LOADER
     async function loadRiderOrders() {
       if (!isOnline || !loggedInRider) return;
       try {
@@ -972,7 +1044,6 @@
       container.innerHTML = html;
     }
 
-    // SCREEN 1 (BIN)
     function openBinScreen(order) {
       currentSelectedOrder = order;
       document.getElementById('bin-order-hash').innerText = `#BABA${order.id}DSNI19442A`;
@@ -988,7 +1059,6 @@
     }
     function triggerNativeCamera() { document.getElementById('camera-file-input').click(); }
 
-    // SCREEN 2 (PHOTO)
     function handlePhotoTaken(input) {
       if (input.files && input.files[0]) {
         const reader = new FileReader();
@@ -1025,7 +1095,6 @@
       }
     }
 
-    // SCREEN 3 (WAY SCREEN)
     function openWayScreen(order) {
       currentSelectedOrder = order;
       const addressText = order.delivery_address || 'Address Not Provided';
@@ -1054,7 +1123,6 @@
 
     function closeCodModal() { document.getElementById('cod-modal').classList.remove('active'); }
 
-    // COD SLIDER DRAG
     function initCodSlider() {
       const track = document.getElementById('slider-track');
       const thumb = document.getElementById('slider-thumb');
@@ -1127,9 +1195,7 @@
       currentSelectedOrder = null;
     }
 
-    // ============================================
-    // RIDER CHAT LOGIC
-    // ============================================
+    // CHAT SYSTEM
     function openRiderChat(orderId) {
       activeChatOrderId = orderId;
       document.getElementById('rchat-title').innerText = `Order #${orderId} Chat`;
