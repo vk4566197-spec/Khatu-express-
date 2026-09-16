@@ -38,193 +38,6 @@
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
     body { background-color: var(--bg-page); color: var(--text-main); padding-bottom: 120px; }
 
-    /* Fullscreen Logo Preview Modal */
-    .logo-modal-overlay {
-      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(0, 0, 0, 0.88); z-index: 9999; display: none;
-      align-items: center; justify-content: center; flex-direction: column;
-      backdrop-filter: blur(4px);
-    }
-    .logo-modal-overlay.active { display: flex; }
-    .full-logo-view {
-      width: 85%; max-width: 340px; border-radius: 50%;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.6);
-      border: 3px solid #ff758c; animation: popIn 0.25s ease-out;
-    }
-    .btn-close-preview {
-      position: absolute; top: 25px; right: 25px; background: #fff;
-      color: #000; border: none; width: 38px; height: 38px; border-radius: 50%;
-      font-size: 20px; font-weight: 900; cursor: pointer;
-    }
-    @keyframes popIn {
-      from { transform: scale(0.6); opacity: 0; }
-      to { transform: scale(1); opacity: 1; }
-    }
-
-    /* Side Drawer */
-    .drawer-overlay {
-      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(0, 0, 0, 0.5); z-index: 500; display: none;
-    }
-    .drawer-overlay.active { display: block; }
-    .side-drawer {
-      position: fixed; top: 0; left: -290px; width: 280px; height: 100%;
-      background: #fff; z-index: 501; box-shadow: 4px 0 20px rgba(0,0,0,0.15);
-      transition: left 0.3s ease; display: flex; flex-direction: column;
-    }
-    .side-drawer.active { left: 0; }
-    
-    .drawer-header {
-      background: linear-gradient(135deg, var(--zepto-purple), #240046);
-      color: white; padding: 22px 16px;
-    }
-    .drawer-logo-img {
-      width: 85px !important;
-      height: 85px !important;
-      border-radius: 50% !important;
-      object-fit: cover !important;
-      background: #fff;
-      border: 3px solid #ff758c;
-      display: block !important;
-      margin-bottom: 8px;
-      cursor: pointer;
-    }
-    .drawer-brand { font-size: 15px; font-weight: 900; color: #ff758c; line-height: 1.2; }
-    .drawer-menu-list { padding: 16px 0; flex: 1; overflow-y: auto; }
-    .drawer-item {
-      display: flex; align-items: center; gap: 12px; padding: 14px 20px;
-      font-size: 13px; font-weight: 700; color: #1e293b; cursor: pointer; text-decoration: none;
-      border-bottom: 1px solid #f8fafc;
-    }
-
-    /* Top Hero Area */
-    .top-hero-area {
-      background: linear-gradient(180deg, #f4ecfb 0%, #fbf9fe 100%);
-      padding: 12px 16px 14px 16px; border-bottom: 1px solid #eee5f7;
-    }
-    .location-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
-    .menu-trigger-btn {
-      background: #fff; border: 1px solid #e7daf5; width: 40px; height: 40px;
-      border-radius: 10px; display: flex; align-items: center; justify-content: center;
-      font-size: 20px; cursor: pointer;
-    }
-    .eta-badge { font-size: 17px; font-weight: 900; color: #111; display: flex; align-items: center; gap: 4px; }
-    .address-line { font-size: 11px; font-weight: 600; color: #475569; margin-top: 1px; }
-
-    .store-pills-row { display: flex; gap: 10px; overflow-x: auto; scrollbar-width: none; margin-bottom: 12px; align-items: center; }
-    .store-pills-row::-webkit-scrollbar { display: none; }
-    .store-pill {
-      background: #fff; padding: 6px 14px; border-radius: 14px;
-      border: 1.5px solid #e7daf5; white-space: nowrap; display: flex; align-items: center; gap: 8px;
-    }
-    .store-pill.active { border-color: var(--zepto-purple); color: var(--zepto-purple); }
-    
-    .pill-logo-compact {
-      width: 50px !important;
-      height: 50px !important;
-      border-radius: 50% !important;
-      object-fit: cover !important;
-      border: 1.5px solid var(--zepto-purple);
-      display: inline-block !important;
-    }
-    .pill-text-compact {
-      font-size: 14px !important;
-      font-weight: 900 !important;
-      line-height: 1.2;
-    }
-
-    .search-box-wrap { position: relative; margin-bottom: 12px; }
-    .search-bar-input {
-      width: 100%; background: #fff; border: 1px solid #e4d7f5; border-radius: 12px;
-      padding: 11px 14px 11px 40px; font-size: 13px; outline: none;
-    }
-    .search-icon-pos { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); font-size: 14px; color: #8c78a5; }
-
-    .category-scroll { display: flex; gap: 12px; overflow-x: auto; scrollbar-width: none; padding-bottom: 4px; }
-    .category-scroll::-webkit-scrollbar { display: none; }
-    .cat-item { display: flex; flex-direction: column; align-items: center; cursor: pointer; min-width: 52px; }
-    .cat-icon-circle {
-      width: 46px; height: 46px; border-radius: 14px; background: #fff; border: 1px solid #e7daf5;
-      display: flex; align-items: center; justify-content: center; font-size: 20px; margin-bottom: 4px;
-    }
-    .cat-item.active .cat-icon-circle { border-color: var(--zepto-pink); background: #fff0f4; }
-    .cat-name { font-size: 11px; font-weight: 700; color: #333; }
-
-    .promo-banner {
-      margin: 12px 14px; background: linear-gradient(100deg, #f7e8ff 0%, #fde2ea 100%);
-      border-radius: 14px; padding: 14px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #eed8f7;
-    }
-    .promo-text h3 { font-size: 14px; font-weight: 900; color: #21003d; line-height: 1.3; }
-    .promo-sub { font-size: 11px; color: var(--zepto-pink); font-weight: 700; margin-top: 3px; }
-
-    /* Products Grid */
-    .main-container { padding: 0 14px; }
-    .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
-    .product-card {
-      background: #fff; border-radius: 14px; border: 1px solid var(--border-color);
-      padding: 10px; display: flex; flex-direction: column; justify-content: space-between; position: relative;
-    }
-    .img-box {
-      width: 100%; height: 115px; border-radius: 10px; background: #faf8fd;
-      display: flex; align-items: center; justify-content: center; overflow: hidden; margin-bottom: 8px; position: relative;
-    }
-    .img-box img { width: 100%; height: 100%; object-fit: cover; }
-    
-    .out-of-stock-tag {
-      position: absolute; top: 6px; left: 6px; background: rgba(225, 29, 72, 0.92);
-      color: white; font-size: 10px; font-weight: 900; padding: 3px 6px; border-radius: 6px;
-    }
-    .btn-out-stock-disabled {
-      background: #e2e8f0 !important; color: #94a3b8 !important; border: 1px solid #cbd5e1 !important;
-      cursor: not-allowed !important; padding: 5px 10px !important; font-size: 11px !important; font-weight: 800 !important; border-radius: 8px !important;
-    }
-
-    .prod-title {
-      font-size: 13px; font-weight: 700; color: #14171a; line-height: 1.3; margin-bottom: 2px;
-      height: 34px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
-    }
-    .prod-unit { font-size: 11px; color: var(--text-muted); margin-bottom: 8px; }
-    .price-action-row { display: flex; align-items: center; justify-content: space-between; margin-top: auto; }
-    .price-tag { font-size: 15px; font-weight: 900; }
-    .btn-add-zepto {
-      background: #fff; border: 1.5px solid var(--zepto-pink); color: var(--zepto-pink);
-      padding: 5px 16px; border-radius: 8px; font-weight: 800; font-size: 12px; cursor: pointer;
-    }
-    .qty-counter {
-      display: flex; align-items: center; background: var(--zepto-pink);
-      border-radius: 8px; color: white; padding: 3px 6px; gap: 8px; font-weight: 800; font-size: 13px;
-    }
-    .qty-btn { background: none; border: none; color: white; font-size: 15px; font-weight: 900; cursor: pointer; }
-
-    /* Sticky Live Tracking Strip */
-    .active-order-strip {
-      background: #0f172a; color: white; border-radius: 14px; padding: 12px 14px;
-      margin-bottom: 12px; display: none; justify-content: space-between; align-items: center; cursor: pointer;
-      box-shadow: 0 4px 14px rgba(0,0,0,0.2);
-    }
-
-    /* Floating Cart Bar */
-    .floating-cart-bar {
-      position: fixed; bottom: 70px; left: 14px; right: 14px;
-      background: linear-gradient(90deg, #ff3269, #e01d51);
-      color: white; border-radius: 14px; padding: 12px 18px; display: none;
-      justify-content: space-between; align-items: center; box-shadow: 0 8px 24px rgba(255, 50, 105, 0.4);
-      z-index: 150; cursor: pointer;
-    }
-
-    /* Bottom Navigation Bar */
-    .bottom-nav-bar {
-      position: fixed; bottom: 0; left: 0; width: 100%; height: 60px;
-      background: #fff; border-top: 1px solid #eae6ef; display: flex;
-      justify-content: space-around; align-items: center; z-index: 100;
-    }
-    .nav-item {
-      display: flex; flex-direction: column; align-items: center; gap: 3px;
-      font-size: 10px; font-weight: 700; color: #657786; cursor: pointer; text-decoration: none;
-    }
-    .nav-item.active { color: var(--zepto-pink); }
-    .nav-item-icon { font-size: 18px; }
-
     /* Modals */
     .modal-overlay {
       position: fixed; top: 0; left: 0; width: 100%; height: 100%;
@@ -246,225 +59,172 @@
       border-radius: 50%; font-weight: bold; cursor: pointer;
     }
 
+    /* Top Hero Header (Dynamic Theme) */
+    .top-hero-area {
+      background: linear-gradient(180deg, var(--zepto-header-bg) 0%, #fbf9fe 100%);
+      padding: 12px 16px 14px 16px; border-bottom: 1px solid #eee5f7;
+    }
+    .location-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+    .menu-trigger-btn {
+      background: #fff; border: 1px solid #e7daf5; width: 40px; height: 40px;
+      border-radius: 10px; display: flex; align-items: center; justify-content: center;
+      font-size: 20px; cursor: pointer;
+    }
+    .eta-badge { font-size: 17px; font-weight: 900; color: #111; display: flex; align-items: center; gap: 4px; }
+    .address-line { font-size: 11px; font-weight: 600; color: #475569; margin-top: 1px; }
+
+    .store-pills-row { display: flex; gap: 10px; overflow-x: auto; scrollbar-width: none; margin-bottom: 12px; align-items: center; }
+    .store-pills-row::-webkit-scrollbar { display: none; }
+    .store-pill {
+      background: #fff; padding: 6px 14px; border-radius: 14px;
+      border: 1.5px solid #e7daf5; white-space: nowrap; display: flex; align-items: center; gap: 8px;
+    }
+    .store-pill.active { border-color: var(--zepto-purple); color: var(--zepto-purple); }
+    .pill-logo-compact { width: 50px !important; height: 50px !important; border-radius: 50% !important; object-fit: cover !important; border: 1.5px solid var(--zepto-purple); display: inline-block !important; }
+    .pill-text-compact { font-size: 14px !important; font-weight: 900 !important; line-height: 1.2; }
+
+    .search-box-wrap { position: relative; margin-bottom: 12px; }
+    .search-bar-input {
+      width: 100%; background: #fff; border: 1px solid #e4d7f5; border-radius: 12px;
+      padding: 11px 14px 11px 40px; font-size: 13px; outline: none;
+    }
+    .search-icon-pos { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); font-size: 14px; color: #8c78a5; }
+
+    /* Admin Dynamic Promo Banner */
+    .promo-banner {
+      margin: 12px 14px; background: linear-gradient(100deg, #f7e8ff 0%, #fde2ea 100%);
+      border-radius: 14px; padding: 14px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #eed8f7;
+    }
+    .promo-text h3 { font-size: 14px; font-weight: 900; color: var(--zepto-purple); line-height: 1.3; }
+    .promo-sub { font-size: 11px; color: var(--zepto-pink); font-weight: 700; margin-top: 3px; }
+
+    /* Products Grid */
+    .main-container { padding: 0 14px; }
+    .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+    .product-card {
+      background: #fff; border-radius: 14px; border: 1px solid var(--border-color);
+      padding: 10px; display: flex; flex-direction: column; justify-content: space-between; position: relative;
+    }
+    .img-box {
+      width: 100%; height: 115px; border-radius: 10px; background: #faf8fd;
+      display: flex; align-items: center; justify-content: center; overflow: hidden; margin-bottom: 8px; position: relative;
+    }
+    .img-box img { width: 100%; height: 100%; object-fit: cover; }
+    .out-of-stock-tag {
+      position: absolute; top: 6px; left: 6px; background: rgba(225, 29, 72, 0.92);
+      color: white; font-size: 10px; font-weight: 900; padding: 3px 6px; border-radius: 6px;
+    }
+    .btn-out-stock-disabled {
+      background: #e2e8f0 !important; color: #94a3b8 !important; border: 1px solid #cbd5e1 !important;
+      cursor: not-allowed !important; padding: 5px 10px !important; font-size: 11px !important; font-weight: 800 !important; border-radius: 8px !important;
+    }
+
+    .prod-title { font-size: 13px; font-weight: 700; color: #14171a; line-height: 1.3; margin-bottom: 2px; }
+    .prod-unit { font-size: 11px; color: var(--text-muted); margin-bottom: 8px; }
+    .price-action-row { display: flex; align-items: center; justify-content: space-between; margin-top: auto; }
+    .price-tag { font-size: 15px; font-weight: 900; }
+    .btn-add-zepto {
+      background: #fff; border: 1.5px solid var(--zepto-pink); color: var(--zepto-pink);
+      padding: 5px 16px; border-radius: 8px; font-weight: 800; font-size: 12px; cursor: pointer;
+    }
+    .qty-counter {
+      display: flex; align-items: center; background: var(--zepto-pink);
+      border-radius: 8px; color: white; padding: 3px 6px; gap: 8px; font-weight: 800; font-size: 13px;
+    }
+    .qty-btn { background: none; border: none; color: white; font-size: 15px; font-weight: 900; cursor: pointer; }
+
+    /* Sticky Live Tracking Strip */
+    .active-order-strip {
+      background: #0f172a; color: white; border-radius: 14px; padding: 12px 14px;
+      margin-bottom: 12px; display: none; justify-content: space-between; align-items: center; cursor: pointer;
+    }
+
+    /* Floating Cart Bar */
+    .floating-cart-bar {
+      position: fixed; bottom: 70px; left: 14px; right: 14px;
+      background: linear-gradient(90deg, var(--zepto-pink), #e01d51);
+      color: white; border-radius: 14px; padding: 12px 18px; display: none;
+      justify-content: space-between; align-items: center; box-shadow: 0 8px 24px rgba(255, 50, 105, 0.4);
+      z-index: 150; cursor: pointer;
+    }
+
+    /* Bottom Nav */
+    .bottom-nav-bar {
+      position: fixed; bottom: 0; left: 0; width: 100%; height: 60px;
+      background: #fff; border-top: 1px solid #eae6ef; display: flex;
+      justify-content: space-around; align-items: center; z-index: 100;
+    }
+    .nav-item { display: flex; flex-direction: column; align-items: center; gap: 3px; font-size: 10px; font-weight: 700; color: #657786; cursor: pointer; }
+    .nav-item.active { color: var(--zepto-pink); }
+    .nav-item-icon { font-size: 18px; }
+
     .cart-item-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid #f8fafc; }
     .bill-box { background: #f8fafc; padding: 12px; border-radius: 12px; margin: 12px 0; font-size: 13px; }
     .bill-row { display: flex; justify-content: space-between; margin-bottom: 6px; }
     .discount-highlight { color: var(--zepto-green); font-weight: 800; }
-    .bill-row.total {
-      font-weight: 900; font-size: 15px; margin-top: 8px; padding-top: 8px;
-      border-top: 1px dashed #cbd5e1; color: #0f172a;
-    }
+    .bill-row.total { font-weight: 900; font-size: 15px; margin-top: 8px; padding-top: 8px; border-top: 1px dashed #cbd5e1; color: #0f172a; }
 
-    /* Payment Methods */
-    .pay-methods-title { font-size: 12px; font-weight: 800; color: #475569; margin-top: 10px; }
     .pay-methods-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 6px 0 10px 0; }
-    .pay-opt {
-      border: 1.5px solid #cbd5e1; border-radius: 10px; padding: 10px 6px;
-      text-align: center; cursor: pointer; font-size: 12px; font-weight: 800; color: #334155;
-    }
+    .pay-opt { border: 1.5px solid #cbd5e1; border-radius: 10px; padding: 10px 6px; text-align: center; cursor: pointer; font-size: 12px; font-weight: 800; }
     .pay-opt.selected { border-color: var(--zepto-pink); background: #fff0f4; color: var(--zepto-pink); }
 
-    .upi-gate-card {
-      background: #faf5ff; border: 1.5px dashed var(--zepto-purple);
-      border-radius: 12px; padding: 14px; text-align: center; margin-bottom: 12px; display: none;
-    }
-    .qr-frame {
-      width: 170px; height: 170px; margin: 8px auto; background: #fff;
-      padding: 6px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.08);
-    }
-    .qr-frame img { width: 100%; height: 100%; }
-
     .input-group { display: flex; flex-direction: column; gap: 8px; }
-    .zepto-input {
-      width: 100%; padding: 11px 12px; border-radius: 10px; border: 1.5px solid #cbd5e1;
-      font-size: 13px; outline: none;
-    }
-    .btn-checkout {
-      background: linear-gradient(90deg, #ff3269, #e01d51); color: white; border: none;
-      padding: 14px; border-radius: 10px; font-size: 14px; font-weight: 800;
-      cursor: pointer; width: 100%; margin-top: 10px; box-shadow: 0 4px 14px rgba(255, 50, 105, 0.3);
-    }
+    .zepto-input { width: 100%; padding: 11px 12px; border-radius: 10px; border: 1.5px solid #cbd5e1; font-size: 13px; outline: none; }
+    .btn-checkout { background: linear-gradient(90deg, var(--zepto-pink), #e01d51); color: white; border: none; padding: 14px; border-radius: 10px; font-size: 14px; font-weight: 800; cursor: pointer; width: 100%; margin-top: 10px; }
 
-    /* Live Tracking Steps */
-    .track-steps {
-      display: flex; flex-direction: column; gap: 16px; margin: 18px 0 10px 18px;
-      position: relative; border-left: 2px solid #e2e8f0; padding-left: 18px;
-    }
-    .t-step { position: relative; font-size: 13px; color: #94a3b8; font-weight: 600; }
-    .t-step::after {
-      content: ''; position: absolute; left: -25px; top: 3px;
-      width: 12px; height: 12px; border-radius: 50%; background: #cbd5e1;
-    }
-    .t-step.active { color: #0f172a; font-weight: 800; }
-    .t-step.active::after { background: var(--zepto-green); box-shadow: 0 0 0 4px #dcfce7; }
-
-    /* Past Order Card Styling */
-    .past-order-box {
-      background: #fff; border-radius: 14px; border: 1.5px solid var(--border-color);
-      padding: 14px; margin-bottom: 12px; box-shadow: 0 2px 6px rgba(0,0,0,0.03);
-    }
-    .past-order-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
-    .past-order-id { font-size: 13px; font-weight: 900; color: #0f172a; }
-    .past-order-time { font-size: 11px; color: var(--text-muted); font-weight: 600; }
-    .past-item-preview-line { font-size: 12px; color: #475569; margin-bottom: 10px; line-height: 1.4; }
-    .past-actions-row { display: flex; gap: 8px; align-items: center; }
-    .btn-past-details {
-      flex: 1; background: #f8fafc; border: 1.5px solid #cbd5e1; color: #334155;
-      font-size: 12px; font-weight: 800; padding: 7px 10px; border-radius: 8px; cursor: pointer; text-align: center;
-    }
-    .btn-past-repeat {
-      flex: 1; background: #fff0f4; border: 1.5px solid var(--zepto-pink); color: var(--zepto-pink);
-      font-size: 12px; font-weight: 800; padding: 7px 10px; border-radius: 8px; cursor: pointer; text-align: center;
-    }
-
-    .receipt-item-row {
-      display: flex; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px solid #f1f5f9;
-    }
-    .receipt-item-img {
-      width: 44px; height: 44px; border-radius: 8px; object-fit: contain; background: #faf8fd; border: 1px solid #eee;
-    }
-
-    /* ======================================= */
-    /* LIVE CHAT DRAWER STYLES                 */
-    /* ======================================= */
-    .chat-drawer {
-      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      background: #f8fafc; z-index: 500; display: none; flex-direction: column;
-    }
+    /* Live Chat */
+    .chat-drawer { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #f8fafc; z-index: 500; display: none; flex-direction: column; }
     .chat-drawer.active { display: flex; }
-    .chat-top-header {
-      background: var(--zepto-purple); color: white; padding: 16px;
-      display: flex; justify-content: space-between; align-items: center;
-    }
-    .chat-messages-area {
-      flex: 1; padding: 16px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px;
-    }
-    .msg-bubble {
-      max-width: 80%; padding: 10px 14px; border-radius: 14px; font-size: 13px; line-height: 1.4;
-      word-wrap: break-word; font-weight: 600;
-    }
-    .msg-customer {
-      align-self: flex-end; background: var(--zepto-pink); color: white;
-      border-bottom-right-radius: 2px;
-    }
-    .msg-rider {
-      align-self: flex-start; background: #ffffff; color: #0f172a;
-      border: 1px solid #e2e8f0; border-bottom-left-radius: 2px;
-    }
-
-    .quick-chips-row {
-      display: flex; gap: 8px; padding: 8px 14px; overflow-x: auto;
-      scrollbar-width: none; background: #ffffff; border-top: 1px solid #eee;
-    }
-    .quick-chips-row::-webkit-scrollbar { display: none; }
-    .quick-chip {
-      background: #f1f5f9; color: #334155; padding: 6px 12px; border-radius: 16px;
-      font-size: 11px; font-weight: 800; white-space: nowrap; cursor: pointer; border: 1px solid #cbd5e1;
-    }
-
-    .chat-input-bar {
-      padding: 10px 14px; background: white; border-top: 1px solid #e2e8f0;
-      display: flex; gap: 8px; align-items: center;
-    }
-    .chat-input-box {
-      flex: 1; padding: 10px 14px; border-radius: 20px; border: 1.5px solid #cbd5e1;
-      font-size: 13px; outline: none;
-    }
-    .chat-send-btn {
-      background: var(--zepto-purple); color: white; border: none; width: 40px; height: 40px;
-      border-radius: 50%; display: flex; align-items: center; justify-content: center;
-      font-size: 16px; cursor: pointer;
-    }
+    .chat-top-header { background: var(--zepto-purple); color: white; padding: 16px; display: flex; justify-content: space-between; align-items: center; }
+    .chat-messages-area { flex: 1; padding: 16px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
+    .msg-bubble { max-width: 80%; padding: 10px 14px; border-radius: 14px; font-size: 13px; font-weight: 600; }
+    .msg-customer { align-self: flex-end; background: var(--zepto-pink); color: white; border-bottom-right-radius: 2px; }
+    .msg-rider { align-self: flex-start; background: #ffffff; color: #0f172a; border: 1px solid #e2e8f0; border-bottom-left-radius: 2px; }
+    .quick-chips-row { display: flex; gap: 8px; padding: 8px 14px; overflow-x: auto; background: #fff; border-top: 1px solid #eee; }
+    .quick-chip { background: #f1f5f9; color: #334155; padding: 6px 12px; border-radius: 16px; font-size: 11px; font-weight: 800; white-space: nowrap; cursor: pointer; border: 1px solid #cbd5e1; }
+    .chat-input-bar { padding: 10px 14px; background: white; border-top: 1px solid #e2e8f0; display: flex; gap: 8px; }
+    .chat-input-box { flex: 1; padding: 10px 14px; border-radius: 20px; border: 1.5px solid #cbd5e1; font-size: 13px; outline: none; }
+    .chat-send-btn { background: var(--zepto-purple); color: white; border: none; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 16px; cursor: pointer; }
   </style>
 </head>
 <body>
-
-  <!-- Fullscreen Logo Modal -->
-  <div class="logo-modal-overlay" id="logo-preview-modal" onclick="closeLogoPreview()">
-    <button class="btn-close-preview" onclick="closeLogoPreview()">✕</button>
-    <img class="full-logo-view" src="logo.png" alt="Full Logo" onclick="event.stopPropagation()">
-    <div style="color: #fff; font-weight: 800; font-size: 15px; margin-top: 14px;">👑 𝐁𝐀𝐁𝐀 𝐅𝐎𝐎𝐃 𝐃𝐄𝐋𝐈𝐕𝐄𝐑𝐘🏹</div>
-  </div>
-
-  <!-- Side Drawer -->
-  <div class="drawer-overlay" id="drawer-overlay" onclick="toggleDrawer(false)"></div>
-  <div class="side-drawer" id="side-drawer">
-    <div class="drawer-header">
-      <img class="drawer-logo-img" src="logo.png" alt="Logo" title="Tap to view full logo" onclick="openLogoPreview()" onerror="this.style.display='none'">
-      <div class="drawer-brand">👑 𝐁𝐀𝐁𝐀 𝐅𝐎𝐎𝐃 𝐃𝐄𝐋𝐈𝐕𝐄𝐑𝐘🏹</div>
-      <div style="font-size: 11px; color: #fdf4ff; margin-top: 2px;">Fast Express Delivery</div>
-    </div>
-    <div class="drawer-menu-list">
-      <div class="drawer-item" onclick="toggleDrawer(false); scrollToHistory();">
-        <span>🕒</span> Past Orders & Receipts
-      </div>
-      <div class="drawer-item" onclick="openSupportModal()">
-        <span>💬</span> 24x7 Help & Support
-      </div>
-      <a class="drawer-item" href="tel:9711107063">
-        <span>📞</span> Helpline: 9711107063
-      </a>
-      <a class="drawer-item" target="_blank" href="https://wa.me/919711107063?text=Hello%20Baba%20Food%20Delivery%20Support">
-        <span>🟢</span> WhatsApp: 9711107063
-      </a>
-      <div class="drawer-item" onclick="alert('डिलीवरी समय: सुबह 7:00 AM से रात 11:00 PM तक!')">
-        <span>ℹ️</span> Store Hours & FAQs
-      </div>
-    </div>
-  </div>
 
   <!-- Top Hero Header -->
   <div class="top-hero-area">
     <div class="location-row">
       <div style="display: flex; align-items: center; gap: 10px;">
-        <button class="menu-trigger-btn" onclick="toggleDrawer(true)">☰</button>
+        <button class="menu-trigger-btn" onclick="alert('Menu')">☰</button>
         <div>
           <div class="eta-badge">⚡ 10 minutes</div>
           <div class="address-line">📍 Delivery to Home & Nearby</div>
         </div>
       </div>
-      <button class="menu-trigger-btn" onclick="openSupportModal()" title="Help & Support">🎧</button>
+      <button class="menu-trigger-btn" onclick="openSupportModal()">🎧</button>
     </div>
 
-    <!-- Store Brand Pill -->
     <div class="store-pills-row">
       <div class="store-pill active">
         <img class="pill-logo-compact" src="logo.png" alt="Logo" onerror="this.style.display='none'">
         <span class="pill-text-compact">👑 𝐁𝐀𝐁𝐀 𝐅𝐎𝐎𝐃 𝐃𝐄𝐋𝐈𝐕𝐄𝐑𝐘🏹</span>
       </div>
-      <div class="store-pill">
-        <span class="pill-text-compact">Express Kitchen</span>
-      </div>
-      <div class="store-pill">
-        <span class="pill-text-compact">Fresh Mart</span>
-      </div>
     </div>
 
-    <!-- Search Box -->
     <div class="search-box-wrap">
       <span class="search-icon-pos">🔍</span>
       <input type="text" id="search-input" class="search-bar-input" placeholder='Search items...' oninput="handleFilter()">
     </div>
-
-    <!-- Categories -->
-    <div class="category-scroll" id="category-chips">
-      <div class="cat-item active" onclick="setCategory('All', this)">
-        <div class="cat-icon-circle">🛍️</div>
-        <div class="cat-name">All</div>
-      </div>
-    </div>
   </div>
 
+  <!-- Dynamic Live Promo Banner from Admin -->
   <div class="promo-banner">
     <div class="promo-text">
-      <h3>₹249+ पर <span style="color: var(--zepto-green);">Free Delivery</span> 🚚</h3>
-      <div class="promo-sub">₹399+ के ऑर्डर पर ₹49 का भारी Discount!</div>
+      <h3 id="dyn-banner-title">₹249+ पर <span style="color: var(--zepto-green);">Free Delivery</span> 🚚</h3>
+      <div class="promo-sub" id="dyn-banner-sub">₹399+ के ऑर्डर पर ₹49 का भारी Discount!</div>
     </div>
-    <div style="font-size: 40px;">🎁</div>
+    <div style="font-size: 40px;" id="dyn-banner-icon">🎁</div>
   </div>
 
   <div class="main-container">
-    <!-- Active Order Strip -->
     <div class="active-order-strip" id="live-order-strip" onclick="openTrackModal()">
       <div style="display: flex; align-items: center; gap: 10px;">
         <span style="font-size: 20px;">🛵</span>
@@ -476,25 +236,13 @@
       <span style="font-size: 16px; color: #94a3b8;">➔</span>
     </div>
 
-    <!-- Product Grid -->
     <div id="loader" style="text-align: center; padding: 40px; font-size: 13px; color: var(--text-muted);">
       Loading fresh items...
     </div>
     <div class="grid" id="product-list"></div>
-
-    <!-- Past Orders Section (Full Details View) -->
-    <div id="past-orders-section" style="margin-top: 35px; border-top: 2px dashed #eee; padding-top: 22px;">
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
-        <div style="font-size: 16px; font-weight: 900; color: #111;">🕒 Past Orders & Invoices</div>
-        <span style="font-size: 11px; color: #64748b; font-weight: 700;">Tap to view details</span>
-      </div>
-      <div id="history-container">
-        <div style="font-size: 12px; color: #94a3b8; padding: 10px 0;">No past orders found.</div>
-      </div>
-    </div>
   </div>
 
-  <!-- Cart Float Bar -->
+  <!-- Floating Cart -->
   <div class="floating-cart-bar" id="cart-float-bar" onclick="openCartModal()">
     <div>
       <div class="cart-summary-text" id="float-qty-text">0 Items Added</div>
@@ -503,7 +251,7 @@
     <div style="font-size: 13px; font-weight: 800;">View Cart ➔</div>
   </div>
 
-  <!-- Bottom Navigation -->
+  <!-- Bottom Nav -->
   <div class="bottom-nav-bar">
     <div class="nav-item active" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">
       <div class="nav-item-icon">🏠</div>
@@ -511,11 +259,7 @@
     </div>
     <div class="nav-item" onclick="openTrackModal()">
       <div class="nav-item-icon">🛵</div>
-      <span>Track Order</span>
-    </div>
-    <div class="nav-item" onclick="scrollToHistory()">
-      <div class="nav-item-icon">🕒</div>
-      <span>Past Orders</span>
+      <span>Track</span>
     </div>
     <div class="nav-item" onclick="openSupportModal()">
       <div class="nav-item-icon">🎧</div>
@@ -539,12 +283,12 @@
           <span id="bill-subtotal">₹0</span>
         </div>
         <div class="bill-row">
-          <span>Delivery Charge (Free on ₹249+)</span>
+          <span>Delivery Charge (<span id="bill-free-del-rule">Free on ₹249+</span>)</span>
           <span id="bill-delivery-charge">₹25</span>
         </div>
         <div class="bill-row" id="row-discount" style="display: none;">
-          <span class="discount-highlight">Special Offer (₹399+ Order)</span>
-          <span class="discount-highlight">-₹49</span>
+          <span class="discount-highlight" id="bill-disc-rule">Special Offer</span>
+          <span class="discount-highlight" id="bill-disc-amount">-₹49</span>
         </div>
         <div class="bill-row total">
           <span>To Pay</span>
@@ -552,177 +296,52 @@
         </div>
       </div>
 
-      <!-- Payment Choice -->
-      <div class="pay-methods-title">💳 भुगतान का तरीका चुनें (Payment Mode):</div>
       <div class="pay-methods-grid">
-        <div class="pay-opt selected" id="opt-cod" onclick="selectPaymentMode('COD')">
-          💵 Cash on Delivery
-        </div>
-        <div class="pay-opt" id="opt-upi" onclick="selectPaymentMode('UPI')">
-          📱 Online UPI (Direct)
-        </div>
+        <div class="pay-opt selected" id="opt-cod" onclick="selectPaymentMode('COD')">💵 Cash on Delivery</div>
+        <div class="pay-opt" id="opt-upi" onclick="selectPaymentMode('UPI')">📱 Online UPI</div>
       </div>
 
-      <!-- UPI Dynamic Gate -->
-      <div class="upi-gate-card" id="upi-box">
-        <div style="font-size: 14px; font-weight: 800; color: var(--zepto-purple);">
-          स्कैन करके पेमेंट करें (₹<span id="upi-box-amount">0</span>):
-        </div>
-        <div style="font-size: 11px; color: #64748b; margin-top: 2px;">
-          UPI ID: <b>7037647464-3@axl</b>
-        </div>
-        
-        <div class="qr-frame">
-          <img id="upi-qr-img" src="" alt="Dynamic UPI QR">
-        </div>
-
-        <div style="margin: 8px 0;">
-          <a id="upi-intent-link" href="#" class="btn-checkout" style="padding: 10px; font-size: 13px; background: #2563eb; text-decoration: none; display: inline-block;">
-            ⚡ Google Pay / PhonePe पर Pay करें
-          </a>
-        </div>
-
-        <div style="font-size: 11px; color: #475569; margin: 10px 0 6px 0;">
-          पेमेंट पूरा होने पर बैंक मैसेज से <b>12-अंकों का UTR No.</b> यहाँ डालें:
-        </div>
-        <input type="tel" id="upi-utr" class="zepto-input" placeholder="12-अंकों का UTR No." maxlength="12" style="background: #fff; text-align: center; font-weight: 800; letter-spacing: 1px;">
-      </div>
-
-      <!-- Checkout Form with Live GPS Location Support -->
       <div class="input-group">
-        <input type="text" id="c-name" class="zepto-input" placeholder="आपका नाम (Full Name) *">
-        <input type="tel" id="c-phone" class="zepto-input" placeholder="10-digit Mobile (6-9 से शुरू) *" maxlength="10">
-        
-        <button type="button" onclick="getCurrentLocation()" style="background:#f1f5f9; border:1.5px solid #cbd5e1; padding:9px; border-radius:10px; font-size:12px; font-weight:800; color:#334155; display:flex; align-items:center; justify-content:center; gap:6px; cursor:pointer;">
-          📍 Use My Current Location (GPS)
-        </button>
-
-        <textarea id="c-address" class="zepto-input" rows="2" placeholder="डिलीवरी पता (House/Flat No, Landmark) *"></textarea>
+        <input type="text" id="c-name" class="zepto-input" placeholder="Full Name *">
+        <input type="tel" id="c-phone" class="zepto-input" placeholder="10-digit Phone *" maxlength="10">
+        <textarea id="c-address" class="zepto-input" rows="2" placeholder="Delivery Address *"></textarea>
         <button class="btn-checkout" id="order-submit-btn" onclick="placeOrder()">Place Delivery Order</button>
       </div>
     </div>
   </div>
 
-  <!-- Live Status Modal WITH LIVE CHAT BUTTON -->
+  <!-- Live Tracking & Chat Trigger -->
   <div class="modal-overlay" id="track-modal" onclick="closeTrackModal(event)">
     <div class="bottom-sheet" onclick="event.stopPropagation()">
       <div class="sheet-head">
-        <div>
-          <div class="sheet-title" id="t-order-id">Live Tracking</div>
-          <div style="font-size: 11px; color: var(--text-muted);">Express 10-Minute Dispatch</div>
-        </div>
+        <div class="sheet-title" id="t-order-id">Live Tracking</div>
         <button class="sheet-close" onclick="toggleTrackModal(false)">✕</button>
       </div>
-
-      <div class="track-steps">
-        <div class="t-step active" id="st-1">✓ Order Confirmed & Packing</div>
-        <div class="t-step" id="st-2">🛵 Out for Delivery (Rider on the way)</div>
-        <div class="t-step" id="st-3">📦 Order Delivered Successfully 🎉</div>
-      </div>
-
-      <div id="rider-map-box" style="display: none; margin-top: 16px; border-radius: 12px; overflow: hidden; height: 160px; border: 1px solid #e2e8f0;">
-        <iframe id="rider-map" style="width: 100%; height: 100%; border: none;" src=""></iframe>
-      </div>
-
-      <!-- Live Chat Trigger Button for Customer -->
-      <button onclick="openLiveChatModal()" style="background:#f3e8ff; border:1.5px solid #d8b4fe; color:var(--zepto-purple); width:100%; padding:13px; border-radius:12px; font-size:13px; font-weight:800; display:flex; align-items:center; justify-content:center; gap:8px; margin:16px 0 6px 0; cursor:pointer;">
+      <button onclick="openLiveChatModal()" style="background:#f3e8ff; border:1.5px solid #d8b4fe; color:var(--zepto-purple); width:100%; padding:13px; border-radius:12px; font-size:13px; font-weight:800; display:flex; align-items:center; justify-content:center; gap:8px; margin:14px 0; cursor:pointer;">
         💬 Chat with Delivery Partner
       </button>
-
-      <button class="btn-checkout" style="background: #0f172a; margin-top: 10px;" onclick="toggleTrackModal(false)">Close Tracking</button>
+      <button class="btn-checkout" style="background:#0f172a;" onclick="toggleTrackModal(false)">Close Tracking</button>
     </div>
   </div>
 
-  <!-- ========================================== -->
-  <!-- FULL LIVE CHAT INTERFACE WITH RIDER        -->
-  <!-- ========================================== -->
+  <!-- Chat Drawer -->
   <div class="chat-drawer" id="chat-drawer">
     <div class="chat-top-header">
       <div style="display:flex; align-items:center; gap:10px;">
-        <button onclick="closeLiveChatModal()" style="background:none; border:none; color:white; font-size:20px; font-weight:900; cursor:pointer;">←</button>
-        <div>
-          <div style="font-size:15px; font-weight:900;" id="chat-header-title">Chat with Rider</div>
-          <div style="font-size:11px; color:#d8b4fe;">Online Delivery Partner</div>
-        </div>
+        <button onclick="closeLiveChatModal()" style="background:none; border:none; color:white; font-size:20px; cursor:pointer;">←</button>
+        <div style="font-size:15px; font-weight:900;" id="chat-header-title">Chat with Rider</div>
       </div>
       <a href="tel:9711107063" style="color:white; text-decoration:none; font-size:18px;">📞</a>
     </div>
-
-    <!-- Messages Container -->
-    <div class="chat-messages-area" id="chat-messages">
-      <div style="text-align:center; font-size:11px; color:#94a3b8; margin:10px 0;">
-        ऑर्डर डिलीवरी से संबंधित चैट यहाँ दिखेगी।
-      </div>
-    </div>
-
-    <!-- Customer Quick Chips -->
+    <div class="chat-messages-area" id="chat-messages"></div>
     <div class="quick-chips-row">
-      <div class="quick-chip" onclick="sendQuickMessage('भैया जल्दी आना प्लीज (Please deliver fast)')">⚡ Please deliver fast</div>
-      <div class="quick-chip" onclick="sendQuickMessage('पहुँचकर कॉल करना (Call me on arrival)')">📞 Call me on arrival</div>
-      <div class="quick-chip" onclick="sendQuickMessage('गेट पर छोड़ दो (Leave at the gate)')">🚪 Leave at the gate</div>
-      <div class="quick-chip" onclick="sendQuickMessage('खुल्ले पैसे नहीं हैं, UPI करूँगा (Will pay via UPI)')">📱 Will pay via UPI</div>
+      <div class="quick-chip" onclick="sendQuickMessage('भैया जल्दी आना प्लीज (Please deliver fast)')">⚡ Fast delivery</div>
+      <div class="quick-chip" onclick="sendQuickMessage('पहुँचकर कॉल करना (Call on arrival)')">📞 Call on arrival</div>
+      <div class="quick-chip" onclick="sendQuickMessage('गेट पर छोड़ दो (Leave at gate)')">🚪 Leave at gate</div>
     </div>
-
-    <!-- Message Input Bar -->
     <div class="chat-input-bar">
-      <input type="text" id="chat-user-text" class="chat-input-box" placeholder="Type a message to rider...">
+      <input type="text" id="chat-user-text" class="chat-input-box" placeholder="Message rider...">
       <button class="chat-send-btn" onclick="sendCustomMessage()">➔</button>
-    </div>
-  </div>
-
-  <!-- Full Past Order Details / Receipt Modal -->
-  <div class="modal-overlay" id="receipt-modal" onclick="closeReceiptModal(event)">
-    <div class="bottom-sheet" onclick="event.stopPropagation()">
-      <div class="sheet-head">
-        <div>
-          <div class="sheet-title" id="rcpt-title">Order Receipt #ORD-00</div>
-          <div style="font-size: 11px; color: #64748b;" id="rcpt-date-mode">Placed on -- | COD</div>
-        </div>
-        <button class="sheet-close" onclick="closeReceiptModal()">✕</button>
-      </div>
-
-      <div style="font-size: 12px; font-weight: 800; color: #334155; margin-bottom: 6px;">ITEMS ORDERED</div>
-      <div id="rcpt-items-list" style="max-height: 220px; overflow-y: auto;"></div>
-
-      <div style="background: #f8fafc; border-radius: 12px; padding: 12px; margin: 14px 0; border: 1px solid #e2e8f0;">
-        <div style="font-size: 11px; font-weight: 800; color: #64748b; margin-bottom: 4px;">DELIVERY ADDRESS</div>
-        <div style="font-size: 12px; font-weight: 700; color: #1e293b; white-space: pre-line;" id="rcpt-address">--</div>
-      </div>
-
-      <div class="bill-box" style="margin: 0 0 14px 0;">
-        <div class="bill-row total">
-          <span>Total Paid</span>
-          <span style="color: var(--zepto-green); font-size: 17px;" id="rcpt-total-amount">₹0</span>
-        </div>
-      </div>
-
-      <button class="btn-checkout" id="rcpt-repeat-btn" style="background: var(--zepto-purple);">
-        🔁 Repeat This Entire Order
-      </button>
-    </div>
-  </div>
-
-  <!-- Support Modal -->
-  <div class="modal-overlay" id="support-modal" onclick="closeSupportModal(event)">
-    <div class="bottom-sheet" onclick="event.stopPropagation()">
-      <div class="sheet-head">
-        <div class="sheet-title">Help & Support 🎧</div>
-        <button class="sheet-close" onclick="toggleSupportModal(false)">✕</button>
-      </div>
-
-      <div style="padding: 10px 0; font-size: 13px; line-height: 1.6; color: #334155;">
-        <div style="font-weight: 800; font-size: 15px; margin-bottom: 6px;">ऑर्डर में कोई समस्या है?</div>
-        <div>हेल्पलाइन नंबर: <b>+91 9711107063</b> पर संपर्क करें।</div>
-      </div>
-
-      <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 10px;">
-        <a class="btn-checkout" style="background: #25D366; text-decoration: none; text-align: center;" target="_blank" href="https://wa.me/919711107063?text=Need%20Help%20With%20My%20Baba%20Food%20Order">
-          💬 Chat on WhatsApp (9711107063)
-        </a>
-        <a class="btn-checkout" style="background: var(--zepto-purple); text-decoration: none; text-align: center;" href="tel:9711107063">
-          📞 Call Support (9711107063)
-        </a>
-      </div>
     </div>
   </div>
 
@@ -733,175 +352,110 @@
 
     let allProducts = [];
     let cart = {}; 
-    let selectedCat = 'All';
     let currentOrderId = localStorage.getItem('zepto_active_order') || null;
     let selectedPaymentMode = 'COD';
-    const STORE_UPI_ID = '7037647464-3@axl';
     let chatInterval = null;
 
-    const catEmojiMap = {
-      'All': '🛍️', 'Grocery': '🥦', 'Dairy': '🥛', 'Snacks': '🍿', 'Bakery': '🍞', 'Drinks': '🥤'
+    // Default Configuration (Overridden by Admin Live Settings)
+    let appConfig = {
+      theme_color: '#ff3269',
+      header_bg: '#f4ecfb',
+      primary_purple: '#3c006b',
+      banner_title: '₹249+ पर Free Delivery 🚚',
+      banner_subtitle: '₹399+ के ऑर्डर पर ₹49 का भारी Discount!',
+      banner_icon: '🎁',
+      min_free_delivery: 249,
+      delivery_charge: 25,
+      discount_min_order: 399,
+      discount_amount: 49
     };
 
-    function openLogoPreview() { document.getElementById('logo-preview-modal').classList.add('active'); }
-    function closeLogoPreview() { document.getElementById('logo-preview-modal').classList.remove('active'); }
+    // ============================================
+    // LOAD DYNAMIC THEME & OFFERS FROM ADMIN
+    // ============================================
+    async function loadLiveAppSettings() {
+      try {
+        const { data } = await _supabase.from('app_settings').select('*').eq('id', 1).single();
+        if (data) {
+          appConfig = { ...appConfig, ...data };
+          applyThemeAndOffers();
+        }
+      } catch (err) {
+        console.warn('Config load notice:', err);
+      }
+    }
 
-    function getCurrentLocation() {
-      if (!navigator.geolocation) { alert('आपके ब्राउज़र में लोकेशन सपोर्ट नहीं है!'); return; }
-      const addrBox = document.getElementById('c-address');
-      addrBox.placeholder = 'Fetching GPS location...';
+    function applyThemeAndOffers() {
+      const root = document.documentElement;
+      root.style.setProperty('--zepto-pink', appConfig.theme_color);
+      root.style.setProperty('--zepto-header-bg', appConfig.header_bg);
+      root.style.setProperty('--zepto-purple', appConfig.primary_purple);
 
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          const lat = position.coords.latitude;
-          const lng = position.coords.longitude;
-          const mapsLink = `https://maps.google.com/?q=${lat},${lng}`;
-          if (!addrBox.value.includes('http')) {
-            addrBox.value = (addrBox.value ? addrBox.value + '\n' : '') + `📍 GPS: ${mapsLink}`;
-          }
-          alert('✅ आपकी सटीक लोकेशन ले ली गई है!');
-        },
-        (error) => { alert('लोकेशन परमिशन बंद है! कृपया ब्राउज़र सेटिंग्स में लोकेशन Allow करें।'); },
-        { enableHighAccuracy: true, timeout: 10000 }
-      );
+      document.getElementById('dyn-banner-title').innerHTML = appConfig.banner_title;
+      document.getElementById('dyn-banner-sub').innerText = appConfig.banner_subtitle;
+      document.getElementById('dyn-banner-icon').innerText = appConfig.banner_icon || '🎁';
+      document.getElementById('bill-free-del-rule').innerText = `Free on ₹${appConfig.min_free_delivery}+`;
+      document.getElementById('bill-disc-rule').innerText = `Offer (₹${appConfig.discount_min_order}+ Order)`;
+      document.getElementById('bill-disc-amount').innerText = `-₹${appConfig.discount_amount}`;
+
+      renderCartSheet();
     }
 
     async function initApp() {
-      renderPastOrdersUI();
+      await loadLiveAppSettings();
       try {
-        const { data, error } = await _supabase
-          .from('products').select('*').order('id', { ascending: true });
-        if (error) throw error;
+        const { data } = await _supabase.from('products').select('*').order('id', { ascending: true });
         allProducts = data || [];
         document.getElementById('loader').style.display = 'none';
-        renderCategories();
         renderProducts(allProducts);
-
         if (currentOrderId) startTracking(currentOrderId);
       } catch (err) {
-        document.getElementById('loader').innerText = 'Error loading items: ' + err.message;
+        document.getElementById('loader').innerText = 'Error loading items.';
       }
-    }
-
-    function refreshUpiQr() {
-      const { finalToPay } = calculateTotals();
-      document.getElementById('upi-box-amount').innerText = finalToPay;
-      const upiUrl = `upi://pay?pa=${STORE_UPI_ID}&pn=BabaFoodDelivery&am=${finalToPay}&cu=INR&tn=FoodOrder`;
-      document.getElementById('upi-qr-img').src = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(upiUrl)}`;
-      document.getElementById('upi-intent-link').href = upiUrl;
-    }
-
-    function selectPaymentMode(mode) {
-      selectedPaymentMode = mode;
-      document.getElementById('opt-cod').className = mode === 'COD' ? 'pay-opt selected' : 'pay-opt';
-      document.getElementById('opt-upi').className = mode === 'UPI' ? 'pay-opt selected' : 'pay-opt';
-      
-      const upiBox = document.getElementById('upi-box');
-      const btn = document.getElementById('order-submit-btn');
-
-      if (mode === 'UPI') {
-        refreshUpiQr();
-        upiBox.style.display = 'block';
-        btn.innerText = 'Verify UTR & Place Order';
-      } else {
-        upiBox.style.display = 'none';
-        btn.innerText = 'Place Delivery Order';
-      }
-    }
-
-    function toggleDrawer(open) {
-      document.getElementById('side-drawer').className = open ? 'side-drawer active' : 'side-drawer';
-      document.getElementById('drawer-overlay').className = open ? 'drawer-overlay active' : 'drawer-overlay';
-    }
-
-    function renderCategories() {
-      const bar = document.getElementById('category-chips');
-      const cats = ['All', ...new Set(allProducts.map(p => p.category).filter(Boolean))];
-      bar.innerHTML = cats.map(c => `
-        <div class="cat-item ${c === selectedCat ? 'active' : ''}" onclick="setCategory('${c}', this)">
-          <div class="cat-icon-circle">${catEmojiMap[c] || '📦'}</div>
-          <div class="cat-name">${c}</div>
-        </div>
-      `).join('');
-    }
-
-    function setCategory(cat, el) {
-      selectedCat = cat;
-      document.querySelectorAll('.cat-item').forEach(c => c.classList.remove('active'));
-      if (el) el.classList.add('active');
-      handleFilter();
-    }
-
-    function handleFilter() {
-      const q = document.getElementById('search-input').value.toLowerCase();
-      const filtered = allProducts.filter(p => {
-        const matchC = selectedCat === 'All' || p.category === selectedCat;
-        const matchQ = p.name.toLowerCase().includes(q) || (p.category && p.category.toLowerCase().includes(q));
-        return matchC && matchQ;
-      });
-      renderProducts(filtered);
     }
 
     function renderProducts(items) {
       const container = document.getElementById('product-list');
-      container.innerHTML = '';
-      if (items.length === 0) {
-        container.innerHTML = '<div style="grid-column: span 2; text-align: center; color: #94a3b8; padding: 20px;">No products found.</div>';
-        return;
-      }
-
-      items.forEach(p => {
-        const card = document.createElement('div');
-        card.className = 'product-card';
+      container.innerHTML = items.map(p => {
         const qty = cart[p.id]?.qty || 0;
-        const isOutOfStock = p.is_out_of_stock === true;
-
-        card.innerHTML = `
-          <div>
-            <div class="img-box" style="${isOutOfStock ? 'filter: grayscale(60%); opacity: 0.8;' : ''}">
-              <img src="${p.image_url || 'https://via.placeholder.com/150'}" alt="${p.name}">
-              ${isOutOfStock ? '<div class="out-of-stock-tag">OUT OF STOCK</div>' : ''}
+        const isOut = p.is_out_of_stock === true;
+        return `
+          <div class="product-card">
+            <div class="img-box" style="${isOut ? 'filter:grayscale(60%); opacity:0.8;' : ''}">
+              <img src="${p.image_url || 'https://via.placeholder.com/150'}">
+              ${isOut ? '<div class="out-of-stock-tag">OUT OF STOCK</div>' : ''}
             </div>
             <div class="prod-title">${p.name}</div>
             <div class="prod-unit">${p.unit || '1 unit'}</div>
-          </div>
-          <div class="price-action-row">
-            <div class="price-tag">₹${p.price}</div>
-            <div id="btn-box-${p.id}">${renderButton(p.id, qty, isOutOfStock)}</div>
+            <div class="price-action-row">
+              <div class="price-tag">₹${p.price}</div>
+              <div id="btn-box-${p.id}">${renderBtn(p.id, qty, isOut)}</div>
+            </div>
           </div>
         `;
-        container.appendChild(card);
-      });
+      }).join('');
     }
 
-    function renderButton(id, qty, isOutOfStock) {
-      if (isOutOfStock) return `<button class="btn-out-stock-disabled" disabled>Out of Stock</button>`;
-      if (qty > 0) {
-        return `
-          <div class="qty-counter">
-            <button class="qty-btn" onclick="updateQty(${id}, -1)">-</button>
-            <span>${qty}</span>
-            <button class="qty-btn" onclick="updateQty(${id}, 1)">+</button>
-          </div>
-        `;
-      }
+    function renderBtn(id, qty, isOut) {
+      if (isOut) return `<button class="btn-out-stock-disabled" disabled>Out of Stock</button>`;
+      if (qty > 0) return `
+        <div class="qty-counter">
+          <button class="qty-btn" onclick="updateQty(${id}, -1)">-</button>
+          <span>${qty}</span>
+          <button class="qty-btn" onclick="updateQty(${id}, 1)">+</button>
+        </div>`;
       return `<button class="btn-add-zepto" onclick="updateQty(${id}, 1)">ADD</button>`;
     }
 
     function updateQty(id, delta) {
       const prod = allProducts.find(p => p.id === id);
       if (!prod || prod.is_out_of_stock) return;
-
       if (!cart[id]) cart[id] = { item: prod, qty: 0 };
       cart[id].qty += delta;
       if (cart[id].qty <= 0) delete cart[id];
-
-      const box = document.getElementById(`btn-box-${id}`);
-      if (box) box.innerHTML = renderButton(id, cart[id]?.qty || 0, false);
-
+      document.getElementById(`btn-box-${id}`).innerHTML = renderBtn(id, cart[id]?.qty || 0, false);
       updateCartBar();
       renderCartSheet();
-      if (selectedPaymentMode === 'UPI') refreshUpiQr();
     }
 
     function calculateTotals() {
@@ -909,8 +463,9 @@
       const itemsTotal = entries.reduce((s, e) => s + (e.qty * e.item.price), 0);
       const totalQty = entries.reduce((s, e) => s + e.qty, 0);
 
-      let deliveryCharge = itemsTotal >= 249 || itemsTotal === 0 ? 0 : 25;
-      let discount = itemsTotal >= 399 ? 49 : 0;
+      // Controlled by Admin Dynamic AppConfig
+      let deliveryCharge = (itemsTotal >= appConfig.min_free_delivery || itemsTotal === 0) ? 0 : appConfig.delivery_charge;
+      let discount = (itemsTotal >= appConfig.discount_min_order) ? appConfig.discount_amount : 0;
       let finalToPay = Math.max(0, itemsTotal + deliveryCharge - discount);
 
       return { itemsTotal, totalQty, deliveryCharge, discount, finalToPay };
@@ -919,360 +474,103 @@
     function updateCartBar() {
       const { totalQty, finalToPay } = calculateTotals();
       const bar = document.getElementById('cart-float-bar');
-      if (totalQty > 0) {
-        bar.style.display = 'flex';
-        document.getElementById('float-qty-text').innerText = `${totalQty} Item${totalQty > 1 ? 's' : ''} Added`;
-        document.getElementById('float-total-text').innerText = `₹${finalToPay}`;
-      } else {
-        bar.style.display = 'none';
-      }
+      bar.style.display = totalQty > 0 ? 'flex' : 'none';
+      document.getElementById('float-qty-text').innerText = `${totalQty} Items`;
+      document.getElementById('float-total-text').innerText = `₹${finalToPay}`;
     }
 
     function renderCartSheet() {
       const box = document.getElementById('cart-items-box');
       const entries = Object.values(cart);
-
       if (entries.length === 0) {
-        box.innerHTML = '<div style="text-align:center; padding: 20px; color: #94a3b8;">Cart is empty.</div>';
-        document.getElementById('bill-subtotal').innerText = '₹0';
-        document.getElementById('bill-delivery-charge').innerText = '₹0';
-        document.getElementById('row-discount').style.display = 'none';
-        document.getElementById('bill-grand-total').innerText = '₹0';
-        document.getElementById('order-submit-btn').disabled = true;
+        box.innerHTML = '<div style="text-align:center; padding:20px; color:#94a3b8;">Cart is empty.</div>';
         return;
       }
-
-      document.getElementById('order-submit-btn').disabled = false;
       const { itemsTotal, deliveryCharge, discount, finalToPay } = calculateTotals();
-
       box.innerHTML = entries.map(({ item, qty }) => `
         <div class="cart-item-row">
-          <div>
-            <div style="font-size: 13px; font-weight: 700;">${item.name}</div>
-            <div style="font-size: 11px; color: #64748b;">₹${item.price} × ${qty}</div>
-          </div>
-          <div style="display: flex; align-items: center; gap: 10px;">
-            <span style="font-size: 13px; font-weight: 800;">₹${item.price * qty}</span>
-            <div class="qty-counter" style="padding: 2px 6px;">
-              <button class="qty-btn" onclick="updateQty(${item.id}, -1)">-</button>
-              <span>${qty}</span>
-              <button class="qty-btn" onclick="updateQty(${item.id}, 1)">+</button>
-            </div>
-          </div>
+          <div><b>${item.name}</b><div style="font-size:11px; color:#64748b;">₹${item.price} × ${qty}</div></div>
+          <b>₹${item.price * qty}</b>
         </div>
       `).join('');
 
       document.getElementById('bill-subtotal').innerText = `₹${itemsTotal}`;
       document.getElementById('bill-delivery-charge').innerText = deliveryCharge === 0 ? 'FREE' : `₹${deliveryCharge}`;
-      document.getElementById('bill-delivery-charge').style.color = deliveryCharge === 0 ? 'var(--zepto-green)' : '#000';
-
-      const discountRow = document.getElementById('row-discount');
-      if (discount > 0) discountRow.style.display = 'flex';
-      else discountRow.style.display = 'none';
-
+      document.getElementById('row-discount').style.display = discount > 0 ? 'flex' : 'none';
       document.getElementById('bill-grand-total').innerText = `₹${finalToPay}`;
     }
 
     async function placeOrder() {
       const name = document.getElementById('c-name').value.trim();
-      const phone = document.getElementById('c-phone').value.trim().replace(/\s+/g, '');
+      const phone = document.getElementById('c-phone').value.trim();
       const address = document.getElementById('c-address').value.trim();
-      const utr = document.getElementById('upi-utr').value.trim();
-
-      if (name.length < 2) { alert('कृपया अपना सही नाम दर्ज करें!'); return; }
-      if (!/^[6-9]\d{9}$/.test(phone)) { alert('कृपया 10 अंकों का सही मोबाइल नंबर डालें!'); return; }
-      if (address.length < 4) { alert('कृपया डिलीवरी का पता दर्ज करें!'); return; }
-
-      if (selectedPaymentMode === 'UPI') {
-        if (!/^\d{12}$/.test(utr)) {
-          alert('कृपया 12 अंकों का सही बैंक UTR नंबर डालें!');
-          return;
-        }
-
-        const { data: existingUtr } = await _supabase
-          .from('orders').select('id').eq('transaction_id', utr);
-
-        if (existingUtr && existingUtr.length > 0) {
-          alert('⚠️ यह UTR नंबर पहले ही इस्तेमाल हो चुका है! कृपया सही ट्रांजेक्शन नंबर डालें।');
-          return;
-        }
-      }
+      if (!name || !phone || !address) return alert('कृपया सभी जानकारी भरें!');
 
       const { finalToPay } = calculateTotals();
-      const entries = Object.values(cart);
-      const orderItems = entries.map(({ item, qty }) => ({
-        id: item.id, name: item.name, price: item.price, unit: item.unit, qty, subtotal: item.price * qty, image_url: item.image_url
-      }));
+      const orderItems = Object.values(cart).map(({ item, qty }) => ({ id: item.id, name: item.name, price: item.price, qty }));
 
-      const btn = document.getElementById('order-submit-btn');
-      btn.disabled = true;
-      btn.innerText = 'Verifying & Saving Order...';
+      const { data } = await _supabase.from('orders').insert([{
+        customer_name: name, customer_phone: phone, delivery_address: address, items: orderItems,
+        total_amount: finalToPay, status: 'Order Placed', payment_mode: selectedPaymentMode
+      }]).select();
 
-      const initialStatus = selectedPaymentMode === 'UPI' ? 'Payment Verification Pending' : 'Order Placed';
-
-      try {
-        const { data, error } = await _supabase
-          .from('orders')
-          .insert([{
-            customer_name: name,
-            customer_phone: phone,
-            delivery_address: address,
-            items: orderItems,
-            total_amount: finalToPay,
-            status: initialStatus,
-            payment_mode: selectedPaymentMode,
-            transaction_id: selectedPaymentMode === 'UPI' ? utr : null
-          }])
-          .select();
-
-        if (error) throw error;
-
-        const newOrder = data[0];
-        currentOrderId = newOrder.id;
-        localStorage.setItem('zepto_active_order', newOrder.id);
-
-        saveOrderToHistory({
-          id: newOrder.id,
-          total_amount: finalToPay,
-          items: orderItems,
-          customer_name: name,
-          delivery_address: address,
-          payment_mode: selectedPaymentMode,
-          date: new Date().toLocaleDateString('hi-IN', { day: 'numeric', month: 'short' }) + ', ' + new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-        });
-
+      if (data) {
+        currentOrderId = data[0].id;
+        localStorage.setItem('zepto_active_order', currentOrderId);
         cart = {};
-        document.getElementById('upi-utr').value = '';
         updateCartBar();
         renderProducts(allProducts);
         toggleCartModal(false);
-
-        btn.disabled = false;
-        btn.innerText = 'Place Delivery Order';
-
-        startTracking(newOrder.id);
+        startTracking(currentOrderId);
         openTrackModal();
-
-      } catch (e) {
-        alert('Order failed: ' + e.message);
-        btn.disabled = false;
-        btn.innerText = 'Place Delivery Order';
       }
     }
 
-    function startTracking(orderId) {
+    function startTracking(id) {
       document.getElementById('live-order-strip').style.display = 'flex';
-      document.getElementById('t-order-id').innerText = `Order #ORD-${orderId}`;
-
-      const checkStatus = async () => {
-        const { data } = await _supabase.from('orders').select('*').eq('id', orderId).single();
-        if (!data) return;
-
-        const s1 = document.getElementById('st-1');
-        const s2 = document.getElementById('st-2');
-        const s3 = document.getElementById('st-3');
-        const stripTitle = document.getElementById('strip-title');
-        const stripSub = document.getElementById('strip-sub');
-        const mapBox = document.getElementById('rider-map-box');
-        const mapFrame = document.getElementById('rider-map');
-
-        s1.className = 't-step'; s2.className = 't-step'; s3.className = 't-step';
-
-        if (data.status === 'Order Placed' || data.status === 'Paid Online (UPI)' || data.status === 'Payment Verification Pending') {
-          s1.className = 't-step active';
-          stripTitle.innerText = data.status === 'Payment Verification Pending' ? 'Payment Verifying...' : 'Order Accepted (Packing)';
-          stripSub.innerText = 'Kitchen is packing your items';
-          mapBox.style.display = 'none';
-        } else if (data.status === 'Out for Delivery' || data.status === 'Picked Up') {
-          s1.className = 't-step active';
-          s2.className = 't-step active';
-          stripTitle.innerText = 'Rider On The Way! ⚡';
-          stripSub.innerText = 'Delivering to your location';
-          mapBox.style.display = 'block';
-          mapFrame.src = `https://maps.google.com/maps?q=${encodeURIComponent(data.delivery_address)}&t=&z=15&ie=UTF8&iwloc=&output=embed`;
-        } else if (data.status === 'Delivered') {
-          s1.className = 't-step active';
-          s2.className = 't-step active';
-          s3.className = 't-step active';
-          stripTitle.innerText = 'Delivered Successfully 🎉';
-          stripSub.innerText = 'Enjoy your fresh food items!';
-          mapBox.style.display = 'none';
-          localStorage.removeItem('zepto_active_order');
-        }
-      };
-
-      checkStatus();
-      setInterval(checkStatus, 4000);
+      document.getElementById('t-order-id').innerText = `Order #ORD-${id}`;
     }
 
-    // ============================================
-    // LIVE CHAT WITH RIDER LOGIC
-    // ============================================
+    // Live Chat Functions
     function openLiveChatModal() {
-      if (!currentOrderId) { alert('कोई सक्रिय ऑर्डर नहीं है!'); return; }
+      if (!currentOrderId) return alert('No active order!');
       document.getElementById('chat-drawer').classList.add('active');
-      document.getElementById('chat-header-title').innerText = `Order #${currentOrderId} Chat`;
       loadOrderMessages();
       if (!chatInterval) chatInterval = setInterval(loadOrderMessages, 2500);
     }
-
     function closeLiveChatModal() {
       document.getElementById('chat-drawer').classList.remove('active');
       if (chatInterval) { clearInterval(chatInterval); chatInterval = null; }
     }
-
     async function loadOrderMessages() {
-      if (!currentOrderId) return;
-      const { data } = await _supabase
-        .from('order_chats')
-        .select('*')
-        .eq('order_id', currentOrderId)
-        .order('id', { ascending: true });
-
-      const container = document.getElementById('chat-messages');
-      if (!data || data.length === 0) {
-        container.innerHTML = '<div style="text-align:center; font-size:11px; color:#94a3b8; margin:10px 0;">राइडर से बात करने के लिए नीचे से विकल्प चुनें।</div>';
-        return;
-      }
-
-      container.innerHTML = data.map(m => `
+      const { data } = await _supabase.from('order_chats').select('*').eq('order_id', currentOrderId).order('id', { ascending: true });
+      const c = document.getElementById('chat-messages');
+      c.innerHTML = (data || []).map(m => `
         <div class="msg-bubble ${m.sender === 'customer' ? 'msg-customer' : 'msg-rider'}">
-          <div style="font-size:10px; opacity:0.8; margin-bottom:2px;">${m.sender === 'customer' ? 'You' : '🛵 Rider'}</div>
-          ${m.message}
+          <div style="font-size:10px; opacity:0.8;">${m.sender === 'customer' ? 'You' : '🛵 Rider'}</div>${m.message}
         </div>
       `).join('');
-      container.scrollTop = container.scrollHeight;
+      c.scrollTop = c.scrollHeight;
     }
-
     async function sendMessage(text) {
       if (!text || !currentOrderId) return;
-      await _supabase.from('order_chats').insert([{
-        order_id: currentOrderId,
-        sender: 'customer',
-        message: text
-      }]);
+      await _supabase.from('order_chats').insert([{ order_id: currentOrderId, sender: 'customer', message: text }]);
       loadOrderMessages();
     }
-
-    function sendQuickMessage(txt) { sendMessage(txt); }
-
+    function sendQuickMessage(t) { sendMessage(t); }
     function sendCustomMessage() {
-      const inp = document.getElementById('chat-user-text');
-      const val = inp.value.trim();
-      if (val) {
-        sendMessage(val);
-        inp.value = '';
-      }
+      const i = document.getElementById('chat-user-text');
+      if (i.value.trim()) { sendMessage(i.value.trim()); i.value = ''; }
     }
 
-    function saveOrderToHistory(orderObj) {
-      let history = JSON.parse(localStorage.getItem('zepto_order_history') || '[]');
-      history.unshift(orderObj);
-      if (history.length > 8) history = history.slice(0, 8);
-      localStorage.setItem('zepto_order_history', JSON.stringify(history));
-      renderPastOrdersUI();
-    }
-
-    function renderPastOrdersUI() {
-      const container = document.getElementById('history-container');
-      const history = JSON.parse(localStorage.getItem('zepto_order_history') || '[]');
-
-      if (history.length === 0) {
-        container.innerHTML = '<div style="font-size: 12px; color: #94a3b8; padding: 10px 0;">No past orders found.</div>';
-        return;
-      }
-
-      container.innerHTML = history.map((order) => {
-        const itemCount = Array.isArray(order.items) ? order.items.reduce((s, i) => s + (i.qty || 1), 0) : 0;
-        const itemNames = Array.isArray(order.items) ? order.items.map(i => `${i.name} (${i.qty})`).join(', ') : 'Items';
-
-        return `
-          <div class="past-order-box">
-            <div class="past-order-top">
-              <span class="past-order-id">ORD #${order.id}</span>
-              <span class="past-order-time">📅 ${order.date || ''}</span>
-            </div>
-            
-            <div class="past-item-preview-line">
-              <b>${itemCount} Items:</b> ${itemNames}
-            </div>
-
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
-              <span style="font-size:11px; color:#64748b;">Paid via <b>${order.payment_mode || 'COD'}</b></span>
-              <span style="font-size:15px; font-weight:900; color:var(--zepto-green);">₹${order.total_amount}</span>
-            </div>
-
-            <div class="past-actions-row">
-              <button class="btn-past-details" onclick='openReceiptModal(${JSON.stringify(order)})'>
-                📄 View Receipt Details
-              </button>
-              <button class="btn-past-repeat" onclick='repeatOrder(${JSON.stringify(order.items)})'>
-                🔁 Repeat
-              </button>
-            </div>
-          </div>
-        `;
-      }).join('');
-    }
-
-    function openReceiptModal(order) {
-      document.getElementById('rcpt-title').innerText = `Order Receipt #ORD-${order.id}`;
-      document.getElementById('rcpt-date-mode').innerText = `Date: ${order.date || ''} | Mode: ${order.payment_mode || 'COD'}`;
-      document.getElementById('rcpt-address').innerText = order.delivery_address || 'Home Address';
-      document.getElementById('rcpt-total-amount').innerText = `₹${order.total_amount}`;
-
-      const itemsListContainer = document.getElementById('rcpt-items-list');
-      const items = Array.isArray(order.items) ? order.items : [];
-
-      itemsListContainer.innerHTML = items.map(item => `
-        <div class="receipt-item-row">
-          <img class="receipt-item-img" src="${item.image_url || 'https://via.placeholder.com/60'}" alt="${item.name}">
-          <div style="flex:1;">
-            <div style="font-size:13px; font-weight:800; color:#1e293b;">${item.name}</div>
-            <div style="font-size:11px; color:#64748b;">Rate: ₹${item.price} × ${item.qty}</div>
-          </div>
-          <div style="font-size:14px; font-weight:900; color:#0f172a;">
-            ₹${item.subtotal || (item.price * item.qty)}
-          </div>
-        </div>
-      `).join('');
-
-      document.getElementById('rcpt-repeat-btn').onclick = () => {
-        closeReceiptModal();
-        repeatOrder(order.items);
-      };
-
-      document.getElementById('receipt-modal').classList.add('active');
-    }
-
-    function closeReceiptModal() { document.getElementById('receipt-modal').classList.remove('active'); }
-
-    function repeatOrder(items) {
-      cart = {};
-      items.forEach(oldItem => {
-        const product = allProducts.find(p => p.id === oldItem.id) || {
-          id: oldItem.id, name: oldItem.name, price: oldItem.price, unit: oldItem.unit, image_url: oldItem.image_url || ''
-        };
-        cart[product.id] = { item: product, qty: oldItem.qty };
-      });
-      renderProducts(allProducts);
-      updateCartBar();
-      openCartModal();
-    }
-
-    function toggleCartModal(show) { document.getElementById('cart-modal').className = show ? 'modal-overlay active' : 'modal-overlay'; }
+    function toggleCartModal(s) { document.getElementById('cart-modal').className = s ? 'modal-overlay active' : 'modal-overlay'; }
     function openCartModal() { renderCartSheet(); toggleCartModal(true); }
-    function closeCartModal(e) { toggleCartModal(false); }
-
-    function toggleTrackModal(show) { document.getElementById('track-modal').className = show ? 'modal-overlay active' : 'modal-overlay'; }
+    function closeCartModal() { toggleCartModal(false); }
+    function toggleTrackModal(s) { document.getElementById('track-modal').className = s ? 'modal-overlay active' : 'modal-overlay'; }
     function openTrackModal() { toggleTrackModal(true); }
-    function closeTrackModal(e) { toggleTrackModal(false); }
-
-    function toggleSupportModal(show) { document.getElementById('support-modal').className = show ? 'modal-overlay active' : 'modal-overlay'; }
-    function openSupportModal() { toggleDrawer(false); toggleSupportModal(true); }
-    function closeSupportModal(e) { toggleSupportModal(false); }
-
-    function scrollToHistory() { document.getElementById('past-orders-section').scrollIntoView({ behavior: 'smooth' }); }
+    function closeTrackModal() { toggleTrackModal(false); }
+    function selectPaymentMode(m) { selectedPaymentMode = m; }
+    function openSupportModal() { alert('Helpline: +91 9711107063'); }
 
     initApp();
   </script>
