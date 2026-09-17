@@ -33,6 +33,16 @@
     .brand-logo { width: 44px; height: 44px; border-radius: 50%; border: 2px solid #ff758c; object-fit: cover; background: #fff; }
     .brand-title { font-size: 16px; font-weight: 900; color: #fff; }
     .brand-subtitle { font-size: 11px; color: #fdf4ff; }
+    
+    .header-actions { display: flex; align-items: center; gap: 8px; }
+    .store-toggle-btn {
+      border: none; color: white; padding: 8px 14px; border-radius: 8px;
+      font-weight: 800; font-size: 12px; cursor: pointer; transition: 0.2s;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    }
+    .store-open { background: #10b981; }
+    .store-closed { background: #dc2626; }
+
     .refresh-btn {
       background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3);
       color: white; padding: 8px 14px; border-radius: 8px; font-weight: 700; font-size: 12px; cursor: pointer;
@@ -171,7 +181,14 @@
         <div class="brand-subtitle">Live Admin, Orders, Products & Riders</div>
       </div>
     </div>
-    <button class="refresh-btn" onclick="refreshCurrentSection()">🔄 Refresh</button>
+    
+    <!-- Header Action Buttons (Store Toggle + Refresh) -->
+    <div class="header-actions">
+      <button id="store-status-btn" class="store-toggle-btn store-open" onclick="toggleStoreStatus()">
+        🟢 Store is OPEN
+      </button>
+      <button class="refresh-btn" onclick="refreshCurrentSection()">🔄 Refresh</button>
+    </div>
   </div>
 
   <div class="container">
@@ -374,6 +391,7 @@
     let currentOrderTab = 'ALL';
     let currentProdTab = 'ALL';
     let currentRiderTab = 'ALL';
+    let currentStoreStatus = 'OPEN';
 
     function switchMasterSection(sec) {
       currentMasterSec = sec;
@@ -397,7 +415,59 @@
       else fetchRiders();
     }
 
+    // ============================================
+    // STORE OPEN / CLOSED MASTER TOGGLE LOGIC
+    // ============================================
+    async function loadStoreStatus() {
+      try {
+        const { data } = await _supabase.from('app_settings').select('store_status').eq('id', 1).single();
+        if (data && data.store_status) {
+          currentStoreStatus = data.store_status;
+          updateStoreBtnUI();
+        }
+      } catch (err) {
+        console.warn("Store status load error:", err);
+      }
+    }
+
+    function updateStoreBtnUI() {
+      const btn = document.getElementById('store-status-btn');
+      if (!btn) return;
+      if (currentStoreStatus === 'OPEN') {
+        btn.className = 'store-toggle-btn store-open';
+        btn.innerText = '🟢 Store is OPEN';
+      } else {
+        btn.className = 'store-toggle-btn store-closed';
+        btn.innerText = '🔴 Store is CLOSED';
+      }
+    }
+
+    async function toggleStoreStatus() {
+      const newStatus = currentStoreStatus === 'OPEN' ? 'CLOSED' : 'OPEN';
+      const confirmMsg = newStatus === 'CLOSED'
+        ? '⚠️ क्या आप दुकान बंद करना चाहते हैं?\n\nग्राहक ऐप में ऑर्डर लगना तुरंत रुक जाएगा।'
+        : '🟢 क्या आप दुकान खोलना चाहते हैं?\n\nग्राहक नए ऑर्डर प्लेस कर सकेंगे।';
+
+      if (!confirm(confirmMsg)) return;
+
+      try {
+        const { error } = await _supabase
+          .from('app_settings')
+          .update({ store_status: newStatus })
+          .eq('id', 1);
+
+        if (error) throw error;
+        currentStoreStatus = newStatus;
+        updateStoreBtnUI();
+        alert(`✅ दुकान का स्टेटस बदलकर "${newStatus === 'OPEN' ? 'चालू (OPEN)' : 'बंद (CLOSED)'}" कर दिया गया!`);
+      } catch (err) {
+        alert('स्टेटस बदलने में एरर: ' + err.message);
+      }
+    }
+
+    // ============================================
     // 1. ORDERS CONTROLLER
+    // ============================================
     async function fetchOrders() {
       try {
         const fourDaysAgo = new Date();
@@ -505,6 +575,7 @@
                 <div class="cust-name">👤 ${order.customer_name || 'N/A'} (📞 <a href="tel:${order.customer_phone}">${order.customer_phone}</a>)</div>
                 <div style="color: #475569; margin-top: 2px;">📍 ${order.delivery_address || 'पता दर्ज नहीं'}</div>
                 ${order.transaction_id ? `<div class="utr-tag">🔑 UTR No: ${order.transaction_id}</div>` : ''}
+                ${order.delivery_otp ? `<div class="utr-tag" style="background:#fdf4ff; border-color:#d8b4fe; color:#7e22ce;">🔐 OTP: ${order.delivery_otp}</div>` : ''}
               </div>
 
               <div class="items-list">${itemsSummary}</div>
@@ -566,7 +637,9 @@
       }
     }
 
+    // ============================================
     // 2. APP THEME & OFFERS
+    // ============================================
     async function loadAppSettings() {
       const { data } = await _supabase.from('app_settings').select('*').eq('id', 1).single();
       if (data) {
@@ -583,6 +656,11 @@
         document.getElementById('set-del-charge').value = data.delivery_charge || 25;
         document.getElementById('set-disc-min').value = data.discount_min_order || 399;
         document.getElementById('set-disc-amt').value = data.discount_amount || 49;
+        
+        if (data.store_status) {
+          currentStoreStatus = data.store_status;
+          updateStoreBtnUI();
+        }
       }
     }
 
@@ -617,7 +695,8 @@
         min_free_delivery: minFreeDel,
         delivery_charge: delCharge,
         discount_min_order: discMin,
-        discount_amount: discAmt
+        discount_amount: discAmt,
+        store_status: currentStoreStatus
       });
 
       if (!error) {
@@ -627,7 +706,9 @@
       }
     }
 
+    // ============================================
     // 3. PRODUCTS
+    // ============================================
     async function fetchProducts() {
       try {
         const { data, error } = await _supabase.from('products').select('*').order('id', { ascending: true });
@@ -765,7 +846,9 @@
       }
     }
 
+    // ============================================
     // 4. RIDERS
+    // ============================================
     async function fetchRiders() {
       try {
         const { data, error } = await _supabase.from('riders').select('*').order('id', { ascending: false });
@@ -860,6 +943,7 @@
 
     fetchOrders();
     loadAppSettings();
+    loadStoreStatus();
     setInterval(() => {
       if (currentMasterSec === 'ORDERS') fetchOrders();
     }, 10000);
