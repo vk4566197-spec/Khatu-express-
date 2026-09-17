@@ -100,6 +100,13 @@
     .cat-item.active .cat-icon-circle { border-color: var(--zepto-pink); background: #fff0f4; }
     .cat-name { font-size: 11px; font-weight: 700; color: #333; }
 
+    /* Store Closed Alert Bar */
+    .store-closed-alert {
+      display: none; background: #fee2e2; border: 1.5px solid #f87171;
+      color: #991b1b; padding: 12px 16px; margin: 10px 14px; border-radius: 12px;
+      font-size: 13px; font-weight: 800; text-align: center;
+    }
+
     /* Promo Banner */
     .promo-banner {
       margin: 12px 14px; background: linear-gradient(100deg, #f7e8ff 0%, #fde2ea 100%);
@@ -191,7 +198,7 @@
     .t-step.active { color: #0f172a; font-weight: 800; }
     .t-step.active::after { background: var(--zepto-green); box-shadow: 0 0 0 4px #dcfce7; }
 
-    /* 4-Digit OTP Display Box in Customer App */
+    /* 4-Digit OTP Box */
     .cust-otp-box {
       background: linear-gradient(135deg, #fdf4ff, #fae8ff);
       border: 2px dashed #c084fc; border-radius: 14px;
@@ -201,9 +208,7 @@
     .cust-otp-code { font-size: 32px; font-weight: 900; color: #581c87; letter-spacing: 6px; margin: 4px 0; }
     .cust-otp-sub { font-size: 11px; color: #6b21a8; font-weight: 600; }
 
-    /* ======================================= */
-    /* STAR ⭐ RIDER FEEDBACK CARD STYLES      */
-    /* ======================================= */
+    /* Star ⭐ Rider Rating Box */
     .rider-rating-card {
       background: #ffffff; border: 1.5px solid #fde047; border-radius: 16px;
       padding: 18px 16px; margin: 16px 0; text-align: center; box-shadow: 0 4px 16px rgba(234, 179, 8, 0.15);
@@ -227,7 +232,6 @@
     .rating-chip.selected {
       background: #fef9c3; border-color: #facc15; color: #854d0e; font-weight: 800;
     }
-
     .btn-submit-rating {
       background: #0f172a; color: white; border: none; padding: 11px 20px;
       border-radius: 10px; font-size: 13px; font-weight: 800; cursor: pointer; width: 100%; margin-top: 8px;
@@ -295,6 +299,11 @@
         <div class="cat-name">All</div>
       </div>
     </div>
+  </div>
+
+  <!-- Store Closed Warning Alert Bar -->
+  <div class="store-closed-alert" id="store-closed-alert">
+    ⚠️ दुकान अभी बंद है। हम नए ऑर्डर स्वीकार नहीं कर रहे हैं।
   </div>
 
   <!-- Dynamic Promo Banner -->
@@ -456,7 +465,7 @@
         <div class="t-step" id="st-3">📦 Order Delivered Successfully 🎉</div>
       </div>
 
-      <!-- Star ⭐ Rider Rating & Feedback Section (Shown when Delivered) -->
+      <!-- Star ⭐ Rider Rating & Feedback Section -->
       <div class="rider-rating-card" id="rider-rating-box" style="display: none;">
         <div style="font-size: 14px; font-weight: 900; color: #0f172a;">Rate Your Delivery Partner 🛵</div>
         <div style="font-size: 11px; color: #64748b; margin-top: 2px;">डिलीवरी अनुभव कैसा रहा? स्टार रेटिंग दें:</div>
@@ -602,16 +611,15 @@
       min_free_delivery: 249,
       delivery_charge: 25,
       discount_min_order: 399,
-      discount_amount: 49
+      discount_amount: 49,
+      store_status: 'OPEN'
     };
 
     const catEmojiMap = {
       'All': '🛍️', 'Grocery': '🥦', 'Dairy': '🥛', 'Snacks': '🍿', 'Bakery': '🍞', 'Drinks': '🥤'
     };
 
-    // ============================================
-    // PLEASING NOTIFICATION AUDIO CHIME (WEB AUDIO)
-    // ============================================
+    // AUDIO CHIME
     function initAudioContext() {
       if (!audioCtx) {
         audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -696,6 +704,24 @@
       root.style.setProperty('--zepto-header-bg', appConfig.header_bg);
       root.style.setProperty('--zepto-purple', appConfig.primary_purple);
 
+      // Store Closed Check & Alert
+      const isStoreClosed = appConfig.store_status === 'CLOSED';
+      const closedAlert = document.getElementById('store-closed-alert');
+      if (closedAlert) closedAlert.style.display = isStoreClosed ? 'block' : 'none';
+
+      const checkoutBtn = document.getElementById('order-submit-btn');
+      if (checkoutBtn) {
+        if (isStoreClosed) {
+          checkoutBtn.disabled = true;
+          checkoutBtn.innerText = 'Store Closed Currently';
+          checkoutBtn.style.background = '#94a3b8';
+        } else {
+          checkoutBtn.disabled = false;
+          checkoutBtn.innerText = selectedPaymentMode === 'UPI' ? 'Verify UTR & Place Order' : 'Place Delivery Order';
+          checkoutBtn.style.background = '';
+        }
+      }
+
       if(document.getElementById('dyn-banner-title')) document.getElementById('dyn-banner-title').innerHTML = appConfig.banner_title;
       if(document.getElementById('dyn-banner-sub')) document.getElementById('dyn-banner-sub').innerText = appConfig.banner_subtitle;
       if(document.getElementById('dyn-banner-icon')) document.getElementById('dyn-banner-icon').innerText = appConfig.banner_icon || '🎁';
@@ -704,6 +730,7 @@
       if(document.getElementById('bill-disc-amount')) document.getElementById('bill-disc-amount').innerText = `-₹${appConfig.discount_amount}`;
 
       renderCartSheet();
+      renderProducts(allProducts);
     }
 
     async function initApp() {
@@ -743,10 +770,10 @@
       if (mode === 'UPI') {
         refreshUpiQr();
         upiBox.style.display = 'block';
-        btn.innerText = 'Verify UTR & Place Order';
+        if (appConfig.store_status !== 'CLOSED') btn.innerText = 'Verify UTR & Place Order';
       } else {
         upiBox.style.display = 'none';
-        btn.innerText = 'Place Delivery Order';
+        if (appConfig.store_status !== 'CLOSED') btn.innerText = 'Place Delivery Order';
       }
     }
 
@@ -811,7 +838,12 @@
     }
 
     function renderButton(id, qty, isOutOfStock) {
-      if (isOutOfStock) return `<button class="btn-out-stock-disabled" disabled>Out of Stock</button>`;
+      if (appConfig.store_status === 'CLOSED') {
+        return `<button class="btn-out-stock-disabled" disabled>Closed</button>`;
+      }
+      if (isOutOfStock) {
+        return `<button class="btn-out-stock-disabled" disabled>Out of Stock</button>`;
+      }
       if (qty > 0) {
         return `
           <div class="qty-counter">
@@ -825,6 +857,10 @@
     }
 
     function updateQty(id, delta) {
+      if (appConfig.store_status === 'CLOSED') {
+        alert('⚠️ दुकान अभी बंद है। ऑर्डर नहीं लिया जा सकता।');
+        return;
+      }
       const prod = allProducts.find(p => p.id === id);
       if (!prod || prod.is_out_of_stock) return;
 
@@ -888,7 +924,9 @@
       }
 
       const submitBtn = document.getElementById('order-submit-btn');
-      if (submitBtn) submitBtn.disabled = false;
+      if (submitBtn) {
+        submitBtn.disabled = appConfig.store_status === 'CLOSED';
+      }
       const { itemsTotal, deliveryCharge, discount, finalToPay } = calculateTotals();
 
       box.innerHTML = entries.map(({ item, qty }) => `
@@ -920,6 +958,11 @@
     }
 
     async function placeOrder() {
+      if (appConfig.store_status === 'CLOSED') {
+        alert('⚠️ दुकान अभी बंद है। हम नए ऑर्डर स्वीकार नहीं कर रहे हैं।');
+        return;
+      }
+
       const name = document.getElementById('c-name').value.trim();
       const phone = document.getElementById('c-phone').value.trim().replace(/\s+/g, '');
       const address = document.getElementById('c-address').value.trim();
@@ -1012,9 +1055,6 @@
       }
     }
 
-    // ============================================
-    // LIVE STATUS TRACKING WITH SOUND & RATING ⭐
-    // ============================================
     function startTracking(orderId) {
       document.getElementById('live-order-strip').style.display = 'flex';
       document.getElementById('t-order-id').innerText = `Order #ORD-${orderId}`;
@@ -1023,13 +1063,11 @@
         const { data } = await _supabase.from('orders').select('*').eq('id', orderId).single();
         if (!data) return;
 
-        // Sound Trigger on Status Change
         if (lastKnownStatus && lastKnownStatus !== data.status) {
           playLiveStatusChime(data.status);
         }
         lastKnownStatus = data.status;
 
-        // 4-Digit OTP Box
         const otpContainer = document.getElementById('cust-otp-container');
         const otpText = document.getElementById('cust-live-otp');
         if (data.delivery_otp && data.status !== 'Delivered') {
@@ -1072,7 +1110,6 @@
           stripSub.innerText = 'Enjoy your fresh food items!';
           mapBox.style.display = 'none';
 
-          // Show Star Rating Option if not already submitted
           const alreadyRated = localStorage.getItem(`baba_rated_${orderId}`);
           if (!alreadyRated) {
             ratingBox.style.display = 'block';
@@ -1089,9 +1126,7 @@
       setInterval(checkStatus, 4000);
     }
 
-    // ============================================
-    // STAR ⭐ RIDER RATING LOGIC
-    // ============================================
+    // STAR RATING LOGIC
     function setRiderStars(count) {
       selectedStarCount = count;
       const stars = document.querySelectorAll('#stars-container .star-icon');
@@ -1302,17 +1337,20 @@
 
     function toggleCartModal(show) { document.getElementById('cart-modal').className = show ? 'modal-overlay active' : 'modal-overlay'; }
     function openCartModal() { renderCartSheet(); toggleCartModal(true); }
-    function closeCartModal(e) { toggleCartModal(false); }
+    function closeCartModal() { toggleCartModal(false); }
 
     function toggleTrackModal(show) { document.getElementById('track-modal').className = show ? 'modal-overlay active' : 'modal-overlay'; }
     function openTrackModal() { toggleTrackModal(true); }
-    function closeTrackModal(e) { toggleTrackModal(false); }
+    function closeTrackModal() { toggleTrackModal(false); }
 
     function toggleSupportModal(show) { document.getElementById('support-modal').className = show ? 'modal-overlay active' : 'modal-overlay'; }
     function openSupportModal() { toggleSupportModal(true); }
-    function closeSupportModal(e) { toggleSupportModal(false); }
+    function closeSupportModal() { toggleSupportModal(false); }
 
     function scrollToHistory() { document.getElementById('past-orders-section').scrollIntoView({ behavior: 'smooth' }); }
+
+    // Real-time Settings Listener (दुकान बंद/चालू का तुरंत असर देखने के लिए)
+    setInterval(loadLiveAppSettings, 5000);
 
     initApp();
   </script>
