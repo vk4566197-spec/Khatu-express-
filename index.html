@@ -201,6 +201,38 @@
     .cust-otp-code { font-size: 32px; font-weight: 900; color: #581c87; letter-spacing: 6px; margin: 4px 0; }
     .cust-otp-sub { font-size: 11px; color: #6b21a8; font-weight: 600; }
 
+    /* ======================================= */
+    /* STAR ⭐ RIDER FEEDBACK CARD STYLES      */
+    /* ======================================= */
+    .rider-rating-card {
+      background: #ffffff; border: 1.5px solid #fde047; border-radius: 16px;
+      padding: 18px 16px; margin: 16px 0; text-align: center; box-shadow: 0 4px 16px rgba(234, 179, 8, 0.15);
+    }
+    .stars-row {
+      display: flex; justify-content: center; gap: 8px; font-size: 32px;
+      margin: 10px 0; cursor: pointer; user-select: none;
+    }
+    .star-icon { color: #cbd5e1; transition: transform 0.2s, color 0.2s; }
+    .star-icon.filled { color: #eab308; }
+    .star-icon:active { transform: scale(1.3); }
+
+    .rating-chips-row {
+      display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; margin: 10px 0;
+    }
+    .rating-chip {
+      background: #f8fafc; border: 1px solid #e2e8f0; color: #475569;
+      font-size: 11px; font-weight: 700; padding: 5px 10px; border-radius: 16px;
+      cursor: pointer; transition: 0.2s;
+    }
+    .rating-chip.selected {
+      background: #fef9c3; border-color: #facc15; color: #854d0e; font-weight: 800;
+    }
+
+    .btn-submit-rating {
+      background: #0f172a; color: white; border: none; padding: 11px 20px;
+      border-radius: 10px; font-size: 13px; font-weight: 800; cursor: pointer; width: 100%; margin-top: 8px;
+    }
+
     /* Past Orders */
     .past-order-box { background: #fff; border-radius: 14px; border: 1.5px solid var(--border-color); padding: 14px; margin-bottom: 12px; }
     .past-order-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
@@ -400,7 +432,7 @@
     </div>
   </div>
 
-  <!-- Live Status Modal WITH OTP & CHAT -->
+  <!-- Live Status Modal WITH OTP, AUDIO CHIME & RIDER RATING ⭐ -->
   <div class="modal-overlay" id="track-modal" onclick="closeTrackModal(event)">
     <div class="bottom-sheet" onclick="event.stopPropagation()">
       <div class="sheet-head">
@@ -422,6 +454,31 @@
         <div class="t-step active" id="st-1">✓ Order Confirmed & Packing</div>
         <div class="t-step" id="st-2">🛵 Out for Delivery (Rider on the way)</div>
         <div class="t-step" id="st-3">📦 Order Delivered Successfully 🎉</div>
+      </div>
+
+      <!-- Star ⭐ Rider Rating & Feedback Section (Shown when Delivered) -->
+      <div class="rider-rating-card" id="rider-rating-box" style="display: none;">
+        <div style="font-size: 14px; font-weight: 900; color: #0f172a;">Rate Your Delivery Partner 🛵</div>
+        <div style="font-size: 11px; color: #64748b; margin-top: 2px;">डिलीवरी अनुभव कैसा रहा? स्टार रेटिंग दें:</div>
+
+        <div class="stars-row" id="stars-container">
+          <span class="star-icon" onclick="setRiderStars(1)">★</span>
+          <span class="star-icon" onclick="setRiderStars(2)">★</span>
+          <span class="star-icon" onclick="setRiderStars(3)">★</span>
+          <span class="star-icon" onclick="setRiderStars(4)">★</span>
+          <span class="star-icon" onclick="setRiderStars(5)">★</span>
+        </div>
+
+        <div class="rating-chips-row">
+          <span class="rating-chip" onclick="toggleRatingChip(this, '⚡ Super Fast')">⚡ Super Fast</span>
+          <span class="rating-chip" onclick="toggleRatingChip(this, '😊 Polite Rider')">😊 Polite Rider</span>
+          <span class="rating-chip" onclick="toggleRatingChip(this, '📦 Safe Packaging')">📦 Safe Packaging</span>
+          <span class="rating-chip" onclick="toggleRatingChip(this, '📍 Exact Location')">📍 Exact Location</span>
+        </div>
+
+        <button class="btn-submit-rating" id="btn-submit-rating" onclick="submitRiderRating()">
+          Submit Star Rating ⭐
+        </button>
       </div>
 
       <div id="rider-map-box" style="display: none; margin-top: 16px; border-radius: 12px; overflow: hidden; height: 160px; border: 1px solid #e2e8f0;">
@@ -530,6 +587,10 @@
     let selectedPaymentMode = 'COD';
     const STORE_UPI_ID = '7037647464-3@axl';
     let chatInterval = null;
+    let audioCtx = null;
+    let lastKnownStatus = null;
+    let selectedStarCount = 5;
+    let selectedChips = new Set();
 
     let appConfig = {
       theme_color: '#ff3269',
@@ -547,6 +608,52 @@
     const catEmojiMap = {
       'All': '🛍️', 'Grocery': '🥦', 'Dairy': '🥛', 'Snacks': '🍿', 'Bakery': '🍞', 'Drinks': '🥤'
     };
+
+    // ============================================
+    // PLEASING NOTIFICATION AUDIO CHIME (WEB AUDIO)
+    // ============================================
+    function initAudioContext() {
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+    }
+    window.addEventListener('click', initAudioContext, { once: true });
+    window.addEventListener('touchstart', initAudioContext, { once: true });
+
+    function playLiveStatusChime(type) {
+      try {
+        initAudioContext();
+        if (!audioCtx) return;
+
+        const now = audioCtx.currentTime;
+        const notes = type === 'Delivered' ? [523.25, 659.25, 783.99, 1046.50] : [587.33, 739.99, 880.00];
+
+        notes.forEach((freq, idx) => {
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(freq, now + (idx * 0.14));
+
+          gain.gain.setValueAtTime(0.3, now + (idx * 0.14));
+          gain.gain.exponentialRampToValueAtTime(0.001, now + (idx * 0.14) + 0.35);
+
+          osc.connect(gain);
+          gain.connect(audioCtx.destination);
+
+          osc.start(now + (idx * 0.14));
+          osc.stop(now + (idx * 0.14) + 0.36);
+        });
+
+        if (navigator.vibrate) {
+          navigator.vibrate([200, 100, 300]);
+        }
+      } catch (err) {
+        console.warn("Audio chime note:", err);
+      }
+    }
 
     function openLogoPreview() { document.getElementById('logo-preview-modal').classList.add('active'); }
     function closeLogoPreview() { document.getElementById('logo-preview-modal').classList.remove('active'); }
@@ -845,7 +952,6 @@
         id: item.id, name: item.name, price: item.price, unit: item.unit, qty, subtotal: item.price * qty, image_url: item.image_url
       }));
 
-      // Generate 4-Digit Secure Delivery OTP (1000 - 9999)
       const generatedOtp = Math.floor(1000 + Math.random() * 9000).toString();
 
       const btn = document.getElementById('order-submit-btn');
@@ -874,6 +980,7 @@
 
         const newOrder = data[0];
         currentOrderId = newOrder.id;
+        lastKnownStatus = initialStatus;
         localStorage.setItem('zepto_active_order', newOrder.id);
 
         saveOrderToHistory({
@@ -905,6 +1012,9 @@
       }
     }
 
+    // ============================================
+    // LIVE STATUS TRACKING WITH SOUND & RATING ⭐
+    // ============================================
     function startTracking(orderId) {
       document.getElementById('live-order-strip').style.display = 'flex';
       document.getElementById('t-order-id').innerText = `Order #ORD-${orderId}`;
@@ -913,7 +1023,13 @@
         const { data } = await _supabase.from('orders').select('*').eq('id', orderId).single();
         if (!data) return;
 
-        // Display Live 4-Digit OTP to Customer
+        // Sound Trigger on Status Change
+        if (lastKnownStatus && lastKnownStatus !== data.status) {
+          playLiveStatusChime(data.status);
+        }
+        lastKnownStatus = data.status;
+
+        // 4-Digit OTP Box
         const otpContainer = document.getElementById('cust-otp-container');
         const otpText = document.getElementById('cust-live-otp');
         if (data.delivery_otp && data.status !== 'Delivered') {
@@ -930,6 +1046,7 @@
         const stripSub = document.getElementById('strip-sub');
         const mapBox = document.getElementById('rider-map-box');
         const mapFrame = document.getElementById('rider-map');
+        const ratingBox = document.getElementById('rider-rating-box');
 
         s1.className = 't-step'; s2.className = 't-step'; s3.className = 't-step';
 
@@ -938,12 +1055,14 @@
           stripTitle.innerText = data.status === 'Payment Verification Pending' ? 'Payment Verifying...' : 'Order Accepted (Packing)';
           stripSub.innerText = 'Kitchen is packing your items';
           mapBox.style.display = 'none';
+          ratingBox.style.display = 'none';
         } else if (data.status === 'Out for Delivery' || data.status === 'Picked Up') {
           s1.className = 't-step active';
           s2.className = 't-step active';
           stripTitle.innerText = 'Rider On The Way! ⚡';
           stripSub.innerText = 'Delivering to your location';
           mapBox.style.display = 'block';
+          ratingBox.style.display = 'none';
           mapFrame.src = `https://maps.google.com/maps?q=${encodeURIComponent(data.delivery_address)}&t=&z=15&ie=UTF8&iwloc=&output=embed`;
         } else if (data.status === 'Delivered') {
           s1.className = 't-step active';
@@ -952,12 +1071,81 @@
           stripTitle.innerText = 'Delivered Successfully 🎉';
           stripSub.innerText = 'Enjoy your fresh food items!';
           mapBox.style.display = 'none';
+
+          // Show Star Rating Option if not already submitted
+          const alreadyRated = localStorage.getItem(`baba_rated_${orderId}`);
+          if (!alreadyRated) {
+            ratingBox.style.display = 'block';
+            setRiderStars(5);
+          } else {
+            ratingBox.style.display = 'none';
+          }
+
           localStorage.removeItem('zepto_active_order');
         }
       };
 
       checkStatus();
       setInterval(checkStatus, 4000);
+    }
+
+    // ============================================
+    // STAR ⭐ RIDER RATING LOGIC
+    // ============================================
+    function setRiderStars(count) {
+      selectedStarCount = count;
+      const stars = document.querySelectorAll('#stars-container .star-icon');
+      stars.forEach((star, idx) => {
+        if (idx < count) {
+          star.classList.add('filled');
+        } else {
+          star.classList.remove('filled');
+        }
+      });
+    }
+
+    function toggleRatingChip(el, text) {
+      if (selectedChips.has(text)) {
+        selectedChips.delete(text);
+        el.classList.remove('selected');
+      } else {
+        selectedChips.add(text);
+        el.classList.add('selected');
+      }
+    }
+
+    async function submitRiderRating() {
+      const orderId = currentOrderId || localStorage.getItem('zepto_active_order');
+      if (!orderId) return;
+
+      const btn = document.getElementById('btn-submit-rating');
+      btn.innerText = 'Submitting Rating...';
+      btn.disabled = true;
+
+      const feedbackString = [...selectedChips].join(', ');
+
+      try {
+        const { error } = await _supabase
+          .from('orders')
+          .update({
+            rating: selectedStarCount,
+            feedback: feedbackString || 'Good Delivery'
+          })
+          .eq('id', orderId);
+
+        if (error) throw error;
+
+        localStorage.setItem(`baba_rated_${orderId}`, 'true');
+        document.getElementById('rider-rating-box').innerHTML = `
+          <div style="font-size:24px; margin-bottom:4px;">🎉</div>
+          <div style="font-size:14px; font-weight:900; color:var(--zepto-green);">धन्यवाद! आपकी रेटिंग दर्ज हो गई है।</div>
+          <div style="font-size:12px; color:#64748b; margin-top:2px;">आपने राइडर को ${'⭐'.repeat(selectedStarCount)} रेटिंग दी।</div>
+        `;
+      } catch (err) {
+        alert('रेटिंग एरर: ' + err.message);
+        btn.innerText = 'Submit Star Rating ⭐';
+        btn.disabled = false;
+      }
     }
 
     // LIVE CHAT
@@ -1114,14 +1302,14 @@
 
     function toggleCartModal(show) { document.getElementById('cart-modal').className = show ? 'modal-overlay active' : 'modal-overlay'; }
     function openCartModal() { renderCartSheet(); toggleCartModal(true); }
-    function closeCartModal() { toggleCartModal(false); }
+    function closeCartModal(e) { toggleCartModal(false); }
 
     function toggleTrackModal(show) { document.getElementById('track-modal').className = show ? 'modal-overlay active' : 'modal-overlay'; }
     function openTrackModal() { toggleTrackModal(true); }
-    function closeTrackModal() { toggleTrackModal(false); }
+    function closeTrackModal(e) { toggleTrackModal(false); }
 
     function toggleSupportModal(show) { document.getElementById('support-modal').className = show ? 'modal-overlay active' : 'modal-overlay'; }
-    function openSupportModal() { toggleDrawer(false); toggleSupportModal(true); }
+    function openSupportModal() { toggleSupportModal(true); }
     function closeSupportModal(e) { toggleSupportModal(false); }
 
     function scrollToHistory() { document.getElementById('past-orders-section').scrollIntoView({ behavior: 'smooth' }); }
