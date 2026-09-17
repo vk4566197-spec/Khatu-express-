@@ -267,6 +267,32 @@
       font-weight: 900; cursor: grab; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
     }
 
+    /* =================================================== */
+    /* 4-DIGIT OTP VERIFICATION MODAL FOR RIDER           */
+    /* =================================================== */
+    .otp-modal-overlay {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(15, 23, 42, 0.85); z-index: 880; display: none;
+      align-items: center; justify-content: center; padding: 20px; backdrop-filter: blur(4px);
+    }
+    .otp-modal-overlay.active { display: flex; }
+    .otp-card-sheet {
+      background: #ffffff; width: 100%; max-width: 360px; border-radius: 20px;
+      padding: 24px 20px; text-align: center; color: #0f172a;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+    }
+    .otp-icon-circle {
+      width: 60px; height: 60px; border-radius: 50%; background: #f3e8ff;
+      color: #7e22ce; display: flex; align-items: center; justify-content: center;
+      font-size: 28px; margin: 0 auto 12px auto;
+    }
+    .otp-input-field {
+      width: 100%; padding: 14px; border-radius: 12px; border: 2px solid #cbd5e1;
+      font-size: 26px; font-weight: 900; text-align: center; letter-spacing: 10px;
+      outline: none; color: #1e293b; background: #f8fafc; margin: 16px 0;
+    }
+    .otp-input-field:focus { border-color: var(--accent-green); background: #ffffff; }
+
     /* Success Modal */
     .success-modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.75); z-index: 900; display: none; align-items: flex-end; justify-content: center; backdrop-filter: blur(4px); }
     .success-modal-overlay.active { display: flex; }
@@ -293,9 +319,7 @@
     .btn-help-link { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 13px; border-radius: 10px; font-size: 13px; font-weight: 800; text-decoration: none; margin-bottom: 10px; }
     .btn-logout { background: #fee2e2; color: #dc2626; border: 1.5px solid #fca5a5; width: 100%; padding: 13px; border-radius: 10px; font-size: 14px; font-weight: 900; cursor: pointer; margin-top: 6px; }
 
-    /* ======================================= */
-    /* SOS EMERGENCY POPUP MODAL (108 & 112)   */
-    /* ======================================= */
+    /* SOS Emergency Modal */
     .sos-modal-overlay {
       position: fixed; top: 0; left: 0; width: 100%; height: 100%;
       background: rgba(15, 23, 42, 0.85); z-index: 999; display: none;
@@ -388,7 +412,6 @@
         </div>
       </div>
       <div class="top-actions">
-        <!-- SOS Top Header Button -->
         <button class="btn-sos-top" onclick="openSosModal()">🚨 SOS</button>
 
         <label class="switch">
@@ -413,13 +436,11 @@
       </div>
     </div>
 
-    <!-- Active Slot Banner Button -->
     <div class="slot-banner">
       <span>Book more to earn more 🤑</span>
       <a onclick="showSlotDetails()">View My Slots ❯</a>
     </div>
 
-    <!-- Referral Bonus Button -->
     <div class="promo-card">
       <div class="promo-info">
         <h4>Rider Referral Bonus is Live 🎉</h4>
@@ -461,7 +482,6 @@
       <div style="text-align:center; color: var(--text-sub); padding: 20px; font-size: 12px;">Waiting for Order... कोई नया ऑर्डर नहीं है।</div>
     </div>
 
-    <!-- Fully Working Bottom Nav -->
     <div class="bottom-nav">
       <div class="b-item active" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">
         <div class="b-icon">🏠</div>
@@ -486,7 +506,7 @@
     </div>
   </div>
 
-  <!-- SCREEN 1: "Go to the Bin" View -->
+  <!-- SCREEN 1: Bin -->
   <div class="bin-screen" id="bin-screen">
     <div class="bin-header">
       <div class="bin-title">Go to the Bin</div>
@@ -510,7 +530,7 @@
     </div>
   </div>
 
-  <!-- SCREEN 2: "Take Photo of Items in Bag" View -->
+  <!-- SCREEN 2: Photo -->
   <div class="photo-screen" id="photo-screen">
     <div class="photo-nav">
       <button class="btn-photo-close" onclick="closePhotoScreen()">✕</button>
@@ -531,7 +551,7 @@
     </div>
   </div>
 
-  <!-- SCREEN 3: "On the Way" Live Map Screen -->
+  <!-- SCREEN 3: On The Way -->
   <div class="way-screen" id="way-screen">
     <div class="way-map-container">
       <div class="way-top-bar">
@@ -566,7 +586,7 @@
     </div>
   </div>
 
-  <!-- COD SLIDE MODAL -->
+  <!-- COD Slide Modal -->
   <div class="cod-modal-overlay" id="cod-modal">
     <div class="cod-sheet">
       <div class="cod-cash-icon">💵</div>
@@ -589,7 +609,28 @@
     </div>
   </div>
 
-  <!-- SUCCESS MODAL -->
+  <!-- =================================================== -->
+  <!-- 4-DIGIT OTP VERIFICATION POPUP MODAL FOR RIDER     -->
+  <!-- =================================================== -->
+  <div class="otp-modal-overlay" id="otp-modal">
+    <div class="otp-card-sheet">
+      <div class="otp-icon-circle">🔐</div>
+      <div style="font-size: 18px; font-weight: 900; color: #0f172a;">Customer OTP Verify</div>
+      <div style="font-size: 12px; color: #64748b; margin-top: 4px;">ग्राहक के मोबाइल ऐप से 4-अंकों का OTP पूछकर यहाँ दर्ज करें:</div>
+
+      <input type="tel" id="rider-otp-input" class="otp-input-field" placeholder="••••" maxlength="4" autofocus>
+
+      <button class="btn-action-rider" style="background: var(--accent-green); padding: 14px;" onclick="verifyOtpAndDeliver()">
+        ✓ Verify OTP & Complete Delivery
+      </button>
+
+      <button onclick="closeOtpModal()" style="background:none; border:none; color:#64748b; font-size:12px; font-weight:800; margin-top:14px; cursor:pointer;">
+        ✕ Cancel
+      </button>
+    </div>
+  </div>
+
+  <!-- Success Modal -->
   <div class="success-modal-overlay" id="success-modal">
     <div class="success-sheet">
       <div class="success-check-circle">✓</div>
@@ -605,7 +646,7 @@
     </div>
   </div>
 
-  <!-- PROFILE & SUPPORT MODAL -->
+  <!-- Profile Modal -->
   <div class="profile-modal-overlay" id="profile-modal" onclick="closeProfileModal(event)">
     <div class="profile-sheet" onclick="event.stopPropagation()">
       <div class="profile-head">
@@ -632,9 +673,7 @@
     </div>
   </div>
 
-  <!-- ======================================= -->
-  <!-- SOS EMERGENCY MODAL (108 & 112)         -->
-  <!-- ======================================= -->
+  <!-- SOS Emergency Modal -->
   <div class="sos-modal-overlay" id="sos-modal" onclick="closeSosModal(event)">
     <div class="sos-sheet" onclick="event.stopPropagation()">
       <div class="sos-icon-head">🚨</div>
@@ -642,19 +681,16 @@
       <div class="sos-desc">सड़क दुर्घटना या आपातकालीन स्थिति में तुरंत कॉल करें:</div>
 
       <div class="sos-btn-grid">
-        <!-- 108 Ambulance Call -->
         <a class="sos-call-btn sos-call-108" href="tel:108">
           <span>🚑 Ambulance (एम्बुलेंस)</span>
           <span>Call 108 ➔</span>
         </a>
 
-        <!-- 112 Police Emergency Call -->
         <a class="sos-call-btn sos-call-112" href="tel:112">
           <span>🚓 Police & All Emergency</span>
           <span>Call 112 ➔</span>
         </a>
 
-        <!-- Admin Urgent Help Call -->
         <a class="sos-call-btn sos-call-admin" href="tel:9711107063">
           <span>👑 Admin Helpline</span>
           <span>9711107063 ➔</span>
@@ -665,7 +701,7 @@
     </div>
   </div>
 
-  <!-- RIDER CHAT DRAWER -->
+  <!-- Rider Chat Drawer -->
   <div class="chat-drawer" id="rider-chat-drawer">
     <div class="chat-top-header">
       <div style="display:flex; align-items:center; gap:10px;">
@@ -709,7 +745,6 @@
     let activeChatOrderId = null;
     let rChatInterval = null;
 
-    // AUTHENTICATION
     function checkAuthStatus() {
       if (!loggedInRider) {
         document.getElementById('auth-overlay').classList.add('active');
@@ -807,20 +842,13 @@
     function openProfileModal() { document.getElementById('profile-modal').classList.add('active'); }
     function closeProfileModal(e) { if(e && e.target !== e.currentTarget) return; document.getElementById('profile-modal').classList.remove('active'); }
 
-    // ============================================
-    // SOS MODAL FUNCTIONS (108 & 112)
-    // ============================================
-    function openSosModal() {
-      document.getElementById('sos-modal').classList.add('active');
-    }
+    // SOS Functions
+    function openSosModal() { document.getElementById('sos-modal').classList.add('active'); }
     function closeSosModal(e) {
       if (e && e.target !== e.currentTarget) return;
       document.getElementById('sos-modal').classList.remove('active');
     }
 
-    // ============================================
-    // WORKING BUTTON HELPERS (Earnings, Slots, Refer)
-    // ============================================
     function showEarningsPopup() {
       let count = 0;
       let cash = 0;
@@ -1108,6 +1136,7 @@
       document.getElementById('way-screen').classList.add('active');
     }
 
+    // Step 1 of Delivery: Mark Arrived Trigger
     function handleMarkArrived() {
       if (!currentSelectedOrder) return;
       if (currentSelectedOrder.payment_mode === 'COD') {
@@ -1115,9 +1144,8 @@
         initCodSlider();
         document.getElementById('cod-modal').classList.add('active');
       } else {
-        if (confirm(`ऑर्डर ऑनलाइन पेड है (₹${currentSelectedOrder.total_amount})। क्या डिलीवर मार्क करें?`)) {
-          finalizeOrderDelivery();
-        }
+        // ऑनलाइन पेड है तो सीधा OTP वेरिफिकेशन खोलें
+        openOtpModal();
       }
     }
 
@@ -1154,7 +1182,8 @@
           thumb.style.background = '#059669';
           setTimeout(() => {
             closeCodModal();
-            finalizeOrderDelivery();
+            // कैश मिलने के बाद OTP स्क्रीन खोलें
+            openOtpModal();
           }, 250);
         }
       };
@@ -1172,6 +1201,58 @@
 
       thumb.onmousedown = onStart; window.onmousemove = onMove; window.onmouseup = onEnd;
       thumb.ontouchstart = onStart; window.ontouchmove = onMove; window.ontouchend = onEnd;
+    }
+
+    // ============================================
+    // 4-DIGIT OTP VERIFICATION LOGIC (STRICT)
+    // ============================================
+    function openOtpModal() {
+      document.getElementById('rider-otp-input').value = '';
+      document.getElementById('otp-modal').classList.add('active');
+      document.getElementById('rider-otp-input').focus();
+    }
+
+    function closeOtpModal() {
+      document.getElementById('otp-modal').classList.remove('active');
+    }
+
+    async function verifyOtpAndDeliver() {
+      const enteredOtp = document.getElementById('rider-otp-input').value.trim();
+      if (enteredOtp.length !== 4) {
+        alert('कृपया 4 अंकों का सही OTP दर्ज करें!');
+        return;
+      }
+
+      if (!currentSelectedOrder) return;
+
+      // Supabase से फ्रेश OTP वेरीफाई करें
+      try {
+        const { data: orderData, error } = await _supabase
+          .from('orders')
+          .select('delivery_otp')
+          .eq('id', currentSelectedOrder.id)
+          .single();
+
+        if (error || !orderData) {
+          alert('ऑर्डर डेटा नहीं मिला!');
+          return;
+        }
+
+        // OTP मिलान की सख्त जाँच
+        if (orderData.delivery_otp && orderData.delivery_otp.toString() !== enteredOtp) {
+          alert('❌ गलत OTP (Invalid OTP)!\n\nकृपया ग्राहक के मोबाइल ऐप से सही 4-अंकों का कोड देखकर डालें।');
+          document.getElementById('rider-otp-input').value = '';
+          document.getElementById('rider-otp-input').focus();
+          return;
+        }
+
+        // OTP सही होने पर ही डिलीवर होगा
+        closeOtpModal();
+        finalizeOrderDelivery();
+
+      } catch (err) {
+        alert('OTP सत्यापन एरर: ' + err.message);
+      }
     }
 
     async function finalizeOrderDelivery() {
