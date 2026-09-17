@@ -191,6 +191,16 @@
     .t-step.active { color: #0f172a; font-weight: 800; }
     .t-step.active::after { background: var(--zepto-green); box-shadow: 0 0 0 4px #dcfce7; }
 
+    /* 4-Digit OTP Display Box in Customer App */
+    .cust-otp-box {
+      background: linear-gradient(135deg, #fdf4ff, #fae8ff);
+      border: 2px dashed #c084fc; border-radius: 14px;
+      padding: 14px; text-align: center; margin: 14px 0;
+    }
+    .cust-otp-title { font-size: 11px; font-weight: 800; color: #7e22ce; text-transform: uppercase; letter-spacing: 0.5px; }
+    .cust-otp-code { font-size: 32px; font-weight: 900; color: #581c87; letter-spacing: 6px; margin: 4px 0; }
+    .cust-otp-sub { font-size: 11px; color: #6b21a8; font-weight: 600; }
+
     /* Past Orders */
     .past-order-box { background: #fff; border-radius: 14px; border: 1.5px solid var(--border-color); padding: 14px; margin-bottom: 12px; }
     .past-order-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
@@ -390,7 +400,7 @@
     </div>
   </div>
 
-  <!-- Live Status Modal -->
+  <!-- Live Status Modal WITH OTP & CHAT -->
   <div class="modal-overlay" id="track-modal" onclick="closeTrackModal(event)">
     <div class="bottom-sheet" onclick="event.stopPropagation()">
       <div class="sheet-head">
@@ -399,6 +409,13 @@
           <div style="font-size: 11px; color: var(--text-muted);">Express 10-Minute Dispatch</div>
         </div>
         <button class="sheet-close" onclick="toggleTrackModal(false)">✕</button>
+      </div>
+
+      <!-- 4-Digit Customer OTP Display -->
+      <div class="cust-otp-box" id="cust-otp-container" style="display:none;">
+        <div class="cust-otp-title">🔑 Safe Delivery OTP</div>
+        <div class="cust-otp-code" id="cust-live-otp">----</div>
+        <div class="cust-otp-sub">सामान प्राप्त होने पर यह कोड राइडर को बताएँ</div>
       </div>
 
       <div class="track-steps">
@@ -828,6 +845,9 @@
         id: item.id, name: item.name, price: item.price, unit: item.unit, qty, subtotal: item.price * qty, image_url: item.image_url
       }));
 
+      // Generate 4-Digit Secure Delivery OTP (1000 - 9999)
+      const generatedOtp = Math.floor(1000 + Math.random() * 9000).toString();
+
       const btn = document.getElementById('order-submit-btn');
       btn.disabled = true;
       btn.innerText = 'Verifying & Saving Order...';
@@ -845,7 +865,8 @@
             total_amount: finalToPay,
             status: initialStatus,
             payment_mode: selectedPaymentMode,
-            transaction_id: selectedPaymentMode === 'UPI' ? utr : null
+            transaction_id: selectedPaymentMode === 'UPI' ? utr : null,
+            delivery_otp: generatedOtp
           }])
           .select();
 
@@ -891,6 +912,16 @@
       const checkStatus = async () => {
         const { data } = await _supabase.from('orders').select('*').eq('id', orderId).single();
         if (!data) return;
+
+        // Display Live 4-Digit OTP to Customer
+        const otpContainer = document.getElementById('cust-otp-container');
+        const otpText = document.getElementById('cust-live-otp');
+        if (data.delivery_otp && data.status !== 'Delivered') {
+          otpContainer.style.display = 'block';
+          otpText.innerText = data.delivery_otp;
+        } else {
+          otpContainer.style.display = 'none';
+        }
 
         const s1 = document.getElementById('st-1');
         const s2 = document.getElementById('st-2');
@@ -1083,14 +1114,14 @@
 
     function toggleCartModal(show) { document.getElementById('cart-modal').className = show ? 'modal-overlay active' : 'modal-overlay'; }
     function openCartModal() { renderCartSheet(); toggleCartModal(true); }
-    function closeCartModal(e) { toggleCartModal(false); }
+    function closeCartModal() { toggleCartModal(false); }
 
     function toggleTrackModal(show) { document.getElementById('track-modal').className = show ? 'modal-overlay active' : 'modal-overlay'; }
     function openTrackModal() { toggleTrackModal(true); }
-    function closeTrackModal(e) { toggleTrackModal(false); }
+    function closeTrackModal() { toggleTrackModal(false); }
 
     function toggleSupportModal(show) { document.getElementById('support-modal').className = show ? 'modal-overlay active' : 'modal-overlay'; }
-    function openSupportModal() { toggleSupportModal(true); }
+    function openSupportModal() { toggleDrawer(false); toggleSupportModal(true); }
     function closeSupportModal(e) { toggleSupportModal(false); }
 
     function scrollToHistory() { document.getElementById('past-orders-section').scrollIntoView({ behavior: 'smooth' }); }
