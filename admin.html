@@ -48,15 +48,15 @@
       color: white; padding: 8px 14px; border-radius: 8px; font-weight: 700; font-size: 12px; cursor: pointer;
     }
 
-    .container { max-width: 1050px; margin: 20px auto; padding: 0 16px; }
+    .container { max-width: 1100px; margin: 20px auto; padding: 0 16px; }
 
     .master-nav {
-      display: flex; gap: 10px; margin-bottom: 18px; overflow-x: auto; scrollbar-width: none;
+      display: flex; gap: 8px; margin-bottom: 18px; overflow-x: auto; scrollbar-width: none;
     }
     .master-nav::-webkit-scrollbar { display: none; }
     .master-btn {
-      flex: 1; min-width: 140px; padding: 12px 10px; border-radius: 12px; border: 2px solid transparent;
-      font-size: 13px; font-weight: 900; cursor: pointer; text-align: center;
+      flex: 1; min-width: 130px; padding: 12px 10px; border-radius: 12px; border: 2px solid transparent;
+      font-size: 12px; font-weight: 900; cursor: pointer; text-align: center;
       background: #ffffff; color: var(--muted); box-shadow: 0 2px 6px rgba(0,0,0,0.04);
       transition: all 0.2s ease; white-space: nowrap;
     }
@@ -165,6 +165,18 @@
       cursor: pointer; box-shadow: 0 4px 14px rgba(16, 185, 129, 0.3); margin-top: 20px; width: 100%;
     }
 
+    /* Live Fleet Map Container */
+    .fleet-map-container {
+      width: 100%; height: 380px; border-radius: 14px; overflow: hidden;
+      border: 1px solid #cbd5e1; margin-bottom: 16px; position: relative; background: #e2e8f0;
+    }
+    .fleet-map-frame { width: 100%; height: 100%; border: none; }
+
+    .wallet-pill {
+      background: #fef3c7; color: #b45309; border: 1px solid #fde047;
+      padding: 4px 10px; border-radius: 12px; font-weight: 900; font-size: 12px; display: inline-block;
+    }
+
     @media (max-width: 680px) {
       .metrics-row { grid-template-columns: repeat(2, 1fr); }
       .btn-delete { margin-left: 0; width: 100%; justify-content: center; }
@@ -178,7 +190,7 @@
       <img class="brand-logo" src="logo.png" alt="Logo" onerror="this.style.display='none'">
       <div>
         <div class="brand-title">👑 𝐁𝐀𝐁𝐀 𝐅𝐎𝐎𝐃 🏹</div>
-        <div class="brand-subtitle">Live Admin, Hubs, Orders, Products & Riders</div>
+        <div class="brand-subtitle">Control Tower: Map, Hubs, Orders, Fleet & Coupons</div>
       </div>
     </div>
     
@@ -196,17 +208,23 @@
       <button class="master-btn active" id="btn-sec-orders" onclick="switchMasterSection('ORDERS')">
         📦 Orders Control (4 Days)
       </button>
+      <button class="master-btn" id="btn-sec-map" onclick="switchMasterSection('MAP')">
+        🗺️ Live Fleet Map
+      </button>
+      <button class="master-btn" id="btn-sec-coupons" onclick="switchMasterSection('COUPONS')">
+        🎟️ Promo Coupons
+      </button>
       <button class="master-btn" id="btn-sec-hubs" onclick="switchMasterSection('HUBS')">
-        🏬 Vendor Hubs & Locations
+        🏬 Vendor Hubs
       </button>
       <button class="master-btn" id="btn-sec-products" onclick="switchMasterSection('PRODUCTS')">
         🛍️ Products & Stock
       </button>
       <button class="master-btn" id="btn-sec-settings" onclick="switchMasterSection('SETTINGS')">
-        🎨 App Control & Offers
+        🎨 Theme & Radius Fees
       </button>
       <button class="master-btn" id="btn-sec-riders" onclick="switchMasterSection('RIDERS')">
-        🛵 Rider Partners & Approvals
+        🛵 Riders & Cash Wallet
       </button>
     </div>
 
@@ -243,7 +261,46 @@
       </div>
     </div>
 
-    <!-- SECTION 2: VENDOR HUBS -->
+    <!-- SECTION 2: LIVE FLEET MAP VIEW -->
+    <div id="section-map" style="display: none;">
+      <div class="order-card">
+        <div style="font-size: 15px; font-weight: 900; color: var(--primary); margin-bottom: 6px;">
+          🗺️ Live Rider Fleet Tracking
+        </div>
+        <div style="font-size: 12px; color: var(--muted); margin-bottom: 14px;">
+          सभी ऑन-ड्यूटी राइडर्स की ताज़ा लोकेशन देखें। नीचे किसी भी राइडर का चयन करके उसका लाइव मैप लोड करें।
+        </div>
+
+        <div class="fleet-map-container">
+          <iframe class="fleet-map-frame" id="admin-fleet-map" src="https://maps.google.com/maps?q=28.2818,79.1554&t=&z=14&ie=UTF8&iwloc=&output=embed"></iframe>
+        </div>
+
+        <div id="fleet-rider-buttons" style="display:flex; flex-wrap:wrap; gap:8px;"></div>
+      </div>
+    </div>
+
+    <!-- SECTION 3: PROMO COUPONS ENGINE -->
+    <div id="section-coupons" style="display: none;">
+      <div class="order-card" style="border: 1.5px dashed var(--primary); background: #fdf8ff;">
+        <div style="font-size: 15px; font-weight: 900; color: var(--primary); margin-bottom: 12px;">
+          ➕ Create New Discount Promo Coupon
+        </div>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)) auto; gap: 10px; align-items: center;">
+          <input type="text" id="cp-code" class="admin-input" placeholder="Coupon Code (e.g. BABA50) *">
+          <input type="number" id="cp-disc" class="admin-input" placeholder="Flat Discount ₹ *">
+          <input type="number" id="cp-min" class="admin-input" placeholder="Min Order ₹ (e.g. 299)">
+          <button class="btn-action btn-pack" style="background: var(--primary); padding: 10px 18px;" onclick="createNewCoupon()">
+            + Add Coupon
+          </button>
+        </div>
+      </div>
+
+      <div id="coupons-list-container">
+        <div style="text-align:center; color:var(--muted); padding:30px;">कूपन लोड हो रहे हैं...</div>
+      </div>
+    </div>
+
+    <!-- SECTION 4: VENDOR HUBS -->
     <div id="section-hubs" style="display: none;">
       <div class="order-card" style="border: 1.5px dashed var(--primary); background: #fdf8ff;">
         <div style="font-size: 15px; font-weight: 900; color: var(--primary); margin-bottom: 12px;">
@@ -271,7 +328,7 @@
       </div>
     </div>
 
-    <!-- SECTION 3: PRODUCTS & STOCK -->
+    <!-- SECTION 5: PRODUCTS & STOCK -->
     <div id="section-products" style="display: none;">
       <div class="order-card" style="border: 1.5px dashed var(--primary); background: #fdf8ff;">
         <div style="font-size: 14px; font-weight: 900; color: var(--primary); margin-bottom: 12px;">
@@ -310,16 +367,36 @@
       </div>
     </div>
 
-    <!-- SECTION 4: APP THEME & OFFERS -->
+    <!-- SECTION 6: APP THEME, GEO-FENCING RADIUS & DELIVERY FEES -->
     <div id="section-settings" style="display: none;">
+      <div class="settings-card">
+        <div style="font-size: 16px; font-weight: 900; color: var(--primary);">
+          📍 Geo-Fencing Delivery Radius & KM Charges
+        </div>
+        <div style="font-size: 12px; color: var(--muted); margin-top: 2px;">
+          तय करें कि हब से अधिकतम कितने KM तक डिलीवरी होगी और दूरी के अनुसार चार्ज कितना लगेगा।
+        </div>
+
+        <div class="settings-grid">
+          <div class="form-group">
+            <span class="form-label">Max Delivery Radius (अधिकतम डिलीवरी दायरा KM):</span>
+            <input type="number" step="0.5" id="set-max-radius" class="admin-input" placeholder="7.0">
+          </div>
+          <div class="form-group">
+            <span class="form-label">Base Free Distance (न्यूनतम KM जिस पर बेस चार्ज लगे):</span>
+            <input type="number" step="0.5" id="set-base-km" class="admin-input" placeholder="3.0">
+          </div>
+          <div class="form-group">
+            <span class="form-label">Extra Charge Per KM (प्रति KM अतिरिक्त शुल्क ₹):</span>
+            <input type="number" id="set-per-km" class="admin-input" placeholder="10">
+          </div>
+        </div>
+      </div>
+
       <div class="settings-card">
         <div style="font-size: 16px; font-weight: 900; color: var(--primary);">
           🎨 Customer App Theme & Colors
         </div>
-        <div style="font-size: 12px; color: var(--muted); margin-top: 2px;">
-          यहाँ से बदला गया रंग सीधे ग्राहक के ऐप में बटन, हेडर और कार्ट पर बदल जाएगा।
-        </div>
-
         <div class="settings-grid">
           <div class="form-group">
             <span class="form-label">Button / Accent Color:</span>
@@ -347,12 +424,8 @@
 
       <div class="settings-card">
         <div style="font-size: 16px; font-weight: 900; color: var(--primary);">
-          🎁 Discount Offers & Delivery Charges Control
+          🎁 Discount Offers & Delivery Rules
         </div>
-        <div style="font-size: 12px; color: var(--muted); margin-top: 2px;">
-          ऑफ़र और डिलीवरी फ़ीस तुरंत ग्राहक के ऐप और बिलिंग में लागू होंगे।
-        </div>
-
         <div class="settings-grid">
           <div class="form-group">
             <span class="form-label">Banner Title:</span>
@@ -367,7 +440,7 @@
             <input type="number" id="set-free-del-min" class="admin-input" placeholder="249">
           </div>
           <div class="form-group">
-            <span class="form-label">Standard Delivery Charge (₹):</span>
+            <span class="form-label">Standard Base Delivery Charge (₹):</span>
             <input type="number" id="set-del-charge" class="admin-input" placeholder="25">
           </div>
           <div class="form-group">
@@ -381,12 +454,12 @@
         </div>
 
         <button class="btn-save-settings" onclick="saveAppSettings()">
-          💾 Save & Update Customer App Live
+          💾 Save & Update Settings Live
         </button>
       </div>
     </div>
 
-    <!-- SECTION 5: RIDERS -->
+    <!-- SECTION 7: RIDERS & COD WALLET SETTLEMENT -->
     <div id="section-riders" style="display: none;">
       <div class="order-card" style="border: 1.5px dashed #cbd5e1;">
         <div style="font-size: 14px; font-weight: 900; color: var(--primary); margin-bottom: 12px;">➕ Add / Register Rider Partner</div>
@@ -402,9 +475,9 @@
 
       <div class="tabs-wrap">
         <button class="tab-btn active" id="rtab-all" onclick="filterRiders('ALL', this)">All Riders</button>
-        <button class="tab-btn" id="rtab-active" onclick="filterRiders('Active', this)">🟢 Active (Allowed)</button>
+        <button class="tab-btn" id="rtab-active" onclick="filterRiders('Active', this)">🟢 Active</button>
         <button class="tab-btn" id="rtab-pending" onclick="filterRiders('Pending', this)">⏳ Pending Approval</button>
-        <button class="tab-btn" id="rtab-blocked" onclick="filterRiders('Blocked', this)">🔴 Deactivated / Blocked</button>
+        <button class="tab-btn" id="rtab-blocked" onclick="filterRiders('Blocked', this)">🔴 Blocked</button>
       </div>
 
       <div id="riders-container">
@@ -423,6 +496,7 @@
     let rawHubs = [];
     let rawProducts = [];
     let rawRiders = [];
+    let rawCoupons = [];
     let currentMasterSec = 'ORDERS';
     let currentOrderTab = 'ALL';
     let currentProdTab = 'ALL';
@@ -431,13 +505,13 @@
 
     function switchMasterSection(sec) {
       currentMasterSec = sec;
-      document.getElementById('btn-sec-orders').className = sec === 'ORDERS' ? 'master-btn active' : 'master-btn';
-      document.getElementById('btn-sec-hubs').className = sec === 'HUBS' ? 'master-btn active' : 'master-btn';
-      document.getElementById('btn-sec-products').className = sec === 'PRODUCTS' ? 'master-btn active' : 'master-btn';
-      document.getElementById('btn-sec-settings').className = sec === 'SETTINGS' ? 'master-btn active' : 'master-btn';
-      document.getElementById('btn-sec-riders').className = sec === 'RIDERS' ? 'master-btn active' : 'master-btn';
+      document.querySelectorAll('.master-btn').forEach(b => b.classList.remove('active'));
+      const activeBtn = document.getElementById(`btn-sec-${sec.toLowerCase()}`);
+      if (activeBtn) activeBtn.classList.add('active');
 
       document.getElementById('section-orders').style.display = sec === 'ORDERS' ? 'block' : 'none';
+      document.getElementById('section-map').style.display = sec === 'MAP' ? 'block' : 'none';
+      document.getElementById('section-coupons').style.display = sec === 'COUPONS' ? 'block' : 'none';
       document.getElementById('section-hubs').style.display = sec === 'HUBS' ? 'block' : 'none';
       document.getElementById('section-products').style.display = sec === 'PRODUCTS' ? 'block' : 'none';
       document.getElementById('section-settings').style.display = sec === 'SETTINGS' ? 'block' : 'none';
@@ -448,6 +522,8 @@
 
     function refreshCurrentSection() {
       if (currentMasterSec === 'ORDERS') fetchOrders();
+      else if (currentMasterSec === 'MAP') loadFleetMap();
+      else if (currentMasterSec === 'COUPONS') fetchCoupons();
       else if (currentMasterSec === 'HUBS') fetchHubs();
       else if (currentMasterSec === 'PRODUCTS') fetchProducts();
       else if (currentMasterSec === 'SETTINGS') loadAppSettings();
@@ -455,7 +531,7 @@
     }
 
     // ============================================
-    // STORE OPEN / CLOSED MASTER TOGGLE
+    // STORE TOGGLE
     // ============================================
     async function loadStoreStatus() {
       try {
@@ -465,7 +541,7 @@
           updateStoreBtnUI();
         }
       } catch (err) {
-        console.warn("Store status load error:", err);
+        console.warn(err);
       }
     }
 
@@ -484,23 +560,16 @@
     async function toggleStoreStatus() {
       const newStatus = currentStoreStatus === 'OPEN' ? 'CLOSED' : 'OPEN';
       const confirmMsg = newStatus === 'CLOSED'
-        ? '⚠️ क्या आप दुकान बंद करना चाहते हैं?\n\nग्राहक ऐप में ऑर्डर लगना तुरंत रुक जाएगा।'
-        : '🟢 क्या आप दुकान खोलना चाहते हैं?\n\nग्राहक नए ऑर्डर प्लेस कर सकेंगे।';
+        ? '⚠️ क्या आप दुकान बंद करना चाहते हैं?\nग्राहक ऐप में ऑर्डर लगना तुरंत रुक जाएगा।'
+        : '🟢 क्या आप दुकान खोलना चाहते हैं?\nग्राहक नए ऑर्डर प्लेस कर सकेंगे।';
 
       if (!confirm(confirmMsg)) return;
 
-      try {
-        const { error } = await _supabase
-          .from('app_settings')
-          .update({ store_status: newStatus })
-          .eq('id', 1);
-
-        if (error) throw error;
+      const { error } = await _supabase.from('app_settings').update({ store_status: newStatus }).eq('id', 1);
+      if (!error) {
         currentStoreStatus = newStatus;
         updateStoreBtnUI();
-        alert(`✅ दुकान का स्टेटस बदलकर "${newStatus === 'OPEN' ? 'चालू (OPEN)' : 'बंद (CLOSED)'}" कर दिया गया!`);
-      } catch (err) {
-        alert('स्टेटस बदलने में एरर: ' + err.message);
+        alert(`दुकान का स्टेटस बदल दिया गया: ${newStatus}`);
       }
     }
 
@@ -522,7 +591,7 @@
         renderOrders();
       } catch (err) {
         document.getElementById('orders-container').innerHTML = 
-          `<div style="text-align:center; color:#dc2626; padding:30px;">डेटा लोड करने में समस्या: ${err.message}</div>`;
+          `<div style="text-align:center; color:#dc2626; padding:30px;">डेटा लोड एरर: ${err.message}</div>`;
       }
     }
 
@@ -580,7 +649,6 @@
         const dateStr = order.created_at ? new Date(order.created_at).toLocaleDateString('hi-IN', {
           weekday: 'short', day: 'numeric', month: 'short', year: 'numeric'
         }) : 'Recent Orders';
-        
         if (!groupedByDate[dateStr]) groupedByDate[dateStr] = [];
         groupedByDate[dateStr].push(order);
       });
@@ -613,10 +681,11 @@
               <div class="cust-info">
                 <div class="cust-name">👤 ${order.customer_name || 'N/A'} (📞 <a href="tel:${order.customer_phone}">${order.customer_phone}</a>)</div>
                 <div style="color: #475569; margin-top: 2px;">📍 ${order.delivery_address || 'पता दर्ज नहीं'}</div>
-                ${order.hub_id ? `<div class="utr-tag" style="background:#f0fdf4; border-color:#86efac; color:#15803d;">🏬 Pickup Hub: HUB-${order.hub_id}</div>` : ''}
-                ${order.assigned_rider_id ? `<div class="utr-tag" style="background:#e0f2fe; border-color:#7dd3fc; color:#0369a1;">🛵 Nearest Rider: RIDER-${order.assigned_rider_id}</div>` : ''}
+                ${order.hub_id ? `<div class="utr-tag" style="background:#f0fdf4; border-color:#86efac; color:#15803d;">🏬 Hub #${order.hub_id}</div>` : ''}
+                ${order.assigned_rider_id ? `<div class="utr-tag" style="background:#e0f2fe; border-color:#7dd3fc; color:#0369a1;">🛵 Rider #${order.assigned_rider_id}</div>` : ''}
+                ${order.coupon_code ? `<div class="utr-tag" style="background:#fdf4ff; border-color:#d8b4fe; color:#7e22ce;">🎟️ Coupon: ${order.coupon_code} (-₹${order.coupon_discount || 0})</div>` : ''}
                 ${order.transaction_id ? `<div class="utr-tag">🔑 UTR No: ${order.transaction_id}</div>` : ''}
-                ${order.delivery_otp ? `<div class="utr-tag" style="background:#fdf4ff; border-color:#d8b4fe; color:#7e22ce;">🔐 OTP: ${order.delivery_otp}</div>` : ''}
+                ${order.delivery_otp ? `<div class="utr-tag" style="background:#fffbeb; border-color:#fde047; color:#b45309;">🔐 OTP: ${order.delivery_otp}</div>` : ''}
               </div>
 
               <div class="items-list">${itemsSummary}</div>
@@ -629,7 +698,7 @@
               <div class="card-actions">
                 ${order.status !== 'Out for Delivery' && order.status !== 'Delivered' ? `
                   <button class="btn-action btn-pack" onclick="updateOrderStatus(${order.id}, 'Out for Delivery')">
-                    🛵 Dispatch / Out for Delivery
+                    🛵 Dispatch
                   </button>
                 ` : ''}
 
@@ -640,7 +709,7 @@
                 ` : ''}
 
                 <button class="btn-action btn-delete" onclick="deleteFakeOrder(${order.id})">
-                  🗑️ Delete Fake Order
+                  🗑️ Delete Order
                 </button>
               </div>
             </div>
@@ -651,53 +720,129 @@
     }
 
     async function updateOrderStatus(orderId, newStatus) {
-      if (!confirm(`क्या आप ऑर्डर #${orderId} का स्टेटस "${newStatus}" करना चाहते हैं?`)) return;
-      try {
-        const { error } = await _supabase.from('orders').update({ status: newStatus }).eq('id', orderId);
-        if (error) throw error;
-        const target = rawOrders.find(o => o.id === orderId);
-        if (target) target.status = newStatus;
-        updateMetrics();
-        renderOrders();
-      } catch (e) {
-        alert('अपडेट नहीं हो पाया: ' + e.message);
-      }
+      if (!confirm(`ऑर्डर #${orderId} को "${newStatus}" करें?`)) return;
+      await _supabase.from('orders').update({ status: newStatus }).eq('id', orderId);
+      fetchOrders();
     }
 
     async function deleteFakeOrder(orderId) {
-      if (!confirm(`⚠️ क्या आप वाकई ऑर्डर #${orderId} को पूरे सिस्टम से हमेशा के लिए हटाना चाहते हैं?`)) return;
-      try {
-        const { error } = await _supabase.from('orders').delete().eq('id', orderId);
-        if (error) throw error;
-        rawOrders = rawOrders.filter(o => o.id !== orderId);
-        updateMetrics();
-        renderOrders();
-        alert(`✅ ऑर्डर #${orderId} डिलीट हो गया!`);
-      } catch (err) {
-        alert('डिलीट करने में त्रुटि: ' + err.message);
-      }
+      if (!confirm(`क्या आप ऑर्डर #${orderId} को हटाना चाहते हैं?`)) return;
+      await _supabase.from('orders').delete().eq('id', orderId);
+      fetchOrders();
     }
 
     // ============================================
-    // 2. VENDOR HUBS CONTROLLER
+    // 2. LIVE FLEET MAP VIEW
+    // ============================================
+    async function loadFleetMap() {
+      const { data } = await _supabase.from('riders').select('*').eq('status', 'Active');
+      const riders = data || [];
+      const btnBox = document.getElementById('fleet-rider-buttons');
+      const mapFrame = document.getElementById('admin-fleet-map');
+
+      if (riders.length === 0) {
+        btnBox.innerHTML = '<div style="color:var(--muted); font-size:12px;">कोई एक्टिव राइडर उपलब्ध नहीं है।</div>';
+        return;
+      }
+
+      btnBox.innerHTML = riders.map(r => {
+        const hasGps = Boolean(r.current_lat && r.current_lng);
+        return `
+          <button class="btn-action" style="background:${hasGps ? '#e0f2fe' : '#f1f5f9'}; color:${hasGps ? '#0369a1' : '#64748b'};" 
+            onclick="focusRiderOnMap(${r.current_lat || 28.2818}, ${r.current_lng || 79.1554}, '${r.name}')">
+            🛵 ${r.name} (${hasGps ? '🟢 Live' : '⚪ No GPS'})
+          </button>
+        `;
+      }).join('');
+
+      const firstLive = riders.find(r => r.current_lat && r.current_lng);
+      if (firstLive) {
+        focusRiderOnMap(firstLive.current_lat, firstLive.current_lng, firstLive.name);
+      }
+    }
+
+    function focusRiderOnMap(lat, lng, name) {
+      const mapFrame = document.getElementById('admin-fleet-map');
+      mapFrame.src = `https://maps.google.com/maps?q=${lat},${lng}&t=&z=16&ie=UTF8&iwloc=&output=embed`;
+    }
+
+    // ============================================
+    // 3. PROMO COUPONS
+    // ============================================
+    async function fetchCoupons() {
+      const { data } = await _supabase.from('coupons').select('*').order('id', { ascending: false });
+      rawCoupons = data || [];
+      renderCouponsList();
+    }
+
+    function renderCouponsList() {
+      const box = document.getElementById('coupons-list-container');
+      if (rawCoupons.length === 0) {
+        box.innerHTML = '<div style="text-align:center; color:var(--muted); padding:30px;">कोई कूपन नहीं बना है।</div>';
+        return;
+      }
+      box.innerHTML = rawCoupons.map(c => `
+        <div class="order-card">
+          <div class="card-top">
+            <div>
+              <div style="font-size:16px; font-weight:900; color:var(--primary);">🎟️ ${c.code}</div>
+              <div style="font-size:12px; color:#15803d; font-weight:800; margin-top:2px;">Flat ₹${c.discount_value} OFF (Min Order: ₹${c.min_order_amount || 0})</div>
+            </div>
+            <button class="btn-action" style="background:${c.is_active ? '#fee2e2' : '#dcfce7'}; color:${c.is_active ? '#dc2626' : '#15803d'};" onclick="toggleCoupon(${c.id}, ${!c.is_active})">
+              ${c.is_active ? 'Disable' : 'Enable'}
+            </button>
+          </div>
+          <div class="card-actions">
+            <button class="btn-action btn-delete" onclick="deleteCoupon(${c.id})">🗑️ Delete</button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    async function createNewCoupon() {
+      const code = document.getElementById('cp-code').value.trim().toUpperCase();
+      const disc = parseFloat(document.getElementById('cp-disc').value);
+      const min = parseFloat(document.getElementById('cp-min').value) || 0;
+
+      if (!code || isNaN(disc)) return alert('कृपया कोड और डिस्काउंट अमाउंट डालें!');
+
+      const { error } = await _supabase.from('coupons').insert([{ code, discount_type: 'FLAT', discount_value: disc, min_order_amount: min, is_active: true }]);
+      if (!error) {
+        alert('✅ कूपन सफलतापूर्वक जुड़ गया!');
+        document.getElementById('cp-code').value = '';
+        document.getElementById('cp-disc').value = '';
+        document.getElementById('cp-min').value = '';
+        fetchCoupons();
+      } else {
+        alert('त्रुटि: ' + error.message);
+      }
+    }
+
+    async function toggleCoupon(id, st) {
+      await _supabase.from('coupons').update({ is_active: st }).eq('id', id);
+      fetchCoupons();
+    }
+
+    async function deleteCoupon(id) {
+      if (!confirm('क्या कूपन को हटाना चाहते हैं?')) return;
+      await _supabase.from('coupons').delete().eq('id', id);
+      fetchCoupons();
+    }
+
+    // ============================================
+    // 4. VENDOR HUBS
     // ============================================
     async function fetchHubs() {
-      try {
-        const { data, error } = await _supabase.from('hubs').select('*').order('id', { ascending: true });
-        if (error) throw error;
-        rawHubs = data || [];
-        renderHubsList();
-        populateHubDropdown();
-      } catch (err) {
-        document.getElementById('hubs-list-container').innerHTML = 
-          `<div style="text-align:center; color:#dc2626; padding:20px;">हब्स लोड करने में समस्या: ${err.message}</div>`;
-      }
+      const { data } = await _supabase.from('hubs').select('*').order('id', { ascending: true });
+      rawHubs = data || [];
+      renderHubsList();
+      populateHubDropdown();
     }
 
     function renderHubsList() {
       const box = document.getElementById('hubs-list-container');
       if (rawHubs.length === 0) {
-        box.innerHTML = '<div style="text-align:center; color:var(--muted); padding:30px; font-weight:700;">कोई वेंडर हब दर्ज नहीं है।</div>';
+        box.innerHTML = '<div style="text-align:center; color:var(--muted); padding:30px;">कोई हब नहीं बना है।</div>';
         return;
       }
       box.innerHTML = rawHubs.map(h => `
@@ -708,10 +853,10 @@
               <div style="font-size:12px; color:#475569; margin-top:2px;">📍 ${h.address}</div>
               <div style="font-size:11px; color:#64748b; margin-top:2px;">📞 ${h.phone || 'N/A'} | GPS: <b>${h.lat}, ${h.lng}</b></div>
             </div>
-            <span class="status-badge ${h.status === 'Active' ? 'status-active' : 'status-blocked'}">${h.status || 'Active'}</span>
+            <span class="status-badge status-active">${h.status || 'Active'}</span>
           </div>
           <div class="card-actions">
-            <a href="https://maps.google.com/?q=${h.lat},${h.lng}" target="_blank" style="color:#0284c7; font-size:12px; font-weight:800; text-decoration:none;">🗺️ View on Google Maps ↗</a>
+            <a href="https://maps.google.com/?q=${h.lat},${h.lng}" target="_blank" style="color:#0284c7; font-size:12px; font-weight:800; text-decoration:none;">🗺️ View on Maps ↗</a>
             <button class="btn-action btn-delete" onclick="deleteHub(${h.id})">🗑️ Remove Hub</button>
           </div>
         </div>
@@ -719,12 +864,12 @@
     }
 
     function getHubGps() {
-      if (!navigator.geolocation) { alert('GPS सपोर्ट उपलब्ध नहीं है!'); return; }
+      if (!navigator.geolocation) return alert('GPS उपलब्ध नहीं है!');
       navigator.geolocation.getCurrentPosition(pos => {
         document.getElementById('hub-lat').value = pos.coords.latitude;
         document.getElementById('hub-lng').value = pos.coords.longitude;
-        alert('✅ हब की सटीक लोकेशन दर्ज हो गई!');
-      }, err => alert('GPS एरर: ' + err.message), { enableHighAccuracy: true });
+        alert('✅ GPS लोकेशन सेट हो गई!');
+      }, err => alert('GPS एरर: ' + err.message));
     }
 
     async function saveNewHub() {
@@ -734,74 +879,46 @@
       const lat = parseFloat(document.getElementById('hub-lat').value);
       const lng = parseFloat(document.getElementById('hub-lng').value);
 
-      if (!name || !addr || isNaN(lat) || isNaN(lng)) {
-        alert('कृपया नाम, पता और दोनों GPS निर्देशांक (Lat, Lng) भरें!');
-        return;
-      }
+      if (!name || !addr || isNaN(lat) || isNaN(lng)) return alert('कृपया सभी विवरण भरें!');
 
-      try {
-        const { error } = await _supabase.from('hubs').insert([{
-          name, address: addr, phone, lat, lng, status: 'Active'
-        }]);
-        if (error) throw error;
-        alert('✅ नया वेंडर हब सफलतापूर्वक जुड़ गया!');
-        document.getElementById('hub-name').value = '';
-        document.getElementById('hub-addr').value = '';
-        document.getElementById('hub-phone').value = '';
-        document.getElementById('hub-lat').value = '';
-        document.getElementById('hub-lng').value = '';
-        fetchHubs();
-      } catch (e) {
-        alert('हब जोड़ने में त्रुटि: ' + e.message);
-      }
+      await _supabase.from('hubs').insert([{ name, address: addr, phone, lat, lng, status: 'Active' }]);
+      document.getElementById('hub-name').value = '';
+      document.getElementById('hub-addr').value = '';
+      document.getElementById('hub-phone').value = '';
+      document.getElementById('hub-lat').value = '';
+      document.getElementById('hub-lng').value = '';
+      fetchHubs();
     }
 
     async function deleteHub(id) {
-      if (!confirm('क्या आप वाकई इस वेंडर हब को हटाना चाहते हैं?')) return;
-      try {
-        const { error } = await _supabase.from('hubs').delete().eq('id', id);
-        if (error) throw error;
-        fetchHubs();
-      } catch (e) {
-        alert('हटाने में त्रुटि: ' + e.message);
-      }
+      if (!confirm('हब को हटाना चाहते हैं?')) return;
+      await _supabase.from('hubs').delete().eq('id', id);
+      fetchHubs();
     }
 
     function populateHubDropdown() {
       const sel = document.getElementById('np-hub-select');
       if (!sel) return;
-      if (rawHubs.length === 0) {
-        sel.innerHTML = '<option value="">No Hubs Available</option>';
-        return;
-      }
       sel.innerHTML = '<option value="">-- Select Pickup Hub * --</option>' + 
-        rawHubs.map(h => `<option value="${h.id}">${h.name} (${h.address})</option>`).join('');
+        rawHubs.map(h => `<option value="${h.id}">${h.name}</option>`).join('');
     }
 
     // ============================================
-    // 3. PRODUCTS & STOCK
+    // 5. PRODUCTS & STOCK
     // ============================================
     async function fetchProducts() {
-      try {
-        const { data, error } = await _supabase.from('products').select('*').order('id', { ascending: true });
-        if (error) throw error;
-        rawProducts = data || [];
-        updateProductStats();
-        renderProductsAdmin();
-        if (rawHubs.length === 0) fetchHubs();
-        else populateHubDropdown();
-      } catch (err) {
-        document.getElementById('products-admin-list').innerHTML = 
-          `<div style="text-align:center; color:#dc2626; padding:20px; grid-column:1/-1;">आइटम लोड करने में समस्या: ${err.message}</div>`;
-      }
+      const { data } = await _supabase.from('products').select('*').order('id', { ascending: true });
+      rawProducts = data || [];
+      updateProductStats();
+      renderProductsAdmin();
+      if (rawHubs.length === 0) fetchHubs();
+      else populateHubDropdown();
     }
 
     function updateProductStats() {
-      const inStock = rawProducts.filter(p => !p.is_out_of_stock).length;
-      const outStock = rawProducts.filter(p => p.is_out_of_stock).length;
       document.getElementById('cnt-prod-all').innerText = rawProducts.length;
-      document.getElementById('cnt-prod-in').innerText = inStock;
-      document.getElementById('cnt-prod-out').innerText = outStock;
+      document.getElementById('cnt-prod-in').innerText = rawProducts.filter(p => !p.is_out_of_stock).length;
+      document.getElementById('cnt-prod-out').innerText = rawProducts.filter(p => p.is_out_of_stock).length;
     }
 
     function filterProductTab(tab, btn) {
@@ -825,7 +942,7 @@
       });
 
       if (list.length === 0) {
-        container.innerHTML = '<div style="text-align:center; color:var(--muted); padding:30px; grid-column:1/-1; font-weight:700;">कोई प्रोडक्ट नहीं मिला।</div>';
+        container.innerHTML = '<div style="text-align:center; color:var(--muted); padding:30px; grid-column:1/-1;">कोई प्रोडक्ट नहीं मिला।</div>';
         return;
       }
 
@@ -837,7 +954,7 @@
         return `
           <div class="product-admin-card" style="${isOut ? 'opacity: 0.75; border-color: #fca5a5;' : ''}">
             <div style="display:flex; gap:12px; align-items:center;">
-              <img class="prod-thumb-box" src="${p.image_url || 'https://via.placeholder.com/80'}" alt="${p.name}">
+              <img class="prod-thumb-box" src="${p.image_url || 'https://via.placeholder.com/80'}">
               <div style="flex:1;">
                 <div style="font-size:14px; font-weight:800; color:#0f172a;">${p.name}</div>
                 <div style="font-size:11px; color:#64748b;">${p.unit || '1 unit'} | ${p.category || 'General'}</div>
@@ -863,21 +980,8 @@
     }
 
     async function toggleProductStock(prodId, setOutOfStock) {
-      try {
-        const { data, error } = await _supabase
-          .from('products')
-          .update({ is_out_of_stock: setOutOfStock })
-          .eq('id', prodId)
-          .select();
-
-        if (error) throw error;
-        const target = rawProducts.find(p => p.id === prodId);
-        if (target) target.is_out_of_stock = setOutOfStock;
-        updateProductStats();
-        renderProductsAdmin();
-      } catch (err) {
-        alert('स्टॉक बदलने में त्रुटि: ' + err.message);
-      }
+      await _supabase.from('products').update({ is_out_of_stock: setOutOfStock }).eq('id', prodId);
+      fetchProducts();
     }
 
     async function addNewProduct() {
@@ -888,49 +992,30 @@
       const hubId = document.getElementById('np-hub-select').value;
       const img = document.getElementById('np-img').value.trim();
 
-      if (!name || isNaN(price)) {
-        alert('कृपया नाम और सही मूल्य डालें!');
-        return;
-      }
+      if (!name || isNaN(price)) return alert('कृपया नाम और मूल्य भरें!');
 
-      try {
-        const { error } = await _supabase.from('products').insert([{
-          name: name,
-          price: price,
-          unit: unit || '1 unit',
-          category: cat || 'Snacks',
-          hub_id: hubId ? parseInt(hubId) : null,
-          image_url: img || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=120',
-          is_out_of_stock: false
-        }]);
+      await _supabase.from('products').insert([{
+        name, price, unit: unit || '1 unit', category: cat || 'Snacks',
+        hub_id: hubId ? parseInt(hubId) : null, image_url: img || 'https://via.placeholder.com/120',
+        is_out_of_stock: false
+      }]);
 
-        if (error) throw error;
-        alert(`✅ "${name}" जुड़ गया!`);
-        document.getElementById('np-name').value = '';
-        document.getElementById('np-price').value = '';
-        document.getElementById('np-unit').value = '';
-        document.getElementById('np-cat').value = '';
-        document.getElementById('np-img').value = '';
-        fetchProducts();
-      } catch (e) {
-        alert('त्रुटि: ' + e.message);
-      }
+      document.getElementById('np-name').value = '';
+      document.getElementById('np-price').value = '';
+      document.getElementById('np-unit').value = '';
+      document.getElementById('np-cat').value = '';
+      document.getElementById('np-img').value = '';
+      fetchProducts();
     }
 
     async function deleteProduct(prodId) {
-      if (!confirm('क्या आप वाकई इस आइटम को हटाना चाहते हैं?')) return;
-      try {
-        await _supabase.from('products').delete().eq('id', prodId);
-        rawProducts = rawProducts.filter(p => p.id !== prodId);
-        updateProductStats();
-        renderProductsAdmin();
-      } catch (e) {
-        alert('त्रुटि: ' + e.message);
-      }
+      if (!confirm('प्रोडक्ट हटाना चाहते हैं?')) return;
+      await _supabase.from('products').delete().eq('id', prodId);
+      fetchProducts();
     }
 
     // ============================================
-    // 4. APP THEME & OFFERS
+    // 6. APP THEME & GEO-FENCING
     // ============================================
     async function loadAppSettings() {
       const { data } = await _supabase.from('app_settings').select('*').eq('id', 1).single();
@@ -948,6 +1033,10 @@
         document.getElementById('set-del-charge').value = data.delivery_charge || 25;
         document.getElementById('set-disc-min').value = data.discount_min_order || 399;
         document.getElementById('set-disc-amt').value = data.discount_amount || 49;
+
+        document.getElementById('set-max-radius').value = data.max_delivery_radius_km || 7.0;
+        document.getElementById('set-base-km').value = data.base_delivery_km || 3.0;
+        document.getElementById('set-per-km').value = data.per_km_charge || 10.0;
         
         if (data.store_status) {
           currentStoreStatus = data.store_status;
@@ -977,6 +1066,10 @@
       const discMin = parseInt(document.getElementById('set-disc-min').value) || 399;
       const discAmt = parseInt(document.getElementById('set-disc-amt').value) || 49;
 
+      const maxRadius = parseFloat(document.getElementById('set-max-radius').value) || 7.0;
+      const baseKm = parseFloat(document.getElementById('set-base-km').value) || 3.0;
+      const perKm = parseFloat(document.getElementById('set-per-km').value) || 10.0;
+
       const { error } = await _supabase.from('app_settings').upsert({
         id: 1,
         theme_color: themeColor,
@@ -988,28 +1081,26 @@
         delivery_charge: delCharge,
         discount_min_order: discMin,
         discount_amount: discAmt,
-        store_status: currentStoreStatus
+        store_status: currentStoreStatus,
+        max_delivery_radius_km: maxRadius,
+        base_delivery_km: baseKm,
+        per_km_charge: perKm
       });
 
       if (!error) {
-        alert('🎉 कस्टमर ऐप की थीम और डिस्काउंट ऑफ़र तुरंत लाइव अपडेट हो गए हैं!');
+        alert('🎉 सेटिंग्स और डिलीवरी दायरा तुरंत लाइव अपडेट हो गया!');
       } else {
-        alert('सेव करने में समस्या: ' + error.message);
+        alert('त्रुटि: ' + error.message);
       }
     }
 
     // ============================================
-    // 5. RIDERS
+    // 7. RIDERS & COD WALLET SETTLEMENT
     // ============================================
     async function fetchRiders() {
-      try {
-        const { data, error } = await _supabase.from('riders').select('*').order('id', { ascending: false });
-        rawRiders = data || [];
-        renderRiders();
-      } catch (err) {
-        document.getElementById('riders-container').innerHTML = 
-          `<div style="text-align:center; color:#dc2626; padding:20px;">राइडर डेटा लोड करने में समस्या: ${err.message}</div>`;
-      }
+      const { data } = await _supabase.from('riders').select('*').order('id', { ascending: false });
+      rawRiders = data || [];
+      renderRiders();
     }
 
     function filterRiders(tab, btn) {
@@ -1028,7 +1119,7 @@
       }
 
       if (filtered.length === 0) {
-        container.innerHTML = '<div style="text-align:center; color:var(--muted); padding:30px; font-weight:700;">इस श्रेणी में कोई राइडर पार्टनर नहीं मिला।</div>';
+        container.innerHTML = '<div style="text-align:center; color:var(--muted); padding:30px;">कोई राइडर नहीं मिला।</div>';
         return;
       }
 
@@ -1038,32 +1129,42 @@
         if (status === 'Active') badgeClass = 'status-active';
         else if (status === 'Blocked' || status === 'Deactivated') badgeClass = 'status-blocked';
 
-        const gpsStr = (r.current_lat && r.current_lng) ? `📍 GPS: ${r.current_lat.toFixed(4)}, ${r.current_lng.toFixed(4)}` : '📍 GPS: No Signal Yet';
+        const cashOnHand = Number(r.cash_in_hand) || 0;
 
         return `
           <div class="rider-card">
             <div class="card-top">
               <div>
                 <div class="order-num">🛵 ${r.name || 'Unnamed'} (RIDER-${r.id})</div>
-                <div class="order-time">📞 Phone: <a href="tel:${r.phone}">${r.phone}</a> | Vehicle: <b>${r.vehicle_no || 'N/A'}</b></div>
-                <div style="font-size:11px; color:#0284c7; font-weight:700; margin-top:2px;">${gpsStr} | ${r.is_online ? '🟢 Online' : '⚪ Offline'}</div>
+                <div class="order-time">📞 <a href="tel:${r.phone}">${r.phone}</a> | Vehicle: <b>${r.vehicle_no || 'N/A'}</b></div>
+                <div style="margin-top:6px;">
+                  <span class="wallet-pill">💵 COD Cash with Rider: ₹${cashOnHand}</span>
+                </div>
               </div>
               <span class="status-badge ${badgeClass}">${status}</span>
             </div>
 
             <div class="card-actions">
+              ${cashOnHand > 0 ? `
+                <button class="btn-action btn-deliver" onclick="settleRiderCash(${r.id}, '${r.name}',${cashOnHand})">
+                  ✓ Settle & Clear Cash
+                </button>
+              ` : ''}
+
               ${status !== 'Active' ? `
                 <button class="btn-action btn-approve" onclick="updateRiderStatus(${r.id}, 'Active')">
-                  ✅ Approve & Activate
+                  ✅ Approve
                 </button>
               ` : `
                 <button class="btn-action btn-deactivate" onclick="updateRiderStatus(${r.id}, 'Blocked')">
-                  🚫 Deactivate / Block
+                  🚫 Block
                 </button>
               `}
 
               ${(r.current_lat && r.current_lng) ? `
-                <a href="https://maps.google.com/?q=${r.current_lat},${r.current_lng}" target="_blank" style="color:#0284c7; font-size:12px; font-weight:800; text-decoration:none;">🗺️ Track Live ↗</a>
+                <button class="btn-action" style="background:#e0f2fe; color:#0369a1;" onclick="switchMasterSection('MAP'); focusRiderOnMap(${r.current_lat}, ${r.current_lng}, '${r.name}')">
+                  🗺️ Live Map
+                </button>
               ` : ''}
 
               <button class="btn-action btn-delete" onclick="deleteRiderPermanently(${r.id})">
@@ -1075,27 +1176,38 @@
       }).join('');
     }
 
+    async function settleRiderCash(riderId, name, amount) {
+      if (!confirm(`क्या आपने राइडर ${name} से ₹${amount} नकद प्राप्त कर लिए हैं?\n\nहाँ दबाने पर राइडर का कैश बैलेंस 0 हो जाएगा।`)) return;
+
+      const { error } = await _supabase.from('riders').update({ cash_in_hand: 0 }).eq('id', riderId);
+      if (!error) {
+        alert(`✅ ₹${amount} का सेटलमेंट सफल रहा!`);
+        fetchRiders();
+      } else {
+        alert('त्रुटि: ' + error.message);
+      }
+    }
+
     async function registerRiderManually() {
       const name = document.getElementById('new-rider-name').value.trim();
       const phone = document.getElementById('new-rider-phone').value.trim();
       const vehicle = document.getElementById('new-rider-vehicle').value.trim();
 
-      if (!name || !/^[6-9]\d{9}$/.test(phone)) { alert('कृपया सही नाम और 10 अंकों का फोन नंबर डालें!'); return; }
+      if (!name || !/^[6-9]\d{9}$/.test(phone)) return alert('कृपया सही नाम और 10 अंकों का फोन नंबर डालें!');
 
-      await _supabase.from('riders').insert([{ name, phone, vehicle_no: vehicle || 'Standard', status: 'Active', is_online: true }]);
+      await _supabase.from('riders').insert([{ name, phone, vehicle_no: vehicle || 'Standard', status: 'Active', is_online: true, cash_in_hand: 0 }]);
       document.getElementById('new-rider-name').value = '';
       document.getElementById('new-rider-phone').value = '';
       fetchRiders();
     }
 
     async function updateRiderStatus(riderId, newStatus) {
-      if (!confirm(`क्या राइडर का स्टेटस "${newStatus}" करना चाहते हैं?`)) return;
       await _supabase.from('riders').update({ status: newStatus }).eq('id', riderId);
       fetchRiders();
     }
 
     async function deleteRiderPermanently(riderId) {
-      if (!confirm(`क्या राइडर को पूरी तरह हटाना चाहते हैं?`)) return;
+      if (!confirm('राइडर को हटाना चाहते हैं?')) return;
       await _supabase.from('riders').delete().eq('id', riderId);
       fetchRiders();
     }
@@ -1104,6 +1216,8 @@
     loadAppSettings();
     loadStoreStatus();
     fetchHubs();
+    fetchCoupons();
+
     setInterval(() => {
       if (currentMasterSec === 'ORDERS') fetchOrders();
     }, 10000);
