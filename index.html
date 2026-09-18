@@ -38,6 +38,59 @@
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
     body { background-color: var(--bg-page); color: var(--text-main); padding-bottom: 120px; }
 
+    /* Fullscreen Logo Preview Modal */
+    .logo-modal-overlay {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0, 0, 0, 0.88); z-index: 9999; display: none;
+      align-items: center; justify-content: center; flex-direction: column;
+      backdrop-filter: blur(4px);
+    }
+    .logo-modal-overlay.active { display: flex; }
+    .full-logo-view {
+      width: 85%; max-width: 340px; border-radius: 50%;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+      border: 3px solid #ff758c; animation: popIn 0.25s ease-out;
+    }
+    .btn-close-preview {
+      position: absolute; top: 25px; right: 25px; background: #fff;
+      color: #000; border: none; width: 38px; height: 38px; border-radius: 50%;
+      font-size: 20px; font-weight: 900; cursor: pointer;
+    }
+    @keyframes popIn {
+      from { transform: scale(0.6); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+
+    /* Side Drawer */
+    .drawer-overlay {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0, 0, 0, 0.5); z-index: 500; display: none;
+    }
+    .drawer-overlay.active { display: block; }
+    .side-drawer {
+      position: fixed; top: 0; left: -290px; width: 280px; height: 100%;
+      background: #fff; z-index: 501; box-shadow: 4px 0 20px rgba(0,0,0,0.15);
+      transition: left 0.3s ease; display: flex; flex-direction: column;
+    }
+    .side-drawer.active { left: 0; }
+    
+    .drawer-header {
+      background: linear-gradient(135deg, var(--zepto-purple), #240046);
+      color: white; padding: 22px 16px;
+    }
+    .drawer-logo-img {
+      width: 85px !important; height: 85px !important; border-radius: 50% !important;
+      object-fit: cover !important; background: #fff; border: 3px solid #ff758c;
+      display: block !important; margin-bottom: 8px; cursor: pointer;
+    }
+    .drawer-brand { font-size: 15px; font-weight: 900; color: #ff758c; line-height: 1.2; }
+    .drawer-menu-list { padding: 16px 0; flex: 1; overflow-y: auto; }
+    .drawer-item {
+      display: flex; align-items: center; gap: 12px; padding: 14px 20px;
+      font-size: 13px; font-weight: 700; color: #1e293b; cursor: pointer; text-decoration: none;
+      border-bottom: 1px solid #f8fafc;
+    }
+
     /* Modals Common */
     .modal-overlay {
       position: fixed; top: 0; left: 0; width: 100%; height: 100%;
@@ -268,11 +321,45 @@
 </head>
 <body>
 
+  <!-- Fullscreen Logo Preview Modal -->
+  <div class="logo-modal-overlay" id="logo-preview-modal" onclick="closeLogoPreview()">
+    <button class="btn-close-preview" onclick="closeLogoPreview()">✕</button>
+    <img class="full-logo-view" src="logo.png" alt="Full Logo" onclick="event.stopPropagation()">
+    <div style="color: #fff; font-weight: 800; font-size: 15px; margin-top: 14px;">👑 𝐁𝐀𝐁𝐀 𝐅𝐎𝐎𝐃 𝐃𝐄𝐋𝐈𝐕𝐄𝐑𝐘🏹</div>
+  </div>
+
+  <!-- Side Drawer -->
+  <div class="drawer-overlay" id="drawer-overlay" onclick="toggleDrawer(false)"></div>
+  <div class="side-drawer" id="side-drawer">
+    <div class="drawer-header">
+      <img class="drawer-logo-img" src="logo.png" alt="Logo" title="Tap to view full logo" onclick="openLogoPreview()" onerror="this.style.display='none'">
+      <div class="drawer-brand">👑 𝐁𝐀𝐁𝐀 𝐅𝐎𝐎𝐃 𝐃𝐄𝐋𝐈𝐕𝐄𝐑𝐘🏹</div>
+      <div style="font-size: 11px; color: #fdf4ff; margin-top: 2px;">Fast Express Delivery</div>
+    </div>
+    <div class="drawer-menu-list">
+      <div class="drawer-item" onclick="toggleDrawer(false); scrollToHistory();">
+        <span>🕒</span> Past Orders & Receipts
+      </div>
+      <div class="drawer-item" onclick="openSupportModal()">
+        <span>💬</span> 24x7 Help & Support
+      </div>
+      <a class="drawer-item" href="tel:9711107063">
+        <span>📞</span> Helpline: 9711107063
+      </a>
+      <a class="drawer-item" target="_blank" href="https://wa.me/919711107063?text=Hello%20Baba%20Food%20Delivery%20Support">
+        <span>🟢</span> WhatsApp: 9711107063
+      </a>
+      <div class="drawer-item" onclick="alert('डिलीवरी समय: सुबह 7:00 AM से रात 11:00 PM तक!')">
+        <span>ℹ️</span> Store Hours & FAQs
+      </div>
+    </div>
+  </div>
+
   <!-- Top Hero Header -->
   <div class="top-hero-area">
     <div class="location-row">
       <div style="display: flex; align-items: center; gap: 10px;">
-        <button class="menu-trigger-btn" onclick="alert(' एक्सप्रेस डिलीवरी')">☰</button>
+        <button class="menu-trigger-btn" onclick="toggleDrawer(true)">☰</button>
         <div>
           <div class="eta-badge">⚡ 10 minutes</div>
           <div class="address-line">📍 Delivery to Home & Nearby</div>
@@ -285,6 +372,12 @@
       <div class="store-pill active">
         <img class="pill-logo-compact" src="logo.png" alt="Logo" onerror="this.style.display='none'">
         <span class="pill-text-compact">👑 𝐁𝐀𝐁𝐀 𝐅𝐎𝐎𝐃 𝐃𝐄𝐋𝐈𝐕𝐄𝐑𝐘🏹</span>
+      </div>
+      <div class="store-pill">
+        <span class="pill-text-compact">Express Kitchen</span>
+      </div>
+      <div class="store-pill">
+        <span class="pill-text-compact">Fresh Mart</span>
       </div>
     </div>
 
@@ -666,6 +759,11 @@
     function openLogoPreview() { document.getElementById('logo-preview-modal').classList.add('active'); }
     function closeLogoPreview() { document.getElementById('logo-preview-modal').classList.remove('active'); }
 
+    function toggleDrawer(open) {
+      document.getElementById('side-drawer').className = open ? 'side-drawer active' : 'side-drawer';
+      document.getElementById('drawer-overlay').className = open ? 'drawer-overlay active' : 'drawer-overlay';
+    }
+
     function getCurrentLocation() {
       if (!navigator.geolocation) { alert('आपके ब्राउज़र में लोकेशन सपोर्ट नहीं है!'); return; }
       const addrBox = document.getElementById('c-address');
@@ -957,6 +1055,9 @@
       document.getElementById('bill-grand-total').innerText = `₹${finalToPay}`;
     }
 
+    // ============================================================
+    // PLACE ORDER WITH NEAREST HUB & RIDER AUTO-DISPATCH
+    // ============================================================
     async function placeOrder() {
       if (appConfig.store_status === 'CLOSED') {
         alert('⚠️ दुकान अभी बंद है। हम नए ऑर्डर स्वीकार नहीं कर रहे हैं।');
@@ -992,14 +1093,32 @@
       if (entries.length === 0) { alert('आपकी कार्ट खाली है!'); return; }
 
       const orderItems = entries.map(({ item, qty }) => ({
-        id: item.id, name: item.name, price: item.price, unit: item.unit, qty, subtotal: item.price * qty, image_url: item.image_url
+        id: item.id, name: item.name, price: item.price, unit: item.unit, qty, subtotal: item.price * qty, image_url: item.image_url, hub_id: item.hub_id || 1
       }));
 
       const generatedOtp = Math.floor(1000 + Math.random() * 9000).toString();
 
       const btn = document.getElementById('order-submit-btn');
       btn.disabled = true;
-      btn.innerText = 'Verifying & Saving Order...';
+      btn.innerText = 'Finding nearest rider & placing order...';
+
+      // 1. प्राथमिक वेंडर हब निकालना
+      const primaryHubId = orderItems[0]?.hub_id || 1;
+      let assignedRiderId = null;
+
+      // 2. हब की लोकेशन से सबसे पास वाले राइडर को ऑटो-सर्च करना
+      try {
+        const { data: hubInfo } = await _supabase.from('hubs').select('lat, lng').eq('id', primaryHubId).single();
+        if (hubInfo && hubInfo.lat && hubInfo.lng) {
+          const { data: nearestRider } = await _supabase.rpc('find_nearest_rider', {
+            target_lat: hubInfo.lat,
+            target_lng: hubInfo.lng
+          });
+          assignedRiderId = nearestRider || null;
+        }
+      } catch (dispatchErr) {
+        console.warn("Auto-dispatch note:", dispatchErr);
+      }
 
       const initialStatus = selectedPaymentMode === 'UPI' ? 'Payment Verification Pending' : 'Order Placed';
 
@@ -1015,7 +1134,9 @@
             status: initialStatus,
             payment_mode: selectedPaymentMode,
             transaction_id: selectedPaymentMode === 'UPI' ? utr : null,
-            delivery_otp: generatedOtp
+            delivery_otp: generatedOtp,
+            hub_id: primaryHubId,
+            assigned_rider_id: assignedRiderId
           }])
           .select();
 
@@ -1324,7 +1445,7 @@
       cart = {};
       items.forEach(oldItem => {
         const product = allProducts.find(p => p.id === oldItem.id) || {
-          id: oldItem.id, name: oldItem.name, price: oldItem.price, unit: oldItem.unit, image_url: oldItem.image_url || ''
+          id: oldItem.id, name: oldItem.name, price: oldItem.price, unit: oldItem.unit, image_url: oldItem.image_url || '', hub_id: oldItem.hub_id || 1
         };
         if (!product.is_out_of_stock) {
           cart[product.id] = { item: product, qty: oldItem.qty };
@@ -1337,19 +1458,19 @@
 
     function toggleCartModal(show) { document.getElementById('cart-modal').className = show ? 'modal-overlay active' : 'modal-overlay'; }
     function openCartModal() { renderCartSheet(); toggleCartModal(true); }
-    function closeCartModal() { toggleCartModal(false); }
+    function closeCartModal(e) { toggleCartModal(false); }
 
     function toggleTrackModal(show) { document.getElementById('track-modal').className = show ? 'modal-overlay active' : 'modal-overlay'; }
     function openTrackModal() { toggleTrackModal(true); }
-    function closeTrackModal() { toggleTrackModal(false); }
+    function closeTrackModal(e) { toggleTrackModal(false); }
 
     function toggleSupportModal(show) { document.getElementById('support-modal').className = show ? 'modal-overlay active' : 'modal-overlay'; }
     function openSupportModal() { toggleSupportModal(true); }
-    function closeSupportModal() { toggleSupportModal(false); }
+    function closeSupportModal(e) { toggleSupportModal(false); }
 
     function scrollToHistory() { document.getElementById('past-orders-section').scrollIntoView({ behavior: 'smooth' }); }
 
-    // Real-time Settings Listener (दुकान बंद/चालू का तुरंत असर देखने के लिए)
+    // Real-time Settings Listener
     setInterval(loadLiveAppSettings, 5000);
 
     initApp();
