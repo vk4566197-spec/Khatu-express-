@@ -178,11 +178,10 @@
       <img class="brand-logo" src="logo.png" alt="Logo" onerror="this.style.display='none'">
       <div>
         <div class="brand-title">👑 𝐁𝐀𝐁𝐀 𝐅𝐎𝐎𝐃 🏹</div>
-        <div class="brand-subtitle">Live Admin, Orders, Products & Riders</div>
+        <div class="brand-subtitle">Live Admin, Hubs, Orders, Products & Riders</div>
       </div>
     </div>
     
-    <!-- Header Action Buttons (Store Toggle + Refresh) -->
     <div class="header-actions">
       <button id="store-status-btn" class="store-toggle-btn store-open" onclick="toggleStoreStatus()">
         🟢 Store is OPEN
@@ -197,18 +196,21 @@
       <button class="master-btn active" id="btn-sec-orders" onclick="switchMasterSection('ORDERS')">
         📦 Orders Control (4 Days)
       </button>
-      <button class="master-btn" id="btn-sec-settings" onclick="switchMasterSection('SETTINGS')">
-        🎨 App Control & Offers
+      <button class="master-btn" id="btn-sec-hubs" onclick="switchMasterSection('HUBS')">
+        🏬 Vendor Hubs & Locations
       </button>
       <button class="master-btn" id="btn-sec-products" onclick="switchMasterSection('PRODUCTS')">
         🛍️ Products & Stock
+      </button>
+      <button class="master-btn" id="btn-sec-settings" onclick="switchMasterSection('SETTINGS')">
+        🎨 App Control & Offers
       </button>
       <button class="master-btn" id="btn-sec-riders" onclick="switchMasterSection('RIDERS')">
         🛵 Rider Partners & Approvals
       </button>
     </div>
 
-    <!-- SECTION 1: ORDERS -->
+    <!-- SECTION 1: ORDERS CONTROLLER -->
     <div id="section-orders">
       <div class="metrics-row">
         <div class="m-card">
@@ -241,7 +243,74 @@
       </div>
     </div>
 
-    <!-- SECTION 2: APP THEME & OFFERS -->
+    <!-- SECTION 2: VENDOR HUBS -->
+    <div id="section-hubs" style="display: none;">
+      <div class="order-card" style="border: 1.5px dashed var(--primary); background: #fdf8ff;">
+        <div style="font-size: 15px; font-weight: 900; color: var(--primary); margin-bottom: 12px;">
+          ➕ Add New Vendor Hub / Store Location
+        </div>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px;">
+          <input type="text" id="hub-name" class="admin-input" placeholder="Hub Name (e.g. Civil Lines Store) *">
+          <input type="text" id="hub-addr" class="admin-input" placeholder="Full Address / Landmark *">
+          <input type="tel" id="hub-phone" class="admin-input" placeholder="Manager Phone No.">
+          <input type="number" step="any" id="hub-lat" class="admin-input" placeholder="Latitude (e.g. 28.2818) *">
+          <input type="number" step="any" id="hub-lng" class="admin-input" placeholder="Longitude (e.g. 79.1554) *">
+        </div>
+        <div style="display: flex; gap: 10px; margin-top: 12px;">
+          <button type="button" class="btn-action" style="background:#e0f2fe; color:#0369a1;" onclick="getHubGps()">
+            📍 Set to My Current GPS
+          </button>
+          <button type="button" class="btn-action btn-deliver" style="background:var(--primary);" onclick="saveNewHub()">
+            + Save Vendor Hub
+          </button>
+        </div>
+      </div>
+
+      <div id="hubs-list-container">
+        <div style="text-align:center; color:var(--muted); padding:30px;">हब्स लोड हो रहे हैं...</div>
+      </div>
+    </div>
+
+    <!-- SECTION 3: PRODUCTS & STOCK -->
+    <div id="section-products" style="display: none;">
+      <div class="order-card" style="border: 1.5px dashed var(--primary); background: #fdf8ff;">
+        <div style="font-size: 14px; font-weight: 900; color: var(--primary); margin-bottom: 12px;">
+          ➕ Add New Item with Vendor Hub Mapping
+        </div>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; align-items: center;">
+          <input type="text" id="np-name" class="admin-input" placeholder="Item Name *">
+          <input type="number" id="np-price" class="admin-input" placeholder="Price ₹ *">
+          <input type="text" id="np-unit" class="admin-input" placeholder="Unit (e.g. 2 pcs / 1 plate)">
+          <input type="text" id="np-cat" class="admin-input" placeholder="Category (Snacks/Bakery)">
+          <select id="np-hub-select" class="admin-input" style="background:#fff; font-weight:700;">
+            <option value="">Select Vendor Hub...</option>
+          </select>
+          <input type="text" id="np-img" class="admin-input" placeholder="Image URL">
+        </div>
+        <div style="margin-top:10px;">
+          <button class="btn-action btn-pack" style="background: var(--primary); padding: 10px 18px;" onclick="addNewProduct()">
+            + Add Item to Store
+          </button>
+        </div>
+      </div>
+
+      <div class="admin-search-box">
+        <span class="admin-search-icon">🔍</span>
+        <input type="text" id="prod-search-input" class="admin-input" placeholder="Search products by name or category..." oninput="handleProductSearch()">
+      </div>
+
+      <div class="tabs-wrap">
+        <button class="tab-btn active" id="ptab-all" onclick="filterProductTab('ALL', this)">All Items (<span id="cnt-prod-all">0</span>)</button>
+        <button class="tab-btn" id="ptab-in" onclick="filterProductTab('IN_STOCK', this)">🟢 In Stock (<span id="cnt-prod-in">0</span>)</button>
+        <button class="tab-btn" id="ptab-out" onclick="filterProductTab('OUT_OF_STOCK', this)">🔴 Out of Stock (<span id="cnt-prod-out">0</span>)</button>
+      </div>
+
+      <div class="product-admin-grid" id="products-admin-list">
+        <div style="text-align: center; color: var(--muted); padding: 30px; grid-column: 1/-1;">आइटम लोड हो रहे हैं...</div>
+      </div>
+    </div>
+
+    <!-- SECTION 4: APP THEME & OFFERS -->
     <div id="section-settings" style="display: none;">
       <div class="settings-card">
         <div style="font-size: 16px; font-weight: 900; color: var(--primary);">
@@ -253,21 +322,21 @@
 
         <div class="settings-grid">
           <div class="form-group">
-            <span class="form-label">Button / Accent Color (बटन और कार्ट का रंग):</span>
+            <span class="form-label">Button / Accent Color:</span>
             <div class="color-picker-wrap">
               <input type="color" id="set-theme-color" class="color-box" value="#ff3269">
               <input type="text" id="set-theme-color-text" class="admin-input" value="#ff3269">
             </div>
           </div>
           <div class="form-group">
-            <span class="form-label">Header Background (हेडर का रंग):</span>
+            <span class="form-label">Header Background:</span>
             <div class="color-picker-wrap">
               <input type="color" id="set-header-bg" class="color-box" value="#f4ecfb">
               <input type="text" id="set-header-bg-text" class="admin-input" value="#f4ecfb">
             </div>
           </div>
           <div class="form-group">
-            <span class="form-label">Primary Purple (ब्रांड का गहरा रंग):</span>
+            <span class="form-label">Primary Purple:</span>
             <div class="color-picker-wrap">
               <input type="color" id="set-purple" class="color-box" value="#3c006b">
               <input type="text" id="set-purple-text" class="admin-input" value="#3c006b">
@@ -317,41 +386,7 @@
       </div>
     </div>
 
-    <!-- SECTION 3: PRODUCTS & STOCK -->
-    <div id="section-products" style="display: none;">
-      <div class="order-card" style="border: 1.5px dashed var(--primary); background: #fdf8ff;">
-        <div style="font-size: 14px; font-weight: 900; color: var(--primary); margin-bottom: 12px;">
-          ➕ Add New Item to Customer App
-        </div>
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)) auto; gap: 10px; align-items: center;">
-          <input type="text" id="np-name" class="admin-input" placeholder="Item Name (e.g. Samosa) *">
-          <input type="number" id="np-price" class="admin-input" placeholder="Price ₹ *">
-          <input type="text" id="np-unit" class="admin-input" placeholder="Unit (e.g. 2 pcs / 1 plate)">
-          <input type="text" id="np-cat" class="admin-input" placeholder="Category (Snacks/Bakery)">
-          <input type="text" id="np-img" class="admin-input" placeholder="Image URL">
-          <button class="btn-action btn-pack" style="background: var(--primary); padding: 10px 18px;" onclick="addNewProduct()">
-            + Add Item
-          </button>
-        </div>
-      </div>
-
-      <div class="admin-search-box">
-        <span class="admin-search-icon">🔍</span>
-        <input type="text" id="prod-search-input" class="admin-input" placeholder="Search products by name or category..." oninput="handleProductSearch()">
-      </div>
-
-      <div class="tabs-wrap">
-        <button class="tab-btn active" id="ptab-all" onclick="filterProductTab('ALL', this)">All Items (<span id="cnt-prod-all">0</span>)</button>
-        <button class="tab-btn" id="ptab-in" onclick="filterProductTab('IN_STOCK', this)">🟢 In Stock (<span id="cnt-prod-in">0</span>)</button>
-        <button class="tab-btn" id="ptab-out" onclick="filterProductTab('OUT_OF_STOCK', this)">🔴 Out of Stock (<span id="cnt-prod-out">0</span>)</button>
-      </div>
-
-      <div class="product-admin-grid" id="products-admin-list">
-        <div style="text-align: center; color: var(--muted); padding: 30px; grid-column: 1/-1;">आइटम लोड हो रहे हैं...</div>
-      </div>
-    </div>
-
-    <!-- SECTION 4: RIDERS -->
+    <!-- SECTION 5: RIDERS -->
     <div id="section-riders" style="display: none;">
       <div class="order-card" style="border: 1.5px dashed #cbd5e1;">
         <div style="font-size: 14px; font-weight: 900; color: var(--primary); margin-bottom: 12px;">➕ Add / Register Rider Partner</div>
@@ -385,6 +420,7 @@
     const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
     let rawOrders = [];
+    let rawHubs = [];
     let rawProducts = [];
     let rawRiders = [];
     let currentMasterSec = 'ORDERS';
@@ -396,13 +432,15 @@
     function switchMasterSection(sec) {
       currentMasterSec = sec;
       document.getElementById('btn-sec-orders').className = sec === 'ORDERS' ? 'master-btn active' : 'master-btn';
-      document.getElementById('btn-sec-settings').className = sec === 'SETTINGS' ? 'master-btn active' : 'master-btn';
+      document.getElementById('btn-sec-hubs').className = sec === 'HUBS' ? 'master-btn active' : 'master-btn';
       document.getElementById('btn-sec-products').className = sec === 'PRODUCTS' ? 'master-btn active' : 'master-btn';
+      document.getElementById('btn-sec-settings').className = sec === 'SETTINGS' ? 'master-btn active' : 'master-btn';
       document.getElementById('btn-sec-riders').className = sec === 'RIDERS' ? 'master-btn active' : 'master-btn';
 
       document.getElementById('section-orders').style.display = sec === 'ORDERS' ? 'block' : 'none';
-      document.getElementById('section-settings').style.display = sec === 'SETTINGS' ? 'block' : 'none';
+      document.getElementById('section-hubs').style.display = sec === 'HUBS' ? 'block' : 'none';
       document.getElementById('section-products').style.display = sec === 'PRODUCTS' ? 'block' : 'none';
+      document.getElementById('section-settings').style.display = sec === 'SETTINGS' ? 'block' : 'none';
       document.getElementById('section-riders').style.display = sec === 'RIDERS' ? 'block' : 'none';
 
       refreshCurrentSection();
@@ -410,13 +448,14 @@
 
     function refreshCurrentSection() {
       if (currentMasterSec === 'ORDERS') fetchOrders();
-      else if (currentMasterSec === 'SETTINGS') loadAppSettings();
+      else if (currentMasterSec === 'HUBS') fetchHubs();
       else if (currentMasterSec === 'PRODUCTS') fetchProducts();
+      else if (currentMasterSec === 'SETTINGS') loadAppSettings();
       else fetchRiders();
     }
 
     // ============================================
-    // STORE OPEN / CLOSED MASTER TOGGLE LOGIC
+    // STORE OPEN / CLOSED MASTER TOGGLE
     // ============================================
     async function loadStoreStatus() {
       try {
@@ -574,6 +613,8 @@
               <div class="cust-info">
                 <div class="cust-name">👤 ${order.customer_name || 'N/A'} (📞 <a href="tel:${order.customer_phone}">${order.customer_phone}</a>)</div>
                 <div style="color: #475569; margin-top: 2px;">📍 ${order.delivery_address || 'पता दर्ज नहीं'}</div>
+                ${order.hub_id ? `<div class="utr-tag" style="background:#f0fdf4; border-color:#86efac; color:#15803d;">🏬 Pickup Hub: HUB-${order.hub_id}</div>` : ''}
+                ${order.assigned_rider_id ? `<div class="utr-tag" style="background:#e0f2fe; border-color:#7dd3fc; color:#0369a1;">🛵 Nearest Rider: RIDER-${order.assigned_rider_id}</div>` : ''}
                 ${order.transaction_id ? `<div class="utr-tag">🔑 UTR No: ${order.transaction_id}</div>` : ''}
                 ${order.delivery_otp ? `<div class="utr-tag" style="background:#fdf4ff; border-color:#d8b4fe; color:#7e22ce;">🔐 OTP: ${order.delivery_otp}</div>` : ''}
               </div>
@@ -638,7 +679,258 @@
     }
 
     // ============================================
-    // 2. APP THEME & OFFERS
+    // 2. VENDOR HUBS CONTROLLER
+    // ============================================
+    async function fetchHubs() {
+      try {
+        const { data, error } = await _supabase.from('hubs').select('*').order('id', { ascending: true });
+        if (error) throw error;
+        rawHubs = data || [];
+        renderHubsList();
+        populateHubDropdown();
+      } catch (err) {
+        document.getElementById('hubs-list-container').innerHTML = 
+          `<div style="text-align:center; color:#dc2626; padding:20px;">हब्स लोड करने में समस्या: ${err.message}</div>`;
+      }
+    }
+
+    function renderHubsList() {
+      const box = document.getElementById('hubs-list-container');
+      if (rawHubs.length === 0) {
+        box.innerHTML = '<div style="text-align:center; color:var(--muted); padding:30px; font-weight:700;">कोई वेंडर हब दर्ज नहीं है।</div>';
+        return;
+      }
+      box.innerHTML = rawHubs.map(h => `
+        <div class="order-card">
+          <div class="card-top">
+            <div>
+              <div style="font-size:15px; font-weight:900;">🏬 ${h.name}</div>
+              <div style="font-size:12px; color:#475569; margin-top:2px;">📍 ${h.address}</div>
+              <div style="font-size:11px; color:#64748b; margin-top:2px;">📞 ${h.phone || 'N/A'} | GPS: <b>${h.lat}, ${h.lng}</b></div>
+            </div>
+            <span class="status-badge ${h.status === 'Active' ? 'status-active' : 'status-blocked'}">${h.status || 'Active'}</span>
+          </div>
+          <div class="card-actions">
+            <a href="https://maps.google.com/?q=${h.lat},${h.lng}" target="_blank" style="color:#0284c7; font-size:12px; font-weight:800; text-decoration:none;">🗺️ View on Google Maps ↗</a>
+            <button class="btn-action btn-delete" onclick="deleteHub(${h.id})">🗑️ Remove Hub</button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function getHubGps() {
+      if (!navigator.geolocation) { alert('GPS सपोर्ट उपलब्ध नहीं है!'); return; }
+      navigator.geolocation.getCurrentPosition(pos => {
+        document.getElementById('hub-lat').value = pos.coords.latitude;
+        document.getElementById('hub-lng').value = pos.coords.longitude;
+        alert('✅ हब की सटीक लोकेशन दर्ज हो गई!');
+      }, err => alert('GPS एरर: ' + err.message), { enableHighAccuracy: true });
+    }
+
+    async function saveNewHub() {
+      const name = document.getElementById('hub-name').value.trim();
+      const addr = document.getElementById('hub-addr').value.trim();
+      const phone = document.getElementById('hub-phone').value.trim();
+      const lat = parseFloat(document.getElementById('hub-lat').value);
+      const lng = parseFloat(document.getElementById('hub-lng').value);
+
+      if (!name || !addr || isNaN(lat) || isNaN(lng)) {
+        alert('कृपया नाम, पता और दोनों GPS निर्देशांक (Lat, Lng) भरें!');
+        return;
+      }
+
+      try {
+        const { error } = await _supabase.from('hubs').insert([{
+          name, address: addr, phone, lat, lng, status: 'Active'
+        }]);
+        if (error) throw error;
+        alert('✅ नया वेंडर हब सफलतापूर्वक जुड़ गया!');
+        document.getElementById('hub-name').value = '';
+        document.getElementById('hub-addr').value = '';
+        document.getElementById('hub-phone').value = '';
+        document.getElementById('hub-lat').value = '';
+        document.getElementById('hub-lng').value = '';
+        fetchHubs();
+      } catch (e) {
+        alert('हब जोड़ने में त्रुटि: ' + e.message);
+      }
+    }
+
+    async function deleteHub(id) {
+      if (!confirm('क्या आप वाकई इस वेंडर हब को हटाना चाहते हैं?')) return;
+      try {
+        const { error } = await _supabase.from('hubs').delete().eq('id', id);
+        if (error) throw error;
+        fetchHubs();
+      } catch (e) {
+        alert('हटाने में त्रुटि: ' + e.message);
+      }
+    }
+
+    function populateHubDropdown() {
+      const sel = document.getElementById('np-hub-select');
+      if (!sel) return;
+      if (rawHubs.length === 0) {
+        sel.innerHTML = '<option value="">No Hubs Available</option>';
+        return;
+      }
+      sel.innerHTML = '<option value="">-- Select Pickup Hub * --</option>' + 
+        rawHubs.map(h => `<option value="${h.id}">${h.name} (${h.address})</option>`).join('');
+    }
+
+    // ============================================
+    // 3. PRODUCTS & STOCK
+    // ============================================
+    async function fetchProducts() {
+      try {
+        const { data, error } = await _supabase.from('products').select('*').order('id', { ascending: true });
+        if (error) throw error;
+        rawProducts = data || [];
+        updateProductStats();
+        renderProductsAdmin();
+        if (rawHubs.length === 0) fetchHubs();
+        else populateHubDropdown();
+      } catch (err) {
+        document.getElementById('products-admin-list').innerHTML = 
+          `<div style="text-align:center; color:#dc2626; padding:20px; grid-column:1/-1;">आइटम लोड करने में समस्या: ${err.message}</div>`;
+      }
+    }
+
+    function updateProductStats() {
+      const inStock = rawProducts.filter(p => !p.is_out_of_stock).length;
+      const outStock = rawProducts.filter(p => p.is_out_of_stock).length;
+      document.getElementById('cnt-prod-all').innerText = rawProducts.length;
+      document.getElementById('cnt-prod-in').innerText = inStock;
+      document.getElementById('cnt-prod-out').innerText = outStock;
+    }
+
+    function filterProductTab(tab, btn) {
+      currentProdTab = tab;
+      document.querySelectorAll('#section-products .tab-btn').forEach(b => b.classList.remove('active'));
+      if (btn) btn.classList.add('active');
+      renderProductsAdmin();
+    }
+
+    function handleProductSearch() { renderProductsAdmin(); }
+
+    function renderProductsAdmin() {
+      const container = document.getElementById('products-admin-list');
+      const q = (document.getElementById('prod-search-input').value || '').toLowerCase().trim();
+
+      let list = rawProducts.filter(p => {
+        const matchQ = (p.name || '').toLowerCase().includes(q) || (p.category || '').toLowerCase().includes(q);
+        if (currentProdTab === 'IN_STOCK') return matchQ && !p.is_out_of_stock;
+        if (currentProdTab === 'OUT_OF_STOCK') return matchQ && p.is_out_of_stock;
+        return matchQ;
+      });
+
+      if (list.length === 0) {
+        container.innerHTML = '<div style="text-align:center; color:var(--muted); padding:30px; grid-column:1/-1; font-weight:700;">कोई प्रोडक्ट नहीं मिला।</div>';
+        return;
+      }
+
+      container.innerHTML = list.map(p => {
+        const isOut = p.is_out_of_stock === true;
+        const linkedHub = rawHubs.find(h => h.id == p.hub_id);
+        const hubNameStr = linkedHub ? `🏬 ${linkedHub.name}` : (p.hub_id ? `Hub #${p.hub_id}` : 'Main Store');
+
+        return `
+          <div class="product-admin-card" style="${isOut ? 'opacity: 0.75; border-color: #fca5a5;' : ''}">
+            <div style="display:flex; gap:12px; align-items:center;">
+              <img class="prod-thumb-box" src="${p.image_url || 'https://via.placeholder.com/80'}" alt="${p.name}">
+              <div style="flex:1;">
+                <div style="font-size:14px; font-weight:800; color:#0f172a;">${p.name}</div>
+                <div style="font-size:11px; color:#64748b;">${p.unit || '1 unit'} | ${p.category || 'General'}</div>
+                <div style="font-size:11px; color:#0284c7; font-weight:700; margin-top:2px;">${hubNameStr}</div>
+                <div style="font-size:15px; font-weight:900; color:var(--primary); margin-top:2px;">₹${p.price}</div>
+              </div>
+              <span class="${isOut ? 'stock-badge-red' : 'stock-badge-green'}">
+                ${isOut ? '🔴 Out of Stock' : '🟢 In Stock'}
+              </span>
+            </div>
+
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-top:12px; padding-top:10px; border-top:1px solid #f1f5f9;">
+              <button class="toggle-stock-btn ${isOut ? 'btn-mark-in' : 'btn-mark-out'}" onclick="toggleProductStock(${p.id}, ${!isOut})">
+                ${isOut ? '✓ Set In Stock' : '✕ Set Out of Stock'}
+              </button>
+              <button onclick="deleteProduct(${p.id})" style="background:none; border:none; color:#dc2626; font-size:12px; font-weight:800; cursor:pointer;">
+                🗑️ Delete
+              </button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    async function toggleProductStock(prodId, setOutOfStock) {
+      try {
+        const { data, error } = await _supabase
+          .from('products')
+          .update({ is_out_of_stock: setOutOfStock })
+          .eq('id', prodId)
+          .select();
+
+        if (error) throw error;
+        const target = rawProducts.find(p => p.id === prodId);
+        if (target) target.is_out_of_stock = setOutOfStock;
+        updateProductStats();
+        renderProductsAdmin();
+      } catch (err) {
+        alert('स्टॉक बदलने में त्रुटि: ' + err.message);
+      }
+    }
+
+    async function addNewProduct() {
+      const name = document.getElementById('np-name').value.trim();
+      const price = parseFloat(document.getElementById('np-price').value);
+      const unit = document.getElementById('np-unit').value.trim();
+      const cat = document.getElementById('np-cat').value.trim();
+      const hubId = document.getElementById('np-hub-select').value;
+      const img = document.getElementById('np-img').value.trim();
+
+      if (!name || isNaN(price)) {
+        alert('कृपया नाम और सही मूल्य डालें!');
+        return;
+      }
+
+      try {
+        const { error } = await _supabase.from('products').insert([{
+          name: name,
+          price: price,
+          unit: unit || '1 unit',
+          category: cat || 'Snacks',
+          hub_id: hubId ? parseInt(hubId) : null,
+          image_url: img || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=120',
+          is_out_of_stock: false
+        }]);
+
+        if (error) throw error;
+        alert(`✅ "${name}" जुड़ गया!`);
+        document.getElementById('np-name').value = '';
+        document.getElementById('np-price').value = '';
+        document.getElementById('np-unit').value = '';
+        document.getElementById('np-cat').value = '';
+        document.getElementById('np-img').value = '';
+        fetchProducts();
+      } catch (e) {
+        alert('त्रुटि: ' + e.message);
+      }
+    }
+
+    async function deleteProduct(prodId) {
+      if (!confirm('क्या आप वाकई इस आइटम को हटाना चाहते हैं?')) return;
+      try {
+        await _supabase.from('products').delete().eq('id', prodId);
+        rawProducts = rawProducts.filter(p => p.id !== prodId);
+        updateProductStats();
+        renderProductsAdmin();
+      } catch (e) {
+        alert('त्रुटि: ' + e.message);
+      }
+    }
+
+    // ============================================
+    // 4. APP THEME & OFFERS
     // ============================================
     async function loadAppSettings() {
       const { data } = await _supabase.from('app_settings').select('*').eq('id', 1).single();
@@ -707,147 +999,7 @@
     }
 
     // ============================================
-    // 3. PRODUCTS
-    // ============================================
-    async function fetchProducts() {
-      try {
-        const { data, error } = await _supabase.from('products').select('*').order('id', { ascending: true });
-        if (error) throw error;
-        rawProducts = data || [];
-        updateProductStats();
-        renderProductsAdmin();
-      } catch (err) {
-        document.getElementById('products-admin-list').innerHTML = 
-          `<div style="text-align:center; color:#dc2626; padding:20px; grid-column:1/-1;">आइटम लोड करने में समस्या: ${err.message}</div>`;
-      }
-    }
-
-    function updateProductStats() {
-      const inStock = rawProducts.filter(p => !p.is_out_of_stock).length;
-      const outStock = rawProducts.filter(p => p.is_out_of_stock).length;
-      document.getElementById('cnt-prod-all').innerText = rawProducts.length;
-      document.getElementById('cnt-prod-in').innerText = inStock;
-      document.getElementById('cnt-prod-out').innerText = outStock;
-    }
-
-    function filterProductTab(tab, btn) {
-      currentProdTab = tab;
-      document.querySelectorAll('#section-products .tab-btn').forEach(b => b.classList.remove('active'));
-      if (btn) btn.classList.add('active');
-      renderProductsAdmin();
-    }
-
-    function handleProductSearch() { renderProductsAdmin(); }
-
-    function renderProductsAdmin() {
-      const container = document.getElementById('products-admin-list');
-      const q = (document.getElementById('prod-search-input').value || '').toLowerCase().trim();
-
-      let list = rawProducts.filter(p => {
-        const matchQ = (p.name || '').toLowerCase().includes(q) || (p.category || '').toLowerCase().includes(q);
-        if (currentProdTab === 'IN_STOCK') return matchQ && !p.is_out_of_stock;
-        if (currentProdTab === 'OUT_OF_STOCK') return matchQ && p.is_out_of_stock;
-        return matchQ;
-      });
-
-      if (list.length === 0) {
-        container.innerHTML = '<div style="text-align:center; color:var(--muted); padding:30px; grid-column:1/-1; font-weight:700;">कोई प्रोडक्ट नहीं मिला।</div>';
-        return;
-      }
-
-      container.innerHTML = list.map(p => {
-        const isOut = p.is_out_of_stock === true;
-        return `
-          <div class="product-admin-card" style="${isOut ? 'opacity: 0.75; border-color: #fca5a5;' : ''}">
-            <div style="display:flex; gap:12px; align-items:center;">
-              <img class="prod-thumb-box" src="${p.image_url || 'https://via.placeholder.com/80'}" alt="${p.name}">
-              <div style="flex:1;">
-                <div style="font-size:14px; font-weight:800; color:#0f172a;">${p.name}</div>
-                <div style="font-size:11px; color:#64748b;">${p.unit || '1 unit'} | ${p.category || 'General'}</div>
-                <div style="font-size:15px; font-weight:900; color:var(--primary); margin-top:2px;">₹${p.price}</div>
-              </div>
-              <span class="${isOut ? 'stock-badge-red' : 'stock-badge-green'}">
-                ${isOut ? '🔴 Out of Stock' : '🟢 In Stock'}
-              </span>
-            </div>
-
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-top:12px; padding-top:10px; border-top:1px solid #f1f5f9;">
-              <button class="toggle-stock-btn ${isOut ? 'btn-mark-in' : 'btn-mark-out'}" onclick="toggleProductStock(${p.id}, ${!isOut})">
-                ${isOut ? '✓ Set In Stock' : '✕ Set Out of Stock'}
-              </button>
-              <button onclick="deleteProduct(${p.id})" style="background:none; border:none; color:#dc2626; font-size:12px; font-weight:800; cursor:pointer;">
-                🗑️ Delete
-              </button>
-            </div>
-          </div>
-        `;
-      }).join('');
-    }
-
-    async function toggleProductStock(prodId, setOutOfStock) {
-      try {
-        const { data, error } = await _supabase
-          .from('products')
-          .update({ is_out_of_stock: setOutOfStock })
-          .eq('id', prodId)
-          .select();
-
-        if (error) throw error;
-        const target = rawProducts.find(p => p.id === prodId);
-        if (target) target.is_out_of_stock = setOutOfStock;
-        updateProductStats();
-        renderProductsAdmin();
-      } catch (err) {
-        alert('स्टॉक बदलने में त्रुटि: ' + err.message);
-      }
-    }
-
-    async function addNewProduct() {
-      const name = document.getElementById('np-name').value.trim();
-      const price = parseFloat(document.getElementById('np-price').value);
-      const unit = document.getElementById('np-unit').value.trim();
-      const cat = document.getElementById('np-cat').value.trim();
-      const img = document.getElementById('np-img').value.trim();
-
-      if (!name || isNaN(price)) {
-        alert('कृपया नाम और सही मूल्य डालें!');
-        return;
-      }
-
-      try {
-        const { error } = await _supabase.from('products').insert([{
-          name: name,
-          price: price,
-          unit: unit || '1 unit',
-          category: cat || 'Snacks',
-          image_url: img || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=120',
-          is_out_of_stock: false
-        }]);
-
-        if (error) throw error;
-        alert(`✅ "${name}" जुड़ गया!`);
-        document.getElementById('np-name').value = '';
-        document.getElementById('np-price').value = '';
-        fetchProducts();
-      } catch (e) {
-        alert('त्रुटि: ' + e.message);
-      }
-    }
-
-    async function deleteProduct(prodId) {
-      if (!confirm('क्या आप वाकई इस आइटम को हटाना चाहते हैं?')) return;
-      try {
-        await _supabase.from('products').delete().eq('id', prodId);
-        rawProducts = rawProducts.filter(p => p.id !== prodId);
-        updateProductStats();
-        renderProductsAdmin();
-      } catch (e) {
-        alert('त्रुटि: ' + e.message);
-      }
-    }
-
-    // ============================================
-    // 4. RIDERS
+    // 5. RIDERS
     // ============================================
     async function fetchRiders() {
       try {
@@ -886,12 +1038,15 @@
         if (status === 'Active') badgeClass = 'status-active';
         else if (status === 'Blocked' || status === 'Deactivated') badgeClass = 'status-blocked';
 
+        const gpsStr = (r.current_lat && r.current_lng) ? `📍 GPS: ${r.current_lat.toFixed(4)}, ${r.current_lng.toFixed(4)}` : '📍 GPS: No Signal Yet';
+
         return `
           <div class="rider-card">
             <div class="card-top">
               <div>
-                <div class="order-num">🛵 ${r.name || 'Unnamed'}</div>
+                <div class="order-num">🛵 ${r.name || 'Unnamed'} (RIDER-${r.id})</div>
                 <div class="order-time">📞 Phone: <a href="tel:${r.phone}">${r.phone}</a> | Vehicle: <b>${r.vehicle_no || 'N/A'}</b></div>
+                <div style="font-size:11px; color:#0284c7; font-weight:700; margin-top:2px;">${gpsStr} | ${r.is_online ? '🟢 Online' : '⚪ Offline'}</div>
               </div>
               <span class="status-badge ${badgeClass}">${status}</span>
             </div>
@@ -906,6 +1061,10 @@
                   🚫 Deactivate / Block
                 </button>
               `}
+
+              ${(r.current_lat && r.current_lng) ? `
+                <a href="https://maps.google.com/?q=${r.current_lat},${r.current_lng}" target="_blank" style="color:#0284c7; font-size:12px; font-weight:800; text-decoration:none;">🗺️ Track Live ↗</a>
+              ` : ''}
 
               <button class="btn-action btn-delete" onclick="deleteRiderPermanently(${r.id})">
                 🗑️ Remove
@@ -923,7 +1082,7 @@
 
       if (!name || !/^[6-9]\d{9}$/.test(phone)) { alert('कृपया सही नाम और 10 अंकों का फोन नंबर डालें!'); return; }
 
-      await _supabase.from('riders').insert([{ name, phone, vehicle_no: vehicle || 'Standard', status: 'Active' }]);
+      await _supabase.from('riders').insert([{ name, phone, vehicle_no: vehicle || 'Standard', status: 'Active', is_online: true }]);
       document.getElementById('new-rider-name').value = '';
       document.getElementById('new-rider-phone').value = '';
       fetchRiders();
@@ -944,6 +1103,7 @@
     fetchOrders();
     loadAppSettings();
     loadStoreStatus();
+    fetchHubs();
     setInterval(() => {
       if (currentMasterSec === 'ORDERS') fetchOrders();
     }, 10000);
