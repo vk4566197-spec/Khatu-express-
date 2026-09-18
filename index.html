@@ -160,6 +160,13 @@
       font-size: 13px; font-weight: 800; text-align: center;
     }
 
+    /* Out of Delivery Radius Alert */
+    .radius-blocked-alert {
+      display: none; background: #fffbeb; border: 1.5px solid #fde047;
+      color: #854d0e; padding: 10px 14px; border-radius: 10px;
+      font-size: 12px; font-weight: 800; text-align: center; margin-bottom: 10px;
+    }
+
     /* Promo Banner */
     .promo-banner {
       margin: 12px 14px; background: linear-gradient(100deg, #f7e8ff 0%, #fde2ea 100%);
@@ -227,6 +234,24 @@
     .nav-item-icon { font-size: 18px; }
 
     .cart-item-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid #f8fafc; }
+    
+    /* Coupon Section in Cart */
+    .coupon-box-wrap {
+      display: flex; gap: 8px; margin: 10px 0;
+    }
+    .coupon-input {
+      flex: 1; padding: 10px 12px; border-radius: 10px; border: 1.5px dashed #cbd5e1;
+      font-size: 13px; font-weight: 800; text-transform: uppercase; outline: none; background: #fff;
+    }
+    .btn-apply-coupon {
+      background: var(--zepto-purple); color: white; border: none; padding: 0 16px;
+      border-radius: 10px; font-size: 12px; font-weight: 800; cursor: pointer;
+    }
+    .coupon-success-pill {
+      display: none; background: #f0fdf4; border: 1px solid #86efac; color: #15803d;
+      font-size: 11px; font-weight: 800; padding: 6px 10px; border-radius: 8px; margin-bottom: 8px;
+    }
+
     .bill-box { background: #f8fafc; padding: 12px; border-radius: 12px; margin: 12px 0; font-size: 13px; }
     .bill-row { display: flex; justify-content: space-between; margin-bottom: 6px; }
     .discount-highlight { color: var(--zepto-green); font-weight: 800; }
@@ -474,7 +499,19 @@
         <button class="sheet-close" onclick="toggleCartModal(false)">✕</button>
       </div>
 
+      <!-- Out of Radius Warning Message -->
+      <div class="radius-blocked-alert" id="radius-blocked-alert">
+        ⚠️ आपका पता हमारे मुख्य डिलीवरी दायरे से बाहर है।
+      </div>
+
       <div id="cart-items-box"></div>
+
+      <!-- Promo Coupon Code Box -->
+      <div class="coupon-box-wrap">
+        <input type="text" id="cart-coupon-input" class="coupon-input" placeholder="Enter Coupon (e.g. BABA50)">
+        <button class="btn-apply-coupon" onclick="applyCouponCode()">Apply</button>
+      </div>
+      <div class="coupon-success-pill" id="coupon-success-pill"></div>
 
       <div class="bill-box">
         <div class="bill-row">
@@ -482,12 +519,16 @@
           <span id="bill-subtotal">₹0</span>
         </div>
         <div class="bill-row">
-          <span>Delivery Charge (<span id="bill-free-del-rule">Free on ₹249+</span>)</span>
+          <span>Delivery Charge (<span id="bill-free-del-rule">Distance Based</span>)</span>
           <span id="bill-delivery-charge">₹25</span>
         </div>
         <div class="bill-row" id="row-discount" style="display: none;">
           <span class="discount-highlight" id="bill-disc-rule">Special Offer</span>
           <span class="discount-highlight" id="bill-disc-amount">-₹49</span>
+        </div>
+        <div class="bill-row" id="row-coupon" style="display: none;">
+          <span class="discount-highlight" id="bill-coupon-title">🎟️ Coupon Discount</span>
+          <span class="discount-highlight" id="bill-coupon-amount">-₹0</span>
         </div>
         <div class="bill-row total">
           <span>To Pay</span>
@@ -525,7 +566,7 @@
         <input type="tel" id="c-phone" class="zepto-input" placeholder="10-digit Mobile (6-9 से शुरू) *" maxlength="10">
         
         <button type="button" onclick="getCurrentLocation()" style="background:#f1f5f9; border:1.5px solid #cbd5e1; padding:9px; border-radius:10px; font-size:12px; font-weight:800; color:#334155; display:flex; align-items:center; justify-content:center; gap:6px; cursor:pointer;">
-          📍 Use My Current Location (GPS)
+          📍 Use My Current Location (GPS Auto Distance)
         </button>
 
         <textarea id="c-address" class="zepto-input" rows="2" placeholder="डिलीवरी पता (House/Flat No, Landmark) *"></textarea>
@@ -694,6 +735,11 @@
     let selectedStarCount = 5;
     let selectedChips = new Set();
 
+    // Geo & Distance state
+    let customerCoords = null; // { lat, lng }
+    let calculatedKm = 0;
+    let appliedCoupon = null; // { code, discount }
+
     let appConfig = {
       theme_color: '#ff3269',
       header_bg: '#f4ecfb',
@@ -705,7 +751,10 @@
       delivery_charge: 25,
       discount_min_order: 399,
       discount_amount: 49,
-      store_status: 'OPEN'
+      store_status: 'OPEN',
+      max_delivery_radius_km: 7.0,
+      base_delivery_km: 3.0,
+      per_km_charge: 10.0
     };
 
     const catEmojiMap = {
@@ -764,24 +813,77 @@
       document.getElementById('drawer-overlay').className = open ? 'drawer-overlay active' : 'drawer-overlay';
     }
 
+    // HAVERSINE DISTANCE IN KM
+    function calculateHaversineKm(lat1, lon1, lat2, lon2) {
+      const R = 6371; // Earth's radius in KM
+      const dLat = (lat2 - lat1) * Math.PI / 180;
+      const dLon = (lon2 - lon1) * Math.PI / 180;
+      const a = 
+        Math.sin(dLat/2) * Math.sin(dLat/2) +
+        Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * 
+        Math.sin(dLon/2) * Math.sin(dLon/2);
+      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+      return (R * c);
+    }
+
     function getCurrentLocation() {
       if (!navigator.geolocation) { alert('आपके ब्राउज़र में लोकेशन सपोर्ट नहीं है!'); return; }
       const addrBox = document.getElementById('c-address');
-      addrBox.placeholder = 'Fetching GPS location...';
+      addrBox.placeholder = 'Fetching GPS location & calculating distance...';
 
       navigator.geolocation.getCurrentPosition(
-        (position) => {
+        async (position) => {
           const lat = position.coords.latitude;
           const lng = position.coords.longitude;
+          customerCoords = { lat, lng };
+
           const mapsLink = `https://maps.google.com/?q=${lat},${lng}`;
           if (!addrBox.value.includes('http')) {
             addrBox.value = (addrBox.value ? addrBox.value + '\n' : '') + `📍 GPS: ${mapsLink}`;
           }
-          alert('✅ आपकी सटीक लोकेशन ले ली गई है!');
+
+          // Fetch primary hub location to calculate distance
+          try {
+            const { data: hubData } = await _supabase.from('hubs').select('*').limit(1).single();
+            if (hubData && hubData.lat && hubData.lng) {
+              calculatedKm = calculateHaversineKm(lat, lng, hubData.lat, hubData.lng);
+              checkRadiusAndRecalculate();
+            }
+          } catch (e) {
+            console.warn(e);
+          }
+
+          alert(`✅ लोकेशन प्राप्त हुई! हब से अनुमानित दूरी: ${calculatedKm.toFixed(1)} KM`);
         },
         (error) => { alert('लोकेशन परमिशन बंद है! कृपया ब्राउज़र सेटिंग्स में लोकेशन Allow करें।'); },
         { enableHighAccuracy: true, timeout: 10000 }
       );
+    }
+
+    function checkRadiusAndRecalculate() {
+      const maxRadius = Number(appConfig.max_delivery_radius_km) || 7.0;
+      const alertBox = document.getElementById('radius-blocked-alert');
+      const checkoutBtn = document.getElementById('order-submit-btn');
+
+      if (calculatedKm > maxRadius) {
+        if (alertBox) {
+          alertBox.style.display = 'block';
+          alertBox.innerText = `⚠️ आपकी दूरी (${calculatedKm.toFixed(1)} KM) हमारे अधिकतम डिलीवरी दायरे (${maxRadius} KM) से बाहर है।`;
+        }
+        if (checkoutBtn) {
+          checkoutBtn.disabled = true;
+          checkoutBtn.innerText = 'Out of Delivery Area';
+          checkoutBtn.style.background = '#94a3b8';
+        }
+      } else {
+        if (alertBox) alertBox.style.display = 'none';
+        if (checkoutBtn && appConfig.store_status !== 'CLOSED') {
+          checkoutBtn.disabled = false;
+          checkoutBtn.innerText = selectedPaymentMode === 'UPI' ? 'Verify UTR & Place Order' : 'Place Delivery Order';
+          checkoutBtn.style.background = '';
+        }
+      }
+      renderCartSheet();
     }
 
     async function loadLiveAppSettings() {
@@ -813,7 +915,7 @@
           checkoutBtn.disabled = true;
           checkoutBtn.innerText = 'Store Closed Currently';
           checkoutBtn.style.background = '#94a3b8';
-        } else {
+        } else if (!calculatedKm || calculatedKm <= (Number(appConfig.max_delivery_radius_km) || 7.0)) {
           checkoutBtn.disabled = false;
           checkoutBtn.innerText = selectedPaymentMode === 'UPI' ? 'Verify UTR & Place Order' : 'Place Delivery Order';
           checkoutBtn.style.background = '';
@@ -976,21 +1078,74 @@
       if (selectedPaymentMode === 'UPI') refreshUpiQr();
     }
 
+    // COUPON ENGINE
+    async function applyCouponCode() {
+      const codeInput = document.getElementById('cart-coupon-input');
+      const code = codeInput.value.trim().toUpperCase();
+      if (!code) return alert('कृपया कूपन कोड दर्ज करें!');
+
+      const { data, error } = await _supabase
+        .from('coupons')
+        .select('*')
+        .eq('code', code)
+        .eq('is_active', true)
+        .single();
+
+      if (error || !data) {
+        alert('❌ अमान्य या समाप्त कूपन कोड!');
+        return;
+      }
+
+      const { itemsTotal } = calculateTotals();
+      if (itemsTotal < (Number(data.min_order_amount) || 0)) {
+        alert(`⚠️ यह कूपन ₹${data.min_order_amount} या अधिक के ऑर्डर पर ही मान्य है!`);
+        return;
+      }
+
+      appliedCoupon = { code: data.code, discount: Number(data.discount_value) || 0 };
+      const pill = document.getElementById('coupon-success-pill');
+      if (pill) {
+        pill.style.display = 'block';
+        pill.innerText = `✓ कूपन '${data.code}' लागू हुआ! ₹${appliedCoupon.discount} की छूट मिली।`;
+      }
+      renderCartSheet();
+      if (selectedPaymentMode === 'UPI') refreshUpiQr();
+    }
+
+    // DISTANCE & DELIVERY CHARGE CALCULATION
     function calculateTotals() {
       const entries = Object.values(cart);
       const itemsTotal = entries.reduce((s, e) => s + (e.qty * Number(e.item.price)), 0);
       const totalQty = entries.reduce((s, e) => s + e.qty, 0);
 
       const minFree = Number(appConfig.min_free_delivery) || 249;
-      const delCharge = Number(appConfig.delivery_charge) || 25;
+      const baseCharge = Number(appConfig.delivery_charge) || 25;
       const minDisc = Number(appConfig.discount_min_order) || 399;
       const discAmt = Number(appConfig.discount_amount) || 49;
 
-      let deliveryCharge = (itemsTotal >= minFree || itemsTotal === 0) ? 0 : delCharge;
-      let discount = (itemsTotal >= minDisc) ? discAmt : 0;
-      let finalToPay = Math.max(0, itemsTotal + deliveryCharge - discount);
+      // Distance fee calculation
+      let deliveryCharge = 0;
+      if (itemsTotal > 0) {
+        if (itemsTotal >= minFree) {
+          deliveryCharge = 0;
+        } else {
+          deliveryCharge = baseCharge;
+          // Extra KM fee if distance > base distance
+          const baseKm = Number(appConfig.base_delivery_km) || 3.0;
+          const perKm = Number(appConfig.per_km_charge) || 10.0;
+          if (calculatedKm > baseKm) {
+            const extraKm = Math.ceil(calculatedKm - baseKm);
+            deliveryCharge += (extraKm * perKm);
+          }
+        }
+      }
 
-      return { itemsTotal, totalQty, deliveryCharge, discount, finalToPay };
+      let discount = (itemsTotal >= minDisc) ? discAmt : 0;
+      let couponDisc = appliedCoupon ? appliedCoupon.discount : 0;
+
+      let finalToPay = Math.max(0, itemsTotal + deliveryCharge - discount - couponDisc);
+
+      return { itemsTotal, totalQty, deliveryCharge, discount, couponDisc, finalToPay };
     }
 
     function updateCartBar() {
@@ -1015,6 +1170,7 @@
         document.getElementById('bill-subtotal').innerText = '₹0';
         document.getElementById('bill-delivery-charge').innerText = '₹0';
         document.getElementById('row-discount').style.display = 'none';
+        document.getElementById('row-coupon').style.display = 'none';
         document.getElementById('bill-grand-total').innerText = '₹0';
         const submitBtn = document.getElementById('order-submit-btn');
         if (submitBtn) submitBtn.disabled = true;
@@ -1025,7 +1181,7 @@
       if (submitBtn) {
         submitBtn.disabled = appConfig.store_status === 'CLOSED';
       }
-      const { itemsTotal, deliveryCharge, discount, finalToPay } = calculateTotals();
+      const { itemsTotal, deliveryCharge, discount, couponDisc, finalToPay } = calculateTotals();
 
       box.innerHTML = entries.map(({ item, qty }) => `
         <div class="cart-item-row">
@@ -1045,22 +1201,35 @@
       `).join('');
 
       document.getElementById('bill-subtotal').innerText = `₹${itemsTotal}`;
-      document.getElementById('bill-delivery-charge').innerText = deliveryCharge === 0 ? 'FREE' : `₹${deliveryCharge}`;
+      document.getElementById('bill-delivery-charge').innerText = deliveryCharge === 0 ? 'FREE' : `₹${deliveryCharge} ${calculatedKm > 0 ? '(' + calculatedKm.toFixed(1) + ' km)' : ''}`;
       document.getElementById('bill-delivery-charge').style.color = deliveryCharge === 0 ? 'var(--zepto-green)' : '#000';
 
       const discountRow = document.getElementById('row-discount');
       if (discount > 0) discountRow.style.display = 'flex';
       else discountRow.style.display = 'none';
 
+      const couponRow = document.getElementById('row-coupon');
+      if (couponDisc > 0) {
+        couponRow.style.display = 'flex';
+        document.getElementById('bill-coupon-title').innerText = `🎟️ Coupon (${appliedCoupon.code})`;
+        document.getElementById('bill-coupon-amount').innerText = `-₹${couponDisc}`;
+      } else {
+        couponRow.style.display = 'none';
+      }
+
       document.getElementById('bill-grand-total').innerText = `₹${finalToPay}`;
     }
 
-    // ============================================================
-    // PLACE ORDER WITH NEAREST HUB & RIDER AUTO-DISPATCH
-    // ============================================================
+    // PLACE ORDER WITH HUB & NEAREST RIDER AUTO DISPATCH
     async function placeOrder() {
       if (appConfig.store_status === 'CLOSED') {
         alert('⚠️ दुकान अभी बंद है। हम नए ऑर्डर स्वीकार नहीं कर रहे हैं।');
+        return;
+      }
+
+      const maxRadius = Number(appConfig.max_delivery_radius_km) || 7.0;
+      if (calculatedKm > maxRadius) {
+        alert(`⚠️ क्षमा करें! आपका पता हमारे हब से ${calculatedKm.toFixed(1)} KM दूर है, जबकि अधिकतम डिलीवरी दायरा ${maxRadius} KM है।`);
         return;
       }
 
@@ -1088,7 +1257,7 @@
         }
       }
 
-      const { finalToPay } = calculateTotals();
+      const { finalToPay, couponDisc } = calculateTotals();
       const entries = Object.values(cart);
       if (entries.length === 0) { alert('आपकी कार्ट खाली है!'); return; }
 
@@ -1102,11 +1271,9 @@
       btn.disabled = true;
       btn.innerText = 'Finding nearest rider & placing order...';
 
-      // 1. प्राथमिक वेंडर हब निकालना
       const primaryHubId = orderItems[0]?.hub_id || 1;
       let assignedRiderId = null;
 
-      // 2. हब की लोकेशन से सबसे पास वाले राइडर को ऑटो-सर्च करना
       try {
         const { data: hubInfo } = await _supabase.from('hubs').select('lat, lng').eq('id', primaryHubId).single();
         if (hubInfo && hubInfo.lat && hubInfo.lng) {
@@ -1136,7 +1303,10 @@
             transaction_id: selectedPaymentMode === 'UPI' ? utr : null,
             delivery_otp: generatedOtp,
             hub_id: primaryHubId,
-            assigned_rider_id: assignedRiderId
+            assigned_rider_id: assignedRiderId,
+            coupon_code: appliedCoupon ? appliedCoupon.code : null,
+            coupon_discount: couponDisc,
+            distance_km: calculatedKm ? Number(calculatedKm.toFixed(2)) : 0
           }])
           .select();
 
@@ -1158,6 +1328,7 @@
         });
 
         cart = {};
+        appliedCoupon = null;
         document.getElementById('upi-utr').value = '';
         updateCartBar();
         renderProducts(allProducts);
@@ -1470,7 +1641,7 @@
 
     function scrollToHistory() { document.getElementById('past-orders-section').scrollIntoView({ behavior: 'smooth' }); }
 
-    // Real-time Settings Listener
+    // Real-time Settings Sync
     setInterval(loadLiveAppSettings, 5000);
 
     initApp();
