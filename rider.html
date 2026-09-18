@@ -267,9 +267,7 @@
       font-weight: 900; cursor: grab; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
     }
 
-    /* =================================================== */
-    /* 4-DIGIT OTP VERIFICATION MODAL FOR RIDER           */
-    /* =================================================== */
+    /* 4-DIGIT OTP VERIFICATION MODAL FOR RIDER */
     .otp-modal-overlay {
       position: fixed; top: 0; left: 0; width: 100%; height: 100%;
       background: rgba(15, 23, 42, 0.85); z-index: 880; display: none;
@@ -506,7 +504,7 @@
     </div>
   </div>
 
-  <!-- SCREEN 1: Bin -->
+  <!-- SCREEN 1: "Go to the Bin" View -->
   <div class="bin-screen" id="bin-screen">
     <div class="bin-header">
       <div class="bin-title">Go to the Bin</div>
@@ -530,7 +528,7 @@
     </div>
   </div>
 
-  <!-- SCREEN 2: Photo -->
+  <!-- SCREEN 2: "Take Photo of Items in Bag" View -->
   <div class="photo-screen" id="photo-screen">
     <div class="photo-nav">
       <button class="btn-photo-close" onclick="closePhotoScreen()">✕</button>
@@ -551,7 +549,7 @@
     </div>
   </div>
 
-  <!-- SCREEN 3: On The Way -->
+  <!-- SCREEN 3: "On the Way" Live Map Screen -->
   <div class="way-screen" id="way-screen">
     <div class="way-map-container">
       <div class="way-top-bar">
@@ -609,9 +607,7 @@
     </div>
   </div>
 
-  <!-- =================================================== -->
-  <!-- 4-DIGIT OTP VERIFICATION POPUP MODAL FOR RIDER     -->
-  <!-- =================================================== -->
+  <!-- 4-DIGIT OTP VERIFICATION POPUP MODAL FOR RIDER -->
   <div class="otp-modal-overlay" id="otp-modal">
     <div class="otp-card-sheet">
       <div class="otp-icon-circle">🔐</div>
@@ -659,6 +655,7 @@
         <div class="p-row"><span class="p-label">Mobile Number:</span><span class="p-val" id="prof-phone">--</span></div>
         <div class="p-row"><span class="p-label">Vehicle No:</span><span class="p-val" id="prof-vehicle">--</span></div>
         <div class="p-row"><span class="p-label">Status:</span><span class="p-val" style="color:var(--accent-green);" id="prof-status">Active Partner</span></div>
+        <div class="p-row"><span class="p-label">Live GPS:</span><span class="p-val" style="color:#0284c7;" id="prof-gps">Locating...</span></div>
       </div>
 
       <a class="btn-help-link" style="background: #25D366; color:white;" target="_blank" href="https://wa.me/919711107063?text=Rider%20Support%20Needed">
@@ -744,7 +741,9 @@
     let rawAllOrders = [];
     let activeChatOrderId = null;
     let rChatInterval = null;
+    let gpsTrackerInterval = null;
 
+    // AUTHENTICATION
     function checkAuthStatus() {
       if (!loggedInRider) {
         document.getElementById('auth-overlay').classList.add('active');
@@ -756,6 +755,7 @@
         document.getElementById('prof-phone').innerText = loggedInRider.phone;
         document.getElementById('prof-vehicle').innerText = loggedInRider.vehicle_no || 'Standard';
         document.getElementById('prof-status').innerText = loggedInRider.status || 'Active';
+        startRiderLiveGps();
         loadRiderOrders();
       }
     }
@@ -791,7 +791,7 @@
         }
 
         const { error } = await _supabase.from('riders').insert([{
-          name: name, phone: phone, vehicle_no: vehicle || 'Standard', status: 'Pending'
+          name: name, phone: phone, vehicle_no: vehicle || 'Standard', status: 'Pending', is_online: true
         }]);
         if (error) throw error;
 
@@ -833,14 +833,49 @@
 
     function handleRiderLogout() {
       if (!confirm('क्या आप वाकई Logout करना चाहते हैं?')) return;
+      if (loggedInRider) {
+        _supabase.from('riders').update({ is_online: false }).eq('id', loggedInRider.id);
+      }
       localStorage.removeItem('baba_logged_rider');
       loggedInRider = null;
+      if (gpsTrackerInterval) clearInterval(gpsTrackerInterval);
       closeProfileModal();
       checkAuthStatus();
     }
 
     function openProfileModal() { document.getElementById('profile-modal').classList.add('active'); }
     function closeProfileModal(e) { if(e && e.target !== e.currentTarget) return; document.getElementById('profile-modal').classList.remove('active'); }
+
+    // ============================================
+    // LIVE GPS TRACKING FOR NEAREST HUB DISPATCH
+    // ============================================
+    function startRiderLiveGps() {
+      if (!navigator.geolocation || !loggedInRider) return;
+
+      const pushGps = () => {
+        if (!isOnline) return;
+        navigator.geolocation.getCurrentPosition(async (pos) => {
+          const lat = pos.coords.latitude;
+          const lng = pos.coords.longitude;
+          const gpsText = document.getElementById('prof-gps');
+          if (gpsText) gpsText.innerText = `${lat.toFixed(4)}, ${lng.toFixed(4)}`;
+
+          await _supabase.from('riders').update({
+            current_lat: lat,
+            current_lng: lng,
+            is_online: true,
+            last_location_at: new Date().toISOString()
+          }).eq('id', loggedInRider.id);
+        }, (err) => {
+          console.warn("Rider GPS Ping Notice:", err.message);
+        }, { enableHighAccuracy: true });
+      };
+
+      pushGps();
+      if (!gpsTrackerInterval) {
+        gpsTrackerInterval = setInterval(pushGps, 25000); // Har 25 sec me GPS sync
+      }
+    }
 
     // SOS Functions
     function openSosModal() { document.getElementById('sos-modal').classList.add('active'); }
@@ -916,6 +951,11 @@
       isOnline = online;
       const pill = document.getElementById('waiting-pill');
       const text = document.getElementById('duty-text');
+
+      if (loggedInRider) {
+        _supabase.from('riders').update({ is_online: online }).eq('id', loggedInRider.id);
+      }
+
       if (online) {
         pill.className = 'waiting-pill active-duty';
         text.innerText = 'Waiting for Order...';
@@ -935,6 +975,9 @@
       renderTasks();
     }
 
+    // ============================================================
+    // 2-DAY ROLLING ORDERS LOADER WITH NEAREST HUB RIDER FILTER
+    // ============================================================
     async function loadRiderOrders() {
       if (!isOnline || !loggedInRider) return;
       try {
@@ -949,7 +992,11 @@
           .order('id', { ascending: false });
 
         if (error) throw error;
-        rawAllOrders = data || [];
+        
+        // Filter: Ya to order is rider ko assign hua ho ya broadcast ho
+        rawAllOrders = (data || []).filter(o => {
+          return !o.assigned_rider_id || o.assigned_rider_id === loggedInRider.id;
+        });
 
         if (isFirstTimeLoad) {
           rawAllOrders.forEach(o => processedOrders.add(o.id));
@@ -1038,6 +1085,7 @@
               </div>
               <div style="font-size:13px; font-weight:700;">👤 ${o.customer_name || 'Customer'} (📞 <a style="color:#38bdf8;" href="tel:${o.customer_phone}">${o.customer_phone}</a>)</div>
               <div class="r-address">📍 ${o.delivery_address || 'Address Not Provided'}</div>
+              ${o.hub_id ? `<div style="font-size:11px; color:#38bdf8; font-weight:700; margin-bottom:4px;">🏬 Pickup from Hub #${o.hub_id}</div>` : ''}
               <div style="display:flex; justify-content:space-between; align-items:center; margin:6px 0;">
                 <div style="font-size:13px; font-weight:800; color:var(--accent-green);">To Collect: ₹${o.total_amount} (${o.payment_mode || 'COD'})</div>
                 <a href="${mapsLink}" target="_blank" style="color:#38bdf8; text-decoration:none; font-size:11px; font-weight:800;">🗺️ View Map ↗</a>
@@ -1108,7 +1156,11 @@
       btn.innerText = 'Submitting & Starting Delivery...';
       btn.disabled = true;
 
-      const { error } = await _supabase.from('orders').update({ status: 'Out for Delivery' }).eq('id', currentSelectedOrder.id);
+      const { error } = await _supabase.from('orders').update({
+        status: 'Out for Delivery',
+        assigned_rider_id: loggedInRider.id
+      }).eq('id', currentSelectedOrder.id);
+
       if (!error) {
         document.getElementById('photo-screen').classList.remove('active');
         document.getElementById('bin-screen').classList.remove('active');
@@ -1136,7 +1188,6 @@
       document.getElementById('way-screen').classList.add('active');
     }
 
-    // Step 1 of Delivery: Mark Arrived Trigger
     function handleMarkArrived() {
       if (!currentSelectedOrder) return;
       if (currentSelectedOrder.payment_mode === 'COD') {
@@ -1144,7 +1195,6 @@
         initCodSlider();
         document.getElementById('cod-modal').classList.add('active');
       } else {
-        // ऑनलाइन पेड है तो सीधा OTP वेरिफिकेशन खोलें
         openOtpModal();
       }
     }
@@ -1182,7 +1232,6 @@
           thumb.style.background = '#059669';
           setTimeout(() => {
             closeCodModal();
-            // कैश मिलने के बाद OTP स्क्रीन खोलें
             openOtpModal();
           }, 250);
         }
@@ -1203,9 +1252,6 @@
       thumb.ontouchstart = onStart; window.ontouchmove = onMove; window.ontouchend = onEnd;
     }
 
-    // ============================================
-    // 4-DIGIT OTP VERIFICATION LOGIC (STRICT)
-    // ============================================
     function openOtpModal() {
       document.getElementById('rider-otp-input').value = '';
       document.getElementById('otp-modal').classList.add('active');
@@ -1225,7 +1271,6 @@
 
       if (!currentSelectedOrder) return;
 
-      // Supabase से फ्रेश OTP वेरीफाई करें
       try {
         const { data: orderData, error } = await _supabase
           .from('orders')
@@ -1238,7 +1283,6 @@
           return;
         }
 
-        // OTP मिलान की सख्त जाँच
         if (orderData.delivery_otp && orderData.delivery_otp.toString() !== enteredOtp) {
           alert('❌ गलत OTP (Invalid OTP)!\n\nकृपया ग्राहक के मोबाइल ऐप से सही 4-अंकों का कोड देखकर डालें।');
           document.getElementById('rider-otp-input').value = '';
@@ -1246,7 +1290,6 @@
           return;
         }
 
-        // OTP सही होने पर ही डिलीवर होगा
         closeOtpModal();
         finalizeOrderDelivery();
 
@@ -1258,7 +1301,11 @@
     async function finalizeOrderDelivery() {
       if (!currentSelectedOrder) return;
       try {
-        const { error } = await _supabase.from('orders').update({ status: 'Delivered' }).eq('id', currentSelectedOrder.id);
+        const { error } = await _supabase.from('orders').update({
+          status: 'Delivered',
+          assigned_rider_id: loggedInRider.id
+        }).eq('id', currentSelectedOrder.id);
+
         if (error) throw error;
 
         document.getElementById('way-screen').classList.remove('active');
