@@ -656,6 +656,7 @@
         <div class="p-row"><span class="p-label">Vehicle No:</span><span class="p-val" id="prof-vehicle">--</span></div>
         <div class="p-row"><span class="p-label">Status:</span><span class="p-val" style="color:var(--accent-green);" id="prof-status">Active Partner</span></div>
         <div class="p-row"><span class="p-label">Live GPS:</span><span class="p-val" style="color:#0284c7;" id="prof-gps">Locating...</span></div>
+        <div class="p-row"><span class="p-label">Cash In Hand:</span><span class="p-val" style="color:#ea580c;" id="prof-cash">₹0</span></div>
       </div>
 
       <a class="btn-help-link" style="background: #25D366; color:white;" target="_blank" href="https://wa.me/919711107063?text=Rider%20Support%20Needed">
@@ -755,8 +756,21 @@
         document.getElementById('prof-phone').innerText = loggedInRider.phone;
         document.getElementById('prof-vehicle').innerText = loggedInRider.vehicle_no || 'Standard';
         document.getElementById('prof-status').innerText = loggedInRider.status || 'Active';
+        document.getElementById('prof-cash').innerText = `₹${loggedInRider.cash_in_hand || 0}`;
         startRiderLiveGps();
         loadRiderOrders();
+        syncRiderData();
+      }
+    }
+
+    async function syncRiderData() {
+      if (!loggedInRider) return;
+      const { data } = await _supabase.from('riders').select('*').eq('id', loggedInRider.id).single();
+      if (data) {
+        loggedInRider = data;
+        localStorage.setItem('baba_logged_rider', JSON.stringify(data));
+        const cashElem = document.getElementById('prof-cash');
+        if (cashElem) cashElem.innerText = `₹${data.cash_in_hand || 0}`;
       }
     }
 
@@ -791,7 +805,7 @@
         }
 
         const { error } = await _supabase.from('riders').insert([{
-          name: name, phone: phone, vehicle_no: vehicle || 'Standard', status: 'Pending', is_online: true
+          name: name, phone: phone, vehicle_no: vehicle || 'Standard', status: 'Pending', is_online: true, cash_in_hand: 0
         }]);
         if (error) throw error;
 
@@ -843,12 +857,13 @@
       checkAuthStatus();
     }
 
-    function openProfileModal() { document.getElementById('profile-modal').classList.add('active'); }
+    function openProfileModal() { 
+      syncRiderData();
+      document.getElementById('profile-modal').classList.add('active'); 
+    }
     function closeProfileModal(e) { if(e && e.target !== e.currentTarget) return; document.getElementById('profile-modal').classList.remove('active'); }
 
-    // ============================================
-    // LIVE GPS TRACKING FOR NEAREST HUB DISPATCH
-    // ============================================
+    // LIVE GPS BACKGROUND SYNC
     function startRiderLiveGps() {
       if (!navigator.geolocation || !loggedInRider) return;
 
@@ -873,7 +888,7 @@
 
       pushGps();
       if (!gpsTrackerInterval) {
-        gpsTrackerInterval = setInterval(pushGps, 25000); // Har 25 sec me GPS sync
+        gpsTrackerInterval = setInterval(pushGps, 25000);
       }
     }
 
@@ -893,7 +908,8 @@
           cash += Number(o.total_amount) || 0;
         }
       });
-      alert(`👛 Rider Earnings Overview\n\n• कुल डिलीवर किए गए ऑर्डर: ${count}\n• कुल कमाई राशि: ₹${cash}\n• चालू शिफ्ट घंटे: ${document.getElementById('live-login-hrs').innerText} hrs`);
+      const inHand = loggedInRider?.cash_in_hand || 0;
+      alert(`👛 Rider Earnings Overview\n\n• कुल डिलीवर किए गए ऑर्डर: ${count}\n• कुल कमाई राशि: ₹${cash}\n• जमा करने योग्य COD कैश: ₹${inHand}\n• चालू शिफ्ट घंटे: ${document.getElementById('live-login-hrs').innerText} hrs`);
     }
 
     function showSlotDetails() {
@@ -975,9 +991,7 @@
       renderTasks();
     }
 
-    // ============================================================
     // 2-DAY ROLLING ORDERS LOADER WITH NEAREST HUB RIDER FILTER
-    // ============================================================
     async function loadRiderOrders() {
       if (!isOnline || !loggedInRider) return;
       try {
@@ -993,7 +1007,7 @@
 
         if (error) throw error;
         
-        // Filter: Ya to order is rider ko assign hua ho ya broadcast ho
+        // Filter: Order assigned to this rider or open broadcast
         rawAllOrders = (data || []).filter(o => {
           return !o.assigned_rider_id || o.assigned_rider_id === loggedInRider.id;
         });
@@ -1301,12 +1315,26 @@
     async function finalizeOrderDelivery() {
       if (!currentSelectedOrder) return;
       try {
-        const { error } = await _supabase.from('orders').update({
+        // 1. Update Order Status
+        const { error: orderErr } = await _supabase.from('orders').update({
           status: 'Delivered',
           assigned_rider_id: loggedInRider.id
         }).eq('id', currentSelectedOrder.id);
 
-        if (error) throw error;
+        if (orderErr) throw orderErr;
+
+        // 2. COD Cash Auto-Addition to Rider's Hand
+        if (currentSelectedOrder.payment_mode === 'COD') {
+          const codAmount = Number(currentSelectedOrder.total_amount) || 0;
+          const currentCash = Number(loggedInRider.cash_in_hand) || 0;
+          const newCash = currentCash + codAmount;
+
+          await _supabase.from('riders').update({ cash_in_hand: newCash }).eq('id', loggedInRider.id);
+          loggedInRider.cash_in_hand = newCash;
+          localStorage.setItem('baba_logged_rider', JSON.stringify(loggedInRider));
+          const cashElem = document.getElementById('prof-cash');
+          if (cashElem) cashElem.innerText = `₹${newCash}`;
+        }
 
         document.getElementById('way-screen').classList.remove('active');
         document.getElementById('success-order-id').innerText = `ORD #${currentSelectedOrder.id} Delivered to ${currentSelectedOrder.customer_name || 'Customer'}`;
