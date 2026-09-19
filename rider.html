@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>👑 Baba Food Rider Partner</title>
   <link rel="icon" type="image/png" href="logo.png">
+  <link rel="manifest" href="manifest.json">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -71,7 +72,6 @@
 
     .top-actions { display: flex; align-items: center; gap: 12px; }
 
-    /* SOS Header Button */
     .btn-sos-top {
       background: #dc2626; color: white; border: none; font-size: 11px;
       font-weight: 900; padding: 6px 10px; border-radius: 8px; cursor: pointer;
@@ -83,7 +83,6 @@
       50% { transform: scale(1.05); }
     }
     
-    /* Duty Switch */
     .switch { position: relative; display: inline-block; width: 44px; height: 24px; }
     .switch input { opacity: 0; width: 0; height: 0; }
     .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #cbd5e1; transition: .3s; border-radius: 24px; }
@@ -93,7 +92,6 @@
 
     .help-btn { font-size: 12px; font-weight: 700; color: #475569; display: flex; align-items: center; gap: 4px; text-decoration: none; cursor: pointer; }
 
-    /* Shift Details Bar */
     .shift-box {
       background: #ffffff; color: #1e293b; padding: 12px 16px; border-bottom: 1px solid #f1f5f9;
       display: flex; justify-content: space-between; align-items: center;
@@ -371,7 +369,7 @@
 </head>
 <body>
 
-  <!-- Audio Ringtone Player (Downloads/Local alert.mp3) -->
+  <!-- Audio Ringtone Player (Downloaded alert.mp3) -->
   <audio id="rider-order-audio" preload="auto" src="alert.mp3"></audio>
 
   <!-- 1. AUTH SCREEN -->
@@ -452,7 +450,7 @@
 
     <div class="waiting-pill active-duty" id="waiting-pill">
       <span style="font-size: 18px;">🛍️</span>
-      <span class="waiting-text" id="duty-text">Waiting for Order...</span>
+      <span class="waiting-text" id="duty-text">Waiting for Order... (Screen Lock Protected)</span>
     </div>
 
     <div class="earnings-card">
@@ -507,7 +505,7 @@
     </div>
   </div>
 
-  <!-- SCREEN 1: "Go to the Bin" View -->
+  <!-- SCREEN 1: Bin -->
   <div class="bin-screen" id="bin-screen">
     <div class="bin-header">
       <div class="bin-title">Go to the Bin</div>
@@ -531,7 +529,7 @@
     </div>
   </div>
 
-  <!-- SCREEN 2: "Take Photo of Items in Bag" View -->
+  <!-- SCREEN 2: Photo -->
   <div class="photo-screen" id="photo-screen">
     <div class="photo-nav">
       <button class="btn-photo-close" onclick="closePhotoScreen()">✕</button>
@@ -552,7 +550,7 @@
     </div>
   </div>
 
-  <!-- SCREEN 3: "On the Way" Live Map Screen -->
+  <!-- SCREEN 3: On The Way -->
   <div class="way-screen" id="way-screen">
     <div class="way-map-container">
       <div class="way-top-bar">
@@ -750,6 +748,41 @@
     let activeChatOrderId = null;
     let rChatInterval = null;
     let gpsTrackerInterval = null;
+    let wakeLock = null;
+
+    // Service Worker Register
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('sw.js').then(reg => {
+        console.log("Service Worker Active:", reg.scope);
+      }).catch(err => console.warn("SW Error:", err));
+    }
+
+    // SCREEN WAKE LOCK (स्क्रीन लॉक होने पर भी ऐप को ज़िंदा रखना)
+    async function requestWakeLock() {
+      try {
+        if ('wakeLock' in navigator) {
+          wakeLock = await navigator.wakeLock.request('screen');
+          wakeLock.addEventListener('release', () => {
+            console.log('Wake Lock released');
+          });
+        }
+      } catch (err) {
+        console.warn('Wake Lock notice:', err);
+      }
+    }
+
+    document.addEventListener('visibilitychange', async () => {
+      if (wakeLock !== null && document.visibilityState === 'visible') {
+        await requestWakeLock();
+      }
+    });
+
+    // NOTIFICATION PERMISSION (लॉक स्क्रीन अलर्ट के लिए)
+    function initNotificationPermission() {
+      if ('Notification' in window && Notification.permission !== 'granted') {
+        Notification.requestPermission();
+      }
+    }
 
     // AUTHENTICATION
     function checkAuthStatus() {
@@ -764,6 +797,8 @@
         document.getElementById('prof-vehicle').innerText = loggedInRider.vehicle_no || 'Standard';
         document.getElementById('prof-status').innerText = loggedInRider.status || 'Active';
         document.getElementById('prof-cash').innerText = `₹${loggedInRider.cash_in_hand || 0}`;
+        requestWakeLock();
+        initNotificationPermission();
         startRiderLiveGps();
         loadRiderOrders();
         syncRiderData();
@@ -859,6 +894,7 @@
       }
       localStorage.removeItem('baba_logged_rider');
       loggedInRider = null;
+      if (wakeLock) { wakeLock.release(); wakeLock = null; }
       if (gpsTrackerInterval) clearInterval(gpsTrackerInterval);
       closeProfileModal();
       checkAuthStatus();
@@ -930,26 +966,29 @@
     }
 
     // ============================================================
-    // PLAY DOWNLOADED AUDIO RINGTONE (alert.mp3 + WebAudio fallback)
+    // PLAY DOWNLOADED AUDIO RINGTONE (LOCK SCREEN + BACKGROUND COMPATIBLE)
     // ============================================================
-    function playLoudEmergencySiren() {
+    function playLoudEmergencySiren(orderAmount = '') {
       try {
         const audioTag = document.getElementById('rider-order-audio');
         if (audioTag) {
           audioTag.currentTime = 0;
-          const playPromise = audioTag.play();
-          if (playPromise !== undefined) {
-            playPromise.catch(err => {
-              console.warn("MP3 autoplay wait notice:", err);
-              // Fallback to Web Audio Oscillator
-              playSynthesizerFallback();
-            });
-          }
+          audioTag.play().catch(() => playSynthesizerFallback());
         } else {
           playSynthesizerFallback();
         }
 
-        if (navigator.vibrate) navigator.vibrate([500, 250, 500, 250, 800]);
+        if (navigator.vibrate) {
+          navigator.vibrate([600, 300, 600, 300, 1000]);
+        }
+
+        // Trigger Lock Screen Push Notification via Service Worker
+        if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
+          navigator.serviceWorker.controller.postMessage({
+            type: 'NEW_ORDER_ALERT',
+            amount: orderAmount
+          });
+        }
       } catch (err) {
         playSynthesizerFallback();
       }
@@ -1005,10 +1044,12 @@
       }
 
       if (online) {
+        requestWakeLock();
         pill.className = 'waiting-pill active-duty';
-        text.innerText = 'Waiting for Order...';
+        text.innerText = 'Waiting for Order... (Lock Screen Safe)';
         loadRiderOrders();
       } else {
+        if (wakeLock) { wakeLock.release(); wakeLock = null; }
         pill.className = 'waiting-pill';
         text.innerText = 'You are Offline';
         document.getElementById('rider-orders-list').innerHTML = 
@@ -1039,7 +1080,6 @@
 
         if (error) throw error;
         
-        // Filter: Order assigned to this rider or open broadcast
         rawAllOrders = (data || []).filter(o => {
           return !o.assigned_rider_id || o.assigned_rider_id === loggedInRider.id;
         });
@@ -1050,15 +1090,17 @@
           isFirstTimeLoad = false;
         } else {
           let hasNewOrder = false;
+          let newOrderAmt = '';
           rawAllOrders.forEach(o => {
             if (!processedOrders.has(o.id) && o.status !== 'Delivered') {
               hasNewOrder = true;
+              newOrderAmt = o.total_amount;
               processedOrders.add(o.id);
             }
           });
           if (hasNewOrder) {
             localStorage.setItem('baba_processed_orders', JSON.stringify([...processedOrders]));
-            playLoudEmergencySiren();
+            playLoudEmergencySiren(newOrderAmt);
           }
         }
         renderTasks();
@@ -1347,7 +1389,6 @@
     async function finalizeOrderDelivery() {
       if (!currentSelectedOrder) return;
       try {
-        // 1. Update Order Status
         const { error: orderErr } = await _supabase.from('orders').update({
           status: 'Delivered',
           assigned_rider_id: loggedInRider.id
@@ -1355,7 +1396,6 @@
 
         if (orderErr) throw orderErr;
 
-        // 2. COD Cash Auto-Addition to Rider's Hand
         if (currentSelectedOrder.payment_mode === 'COD') {
           const codAmount = Number(currentSelectedOrder.total_amount) || 0;
           const currentCash = Number(loggedInRider.cash_in_hand) || 0;
@@ -1441,8 +1481,10 @@
       }
     }
 
-    // Unlock Audio Context on First User Touch
+    // First Touch Unlocks Audio Context & Notifications
     window.addEventListener('click', () => {
+      initNotificationPermission();
+      requestWakeLock();
       const audioTag = document.getElementById('rider-order-audio');
       if (audioTag) {
         audioTag.load();
