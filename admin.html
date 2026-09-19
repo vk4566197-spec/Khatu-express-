@@ -176,9 +176,6 @@
       padding: 4px 10px; border-radius: 12px; font-weight: 900; font-size: 12px; display: inline-block;
     }
 
-    /* ==================================================== */
-    /* ANALYTICS & PROFIT REPORT STYLES                    */
-    /* ==================================================== */
     .report-filter-bar {
       display: flex; gap: 8px; margin-bottom: 16px; overflow-x: auto;
     }
@@ -240,7 +237,7 @@
         📦 Orders (4 Days)
       </button>
       <button class="master-btn" id="btn-sec-analytics" onclick="switchMasterSection('ANALYTICS')">
-        📈 Profit & Sales (हिसाब)
+        📈 Profit & Sales (Hisaab)
       </button>
       <button class="master-btn" id="btn-sec-map" onclick="switchMasterSection('MAP')">
         🗺️ Live Fleet Map
@@ -291,59 +288,57 @@
       </div>
 
       <div id="orders-container">
-        <div style="text-align: center; color: var(--muted); padding: 40px;">ऑर्डर्स लोड हो रहे हैं...</div>
+        <div style="text-align: center; color: var(--muted); padding: 40px;">Orders load ho rahe hain...</div>
       </div>
     </div>
 
-    <!-- SECTION 2: PROFIT & SALES ANALYTICS (दैनिक हिसाब-किताब) -->
+    <!-- SECTION 2: PROFIT & SALES ANALYTICS -->
     <div id="section-analytics" style="display: none;">
       <div class="report-filter-bar">
-        <button class="report-filter-btn active" onclick="setAnalyticsRange('TODAY', this)">🟢 आज (Today)</button>
-        <button class="report-filter-btn" onclick="setAnalyticsRange('YESTERDAY', this)">🟡 कल (Yesterday)</button>
-        <button class="report-filter-btn" onclick="setAnalyticsRange('LAST7DAYS', this)">📅 पिछले 7 दिन (7 Days)</button>
+        <button class="report-filter-btn active" onclick="setAnalyticsRange('TODAY', this)">🟢 Aaj (Today)</button>
+        <button class="report-filter-btn" onclick="setAnalyticsRange('YESTERDAY', this)">🟡 Kal (Yesterday)</button>
+        <button class="report-filter-btn" onclick="setAnalyticsRange('LAST7DAYS', this)">📅 Pichhle 7 Din (7 Days)</button>
       </div>
 
       <div class="analytics-hero-grid">
         <div class="ana-box" style="border-left: 4px solid var(--green);">
-          <div class="ana-title">कुल शुद्ध बिक्री (Net Sales)</div>
+          <div class="ana-title">Kul Shuddh Bikri (Net Sales)</div>
           <div class="ana-number" style="color: var(--green);" id="ana-total-sales">₹0</div>
-          <div style="font-size: 11px; color: var(--muted); margin-top: 2px;" id="ana-orders-count">0 ऑर्डर्स</div>
+          <div style="font-size: 11px; color: var(--muted); margin-top: 2px;" id="ana-orders-count">0 Orders</div>
         </div>
         <div class="ana-box" style="border-left: 4px solid #f59e0b;">
-          <div class="ana-title">COD नकद (Cash with Riders)</div>
+          <div class="ana-title">COD Nakad (Cash with Riders)</div>
           <div class="ana-number" style="color: #b45309;" id="ana-cod-sales">₹0</div>
-          <div style="font-size: 11px; color: var(--muted); margin-top: 2px;" id="ana-cod-orders">0 ऑर्डर्स</div>
+          <div style="font-size: 11px; color: var(--muted); margin-top: 2px;" id="ana-cod-orders">0 Orders</div>
         </div>
         <div class="ana-box" style="border-left: 4px solid #2563eb;">
-          <div class="ana-title">ऑनलाइन UPI (Bank Balance)</div>
+          <div class="ana-title">Online UPI (Bank Balance)</div>
           <div class="ana-number" style="color: #2563eb;" id="ana-upi-sales">₹0</div>
-          <div style="font-size: 11px; color: var(--muted); margin-top: 2px;" id="ana-upi-orders">0 ऑर्डर्स</div>
+          <div style="font-size: 11px; color: var(--muted); margin-top: 2px;" id="ana-upi-orders">0 Orders</div>
         </div>
         <div class="ana-box" style="border-left: 4px solid var(--pink);">
-          <div class="ana-title">कूपन डिस्काउंट लागत</div>
+          <div class="ana-title">Coupon Discount Lagat</div>
           <div class="ana-number" style="color: var(--pink);" id="ana-coupon-loss">₹0</div>
-          <div style="font-size: 11px; color: var(--muted); margin-top: 2px;">ऑफ़र में दी गई छूट</div>
+          <div style="font-size: 11px; color: var(--muted); margin-top: 2px;">Offer me di gayi chhoot</div>
         </div>
       </div>
 
       <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 14px;">
-        <!-- Top Selling Items -->
         <div class="analytics-card">
           <div style="font-size: 14px; font-weight: 900; color: var(--primary);">
-            🔥 सबसे ज्यादा बिकने वाले सामान (Top Items)
+            🔥 Sabse Jyada Bikne Wale Items (Top Items)
           </div>
           <div id="top-items-container" style="margin-top: 10px;">
-            <div style="font-size: 12px; color: var(--muted);">डेटा लोड हो रहा है...</div>
+            <div style="font-size: 12px; color: var(--muted);">Data load ho raha hai...</div>
           </div>
         </div>
 
-        <!-- Hub-wise Breakdown -->
         <div class="analytics-card">
           <div style="font-size: 14px; font-weight: 900; color: var(--primary);">
-            🏬 वेंडर हब अनुसार बिक्री (Hub Breakdown)
+            🏬 Vendor Hub Ke Anusar Bikri (Hub Breakdown)
           </div>
           <div id="hub-breakdown-container" style="margin-top: 10px;">
-            <div style="font-size: 12px; color: var(--muted);">डेटा लोड हो रहा है...</div>
+            <div style="font-size: 12px; color: var(--muted);">Data load ho raha hai...</div>
           </div>
         </div>
       </div>
@@ -356,7 +351,7 @@
           🗺️ Live Rider Fleet Tracking
         </div>
         <div style="font-size: 12px; color: var(--muted); margin-bottom: 14px;">
-          सभी ऑन-ड्यूटी राइडर्स की ताज़ा लोकेशन देखें। नीचे किसी भी राइडर का चयन करके उसका लाइव मैप लोड करें।
+          Sabhi on-duty riders ki taaza location dekhein. Niche kisi bhi rider ko chunte hi live map open hoga.
         </div>
 
         <div class="fleet-map-container">
@@ -384,7 +379,7 @@
       </div>
 
       <div id="coupons-list-container">
-        <div style="text-align:center; color:var(--muted); padding:30px;">कूपन लोड हो रहे हैं...</div>
+        <div style="text-align:center; color:var(--muted); padding:30px;">Coupons load ho rahe hain...</div>
       </div>
     </div>
 
@@ -412,19 +407,20 @@
       </div>
 
       <div id="hubs-list-container">
-        <div style="text-align:center; color:var(--muted); padding:30px;">हब्स लोड हो रहे हैं...</div>
+        <div style="text-align:center; color:var(--muted); padding:30px;">Hubs load ho rahe hain...</div>
       </div>
     </div>
 
-    <!-- SECTION 6: PRODUCTS & STOCK -->
+    <!-- SECTION 6: PRODUCTS & STOCK (WITH % DISCOUNT FIELD) -->
     <div id="section-products" style="display: none;">
       <div class="order-card" style="border: 1.5px dashed var(--primary); background: #fdf8ff;">
         <div style="font-size: 14px; font-weight: 900; color: var(--primary); margin-bottom: 12px;">
-          ➕ Add New Item with Vendor Hub Mapping
+          ➕ Add New Item with Vendor Hub & % Discount
         </div>
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; align-items: center;">
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; align-items: center;">
           <input type="text" id="np-name" class="admin-input" placeholder="Item Name *">
-          <input type="number" id="np-price" class="admin-input" placeholder="Price ₹ *">
+          <input type="number" id="np-price" class="admin-input" placeholder="Final Price ₹ *">
+          <input type="number" id="np-disc-pct" class="admin-input" placeholder="Discount % (e.g. 20)">
           <input type="text" id="np-unit" class="admin-input" placeholder="Unit (e.g. 2 pcs / 1 plate)">
           <input type="text" id="np-cat" class="admin-input" placeholder="Category (Snacks/Bakery)">
           <select id="np-hub-select" class="admin-input" style="background:#fff; font-weight:700;">
@@ -432,7 +428,7 @@
           </select>
           <input type="text" id="np-img" class="admin-input" placeholder="Image URL">
         </div>
-        <div style="margin-top:10px;">
+        <div style="margin-top:12px;">
           <button class="btn-action btn-pack" style="background: var(--primary); padding: 10px 18px;" onclick="addNewProduct()">
             + Add Item to Store
           </button>
@@ -451,7 +447,7 @@
       </div>
 
       <div class="product-admin-grid" id="products-admin-list">
-        <div style="text-align: center; color: var(--muted); padding: 30px; grid-column: 1/-1;">आइटम लोड हो रहे हैं...</div>
+        <div style="text-align: center; color: var(--muted); padding: 30px; grid-column: 1/-1;">Items load ho rahe hain...</div>
       </div>
     </div>
 
@@ -462,20 +458,20 @@
           📍 Geo-Fencing Delivery Radius & KM Charges
         </div>
         <div style="font-size: 12px; color: var(--muted); margin-top: 2px;">
-          तय करें कि हब से अधिकतम कितने KM तक डिलीवरी होगी और दूरी के अनुसार चार्ज कितना लगेगा।
+          Tay karein ki hub se adhiktam kitne KM tak delivery hogi aur doori ke anusar charge kitna lagega.
         </div>
 
         <div class="settings-grid">
           <div class="form-group">
-            <span class="form-label">Max Delivery Radius (अधिकतम डिलीवरी दायरा KM):</span>
+            <span class="form-label">Max Delivery Radius (Adhiktam Delivery Dayra KM):</span>
             <input type="number" step="0.5" id="set-max-radius" class="admin-input" placeholder="7.0">
           </div>
           <div class="form-group">
-            <span class="form-label">Base Free Distance (न्यूनतम KM जिस पर बेस चार्ज लगे):</span>
+            <span class="form-label">Base Free Distance (Nyuntam KM jis par base charge lage):</span>
             <input type="number" step="0.5" id="set-base-km" class="admin-input" placeholder="3.0">
           </div>
           <div class="form-group">
-            <span class="form-label">Extra Charge Per KM (प्रति KM अतिरिक्त शुल्क ₹):</span>
+            <span class="form-label">Extra Charge Per KM (Prati KM atirikt shulk ₹):</span>
             <input type="number" id="set-per-km" class="admin-input" placeholder="10">
           </div>
         </div>
@@ -517,11 +513,11 @@
         <div class="settings-grid">
           <div class="form-group">
             <span class="form-label">Banner Title:</span>
-            <input type="text" id="set-banner-title" class="admin-input" placeholder="₹249+ पर Free Delivery 🚚">
+            <input type="text" id="set-banner-title" class="admin-input" placeholder="₹249+ par Free Delivery 🚚">
           </div>
           <div class="form-group">
             <span class="form-label">Banner Subtitle:</span>
-            <input type="text" id="set-banner-sub" class="admin-input" placeholder="₹399+ के ऑर्डर पर ₹49 का भारी Discount!">
+            <input type="text" id="set-banner-sub" class="admin-input" placeholder="₹399+ ke order par ₹49 ka Discount!">
           </div>
           <div class="form-group">
             <span class="form-label">Free Delivery Min Order (₹):</span>
@@ -569,7 +565,7 @@
       </div>
 
       <div id="riders-container">
-        <div style="text-align: center; color: var(--muted); padding: 30px;">राइडर्स सूची लोड हो रही है...</div>
+        <div style="text-align: center; color: var(--muted); padding: 30px;">Riders soochi load ho rahi hai...</div>
       </div>
     </div>
 
@@ -651,8 +647,8 @@
     async function toggleStoreStatus() {
       const newStatus = currentStoreStatus === 'OPEN' ? 'CLOSED' : 'OPEN';
       const confirmMsg = newStatus === 'CLOSED'
-        ? '⚠️ क्या आप दुकान बंद करना चाहते हैं?\nग्राहक ऐप में ऑर्डर लगना तुरंत रुक जाएगा।'
-        : '🟢 क्या आप दुकान खोलना चाहते हैं?\nग्राहक नए ऑर्डर प्लेस कर सकेंगे।';
+        ? '⚠️ Kya aap dukaan band karna chahte hain?\nCustomer app me order lagna turant ruk jayega.'
+        : '🟢 Kya aap dukaan kholna chahte hain?\nCustomer naye orders place kar sakenge.';
 
       if (!confirm(confirmMsg)) return;
 
@@ -660,7 +656,7 @@
       if (!error) {
         currentStoreStatus = newStatus;
         updateStoreBtnUI();
-        alert(`दुकान का स्टेटस बदल दिया गया: ${newStatus}`);
+        alert(`Dukaan ka status badal diya gaya: ${newStatus}`);
       }
     }
 
@@ -683,7 +679,7 @@
         if (currentMasterSec === 'ANALYTICS') renderAnalyticsReport();
       } catch (err) {
         document.getElementById('orders-container').innerHTML = 
-          `<div style="text-align:center; color:#dc2626; padding:30px;">डेटा लोड एरर: ${err.message}</div>`;
+          `<div style="text-align:center; color:#dc2626; padding:30px;">Data load error: ${err.message}</div>`;
       }
     }
 
@@ -732,7 +728,7 @@
       const filtered = filterByTab(rawOrders);
 
       if (filtered.length === 0) {
-        container.innerHTML = '<div style="text-align:center; color:var(--muted); padding:40px; font-weight:700;">इस टैब में कोई ऑर्डर नहीं है।</div>';
+        container.innerHTML = '<div style="text-align:center; color:var(--muted); padding:40px; font-weight:700;">Is tab me koi order nahi hai.</div>';
         return;
       }
 
@@ -758,7 +754,7 @@
 
           const itemsSummary = Array.isArray(order.items) 
             ? order.items.map(i => `<div class="item-line"><span>${i.name} × ${i.qty}</span><b>₹${i.subtotal || (i.price * i.qty)}</b></div>`).join('')
-            : 'कोई आइटम विवरण नहीं';
+            : 'Koi item vivaran nahi';
 
           html += `
             <div class="order-card" id="card-${order.id}">
@@ -772,7 +768,7 @@
 
               <div class="cust-info">
                 <div class="cust-name">👤 ${order.customer_name || 'N/A'} (📞 <a href="tel:${order.customer_phone}">${order.customer_phone}</a>)</div>
-                <div style="color: #475569; margin-top: 2px;">📍 ${order.delivery_address || 'पता दर्ज नहीं'}</div>
+                <div style="color: #475569; margin-top: 2px;">📍 ${order.delivery_address || 'Pata darj nahi'}</div>
                 ${order.hub_id ? `<div class="utr-tag" style="background:#f0fdf4; border-color:#86efac; color:#15803d;">🏬 Hub #${order.hub_id}</div>` : ''}
                 ${order.assigned_rider_id ? `<div class="utr-tag" style="background:#e0f2fe; border-color:#7dd3fc; color:#0369a1;">🛵 Rider #${order.assigned_rider_id}</div>` : ''}
                 ${order.coupon_code ? `<div class="utr-tag" style="background:#fdf4ff; border-color:#d8b4fe; color:#7e22ce;">🎟️ Coupon: ${order.coupon_code} (-₹${order.coupon_discount || 0})</div>` : ''}
@@ -812,19 +808,19 @@
     }
 
     async function updateOrderStatus(orderId, newStatus) {
-      if (!confirm(`ऑर्डर #${orderId} को "${newStatus}" करें?`)) return;
+      if (!confirm(`Order #${orderId} ko "${newStatus}" karein?`)) return;
       await _supabase.from('orders').update({ status: newStatus }).eq('id', orderId);
       fetchOrders();
     }
 
     async function deleteFakeOrder(orderId) {
-      if (!confirm(`क्या आप ऑर्डर #${orderId} को हटाना चाहते हैं?`)) return;
+      if (!confirm(`Kya aap order #${orderId} ko hatana chahte hain?`)) return;
       await _supabase.from('orders').delete().eq('id', orderId);
       fetchOrders();
     }
 
     // ====================================================
-    // 2. DAILY PROFIT & SALES ANALYTICS (दैनिक हिसाब-किताब)
+    // 2. DAILY PROFIT & SALES ANALYTICS
     // ====================================================
     function setAnalyticsRange(range, btn) {
       currentAnalyticsRange = range;
@@ -845,7 +841,7 @@
         const oDate = new Date(o.created_at).toDateString();
         if (currentAnalyticsRange === 'TODAY') return oDate === todayStr;
         if (currentAnalyticsRange === 'YESTERDAY') return oDate === yesterdayStr;
-        return true; // LAST7DAYS
+        return true;
       });
 
       let totalGross = 0;
@@ -872,11 +868,9 @@
 
         couponLoss += Number(o.coupon_discount) || 0;
 
-        // Hub wise count
         const hubId = o.hub_id || 1;
         hubSalesMap[hubId] = (hubSalesMap[hubId] || 0) + amt;
 
-        // Items wise count
         if (Array.isArray(o.items)) {
           o.items.forEach(it => {
             const name = it.name || 'Unknown Item';
@@ -889,22 +883,20 @@
         }
       });
 
-      // Update Hero Metrics
       document.getElementById('ana-total-sales').innerText = `₹${totalGross}`;
-      document.getElementById('ana-orders-count').innerText = `${filteredOrders.length} कुल ऑर्डर्स`;
+      document.getElementById('ana-orders-count').innerText = `${filteredOrders.length} Kul Orders`;
       document.getElementById('ana-cod-sales').innerText = `₹${codSales}`;
-      document.getElementById('ana-cod-orders').innerText = `${codCount} नकद ऑर्डर्स`;
+      document.getElementById('ana-cod-orders').innerText = `${codCount} Cash Orders`;
       document.getElementById('ana-upi-sales').innerText = `₹${upiSales}`;
-      document.getElementById('ana-upi-orders').innerText = `${upiCount} ऑनलाइन ऑर्डर्स`;
+      document.getElementById('ana-upi-orders').innerText = `${upiCount} Online Orders`;
       document.getElementById('ana-coupon-loss').innerText = `₹${couponLoss}`;
 
-      // Render Top Items
       const sortedItems = Object.entries(itemSalesMap).sort((a, b) => b[1].qty - a[1].qty);
       const topItemsContainer = document.getElementById('top-items-container');
       if (sortedItems.length === 0) {
-        topItemsContainer.innerHTML = '<div style="font-size:12px; color:var(--muted); padding:10px 0;">इस अवधि में कोई बिक्री नहीं हुई।</div>';
+        topItemsContainer.innerHTML = '<div style="font-size:12px; color:var(--muted); padding:10px 0;">Is avadhi me koi bikri nahi hui.</div>';
       } else {
-        let html = '<table class="breakdown-table"><tr><th>आइटम का नाम</th><th>बिक्री (Qty)</th><th>कुल राजस्व</th></tr>';
+        let html = '<table class="breakdown-table"><tr><th>Item Name</th><th>Bikri (Qty)</th><th>Kul Revenue</th></tr>';
         sortedItems.slice(0, 8).forEach(([name, data]) => {
           html += `<tr><td><b>${name}</b></td><td>${data.qty} pcs</td><td style="color:var(--green); font-weight:800;">₹${data.total}</td></tr>`;
         });
@@ -912,13 +904,12 @@
         topItemsContainer.innerHTML = html;
       }
 
-      // Render Hub Breakdown
       const hubContainer = document.getElementById('hub-breakdown-container');
       const hubEntries = Object.entries(hubSalesMap);
       if (hubEntries.length === 0) {
-        hubContainer.innerHTML = '<div style="font-size:12px; color:var(--muted); padding:10px 0;">कोई हब डेटा नहीं मिला।</div>';
+        hubContainer.innerHTML = '<div style="font-size:12px; color:var(--muted); padding:10px 0;">Koi hub data nahi mila.</div>';
       } else {
-        let html = '<table class="breakdown-table"><tr><th>हब विवरण</th><th>कुल बिक्री</th></tr>';
+        let html = '<table class="breakdown-table"><tr><th>Hub Details</th><th>Kul Bikri</th></tr>';
         hubEntries.forEach(([hId, amt]) => {
           const hubObj = rawHubs.find(h => h.id == hId);
           const hubName = hubObj ? hubObj.name : `Hub #${hId}`;
@@ -936,10 +927,9 @@
       const { data } = await _supabase.from('riders').select('*').eq('status', 'Active');
       const riders = data || [];
       const btnBox = document.getElementById('fleet-rider-buttons');
-      const mapFrame = document.getElementById('admin-fleet-map');
 
       if (riders.length === 0) {
-        btnBox.innerHTML = '<div style="color:var(--muted); font-size:12px;">कोई एक्टिव राइडर उपलब्ध नहीं है।</div>';
+        btnBox.innerHTML = '<div style="color:var(--muted); font-size:12px;">Koi active rider uplabdh nahi hai.</div>';
         return;
       }
 
@@ -976,7 +966,7 @@
     function renderCouponsList() {
       const box = document.getElementById('coupons-list-container');
       if (rawCoupons.length === 0) {
-        box.innerHTML = '<div style="text-align:center; color:var(--muted); padding:30px;">कोई कूपन नहीं बना है।</div>';
+        box.innerHTML = '<div style="text-align:center; color:var(--muted); padding:30px;">Koi coupon nahi bana hai.</div>';
         return;
       }
       box.innerHTML = rawCoupons.map(c => `
@@ -1002,17 +992,17 @@
       const disc = parseFloat(document.getElementById('cp-disc').value);
       const min = parseFloat(document.getElementById('cp-min').value) || 0;
 
-      if (!code || isNaN(disc)) return alert('कृपया कोड और डिस्काउंट अमाउंट डालें!');
+      if (!code || isNaN(disc)) return alert('Kripya code aur discount amount daalein!');
 
       const { error } = await _supabase.from('coupons').insert([{ code, discount_type: 'FLAT', discount_value: disc, min_order_amount: min, is_active: true }]);
       if (!error) {
-        alert('✅ कूपन सफलतापूर्वक जुड़ गया!');
+        alert('✅ Coupon safaltapoorvak jud gaya!');
         document.getElementById('cp-code').value = '';
         document.getElementById('cp-disc').value = '';
         document.getElementById('cp-min').value = '';
         fetchCoupons();
       } else {
-        alert('त्रुटि: ' + error.message);
+        alert('Error: ' + error.message);
       }
     }
 
@@ -1022,7 +1012,7 @@
     }
 
     async function deleteCoupon(id) {
-      if (!confirm('क्या कूपन को हटाना चाहते हैं?')) return;
+      if (!confirm('Kya coupon ko hatana chahte hain?')) return;
       await _supabase.from('coupons').delete().eq('id', id);
       fetchCoupons();
     }
@@ -1040,7 +1030,7 @@
     function renderHubsList() {
       const box = document.getElementById('hubs-list-container');
       if (rawHubs.length === 0) {
-        box.innerHTML = '<div style="text-align:center; color:var(--muted); padding:30px;">कोई हब नहीं बना है।</div>';
+        box.innerHTML = '<div style="text-align:center; color:var(--muted); padding:30px;">Koi hub nahi bana hai.</div>';
         return;
       }
       box.innerHTML = rawHubs.map(h => `
@@ -1062,12 +1052,12 @@
     }
 
     function getHubGps() {
-      if (!navigator.geolocation) return alert('GPS उपलब्ध नहीं है!');
+      if (!navigator.geolocation) return alert('GPS uplabdh nahi hai!');
       navigator.geolocation.getCurrentPosition(pos => {
         document.getElementById('hub-lat').value = pos.coords.latitude;
         document.getElementById('hub-lng').value = pos.coords.longitude;
-        alert('✅ GPS लोकेशन सेट हो गई!');
-      }, err => alert('GPS एरर: ' + err.message));
+        alert('✅ GPS location set ho gayi!');
+      }, err => alert('GPS error: ' + err.message));
     }
 
     async function saveNewHub() {
@@ -1077,7 +1067,7 @@
       const lat = parseFloat(document.getElementById('hub-lat').value);
       const lng = parseFloat(document.getElementById('hub-lng').value);
 
-      if (!name || !addr || isNaN(lat) || isNaN(lng)) return alert('कृपया सभी विवरण भरें!');
+      if (!name || !addr || isNaN(lat) || isNaN(lng)) return alert('Kripya sabhi details bharein!');
 
       await _supabase.from('hubs').insert([{ name, address: addr, phone, lat, lng, status: 'Active' }]);
       document.getElementById('hub-name').value = '';
@@ -1089,7 +1079,7 @@
     }
 
     async function deleteHub(id) {
-      if (!confirm('हब को हटाना चाहते हैं?')) return;
+      if (!confirm('Hub ko hatana chahte hain?')) return;
       await _supabase.from('hubs').delete().eq('id', id);
       fetchHubs();
     }
@@ -1102,7 +1092,7 @@
     }
 
     // ============================================
-    // 6. PRODUCTS & STOCK
+    // 6. PRODUCTS & STOCK (WITH % DISCOUNT)
     // ============================================
     async function fetchProducts() {
       const { data } = await _supabase.from('products').select('*').order('id', { ascending: true });
@@ -1140,7 +1130,7 @@
       });
 
       if (list.length === 0) {
-        container.innerHTML = '<div style="text-align:center; color:var(--muted); padding:30px; grid-column:1/-1;">कोई प्रोडक्ट नहीं मिला।</div>';
+        container.innerHTML = '<div style="text-align:center; color:var(--muted); padding:30px; grid-column:1/-1;">Koi product nahi mila.</div>';
         return;
       }
 
@@ -1148,6 +1138,13 @@
         const isOut = p.is_out_of_stock === true;
         const linkedHub = rawHubs.find(h => h.id == p.hub_id);
         const hubNameStr = linkedHub ? `🏬 ${linkedHub.name}` : (p.hub_id ? `Hub #${p.hub_id}` : 'Main Store');
+        const discPct = Number(p.discount_percent) || 0;
+
+        let originalMrpHtml = '';
+        if (discPct > 0) {
+          const originalMrp = Math.round(p.price / (1 - discPct / 100));
+          originalMrpHtml = `<span style="text-decoration:line-through; color:#94a3b8; font-size:12px; margin-left:4px;">₹${originalMrp}</span> <span style="color:#16a34a; font-size:11px; font-weight:800;">(${discPct}% OFF)</span>`;
+        }
 
         return `
           <div class="product-admin-card" style="${isOut ? 'opacity: 0.75; border-color: #fca5a5;' : ''}">
@@ -1157,7 +1154,9 @@
                 <div style="font-size:14px; font-weight:800; color:#0f172a;">${p.name}</div>
                 <div style="font-size:11px; color:#64748b;">${p.unit || '1 unit'} | ${p.category || 'General'}</div>
                 <div style="font-size:11px; color:#0284c7; font-weight:700; margin-top:2px;">${hubNameStr}</div>
-                <div style="font-size:15px; font-weight:900; color:var(--primary); margin-top:2px;">₹${p.price}</div>
+                <div style="font-size:15px; font-weight:900; color:var(--primary); margin-top:2px;">
+                  ₹${p.price} ${originalMrpHtml}
+                </div>
               </div>
               <span class="${isOut ? 'stock-badge-red' : 'stock-badge-green'}">
                 ${isOut ? '🔴 Out of Stock' : '🟢 In Stock'}
@@ -1185,21 +1184,28 @@
     async function addNewProduct() {
       const name = document.getElementById('np-name').value.trim();
       const price = parseFloat(document.getElementById('np-price').value);
+      const discPct = parseFloat(document.getElementById('np-disc-pct').value) || 0;
       const unit = document.getElementById('np-unit').value.trim();
       const cat = document.getElementById('np-cat').value.trim();
       const hubId = document.getElementById('np-hub-select').value;
       const img = document.getElementById('np-img').value.trim();
 
-      if (!name || isNaN(price)) return alert('कृपया नाम और मूल्य भरें!');
+      if (!name || isNaN(price)) return alert('Kripya item ka naam aur price bharein!');
 
       await _supabase.from('products').insert([{
-        name, price, unit: unit || '1 unit', category: cat || 'Snacks',
-        hub_id: hubId ? parseInt(hubId) : null, image_url: img || 'https://via.placeholder.com/120',
+        name, 
+        price, 
+        discount_percent: discPct,
+        unit: unit || '1 unit', 
+        category: cat || 'Snacks',
+        hub_id: hubId ? parseInt(hubId) : null, 
+        image_url: img || 'https://via.placeholder.com/120',
         is_out_of_stock: false
       }]);
 
       document.getElementById('np-name').value = '';
       document.getElementById('np-price').value = '';
+      document.getElementById('np-disc-pct').value = '';
       document.getElementById('np-unit').value = '';
       document.getElementById('np-cat').value = '';
       document.getElementById('np-img').value = '';
@@ -1207,7 +1213,7 @@
     }
 
     async function deleteProduct(prodId) {
-      if (!confirm('प्रोडक्ट हटाना चाहते हैं?')) return;
+      if (!confirm('Product hatana chahte hain?')) return;
       await _supabase.from('products').delete().eq('id', prodId);
       fetchProducts();
     }
@@ -1286,9 +1292,9 @@
       });
 
       if (!error) {
-        alert('🎉 सेटिंग्स और डिलीवरी दायरा तुरंत लाइव अपडेट हो गया!');
+        alert('🎉 Settings aur delivery dayra live update ho gaya!');
       } else {
-        alert('त्रुटि: ' + error.message);
+        alert('Error: ' + error.message);
       }
     }
 
@@ -1317,7 +1323,7 @@
       }
 
       if (filtered.length === 0) {
-        container.innerHTML = '<div style="text-align:center; color:var(--muted); padding:30px;">कोई राइडर नहीं मिला।</div>';
+        container.innerHTML = '<div style="text-align:center; color:var(--muted); padding:30px;">Koi rider nahi mila.</div>';
         return;
       }
 
@@ -1375,14 +1381,14 @@
     }
 
     async function settleRiderCash(riderId, name, amount) {
-      if (!confirm(`क्या आपने राइडर ${name} से ₹${amount} नकद प्राप्त कर लिए हैं?\n\nहाँ दबाने पर राइडर का कैश बैलेंस 0 हो जाएगा।`)) return;
+      if (!confirm(`Kya aapne rider ${name} se ₹${amount} cash prapt kar liye hain?\n\nHan dabane par rider ka cash balance 0 ho jayega.`)) return;
 
       const { error } = await _supabase.from('riders').update({ cash_in_hand: 0 }).eq('id', riderId);
       if (!error) {
-        alert(`✅ ₹${amount} का सेटलमेंट सफल रहा!`);
+        alert(`✅ ₹${amount} ka settlement safal raha!`);
         fetchRiders();
       } else {
-        alert('त्रुटि: ' + error.message);
+        alert('Error: ' + error.message);
       }
     }
 
@@ -1391,7 +1397,7 @@
       const phone = document.getElementById('new-rider-phone').value.trim();
       const vehicle = document.getElementById('new-rider-vehicle').value.trim();
 
-      if (!name || !/^[6-9]\d{9}$/.test(phone)) return alert('कृपया सही नाम और 10 अंकों का फोन नंबर डालें!');
+      if (!name || !/^[6-9]\d{9}$/.test(phone)) return alert('Kripya sahi naam aur 10 anko ka phone number daalein!');
 
       await _supabase.from('riders').insert([{ name, phone, vehicle_no: vehicle || 'Standard', status: 'Active', is_online: true, cash_in_hand: 0 }]);
       document.getElementById('new-rider-name').value = '';
@@ -1405,7 +1411,7 @@
     }
 
     async function deleteRiderPermanently(riderId) {
-      if (!confirm('राइडर को हटाना चाहते हैं?')) return;
+      if (!confirm('Rider ko hatana chahte hain?')) return;
       await _supabase.from('riders').delete().eq('id', riderId);
       fetchRiders();
     }
