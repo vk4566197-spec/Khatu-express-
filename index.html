@@ -35,7 +35,6 @@
       --border-color: #f0edf4;
     }
 
-    /* Google Touch Bar aur Blue Selection ko rokne ke liye */
     * { 
       box-sizing: border-box; 
       margin: 0; 
@@ -47,13 +46,34 @@
       user-select: none;
     }
 
-    /* Input aur Textarea me typing aur selection allowed rahe */
     input, textarea {
       -webkit-user-select: auto !important;
       user-select: auto !important;
     }
 
     body { background-color: var(--bg-page); color: var(--text-main); padding-bottom: 120px; }
+
+    /* LIVE BROADCAST NOTICE TICKER */
+    .broadcast-ticker-wrap {
+      display: none; background: #ea580c; color: #ffffff; padding: 7px 12px;
+      font-size: 12px; font-weight: 800; overflow: hidden; white-space: nowrap;
+      box-shadow: 0 2px 6px rgba(234, 88, 12, 0.25);
+    }
+    .broadcast-ticker-text {
+      display: inline-block; padding-left: 100%;
+      animation: tickerMarquee 18s linear infinite;
+    }
+    @keyframes tickerMarquee {
+      0% { transform: translate3d(0, 0, 0); }
+      100% { transform: translate3d(-100%, 0, 0); }
+    }
+
+    /* RAIN SURGE ALERT STRIP */
+    .rain-surge-alert-bar {
+      display: none; background: #eff6ff; border: 1.5px solid #93c5fd;
+      color: #1e40af; padding: 8px 14px; margin: 10px 14px 0 14px; border-radius: 10px;
+      font-size: 11px; font-weight: 800; display: flex; align-items: center; gap: 8px;
+    }
 
     /* Fullscreen Logo Preview Modal */
     .logo-modal-overlay {
@@ -375,6 +395,13 @@
 </head>
 <body>
 
+  <!-- 1. LIVE BROADCAST NOTICE TICKER -->
+  <div class="broadcast-ticker-wrap" id="broadcast-ticker-bar">
+    <span class="broadcast-ticker-text" id="broadcast-ticker-content">
+      📢 Baba Food Delivery me aapka swagat hai!
+    </span>
+  </div>
+
   <!-- Fullscreen Logo Preview Modal -->
   <div class="logo-modal-overlay" id="logo-preview-modal" onclick="closeLogoPreview()">
     <button class="btn-close-preview" onclick="closeLogoPreview()">✕</button>
@@ -446,6 +473,12 @@
         <div class="cat-name">All</div>
       </div>
     </div>
+  </div>
+
+  <!-- 2. RAIN SURGE ALERT STRIP -->
+  <div class="rain-surge-alert-bar" id="rain-surge-alert">
+    <span>🌧️</span>
+    <span id="rain-surge-msg">खराब मौसम/बारिश के कारण अतिरिक्त डिलीवरी चार्ज लागू है।</span>
   </div>
 
   <!-- Store Closed Warning Alert Bar -->
@@ -550,6 +583,10 @@
         <div class="bill-row">
           <span>Delivery Charge (<span id="bill-free-del-rule">Distance Based</span>)</span>
           <span id="bill-delivery-charge">₹25</span>
+        </div>
+        <div class="bill-row" id="row-rain-surge" style="display: none; color: #1e40af; font-weight: 800;">
+          <span id="bill-rain-surge-title">🌧️ Rain Surge Fee</span>
+          <span id="bill-rain-surge-amount">+₹0</span>
         </div>
         <div class="bill-row" id="row-discount" style="display: none;">
           <span class="discount-highlight" id="bill-disc-rule">Special Offer</span>
@@ -783,7 +820,11 @@
       store_status: 'OPEN',
       max_delivery_radius_km: 7.0,
       base_delivery_km: 3.0,
-      per_km_charge: 10.0
+      per_km_charge: 10.0,
+      broadcast_notice: '',
+      is_broadcast_active: false,
+      rain_surge_mode: 'OFF',
+      rain_surge_fee: 0
     };
 
     const catEmojiMap = {
@@ -932,6 +973,29 @@
       root.style.setProperty('--zepto-header-bg', appConfig.header_bg);
       root.style.setProperty('--zepto-purple', appConfig.primary_purple);
 
+      // 1. BROADCAST NOTICE TICKER
+      const tickerBar = document.getElementById('broadcast-ticker-bar');
+      const tickerContent = document.getElementById('broadcast-ticker-content');
+      if (appConfig.is_broadcast_active && appConfig.broadcast_notice) {
+        tickerBar.style.display = 'block';
+        tickerContent.innerText = `📢 ${appConfig.broadcast_notice}   •   ${appConfig.broadcast_notice}`;
+      } else {
+        tickerBar.style.display = 'none';
+      }
+
+      // 2. RAIN SURGE STRIP
+      const rainSurgeStrip = document.getElementById('rain-surge-alert');
+      const rainSurgeMsg = document.getElementById('rain-surge-msg');
+      const surgeFee = Number(appConfig.rain_surge_fee) || 0;
+
+      if (appConfig.rain_surge_mode !== 'OFF' && surgeFee > 0) {
+        rainSurgeStrip.style.display = 'flex';
+        rainSurgeMsg.innerText = `🌧️ खराब मौसम / बारिश के कारण ₹${surgeFee} का डिलीवरी सर्ज शुल्क लागू है।`;
+      } else {
+        rainSurgeStrip.style.display = 'none';
+      }
+
+      // 3. STORE STATUS
       const isStoreClosed = appConfig.store_status === 'CLOSED';
       const closedAlert = document.getElementById('store-closed-alert');
       if (closedAlert) closedAlert.style.display = isStoreClosed ? 'block' : 'none';
@@ -1032,7 +1096,6 @@
       renderProducts(filtered);
     }
 
-    // RENDER PRODUCTS WITH % DISCOUNT AND CROSSED MRP
     function renderProducts(items) {
       const container = document.getElementById('product-list');
       container.innerHTML = '';
@@ -1148,7 +1211,7 @@
       if (selectedPaymentMode === 'UPI') refreshUpiQr();
     }
 
-    // DISTANCE & DELIVERY CHARGE CALCULATION
+    // DISTANCE, RAIN SURGE & DELIVERY CHARGE CALCULATION
     function calculateTotals() {
       const entries = Object.values(cart);
       const itemsTotal = entries.reduce((s, e) => s + (e.qty * Number(e.item.price)), 0);
@@ -1174,12 +1237,15 @@
         }
       }
 
+      // Rain Surge Fee
+      let rainSurge = (itemsTotal > 0 && appConfig.rain_surge_mode !== 'OFF') ? (Number(appConfig.rain_surge_fee) || 0) : 0;
+
       let discount = (itemsTotal >= minDisc) ? discAmt : 0;
       let couponDisc = appliedCoupon ? appliedCoupon.discount : 0;
 
-      let finalToPay = Math.max(0, itemsTotal + deliveryCharge - discount - couponDisc);
+      let finalToPay = Math.max(0, itemsTotal + deliveryCharge + rainSurge - discount - couponDisc);
 
-      return { itemsTotal, totalQty, deliveryCharge, discount, couponDisc, finalToPay };
+      return { itemsTotal, totalQty, deliveryCharge, rainSurge, discount, couponDisc, finalToPay };
     }
 
     function updateCartBar() {
@@ -1203,6 +1269,7 @@
         box.innerHTML = '<div style="text-align:center; padding: 20px; color: #94a3b8;">Cart is empty.</div>';
         document.getElementById('bill-subtotal').innerText = '₹0';
         document.getElementById('bill-delivery-charge').innerText = '₹0';
+        document.getElementById('row-rain-surge').style.display = 'none';
         document.getElementById('row-discount').style.display = 'none';
         document.getElementById('row-coupon').style.display = 'none';
         document.getElementById('bill-grand-total').innerText = '₹0';
@@ -1215,7 +1282,7 @@
       if (submitBtn) {
         submitBtn.disabled = appConfig.store_status === 'CLOSED';
       }
-      const { itemsTotal, deliveryCharge, discount, couponDisc, finalToPay } = calculateTotals();
+      const { itemsTotal, deliveryCharge, rainSurge, discount, couponDisc, finalToPay } = calculateTotals();
 
       box.innerHTML = entries.map(({ item, qty }) => `
         <div class="cart-item-row">
@@ -1238,6 +1305,16 @@
       document.getElementById('bill-delivery-charge').innerText = deliveryCharge === 0 ? 'FREE' : `₹${deliveryCharge} ${calculatedKm > 0 ? '(' + calculatedKm.toFixed(1) + ' km)' : ''}`;
       document.getElementById('bill-delivery-charge').style.color = deliveryCharge === 0 ? 'var(--zepto-green)' : '#000';
 
+      // Rain Surge Row
+      const rainSurgeRow = document.getElementById('row-rain-surge');
+      if (rainSurge > 0) {
+        rainSurgeRow.style.display = 'flex';
+        document.getElementById('bill-rain-surge-title').innerText = `🌧️ Rain Surge Fee (${appConfig.rain_surge_mode})`;
+        document.getElementById('bill-rain-surge-amount').innerText = `+₹${rainSurge}`;
+      } else {
+        rainSurgeRow.style.display = 'none';
+      }
+
       const discountRow = document.getElementById('row-discount');
       if (discount > 0) discountRow.style.display = 'flex';
       else discountRow.style.display = 'none';
@@ -1254,7 +1331,7 @@
       document.getElementById('bill-grand-total').innerText = `₹${finalToPay}`;
     }
 
-    // PLACE ORDER WITH HUB & NEAREST RIDER AUTO DISPATCH
+    // PLACE ORDER WITH SURGE FEE & DISPATCH
     async function placeOrder() {
       if (appConfig.store_status === 'CLOSED') {
         alert('⚠️ दुकान अभी बंद है। हम नए ऑर्डर स्वीकार नहीं कर रहे हैं।');
@@ -1291,7 +1368,7 @@
         }
       }
 
-      const { finalToPay, couponDisc } = calculateTotals();
+      const { finalToPay, couponDisc, rainSurge } = calculateTotals();
       const entries = Object.values(cart);
       if (entries.length === 0) { alert('आपकी कार्ट खाली है!'); return; }
 
@@ -1340,6 +1417,7 @@
             assigned_rider_id: assignedRiderId,
             coupon_code: appliedCoupon ? appliedCoupon.code : null,
             coupon_discount: couponDisc,
+            rain_surge_fee: rainSurge,
             distance_km: calculatedKm ? Number(calculatedKm.toFixed(2)) : 0
           }])
           .select();
@@ -1675,7 +1753,7 @@
 
     function scrollToHistory() { document.getElementById('past-orders-section').scrollIntoView({ behavior: 'smooth' }); }
 
-    // Real-time Settings Sync
+    // Real-time Settings Sync (Notice, Surge & Store Status)
     setInterval(loadLiveAppSettings, 5000);
 
     initApp();
