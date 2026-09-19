@@ -371,6 +371,9 @@
 </head>
 <body>
 
+  <!-- Audio Ringtone Player (Downloads/Local alert.mp3) -->
+  <audio id="rider-order-audio" preload="auto" src="alert.mp3"></audio>
+
   <!-- 1. AUTH SCREEN -->
   <div class="auth-overlay" id="auth-overlay">
     <div class="auth-box">
@@ -659,6 +662,10 @@
         <div class="p-row"><span class="p-label">Cash In Hand:</span><span class="p-val" style="color:#ea580c;" id="prof-cash">₹0</span></div>
       </div>
 
+      <button type="button" class="btn-action-rider" style="background:#0284c7; margin-bottom:10px;" onclick="playLoudEmergencySiren()">
+        🔔 Test Alert Ringtone
+      </button>
+
       <a class="btn-help-link" style="background: #25D366; color:white;" target="_blank" href="https://wa.me/919711107063?text=Rider%20Support%20Needed">
         🟢 WhatsApp Support (9711107063)
       </a>
@@ -922,7 +929,33 @@
       window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, '_blank');
     }
 
+    // ============================================================
+    // PLAY DOWNLOADED AUDIO RINGTONE (alert.mp3 + WebAudio fallback)
+    // ============================================================
     function playLoudEmergencySiren() {
+      try {
+        const audioTag = document.getElementById('rider-order-audio');
+        if (audioTag) {
+          audioTag.currentTime = 0;
+          const playPromise = audioTag.play();
+          if (playPromise !== undefined) {
+            playPromise.catch(err => {
+              console.warn("MP3 autoplay wait notice:", err);
+              // Fallback to Web Audio Oscillator
+              playSynthesizerFallback();
+            });
+          }
+        } else {
+          playSynthesizerFallback();
+        }
+
+        if (navigator.vibrate) navigator.vibrate([500, 250, 500, 250, 800]);
+      } catch (err) {
+        playSynthesizerFallback();
+      }
+    }
+
+    function playSynthesizerFallback() {
       try {
         if (!sharedAudioCtx) sharedAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
         if (sharedAudioCtx.state === 'suspended') sharedAudioCtx.resume();
@@ -942,9 +975,8 @@
           osc.start(cycleStart);
           osc.stop(cycleStart + 0.45);
         }
-        if (navigator.vibrate) navigator.vibrate([400, 200, 400, 200, 600]);
-      } catch (err) {
-        console.log(err);
+      } catch (e) {
+        console.warn(e);
       }
     }
 
@@ -1409,7 +1441,12 @@
       }
     }
 
+    // Unlock Audio Context on First User Touch
     window.addEventListener('click', () => {
+      const audioTag = document.getElementById('rider-order-audio');
+      if (audioTag) {
+        audioTag.load();
+      }
       if (!sharedAudioCtx) {
         sharedAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
         sharedAudioCtx.resume();
