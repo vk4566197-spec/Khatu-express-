@@ -191,6 +191,18 @@
       position: absolute; top: 6px; left: 6px; background: rgba(225, 29, 72, 0.92);
       color: white; font-size: 10px; font-weight: 900; padding: 3px 6px; border-radius: 6px;
     }
+
+    /* % DISCOUNT BADGE & CROSSED MRP */
+    .discount-badge-pill {
+      position: absolute; top: 6px; right: 6px; background: #16a34a;
+      color: #ffffff; font-size: 10px; font-weight: 900; padding: 2px 6px;
+      border-radius: 6px; box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+    }
+    .mrp-cut {
+      text-decoration: line-through; color: #94a3b8; font-size: 11px;
+      font-weight: 700; margin-left: 4px;
+    }
+
     .btn-out-stock-disabled {
       background: #e2e8f0 !important; color: #94a3b8 !important; border: 1px solid #cbd5e1 !important;
       cursor: not-allowed !important; padding: 5px 10px !important; font-size: 11px !important; font-weight: 800 !important; border-radius: 8px !important;
@@ -1005,6 +1017,7 @@
       renderProducts(filtered);
     }
 
+    // RENDER PRODUCTS WITH % DISCOUNT AND CROSSED MRP
     function renderProducts(items) {
       const container = document.getElementById('product-list');
       container.innerHTML = '';
@@ -1018,18 +1031,26 @@
         card.className = 'product-card';
         const qty = cart[p.id]?.qty || 0;
         const isOutOfStock = Boolean(p.is_out_of_stock);
+        const discPct = Number(p.discount_percent) || 0;
+
+        let originalMrpHtml = '';
+        if (discPct > 0) {
+          const originalMrp = Math.round(p.price / (1 - discPct / 100));
+          originalMrpHtml = `<span class="mrp-cut">₹${originalMrp}</span>`;
+        }
 
         card.innerHTML = `
           <div>
             <div class="img-box" style="${isOutOfStock ? 'filter: grayscale(60%); opacity: 0.8;' : ''}">
               <img src="${p.image_url || 'https://via.placeholder.com/150'}" alt="${p.name}">
               ${isOutOfStock ? '<div class="out-of-stock-tag">OUT OF STOCK</div>' : ''}
+              ${discPct > 0 && !isOutOfStock ? `<div class="discount-badge-pill">${discPct}% OFF</div>` : ''}
             </div>
             <div class="prod-title">${p.name}</div>
             <div class="prod-unit">${p.unit || '1 unit'}</div>
           </div>
           <div class="price-action-row">
-            <div class="price-tag">₹${p.price}</div>
+            <div class="price-tag">₹${p.price} ${originalMrpHtml}</div>
             <div id="btn-box-${p.id}">${renderButton(p.id, qty, isOutOfStock)}</div>
           </div>
         `;
@@ -1123,14 +1144,12 @@
       const minDisc = Number(appConfig.discount_min_order) || 399;
       const discAmt = Number(appConfig.discount_amount) || 49;
 
-      // Distance fee calculation
       let deliveryCharge = 0;
       if (itemsTotal > 0) {
         if (itemsTotal >= minFree) {
           deliveryCharge = 0;
         } else {
           deliveryCharge = baseCharge;
-          // Extra KM fee if distance > base distance
           const baseKm = Number(appConfig.base_delivery_km) || 3.0;
           const perKm = Number(appConfig.per_km_charge) || 10.0;
           if (calculatedKm > baseKm) {
