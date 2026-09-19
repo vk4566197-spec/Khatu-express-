@@ -35,7 +35,24 @@
       --border-color: #f0edf4;
     }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
+    /* Google Touch Bar aur Blue Selection ko rokne ke liye */
+    * { 
+      box-sizing: border-box; 
+      margin: 0; 
+      padding: 0; 
+      font-family: 'Inter', sans-serif; 
+      -webkit-tap-highlight-color: transparent;
+      -webkit-touch-callout: none;
+      -webkit-user-select: none;
+      user-select: none;
+    }
+
+    /* Input aur Textarea me typing aur selection allowed rahe */
+    input, textarea {
+      -webkit-user-select: auto !important;
+      user-select: auto !important;
+    }
+
     body { background-color: var(--bg-page); color: var(--text-main); padding-bottom: 120px; }
 
     /* Fullscreen Logo Preview Modal */
@@ -748,9 +765,9 @@
     let selectedChips = new Set();
 
     // Geo & Distance state
-    let customerCoords = null; // { lat, lng }
+    let customerCoords = null;
     let calculatedKm = 0;
-    let appliedCoupon = null; // { code, discount }
+    let appliedCoupon = null;
 
     let appConfig = {
       theme_color: '#ff3269',
@@ -827,7 +844,7 @@
 
     // HAVERSINE DISTANCE IN KM
     function calculateHaversineKm(lat1, lon1, lat2, lon2) {
-      const R = 6371; // Earth's radius in KM
+      const R = 6371;
       const dLat = (lat2 - lat1) * Math.PI / 180;
       const dLon = (lon2 - lon1) * Math.PI / 180;
       const a = 
@@ -854,7 +871,6 @@
             addrBox.value = (addrBox.value ? addrBox.value + '\n' : '') + `📍 GPS: ${mapsLink}`;
           }
 
-          // Fetch primary hub location to calculate distance
           try {
             const { data: hubData } = await _supabase.from('hubs').select('*').limit(1).single();
             if (hubData && hubData.lat && hubData.lng) {
@@ -916,7 +932,6 @@
       root.style.setProperty('--zepto-header-bg', appConfig.header_bg);
       root.style.setProperty('--zepto-purple', appConfig.primary_purple);
 
-      // Store Closed Check & Alert
       const isStoreClosed = appConfig.store_status === 'CLOSED';
       const closedAlert = document.getElementById('store-closed-alert');
       if (closedAlert) closedAlert.style.display = isStoreClosed ? 'block' : 'none';
