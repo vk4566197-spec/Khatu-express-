@@ -205,6 +205,20 @@
       padding: 10px; border-bottom: 1px solid #f1f5f9; font-weight: 600;
     }
 
+    /* RAIN SURGE & BROADCAST STYLES */
+    .surge-selector-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px; margin-top: 10px;
+    }
+    .surge-btn {
+      padding: 12px; border-radius: 10px; border: 2px solid #cbd5e1;
+      background: #fff; text-align: center; cursor: pointer; font-weight: 800; font-size: 12px;
+      transition: all 0.2s ease;
+    }
+    .surge-btn.active-off { border-color: #10b981; background: #ecfdf5; color: #065f46; }
+    .surge-btn.active-light { border-color: #38bdf8; background: #f0f9ff; color: #0369a1; }
+    .surge-btn.active-med { border-color: #2563eb; background: #eff6ff; color: #1d4ed8; }
+    .surge-btn.active-heavy { border-color: #7c3aed; background: #f5f3ff; color: #5b21b6; }
+
     @media (max-width: 680px) {
       .metrics-row { grid-template-columns: repeat(2, 1fr); }
       .btn-delete { margin-left: 0; width: 100%; justify-content: center; }
@@ -218,7 +232,7 @@
       <img class="brand-logo" src="logo.png" alt="Logo" onerror="this.style.display='none'">
       <div>
         <div class="brand-title">👑 𝐁𝐀𝐁𝐀 𝐅𝐎𝐎𝐃 🏹</div>
-        <div class="brand-subtitle">Control Tower: Analytics, Map, Hubs, Orders & Fleet</div>
+        <div class="brand-subtitle">Control Tower: Rain Surge, Notice, Map, Orders & Fleet</div>
       </div>
     </div>
     
@@ -235,6 +249,9 @@
     <div class="master-nav">
       <button class="master-btn active" id="btn-sec-orders" onclick="switchMasterSection('ORDERS')">
         📦 Orders (4 Days)
+      </button>
+      <button class="master-btn" id="btn-sec-surge" onclick="switchMasterSection('SURGE')">
+        🌧️ Rain Surge & Notice 📢
       </button>
       <button class="master-btn" id="btn-sec-analytics" onclick="switchMasterSection('ANALYTICS')">
         📈 Profit & Sales (Hisaab)
@@ -292,7 +309,67 @@
       </div>
     </div>
 
-    <!-- SECTION 2: PROFIT & SALES ANALYTICS -->
+    <!-- SECTION 2: RAIN SURGE & BROADCAST NOTICE -->
+    <div id="section-surge" style="display: none;">
+      <!-- Rain Surge Card -->
+      <div class="settings-card" style="border: 2px solid #0284c7;">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <div>
+            <div style="font-size: 16px; font-weight: 900; color: #0369a1;">
+              🌧️ Rain Surge Pricing (खराब मौसम / बारिश शुल्क)
+            </div>
+            <div style="font-size: 12px; color: var(--muted); margin-top: 3px;">
+              बारिश के अनुसार अतिरिक्त डिलीवरी चार्ज सेट करें (यह राशि सीधे कस्टमर बिल में जुड़ जाएगी):
+            </div>
+          </div>
+          <span id="current-surge-tag" class="status-badge" style="background:#ecfdf5; color:#065f46; font-size:12px;">
+            Surge: OFF (₹0)
+          </span>
+        </div>
+
+        <div class="surge-selector-grid">
+          <div class="surge-btn active-off" id="btn-surge-off" onclick="setRainSurge('OFF', 0)">
+            ☀️ Normal<br><span style="font-size:11px; opacity:0.8;">Surge OFF (₹0)</span>
+          </div>
+          <div class="surge-btn" id="btn-surge-light" onclick="setRainSurge('LIGHT', 10)">
+            🌦️ Light Rain<br><span style="font-size:11px; font-weight:900;">+ ₹10 Surge</span>
+          </div>
+          <div class="surge-btn" id="btn-surge-med" onclick="setRainSurge('MEDIUM', 20)">
+            🌧️ Medium Rain<br><span style="font-size:11px; font-weight:900;">+ ₹20 Surge</span>
+          </div>
+          <div class="surge-btn" id="btn-surge-heavy" onclick="setRainSurge('HEAVY', 30)">
+            ⛈️ Heavy Rain<br><span style="font-size:11px; font-weight:900;">+ ₹30 Surge</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Broadcast Notice Card -->
+      <div class="settings-card" style="border: 2px solid #ea580c; margin-top: 16px;">
+        <div style="font-size: 16px; font-weight: 900; color: #c2410c;">
+          📢 Live Broadcast Notice Bar (ग्राहक ऐप में सूचना पट्टी)
+        </div>
+        <div style="font-size: 12px; color: var(--muted); margin-top: 3px;">
+          यह मैसेज तुरंत कस्टमर ऐप के सबसे ऊपर टिकर के रूप में चलने लगेगा:
+        </div>
+
+        <div style="margin-top: 14px;">
+          <textarea id="notice-text-input" class="admin-input" rows="3" placeholder="यहाँ सूचना लिखें... जैसे: '📢 आज बारिश के कारण डिलीवरी में 10-15 मिनट की देरी हो सकती है।'"></textarea>
+          
+          <div style="display: flex; gap: 10px; align-items: center; margin-top: 10px;">
+            <label style="display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 800; cursor: pointer;">
+              <input type="checkbox" id="notice-active-toggle" style="width: 18px; height: 18px;">
+              सूचना पट्टी चालू रखें (Show Notice Bar)
+            </label>
+
+            <button class="btn-action btn-pack" style="background:#ea580c; margin-left:auto; padding:10px 20px;" onclick="saveBroadcastNotice()">
+              📢 Publish Notice Live
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SECTION 3: PROFIT & SALES ANALYTICS -->
     <div id="section-analytics" style="display: none;">
       <div class="report-filter-bar">
         <button class="report-filter-btn active" onclick="setAnalyticsRange('TODAY', this)">🟢 Aaj (Today)</button>
@@ -344,7 +421,7 @@
       </div>
     </div>
 
-    <!-- SECTION 3: LIVE FLEET MAP VIEW -->
+    <!-- SECTION 4: LIVE FLEET MAP VIEW -->
     <div id="section-map" style="display: none;">
       <div class="order-card">
         <div style="font-size: 15px; font-weight: 900; color: var(--primary); margin-bottom: 6px;">
@@ -362,7 +439,7 @@
       </div>
     </div>
 
-    <!-- SECTION 4: PROMO COUPONS ENGINE -->
+    <!-- SECTION 5: PROMO COUPONS ENGINE -->
     <div id="section-coupons" style="display: none;">
       <div class="order-card" style="border: 1.5px dashed var(--primary); background: #fdf8ff;">
         <div style="font-size: 15px; font-weight: 900; color: var(--primary); margin-bottom: 12px;">
@@ -383,7 +460,7 @@
       </div>
     </div>
 
-    <!-- SECTION 5: VENDOR HUBS -->
+    <!-- SECTION 6: VENDOR HUBS -->
     <div id="section-hubs" style="display: none;">
       <div class="order-card" style="border: 1.5px dashed var(--primary); background: #fdf8ff;">
         <div style="font-size: 15px; font-weight: 900; color: var(--primary); margin-bottom: 12px;">
@@ -411,7 +488,7 @@
       </div>
     </div>
 
-    <!-- SECTION 6: PRODUCTS & STOCK (WITH % DISCOUNT FIELD) -->
+    <!-- SECTION 7: PRODUCTS & STOCK -->
     <div id="section-products" style="display: none;">
       <div class="order-card" style="border: 1.5px dashed var(--primary); background: #fdf8ff;">
         <div style="font-size: 14px; font-weight: 900; color: var(--primary); margin-bottom: 12px;">
@@ -451,7 +528,7 @@
       </div>
     </div>
 
-    <!-- SECTION 7: APP THEME, GEO-FENCING RADIUS & DELIVERY FEES -->
+    <!-- SECTION 8: APP THEME, GEO-FENCING RADIUS & DELIVERY FEES -->
     <div id="section-settings" style="display: none;">
       <div class="settings-card">
         <div style="font-size: 16px; font-weight: 900; color: var(--primary);">
@@ -543,7 +620,7 @@
       </div>
     </div>
 
-    <!-- SECTION 8: RIDERS & COD WALLET SETTLEMENT -->
+    <!-- SECTION 9: RIDERS & COD WALLET SETTLEMENT -->
     <div id="section-riders" style="display: none;">
       <div class="order-card" style="border: 1.5px dashed #cbd5e1;">
         <div style="font-size: 14px; font-weight: 900; color: var(--primary); margin-bottom: 12px;">➕ Add / Register Rider Partner</div>
@@ -587,6 +664,8 @@
     let currentRiderTab = 'ALL';
     let currentStoreStatus = 'OPEN';
     let currentAnalyticsRange = 'TODAY';
+    let currentRainSurgeMode = 'OFF';
+    let currentRainSurgeFee = 0;
 
     function switchMasterSection(sec) {
       currentMasterSec = sec;
@@ -595,6 +674,7 @@
       if (activeBtn) activeBtn.classList.add('active');
 
       document.getElementById('section-orders').style.display = sec === 'ORDERS' ? 'block' : 'none';
+      document.getElementById('section-surge').style.display = sec === 'SURGE' ? 'block' : 'none';
       document.getElementById('section-analytics').style.display = sec === 'ANALYTICS' ? 'block' : 'none';
       document.getElementById('section-map').style.display = sec === 'MAP' ? 'block' : 'none';
       document.getElementById('section-coupons').style.display = sec === 'COUPONS' ? 'block' : 'none';
@@ -608,6 +688,7 @@
 
     function refreshCurrentSection() {
       if (currentMasterSec === 'ORDERS') fetchOrders();
+      else if (currentMasterSec === 'SURGE') loadSurgeAndNoticeSettings();
       else if (currentMasterSec === 'ANALYTICS') renderAnalyticsReport();
       else if (currentMasterSec === 'MAP') loadFleetMap();
       else if (currentMasterSec === 'COUPONS') fetchCoupons();
@@ -657,6 +738,80 @@
         currentStoreStatus = newStatus;
         updateStoreBtnUI();
         alert(`Dukaan ka status badal diya gaya: ${newStatus}`);
+      }
+    }
+
+    // ============================================
+    // 2. RAIN SURGE & BROADCAST NOTICE ENGINE
+    // ============================================
+    async function loadSurgeAndNoticeSettings() {
+      const { data } = await _supabase.from('app_settings').select('*').eq('id', 1).single();
+      if (data) {
+        currentRainSurgeMode = data.rain_surge_mode || 'OFF';
+        currentRainSurgeFee = Number(data.rain_surge_fee) || 0;
+        updateSurgeUI();
+
+        document.getElementById('notice-text-input').value = data.broadcast_notice || '';
+        document.getElementById('notice-active-toggle').checked = Boolean(data.is_broadcast_active);
+      }
+    }
+
+    function updateSurgeUI() {
+      const tag = document.getElementById('current-surge-tag');
+      ['off', 'light', 'med', 'heavy'].forEach(s => {
+        const el = document.getElementById(`btn-surge-${s}`);
+        if (el) el.className = 'surge-btn';
+      });
+
+      if (currentRainSurgeMode === 'LIGHT') {
+        document.getElementById('btn-surge-light').className = 'surge-btn active-light';
+        tag.innerText = 'Surge: Light (+₹10)';
+        tag.style.background = '#f0f9ff'; tag.style.color = '#0369a1';
+      } else if (currentRainSurgeMode === 'MEDIUM') {
+        document.getElementById('btn-surge-med').className = 'surge-btn active-med';
+        tag.innerText = 'Surge: Medium (+₹20)';
+        tag.style.background = '#eff6ff'; tag.style.color = '#1d4ed8';
+      } else if (currentRainSurgeMode === 'HEAVY') {
+        document.getElementById('btn-surge-heavy').className = 'surge-btn active-heavy';
+        tag.innerText = 'Surge: Heavy (+₹30)';
+        tag.style.background = '#f5f3ff'; tag.style.color = '#5b21b6';
+      } else {
+        document.getElementById('btn-surge-off').className = 'surge-btn active-off';
+        tag.innerText = 'Surge: OFF (₹0)';
+        tag.style.background = '#ecfdf5'; tag.style.color = '#065f46';
+      }
+    }
+
+    async function setRainSurge(mode, fee) {
+      currentRainSurgeMode = mode;
+      currentRainSurgeFee = fee;
+      updateSurgeUI();
+
+      const { error } = await _supabase.from('app_settings').update({
+        rain_surge_mode: mode,
+        rain_surge_fee: fee
+      }).eq('id', 1);
+
+      if (!error) {
+        alert(`🌧️ Rain Surge अपडेट हो गया: ${mode} (+₹${fee})`);
+      } else {
+        alert('त्रुटि: ' + error.message);
+      }
+    }
+
+    async function saveBroadcastNotice() {
+      const text = document.getElementById('notice-text-input').value.trim();
+      const isActive = document.getElementById('notice-active-toggle').checked;
+
+      const { error } = await _supabase.from('app_settings').update({
+        broadcast_notice: text,
+        is_broadcast_active: isActive
+      }).eq('id', 1);
+
+      if (!error) {
+        alert(isActive ? '📢 लाइव नोटिस बार चालू हो गया है!' : '📢 नोटिस बार बंद कर दिया गया है!');
+      } else {
+        alert('त्रुटि: ' + error.message);
       }
     }
 
@@ -771,6 +926,7 @@
                 <div style="color: #475569; margin-top: 2px;">📍 ${order.delivery_address || 'Pata darj nahi'}</div>
                 ${order.hub_id ? `<div class="utr-tag" style="background:#f0fdf4; border-color:#86efac; color:#15803d;">🏬 Hub #${order.hub_id}</div>` : ''}
                 ${order.assigned_rider_id ? `<div class="utr-tag" style="background:#e0f2fe; border-color:#7dd3fc; color:#0369a1;">🛵 Rider #${order.assigned_rider_id}</div>` : ''}
+                ${order.rain_surge_fee > 0 ? `<div class="utr-tag" style="background:#eff6ff; border-color:#93c5fd; color:#1d4ed8;">🌧️ Rain Surge: ₹${order.rain_surge_fee}</div>` : ''}
                 ${order.coupon_code ? `<div class="utr-tag" style="background:#fdf4ff; border-color:#d8b4fe; color:#7e22ce;">🎟️ Coupon: ${order.coupon_code} (-₹${order.coupon_discount || 0})</div>` : ''}
                 ${order.transaction_id ? `<div class="utr-tag">🔑 UTR No: ${order.transaction_id}</div>` : ''}
                 ${order.delivery_otp ? `<div class="utr-tag" style="background:#fffbeb; border-color:#fde047; color:#b45309;">🔐 OTP: ${order.delivery_otp}</div>` : ''}
@@ -820,7 +976,7 @@
     }
 
     // ====================================================
-    // 2. DAILY PROFIT & SALES ANALYTICS
+    // 3. DAILY PROFIT & SALES ANALYTICS
     // ====================================================
     function setAnalyticsRange(range, btn) {
       currentAnalyticsRange = range;
@@ -921,7 +1077,7 @@
     }
 
     // ============================================
-    // 3. LIVE FLEET MAP VIEW
+    // 4. LIVE FLEET MAP VIEW
     // ============================================
     async function loadFleetMap() {
       const { data } = await _supabase.from('riders').select('*').eq('status', 'Active');
@@ -955,7 +1111,7 @@
     }
 
     // ============================================
-    // 4. PROMO COUPONS
+    // 5. PROMO COUPONS
     // ============================================
     async function fetchCoupons() {
       const { data } = await _supabase.from('coupons').select('*').order('id', { ascending: false });
@@ -1018,7 +1174,7 @@
     }
 
     // ============================================
-    // 5. VENDOR HUBS
+    // 6. VENDOR HUBS
     // ============================================
     async function fetchHubs() {
       const { data } = await _supabase.from('hubs').select('*').order('id', { ascending: true });
@@ -1092,7 +1248,7 @@
     }
 
     // ============================================
-    // 6. PRODUCTS & STOCK (WITH % DISCOUNT)
+    // 7. PRODUCTS & STOCK
     // ============================================
     async function fetchProducts() {
       const { data } = await _supabase.from('products').select('*').order('id', { ascending: true });
@@ -1219,7 +1375,7 @@
     }
 
     // ============================================
-    // 7. APP THEME & GEO-FENCING
+    // 8. APP THEME & GEO-FENCING
     // ============================================
     async function loadAppSettings() {
       const { data } = await _supabase.from('app_settings').select('*').eq('id', 1).single();
@@ -1299,7 +1455,7 @@
     }
 
     // ============================================
-    // 8. RIDERS & COD WALLET SETTLEMENT
+    // 9. RIDERS & COD WALLET SETTLEMENT
     // ============================================
     async function fetchRiders() {
       const { data } = await _supabase.from('riders').select('*').order('id', { ascending: false });
@@ -1350,7 +1506,7 @@
 
             <div class="card-actions">
               ${cashOnHand > 0 ? `
-                <button class="btn-action btn-deliver" onclick="settleRiderCash(${r.id}, '${r.name}',${cashOnHand})">
+                <button class="btn-action btn-deliver" onclick="settleRiderCash(${r.id}, '${r.name}', ${cashOnHand})">
                   ✓ Settle & Clear Cash
                 </button>
               ` : ''}
@@ -1421,6 +1577,7 @@
     loadStoreStatus();
     fetchHubs();
     fetchCoupons();
+    loadSurgeAndNoticeSettings();
 
     setInterval(() => {
       if (currentMasterSec === 'ORDERS') fetchOrders();
