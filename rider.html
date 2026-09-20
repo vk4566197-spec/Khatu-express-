@@ -205,8 +205,8 @@
       overflow-x: auto; 
     }
     .bin-item-card { 
-      width: 82px; 
-      height: 82px; 
+      width: 86px; 
+      height: 86px; 
       border: 2px solid #cbd5e1; 
       border-radius: 14px; 
       display: flex; 
@@ -218,11 +218,12 @@
       cursor: pointer;
       box-shadow: 0 2px 6px rgba(0,0,0,0.06);
       transition: transform 0.15s;
+      overflow: visible;
     }
     .bin-item-card:active { transform: scale(0.95); }
     .bin-item-card img { 
-      width: 60px; 
-      height: 60px; 
+      width: 66px; 
+      height: 66px; 
       object-fit: cover; 
       border-radius: 10px;
     }
@@ -232,7 +233,7 @@
       background: #0f172a; 
       color: #fff;
       border-radius: 6px; 
-      font-size: 10px; 
+      font-size: 11px; 
       font-weight: 900; 
       padding: 1px 7px; 
     }
@@ -1249,19 +1250,34 @@
       window.location.href = `tel:${currentSelectedOrder.customer_phone}`;
     }
 
-    // BIN SCREEN WITH REAL IMAGES & TAP-TO-ZOOM
-    function openBinScreen(order) {
+    // FIX: REAL ITEM PHOTO FALLBACK + TAP TO ZOOM
+    async function openBinScreen(order) {
       currentSelectedOrder = order;
       document.getElementById('bin-order-hash').innerText = `#BABA${order.id}DSNI19442A`;
       const items = Array.isArray(order.items) ? order.items : [];
       document.getElementById('bin-shelf-num').innerText = items.length;
 
-      document.getElementById('bin-items-container').innerHTML = items.map(it => {
-        const itemImg = it.image_url || 'logo.png';
+      // Agar kisi puraane order ke item me image_url miss ho toh products table se fallback fetch karega
+      const resolvedItems = await Promise.all(items.map(async (it) => {
+        let img = it.image_url;
+        if (!img || img === 'logo.png') {
+          if (it.id) {
+            const { data: prod } = await _supabase.from('products').select('image_url').eq('id', it.id).single();
+            if (prod && prod.image_url) img = prod.image_url;
+          }
+        }
+        return {
+          ...it,
+          image_url: img || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=120'
+        };
+      }));
+
+      document.getElementById('bin-items-container').innerHTML = resolvedItems.map(it => {
+        const itemImg = it.image_url;
         const safeName = (it.name || 'Item').replace(/'/g, "\\'");
         return `
           <div class="bin-item-card" onclick="openItemZoom('${itemImg}', '${safeName}', ${it.qty || 1})">
-            <img src="${itemImg}" alt="${it.name}">
+            <img src="${itemImg}" alt="${it.name}" onerror="this.src='https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=120'">
             <div class="bin-item-qty">×${it.qty || 1}</div>
           </div>
         `;
