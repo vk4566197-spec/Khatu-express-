@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>👑 Admin Control Panel | BABA FOOD DELIVERY🏹</title>
+  <title>👑 Admin Master Control Panel | BABA FOOD DELIVERY🏹</title>
   <link rel="icon" type="image/png" href="logo.png">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -48,14 +48,14 @@
       color: white; padding: 8px 14px; border-radius: 8px; font-weight: 700; font-size: 12px; cursor: pointer;
     }
 
-    .container { max-width: 1100px; margin: 20px auto; padding: 0 16px; }
+    .container { max-width: 1150px; margin: 20px auto; padding: 0 16px; }
 
     .master-nav {
       display: flex; gap: 8px; margin-bottom: 18px; overflow-x: auto; scrollbar-width: none;
     }
     .master-nav::-webkit-scrollbar { display: none; }
     .master-btn {
-      flex: 1; min-width: 130px; padding: 12px 10px; border-radius: 12px; border: 2px solid transparent;
+      flex: 1; min-width: 135px; padding: 12px 10px; border-radius: 12px; border: 2px solid transparent;
       font-size: 12px; font-weight: 900; cursor: pointer; text-align: center;
       background: #ffffff; color: var(--muted); box-shadow: 0 2px 6px rgba(0,0,0,0.04);
       transition: all 0.2s ease; white-space: nowrap;
@@ -92,7 +92,7 @@
       padding: 6px 14px; border-radius: 20px; display: inline-block; margin: 18px 0 12px 0;
     }
 
-    .order-card, .rider-card, .product-admin-card, .settings-card, .analytics-card {
+    .order-card, .rider-card, .product-admin-card, .settings-card, .analytics-card, .dispute-card {
       background: var(--card-bg); border-radius: 14px; border: 1px solid var(--border);
       padding: 16px; margin-bottom: 14px; box-shadow: 0 2px 8px rgba(0,0,0,0.04);
     }
@@ -104,6 +104,7 @@
     .status-pending { background: #fef3c7; color: #b45309; }
     .status-running { background: #e0f2fe; color: #0369a1; }
     .status-delivered { background: #dcfce7; color: #15803d; }
+    .status-cancelled { background: #fee2e2; color: #b91c1c; }
     .status-upi { background: #f3e8ff; color: #6b21a8; }
     .status-active { background: #dcfce7; color: #15803d; }
     .status-blocked { background: #fee2e2; color: #b91c1c; }
@@ -132,6 +133,7 @@
     .btn-pack { background: #0284c7; color: white; }
     .btn-deliver { background: var(--green); color: white; }
     .btn-approve { background: var(--green); color: white; }
+    .btn-batch { background: #8b5cf6; color: white; }
     .btn-deactivate { background: #ea580c; color: white; }
     .btn-delete { background: #fee2e2; color: #dc2626; border: 1px solid #fca5a5; margin-left: auto; }
     .btn-delete:hover { background: #dc2626; color: white; }
@@ -148,6 +150,7 @@
     .prod-thumb-box { width: 60px; height: 60px; border-radius: 8px; background: #f1f5f9; object-fit: contain; border: 1px solid #e2e8f0; flex-shrink: 0; }
     .stock-badge-green { background: #dcfce7; color: #15803d; font-size: 11px; font-weight: 800; padding: 3px 8px; border-radius: 6px; }
     .stock-badge-red { background: #fee2e2; color: #b91c1c; font-size: 11px; font-weight: 800; padding: 3px 8px; border-radius: 6px; }
+    .stock-badge-low { background: #fef3c7; color: #b45309; font-size: 11px; font-weight: 800; padding: 3px 8px; border-radius: 6px; }
 
     .toggle-stock-btn { padding: 7px 12px; border-radius: 8px; border: none; font-size: 11px; font-weight: 800; cursor: pointer; }
     .btn-mark-out { background: #fee2e2; color: #b91c1c; border: 1px solid #fca5a5; }
@@ -205,7 +208,6 @@
       padding: 10px; border-bottom: 1px solid #f1f5f9; font-weight: 600;
     }
 
-    /* RAIN SURGE & BROADCAST STYLES */
     .surge-selector-grid {
       display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px; margin-top: 10px;
     }
@@ -218,6 +220,18 @@
     .surge-btn.active-light { border-color: #38bdf8; background: #f0f9ff; color: #0369a1; }
     .surge-btn.active-med { border-color: #2563eb; background: #eff6ff; color: #1d4ed8; }
     .surge-btn.active-heavy { border-color: #7c3aed; background: #f5f3ff; color: #5b21b6; }
+
+    .overspeed-pill {
+      background: #fee2e2; color: #b91c1c; border: 1.5px solid #f87171;
+      font-size: 11px; font-weight: 900; padding: 3px 8px; border-radius: 12px;
+      animation: pulseAlert 1.5s infinite; display: inline-flex; align-items: center; gap: 4px;
+    }
+    @keyframes pulseAlert { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+
+    .dispute-img-preview {
+      width: 110px; height: 110px; border-radius: 10px; object-fit: cover;
+      border: 1.5px solid #cbd5e1; background: #f1f5f9; cursor: pointer;
+    }
 
     @media (max-width: 680px) {
       .metrics-row { grid-template-columns: repeat(2, 1fr); }
@@ -232,7 +246,7 @@
       <img class="brand-logo" src="logo.png" alt="Logo" onerror="this.style.display='none'">
       <div>
         <div class="brand-title">👑 𝐁𝐀𝐁𝐀 𝐅𝐎𝐎𝐃 🏹</div>
-        <div class="brand-subtitle">Control Tower: Rain Surge, Notice, Map, Orders & Fleet</div>
+        <div class="brand-subtitle">Master Tower: 11 Pro Features, Fleet, Surge & Auto-Controls</div>
       </div>
     </div>
     
@@ -248,16 +262,22 @@
     
     <div class="master-nav">
       <button class="master-btn active" id="btn-sec-orders" onclick="switchMasterSection('ORDERS')">
-        📦 Orders (4 Days)
+        📦 Orders (Live & Batch)
+      </button>
+      <button class="master-btn" id="btn-sec-disputes" onclick="switchMasterSection('DISPUTES')">
+        📸 Claims & Refunds (<span id="cnt-disputes-nav">0</span>)
+      </button>
+      <button class="master-btn" id="btn-sec-prosettings" onclick="switchMasterSection('PROSETTINGS')">
+        ⚡ 11 Pro Controls
       </button>
       <button class="master-btn" id="btn-sec-surge" onclick="switchMasterSection('SURGE')">
-        🌧️ Rain Surge & Notice 📢
+        🌧️ Rain & Night Surge
       </button>
       <button class="master-btn" id="btn-sec-analytics" onclick="switchMasterSection('ANALYTICS')">
         📈 Profit & Sales (Hisaab)
       </button>
       <button class="master-btn" id="btn-sec-map" onclick="switchMasterSection('MAP')">
-        🗺️ Live Fleet Map
+        🗺️ Fleet Map & Speed Guard
       </button>
       <button class="master-btn" id="btn-sec-coupons" onclick="switchMasterSection('COUPONS')">
         🎟️ Promo Coupons
@@ -266,7 +286,7 @@
         🏬 Vendor Hubs
       </button>
       <button class="master-btn" id="btn-sec-products" onclick="switchMasterSection('PRODUCTS')">
-        🛍️ Products & Stock
+        🛍️ Products & Inventory Stock
       </button>
       <button class="master-btn" id="btn-sec-settings" onclick="switchMasterSection('SETTINGS')">
         🎨 Theme & Radius Fees
@@ -276,7 +296,7 @@
       </button>
     </div>
 
-    <!-- SECTION 1: ORDERS CONTROLLER -->
+    <!-- SECTION 1: ORDERS CONTROLLER WITH BATCHING -->
     <div id="section-orders">
       <div class="metrics-row">
         <div class="m-card">
@@ -302,6 +322,7 @@
         <button class="tab-btn" onclick="switchTab('PENDING', this)">⏳ Pending</button>
         <button class="tab-btn" onclick="switchTab('RUNNING', this)">🛵 Running</button>
         <button class="tab-btn" onclick="switchTab('DELIVERED', this)">✅ Delivered</button>
+        <button class="tab-btn" onclick="switchTab('CANCELLED', this)">❌ Cancelled</button>
       </div>
 
       <div id="orders-container">
@@ -309,17 +330,150 @@
       </div>
     </div>
 
-    <!-- SECTION 2: RAIN SURGE & BROADCAST NOTICE -->
+    <!-- SECTION 2: PHOTO REFUND DISPUTE CLAIMS -->
+    <div id="section-disputes" style="display: none;">
+      <div class="settings-card" style="border: 2px solid #ef4444; background: #fff5f5;">
+        <div style="font-size: 16px; font-weight: 900; color: #b91c1c;">
+          📸 Customer Damaged/Missing Item Disputes & Refund Claims
+        </div>
+        <div style="font-size: 12px; color: #7f1d1d; margin-top: 4px;">
+          Grahak dwara bheji gayi kharab saman ki photo aur vivaran dekhein aur 1-click me refund approve ya reject karein:
+        </div>
+      </div>
+
+      <div id="disputes-container">
+        <div style="text-align: center; color: var(--muted); padding: 30px;">Dispute claims load ho rahe hain...</div>
+      </div>
+    </div>
+
+    <!-- SECTION 3: 11 PRO CONTROLS CENTER -->
+    <div id="section-prosettings" style="display: none;">
+      <div class="settings-card" style="border: 2px solid var(--primary);">
+        <div style="font-size: 16px; font-weight: 900; color: var(--primary);">
+          ⚡ 11 Pro Automated Business Engines
+        </div>
+        <div style="font-size: 12px; color: var(--muted); margin-top: 3px;">
+          Yahan se app ke sabhi naye rules aur automated limits ko live niyantrit karein:
+        </div>
+
+        <div class="settings-grid">
+          <!-- 1. Min Order & Hub Lock -->
+          <div class="form-group">
+            <span class="form-label">💰 Minimum Order Value (₹):</span>
+            <input type="number" id="pro-min-order" class="admin-input" placeholder="99">
+            <span style="font-size:10px; color:var(--muted);">Isse kam ke order lagna customer app me block ho jayenge</span>
+          </div>
+
+          <div class="form-group">
+            <span class="form-label">🔒 Single Hub Cart Lock:</span>
+            <select id="pro-hub-lock" class="admin-input" style="background:#fff; font-weight:700;">
+              <option value="true">✅ Enabled (Only 1 Hub items in 1 cart)</option>
+              <option value="false">❌ Disabled (Any items allowed)</option>
+            </select>
+            <span style="font-size:10px; color:var(--muted);">Alag-alag dukanon ke order mix hone se rokta hai</span>
+          </div>
+
+          <!-- 2. Self Cancel Window -->
+          <div class="form-group">
+            <span class="form-label">⏱️ Self-Cancel Window (Seconds):</span>
+            <input type="number" id="pro-cancel-sec" class="admin-input" placeholder="60">
+            <span style="font-size:10px; color:var(--muted);">Customer ko kitne second tak khud cancel karne ka mauka mile</span>
+          </div>
+
+          <!-- 3. Free Gift Auto-Offer -->
+          <div class="form-group">
+            <span class="form-label">🎁 Free Gift Min Order Amount (₹):</span>
+            <input type="number" id="pro-gift-min" class="admin-input" placeholder="499">
+          </div>
+
+          <div class="form-group">
+            <span class="form-label">🎁 Free Gift Item Name:</span>
+            <input type="text" id="pro-gift-name" class="admin-input" placeholder="1x Cold Drink (Free Gift)">
+          </div>
+
+          <div class="form-group">
+            <span class="form-label">🎁 Free Gift Status:</span>
+            <select id="pro-gift-active" class="admin-input" style="background:#fff; font-weight:700;">
+              <option value="true">🟢 Active (Auto-add to cart)</option>
+              <option value="false">🔴 Inactive</option>
+            </select>
+          </div>
+
+          <!-- 4. Low Stock Alert Threshold -->
+          <div class="form-group">
+            <span class="form-label">⚠️ Low Stock Alert Limit (Qty):</span>
+            <input type="number" id="pro-low-stock-limit" class="admin-input" placeholder="5">
+            <span style="font-size:10px; color:var(--muted);">Quantity isse kam hote hi inventory me warning aayegi</span>
+          </div>
+
+          <!-- 5. Rider Speed Guard -->
+          <div class="form-group">
+            <span class="form-label">🚨 Rider Overspeed Warning Limit (KM/H):</span>
+            <input type="number" id="pro-speed-limit" class="admin-input" placeholder="55">
+            <span style="font-size:10px; color:var(--muted);">Isse tej chalne par rider map me red blinking alert aayega</span>
+          </div>
+        </div>
+
+        <button class="btn-save-settings" onclick="saveProControls()">
+          💾 Save All 11 Pro Settings Live
+        </button>
+      </div>
+    </div>
+
+    <!-- SECTION 4: RAIN & NIGHT SURGE + BROADCAST NOTICE -->
     <div id="section-surge" style="display: none;">
+      <!-- Night Surge Card -->
+      <div class="settings-card" style="border: 2px solid #3b82f6;">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <div>
+            <div style="font-size: 16px; font-weight: 900; color: #1d4ed8;">
+              🌙 Auto Night Surge Pricing (देर रात डिलीवरी शुल्क)
+            </div>
+            <div style="font-size: 12px; color: var(--muted); margin-top: 3px;">
+              Tay samay ke beech delivery bill me night charge apne-aap jud jayega:
+            </div>
+          </div>
+          <span id="current-night-tag" class="status-badge" style="background:#eff6ff; color:#1d4ed8; font-size:12px;">
+            Night Surge: Active
+          </span>
+        </div>
+
+        <div class="settings-grid" style="margin-top:12px;">
+          <div class="form-group">
+            <span class="form-label">🌙 Night Surge Start Time (Hour 0-23):</span>
+            <input type="number" id="night-start-hr" class="admin-input" placeholder="22 (Raat 10 Baje)">
+          </div>
+          <div class="form-group">
+            <span class="form-label">🌅 Night Surge End Time (Hour 0-23):</span>
+            <input type="number" id="night-end-hr" class="admin-input" placeholder="6 (Subah 6 Baje)">
+          </div>
+          <div class="form-group">
+            <span class="form-label">💵 Extra Night Surge Fee (₹):</span>
+            <input type="number" id="night-fee-amt" class="admin-input" placeholder="20">
+          </div>
+          <div class="form-group">
+            <span class="form-label">🌙 Night Surge Switch:</span>
+            <select id="night-active-toggle" class="admin-input" style="background:#fff; font-weight:700;">
+              <option value="true">🟢 Auto Enabled (Time ke anusaar)</option>
+              <option value="false">🔴 Disabled (No Night Charge)</option>
+            </select>
+          </div>
+        </div>
+
+        <button class="btn-action btn-pack" style="margin-top:12px; padding:10px 20px; background:#2563eb;" onclick="saveNightSurgeSettings()">
+          🌙 Update Night Surge Schedule
+        </button>
+      </div>
+
       <!-- Rain Surge Card -->
-      <div class="settings-card" style="border: 2px solid #0284c7;">
+      <div class="settings-card" style="border: 2px solid #0284c7; margin-top:16px;">
         <div style="display:flex; justify-content:space-between; align-items:center;">
           <div>
             <div style="font-size: 16px; font-weight: 900; color: #0369a1;">
               🌧️ Rain Surge Pricing (खराब मौसम / बारिश शुल्क)
             </div>
             <div style="font-size: 12px; color: var(--muted); margin-top: 3px;">
-              बारिश के अनुसार अतिरिक्त डिलीवरी चार्ज सेट करें (यह राशि सीधे कस्टमर बिल में जुड़ जाएगी):
+              Barish ke anusaar turant 1-click me surge charge on/off karein:
             </div>
           </div>
           <span id="current-surge-tag" class="status-badge" style="background:#ecfdf5; color:#065f46; font-size:12px;">
@@ -348,19 +502,13 @@
         <div style="font-size: 16px; font-weight: 900; color: #c2410c;">
           📢 Live Broadcast Notice Bar (ग्राहक ऐप में सूचना पट्टी)
         </div>
-        <div style="font-size: 12px; color: var(--muted); margin-top: 3px;">
-          यह मैसेज तुरंत कस्टमर ऐप के सबसे ऊपर टिकर के रूप में चलने लगेगा:
-        </div>
-
-        <div style="margin-top: 14px;">
+        <div style="margin-top: 10px;">
           <textarea id="notice-text-input" class="admin-input" rows="3" placeholder="यहाँ सूचना लिखें... जैसे: '📢 आज बारिश के कारण डिलीवरी में 10-15 मिनट की देरी हो सकती है।'"></textarea>
-          
           <div style="display: flex; gap: 10px; align-items: center; margin-top: 10px;">
             <label style="display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 800; cursor: pointer;">
               <input type="checkbox" id="notice-active-toggle" style="width: 18px; height: 18px;">
               सूचना पट्टी चालू रखें (Show Notice Bar)
             </label>
-
             <button class="btn-action btn-pack" style="background:#ea580c; margin-left:auto; padding:10px 20px;" onclick="saveBroadcastNotice()">
               📢 Publish Notice Live
             </button>
@@ -369,7 +517,7 @@
       </div>
     </div>
 
-    <!-- SECTION 3: PROFIT & SALES ANALYTICS -->
+    <!-- SECTION 5: PROFIT & SALES ANALYTICS -->
     <div id="section-analytics" style="display: none;">
       <div class="report-filter-bar">
         <button class="report-filter-btn active" onclick="setAnalyticsRange('TODAY', this)">🟢 Aaj (Today)</button>
@@ -394,7 +542,7 @@
           <div style="font-size: 11px; color: var(--muted); margin-top: 2px;" id="ana-upi-orders">0 Orders</div>
         </div>
         <div class="ana-box" style="border-left: 4px solid var(--pink);">
-          <div class="ana-title">Coupon Discount Lagat</div>
+          <div class="ana-title">Coupon & Gift Lagat</div>
           <div class="ana-number" style="color: var(--pink);" id="ana-coupon-loss">₹0</div>
           <div style="font-size: 11px; color: var(--muted); margin-top: 2px;">Offer me di gayi chhoot</div>
         </div>
@@ -421,14 +569,17 @@
       </div>
     </div>
 
-    <!-- SECTION 4: LIVE FLEET MAP VIEW -->
+    <!-- SECTION 6: LIVE FLEET MAP & SPEED GUARD -->
     <div id="section-map" style="display: none;">
       <div class="order-card">
-        <div style="font-size: 15px; font-weight: 900; color: var(--primary); margin-bottom: 6px;">
-          🗺️ Live Rider Fleet Tracking
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 6px;">
+          <div style="font-size: 15px; font-weight: 900; color: var(--primary);">
+            🗺️ Live Rider Fleet Tracking & Speed Guard
+          </div>
+          <span style="font-size:11px; color:var(--muted); font-weight:700;">Max Limit: <b id="map-speed-rule">55 km/h</b></span>
         </div>
         <div style="font-size: 12px; color: var(--muted); margin-bottom: 14px;">
-          Sabhi on-duty riders ki taaza location dekhein. Niche kisi bhi rider ko chunte hi live map open hoga.
+          Riders ki live GPS location aur speed dekhein. Agar koi limit se tej chalega toh alert dikhega:
         </div>
 
         <div class="fleet-map-container">
@@ -439,7 +590,7 @@
       </div>
     </div>
 
-    <!-- SECTION 5: PROMO COUPONS ENGINE -->
+    <!-- SECTION 7: PROMO COUPONS -->
     <div id="section-coupons" style="display: none;">
       <div class="order-card" style="border: 1.5px dashed var(--primary); background: #fdf8ff;">
         <div style="font-size: 15px; font-weight: 900; color: var(--primary); margin-bottom: 12px;">
@@ -460,7 +611,7 @@
       </div>
     </div>
 
-    <!-- SECTION 6: VENDOR HUBS -->
+    <!-- SECTION 8: VENDOR HUBS -->
     <div id="section-hubs" style="display: none;">
       <div class="order-card" style="border: 1.5px dashed var(--primary); background: #fdf8ff;">
         <div style="font-size: 15px; font-weight: 900; color: var(--primary); margin-bottom: 12px;">
@@ -488,18 +639,19 @@
       </div>
     </div>
 
-    <!-- SECTION 7: PRODUCTS & STOCK -->
+    <!-- SECTION 9: PRODUCTS & INVENTORY STOCK -->
     <div id="section-products" style="display: none;">
       <div class="order-card" style="border: 1.5px dashed var(--primary); background: #fdf8ff;">
         <div style="font-size: 14px; font-weight: 900; color: var(--primary); margin-bottom: 12px;">
-          ➕ Add New Item with Vendor Hub & % Discount
+          ➕ Add New Item with Stock Quantity & % Discount
         </div>
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; align-items: center;">
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px; align-items: center;">
           <input type="text" id="np-name" class="admin-input" placeholder="Item Name *">
           <input type="number" id="np-price" class="admin-input" placeholder="Final Price ₹ *">
-          <input type="number" id="np-disc-pct" class="admin-input" placeholder="Discount % (e.g. 20)">
-          <input type="text" id="np-unit" class="admin-input" placeholder="Unit (e.g. 2 pcs / 1 plate)">
-          <input type="text" id="np-cat" class="admin-input" placeholder="Category (Snacks/Bakery)">
+          <input type="number" id="np-disc-pct" class="admin-input" placeholder="Discount %">
+          <input type="number" id="np-stock-qty" class="admin-input" placeholder="Stock Qty (e.g. 50)">
+          <input type="text" id="np-unit" class="admin-input" placeholder="Unit (e.g. 1 plate)">
+          <input type="text" id="np-cat" class="admin-input" placeholder="Category (Snacks)">
           <select id="np-hub-select" class="admin-input" style="background:#fff; font-weight:700;">
             <option value="">Select Vendor Hub...</option>
           </select>
@@ -520,6 +672,7 @@
       <div class="tabs-wrap">
         <button class="tab-btn active" id="ptab-all" onclick="filterProductTab('ALL', this)">All Items (<span id="cnt-prod-all">0</span>)</button>
         <button class="tab-btn" id="ptab-in" onclick="filterProductTab('IN_STOCK', this)">🟢 In Stock (<span id="cnt-prod-in">0</span>)</button>
+        <button class="tab-btn" id="ptab-low" onclick="filterProductTab('LOW_STOCK', this)">⚠️ Low Stock (<span id="cnt-prod-low">0</span>)</button>
         <button class="tab-btn" id="ptab-out" onclick="filterProductTab('OUT_OF_STOCK', this)">🔴 Out of Stock (<span id="cnt-prod-out">0</span>)</button>
       </div>
 
@@ -528,27 +681,23 @@
       </div>
     </div>
 
-    <!-- SECTION 8: APP THEME, GEO-FENCING RADIUS & DELIVERY FEES -->
+    <!-- SECTION 10: APP THEME & GEO-FENCING RADIUS -->
     <div id="section-settings" style="display: none;">
       <div class="settings-card">
         <div style="font-size: 16px; font-weight: 900; color: var(--primary);">
           📍 Geo-Fencing Delivery Radius & KM Charges
         </div>
-        <div style="font-size: 12px; color: var(--muted); margin-top: 2px;">
-          Tay karein ki hub se adhiktam kitne KM tak delivery hogi aur doori ke anusar charge kitna lagega.
-        </div>
-
         <div class="settings-grid">
           <div class="form-group">
-            <span class="form-label">Max Delivery Radius (Adhiktam Delivery Dayra KM):</span>
+            <span class="form-label">Max Delivery Radius (KM):</span>
             <input type="number" step="0.5" id="set-max-radius" class="admin-input" placeholder="7.0">
           </div>
           <div class="form-group">
-            <span class="form-label">Base Free Distance (Nyuntam KM jis par base charge lage):</span>
+            <span class="form-label">Base Free Distance (KM):</span>
             <input type="number" step="0.5" id="set-base-km" class="admin-input" placeholder="3.0">
           </div>
           <div class="form-group">
-            <span class="form-label">Extra Charge Per KM (Prati KM atirikt shulk ₹):</span>
+            <span class="form-label">Extra Charge Per KM (₹):</span>
             <input type="number" id="set-per-km" class="admin-input" placeholder="10">
           </div>
         </div>
@@ -585,7 +734,7 @@
 
       <div class="settings-card">
         <div style="font-size: 16px; font-weight: 900; color: var(--primary);">
-          🎁 Discount Offers & Delivery Rules
+          🎁 Discount Offers & Free Delivery Rules
         </div>
         <div class="settings-grid">
           <div class="form-group">
@@ -594,7 +743,7 @@
           </div>
           <div class="form-group">
             <span class="form-label">Banner Subtitle:</span>
-            <input type="text" id="set-banner-sub" class="admin-input" placeholder="₹399+ ke order par ₹49 ka Discount!">
+            <input type="text" id="set-banner-sub" class="admin-input" placeholder="₹399+ par ₹49 OFF">
           </div>
           <div class="form-group">
             <span class="form-label">Free Delivery Min Order (₹):</span>
@@ -615,19 +764,19 @@
         </div>
 
         <button class="btn-save-settings" onclick="saveAppSettings()">
-          💾 Save & Update Settings Live
+          💾 Save & Update Theme Live
         </button>
       </div>
     </div>
 
-    <!-- SECTION 9: RIDERS & COD WALLET SETTLEMENT -->
+    <!-- SECTION 11: RIDERS & CASH WALLET -->
     <div id="section-riders" style="display: none;">
       <div class="order-card" style="border: 1.5px dashed #cbd5e1;">
-        <div style="font-size: 14px; font-weight: 900; color: var(--primary); margin-bottom: 12px;">➕ Add / Register Rider Partner</div>
+        <div style="font-size: 14px; font-weight: 900; color: var(--primary); margin-bottom: 12px;">➕ Register Rider Partner</div>
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)) auto; gap: 10px; align-items: center;">
           <input type="text" id="new-rider-name" class="admin-input" placeholder="Rider Full Name *">
           <input type="tel" id="new-rider-phone" class="admin-input" placeholder="10-digit Phone No. *" maxlength="10">
-          <input type="text" id="new-rider-vehicle" class="admin-input" placeholder="Vehicle No (e.g. UP25-XX-1234)">
+          <input type="text" id="new-rider-vehicle" class="admin-input" placeholder="Vehicle No (UP25-XX-1234)">
           <button class="btn-action btn-approve" style="padding: 10px 18px; font-weight:900;" onclick="registerRiderManually()">
             + Add Rider
           </button>
@@ -666,6 +815,8 @@
     let currentAnalyticsRange = 'TODAY';
     let currentRainSurgeMode = 'OFF';
     let currentRainSurgeFee = 0;
+    let lowStockLimit = 5;
+    let maxSpeedLimit = 55;
 
     function switchMasterSection(sec) {
       currentMasterSec = sec;
@@ -673,21 +824,19 @@
       const activeBtn = document.getElementById(`btn-sec-${sec.toLowerCase()}`);
       if (activeBtn) activeBtn.classList.add('active');
 
-      document.getElementById('section-orders').style.display = sec === 'ORDERS' ? 'block' : 'none';
-      document.getElementById('section-surge').style.display = sec === 'SURGE' ? 'block' : 'none';
-      document.getElementById('section-analytics').style.display = sec === 'ANALYTICS' ? 'block' : 'none';
-      document.getElementById('section-map').style.display = sec === 'MAP' ? 'block' : 'none';
-      document.getElementById('section-coupons').style.display = sec === 'COUPONS' ? 'block' : 'none';
-      document.getElementById('section-hubs').style.display = sec === 'HUBS' ? 'block' : 'none';
-      document.getElementById('section-products').style.display = sec === 'PRODUCTS' ? 'block' : 'none';
-      document.getElementById('section-settings').style.display = sec === 'SETTINGS' ? 'block' : 'none';
-      document.getElementById('section-riders').style.display = sec === 'RIDERS' ? 'block' : 'none';
+      const sections = ['orders', 'disputes', 'prosettings', 'surge', 'analytics', 'map', 'coupons', 'hubs', 'products', 'settings', 'riders'];
+      sections.forEach(s => {
+        const el = document.getElementById(`section-${s}`);
+        if (el) el.style.display = (sec.toLowerCase() === s) ? 'block' : 'none';
+      });
 
       refreshCurrentSection();
     }
 
     function refreshCurrentSection() {
       if (currentMasterSec === 'ORDERS') fetchOrders();
+      else if (currentMasterSec === 'DISPUTES') fetchDisputes();
+      else if (currentMasterSec === 'PROSETTINGS') loadProSettings();
       else if (currentMasterSec === 'SURGE') loadSurgeAndNoticeSettings();
       else if (currentMasterSec === 'ANALYTICS') renderAnalyticsReport();
       else if (currentMasterSec === 'MAP') loadFleetMap();
@@ -727,22 +876,329 @@
 
     async function toggleStoreStatus() {
       const newStatus = currentStoreStatus === 'OPEN' ? 'CLOSED' : 'OPEN';
-      const confirmMsg = newStatus === 'CLOSED'
-        ? '⚠️ Kya aap dukaan band karna chahte hain?\nCustomer app me order lagna turant ruk jayega.'
-        : '🟢 Kya aap dukaan kholna chahte hain?\nCustomer naye orders place kar sakenge.';
-
-      if (!confirm(confirmMsg)) return;
+      if (!confirm(`Dukaan ka status badal kar "${newStatus}" karein?`)) return;
 
       const { error } = await _supabase.from('app_settings').update({ store_status: newStatus }).eq('id', 1);
       if (!error) {
         currentStoreStatus = newStatus;
         updateStoreBtnUI();
-        alert(`Dukaan ka status badal diya gaya: ${newStatus}`);
       }
     }
 
     // ============================================
-    // 2. RAIN SURGE & BROADCAST NOTICE ENGINE
+    // 1. ORDERS CONTROLLER + BATCHING
+    // ============================================
+    async function fetchOrders() {
+      try {
+        const sevenDaysAgo = new Date();
+        sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+        sevenDaysAgo.setHours(0, 0, 0, 0);
+
+        const { data, error } = await _supabase
+          .from('orders').select('*').gte('created_at', sevenDaysAgo.toISOString()).order('id', { ascending: false });
+
+        if (error) throw error;
+        rawOrders = data || [];
+        updateMetrics();
+        renderOrders();
+        updateDisputesCount();
+        if (currentMasterSec === 'ANALYTICS') renderAnalyticsReport();
+      } catch (err) {
+        document.getElementById('orders-container').innerHTML = 
+          `<div style="text-align:center; color:#dc2626; padding:30px;">Data load error: ${err.message}</div>`;
+      }
+    }
+
+    function updateMetrics() {
+      let pending = 0, running = 0, delivered = 0;
+      rawOrders.forEach(o => {
+        const s = (o.status || '').toLowerCase();
+        if (s.includes('placed') || s.includes('paid online') || s.includes('pending')) pending++;
+        else if (s.includes('out') || s.includes('picked') || s.includes('running')) running++;
+        else if (s.includes('delivered')) delivered++;
+      });
+      document.getElementById('cnt-all').innerText = rawOrders.length;
+      document.getElementById('cnt-pending').innerText = pending;
+      document.getElementById('cnt-running').innerText = running;
+      document.getElementById('cnt-delivered').innerText = delivered;
+    }
+
+    function switchTab(tab, btn) {
+      currentOrderTab = tab;
+      document.querySelectorAll('#section-orders .tab-btn').forEach(b => b.classList.remove('active'));
+      if (btn) btn.classList.add('active');
+      renderOrders();
+    }
+
+    function filterByTab(orders) {
+      if (currentOrderTab === 'PENDING') {
+        return orders.filter(o => {
+          const s = (o.status || '').toLowerCase();
+          return (s.includes('placed') || s.includes('paid online') || s.includes('pending')) && !s.includes('cancelled');
+        });
+      }
+      if (currentOrderTab === 'RUNNING') {
+        return orders.filter(o => {
+          const s = (o.status || '').toLowerCase();
+          return (s.includes('out') || s.includes('picked') || s.includes('running')) && !s.includes('cancelled');
+        });
+      }
+      if (currentOrderTab === 'DELIVERED') {
+        return orders.filter(o => (o.status || '').toLowerCase().includes('delivered'));
+      }
+      if (currentOrderTab === 'CANCELLED') {
+        return orders.filter(o => (o.status || '').toLowerCase().includes('cancelled'));
+      }
+      return orders;
+    }
+
+    function renderOrders() {
+      const container = document.getElementById('orders-container');
+      const filtered = filterByTab(rawOrders);
+
+      if (filtered.length === 0) {
+        container.innerHTML = '<div style="text-align:center; color:var(--muted); padding:40px; font-weight:700;">Is tab me koi order nahi hai.</div>';
+        return;
+      }
+
+      const groupedByDate = {};
+      filtered.forEach(order => {
+        const dateStr = order.created_at ? new Date(order.created_at).toLocaleDateString('hi-IN', {
+          weekday: 'short', day: 'numeric', month: 'short', year: 'numeric'
+        }) : 'Recent Orders';
+        if (!groupedByDate[dateStr]) groupedByDate[dateStr] = [];
+        groupedByDate[dateStr].push(order);
+      });
+
+      let html = '';
+      for (const [date, orders] of Object.entries(groupedByDate)) {
+        html += `<div class="date-divider">📅 ${date} (${orders.length} Orders)</div>`;
+        orders.forEach(order => {
+          const timeStr = order.created_at ? new Date(order.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '';
+          
+          let badgeClass = 'status-pending';
+          if ((order.status || '').includes('Out')) badgeClass = 'status-running';
+          else if ((order.status || '').includes('Delivered')) badgeClass = 'status-delivered';
+          else if ((order.status || '').includes('Cancelled')) badgeClass = 'status-cancelled';
+          else if ((order.status || '').includes('Paid')) badgeClass = 'status-upi';
+
+          const itemsSummary = Array.isArray(order.items) 
+            ? order.items.map(i => `<div class="item-line"><span>${i.name} × ${i.qty}</span><b>₹${i.subtotal || (i.price * i.qty)}</b></div>`).join('')
+            : 'Koi item vivaran nahi';
+
+          html += `
+            <div class="order-card" id="card-${order.id}">
+              <div class="card-top">
+                <div>
+                  <div class="order-num">ORD #${order.id}</div>
+                  <div class="order-time">⏰ ${timeStr} | Mode: <b>${order.payment_mode || 'COD'}</b></div>
+                </div>
+                <span class="status-badge ${badgeClass}">${order.status || 'Placed'}</span>
+              </div>
+
+              <div class="cust-info">
+                <div class="cust-name">👤 ${order.customer_name || 'N/A'} (📞 <a href="tel:${order.customer_phone}">${order.customer_phone}</a>)</div>
+                <div style="color: #475569; margin-top: 2px;">📍 ${order.delivery_address || 'Pata darj nahi'}</div>
+                ${order.distance_km ? `<div class="utr-tag" style="background:#f0f9ff; border-color:#bae6fd; color:#0369a1;">📏 Doori: ${order.distance_km} KM</div>` : ''}
+                ${order.hub_id ? `<div class="utr-tag" style="background:#f0fdf4; border-color:#86efac; color:#15803d;">🏬 Hub #${order.hub_id}</div>` : ''}
+                ${order.assigned_rider_id ? `<div class="utr-tag" style="background:#e0f2fe; border-color:#7dd3fc; color:#0369a1;">🛵 Rider #${order.assigned_rider_id}</div>` : ''}
+                ${order.free_gift_added ? `<div class="utr-tag" style="background:#fdf2f8; border-color:#fbcfe8; color:#be185d;">🎁 Gift: ${order.free_gift_added}</div>` : ''}
+                ${order.night_surge_fee > 0 ? `<div class="utr-tag" style="background:#eff6ff; border-color:#bfdbfe; color:#1e40af;">🌙 Night Surge: ₹${order.night_surge_fee}</div>` : ''}
+                ${order.rain_surge_fee > 0 ? `<div class="utr-tag" style="background:#eff6ff; border-color:#93c5fd; color:#1d4ed8;">🌧️ Rain Surge: ₹${order.rain_surge_fee}</div>` : ''}
+                ${order.coupon_code ? `<div class="utr-tag" style="background:#fdf4ff; border-color:#d8b4fe; color:#7e22ce;">🎟️ Coupon: ${order.coupon_code} (-₹${order.coupon_discount || 0})</div>` : ''}
+                ${order.transaction_id ? `<div class="utr-tag">🔑 UTR: ${order.transaction_id}</div>` : ''}
+                ${order.delivery_otp ? `<div class="utr-tag" style="background:#fffbeb; border-color:#fde047; color:#b45309;">🔐 OTP: ${order.delivery_otp}</div>` : ''}
+                ${order.cancelled_by ? `<div class="utr-tag" style="background:#fee2e2; border-color:#fca5a5; color:#b91c1c;">❌ Cancelled by: ${order.cancelled_by} (${order.cancellation_reason || 'Self Cancel'})</div>` : ''}
+              </div>
+
+              <div class="items-list">${itemsSummary}</div>
+
+              <div style="display:flex; justify-content:space-between; align-items:center; font-size:14px; font-weight:900;">
+                <span>Total Amount:</span>
+                <span style="color:var(--green); font-size:16px;">₹${order.total_amount}</span>
+              </div>
+
+              <div class="card-actions">
+                ${order.status !== 'Out for Delivery' && order.status !== 'Delivered' && order.status !== 'Cancelled' ? `
+                  <button class="btn-action btn-pack" onclick="updateOrderStatus(${order.id}, 'Out for Delivery')">
+                    🛵 Dispatch
+                  </button>
+                  <button class="btn-action btn-batch" onclick="promptBatchRider(${order.id})">
+                    🔀 Batch Assign to Rider
+                  </button>
+                ` : ''}
+
+                ${order.status !== 'Delivered' && order.status !== 'Cancelled' ? `
+                  <button class="btn-action btn-deliver" onclick="updateOrderStatus(${order.id}, 'Delivered')">
+                    ✅ Mark Delivered
+                  </button>
+                ` : ''}
+
+                <button class="btn-action btn-delete" onclick="deleteFakeOrder(${order.id})">
+                  🗑️ Delete Order
+                </button>
+              </div>
+            </div>
+          `;
+        });
+      }
+      container.innerHTML = html;
+    }
+
+    async function updateOrderStatus(orderId, newStatus) {
+      if (!confirm(`Order #${orderId} ko "${newStatus}" karein?`)) return;
+      await _supabase.from('orders').update({ status: newStatus }).eq('id', orderId);
+      fetchOrders();
+    }
+
+    async function promptBatchRider(orderId) {
+      const activeRiders = rawRiders.filter(r => r.status === 'Active');
+      if (activeRiders.length === 0) return alert('Koi active rider uplabdh nahi hai!');
+
+      const riderListText = activeRiders.map(r => `ID: ${r.id} - ${r.name}`).join('\n');
+      const chosenId = prompt(`Batch Delivery ke liye Rider ID daalein:\n\n${riderListText}`);
+      if (!chosenId) return;
+
+      const rId = parseInt(chosenId);
+      if (isNaN(rId)) return alert('Sahi Rider ID daalein!');
+
+      await _supabase.from('orders').update({
+        assigned_rider_id: rId,
+        status: 'Out for Delivery'
+      }).eq('id', orderId);
+
+      alert(`✅ Order #${orderId} Rider #${rId} ko batch me assign ho gaya!`);
+      fetchOrders();
+    }
+
+    async function deleteFakeOrder(orderId) {
+      if (!confirm(`Kya aap order #${orderId} ko hatana chahte hain?`)) return;
+      await _supabase.from('orders').delete().eq('id', orderId);
+      fetchOrders();
+    }
+
+    // ============================================
+    // 2. REFUND CLAIMS & DISPUTES
+    // ============================================
+    function updateDisputesCount() {
+      const pendingDisputes = rawOrders.filter(o => o.dispute_status === 'PENDING').length;
+      document.getElementById('cnt-disputes-nav').innerText = pendingDisputes;
+    }
+
+    async function fetchDisputes() {
+      const { data } = await _supabase.from('orders').select('*').not('dispute_status', 'is', null).order('id', { ascending: false });
+      const disputes = data || [];
+      const box = document.getElementById('disputes-container');
+
+      if (disputes.length === 0) {
+        box.innerHTML = '<div style="text-align:center; color:var(--muted); padding:40px; font-weight:700;">Abhi koi refund dispute claim nahi hai. Sab shant hai! 🎉</div>';
+        return;
+      }
+
+      box.innerHTML = disputes.map(d => `
+        <div class="dispute-card" style="border-left: 5px solid ${d.dispute_status === 'APPROVED' ? '#10b981' : d.dispute_status === 'REJECTED' ? '#ef4444' : '#f59e0b'};">
+          <div class="card-top">
+            <div>
+              <div style="font-size:15px; font-weight:900;">Claim for Order #ORD-${d.id} (₹${d.total_amount})</div>
+              <div style="font-size:12px; color:#64748b; margin-top:2px;">Customer: <b>${d.customer_name}</b> (📞 <a href="tel:${d.customer_phone}">${d.customer_phone}</a>)</div>
+            </div>
+            <span class="status-badge" style="background:${d.dispute_status === 'APPROVED' ? '#dcfce7' : d.dispute_status === 'REJECTED' ? '#fee2e2' : '#fef3c7'}; color:${d.dispute_status === 'APPROVED' ? '#15803d' : d.dispute_status === 'REJECTED' ? '#b91c1c' : '#b45309'};">
+              ${d.dispute_status}
+            </span>
+          </div>
+
+          <div style="margin:12px 0; font-size:13px; color:#334155; line-height:1.5;">
+            <b>Grahak ki Shikayat (Issue Note):</b><br>
+            <i>"${d.dispute_note || 'Damage item received'}"</i>
+          </div>
+
+          ${d.dispute_photo_url ? `
+            <div style="margin: 10px 0;">
+              <span style="font-size:11px; font-weight:800; color:var(--muted); display:block; margin-bottom:4px;">PROVE PHOTO:</span>
+              <a href="${d.dispute_photo_url}" target="_blank">
+                <img src="${d.dispute_photo_url}" class="dispute-img-preview" alt="Proof Photo">
+              </a>
+            </div>
+          ` : ''}
+
+          ${d.dispute_status === 'PENDING' ? `
+            <div class="card-actions">
+              <button class="btn-action btn-deliver" onclick="settleDispute(${d.id}, 'APPROVED')">
+                ✓ Approve Refund / Wallet Credit
+              </button>
+              <button class="btn-action btn-delete" style="margin-left:0;" onclick="settleDispute(${d.id}, 'REJECTED')">
+                ✕ Reject Fake Claim
+              </button>
+            </div>
+          ` : `
+            <div style="font-size:11px; font-weight:800; color:#64748b; margin-top:8px;">
+              Action taken: Status is <b>${d.dispute_status}</b>
+            </div>
+          `}
+        </div>
+      `).join('');
+    }
+
+    async function settleDispute(orderId, status) {
+      if (!confirm(`Is claim ko "${status}" karein?`)) return;
+      await _supabase.from('orders').update({ dispute_status: status }).eq('id', orderId);
+      alert(`Claim #${orderId} set to ${status}`);
+      fetchDisputes();
+      fetchOrders();
+    }
+
+    // ============================================
+    // 3. 11 PRO CONTROLS SETTINGS
+    // ============================================
+    async function loadProSettings() {
+      const { data } = await _supabase.from('app_settings').select('*').eq('id', 1).single();
+      if (data) {
+        document.getElementById('pro-min-order').value = data.min_order_value ?? 99;
+        document.getElementById('pro-hub-lock').value = data.enable_hub_lock !== false ? 'true' : 'false';
+        document.getElementById('pro-cancel-sec').value = data.cancel_window_seconds ?? 60;
+        document.getElementById('pro-gift-min').value = data.free_gift_min_order ?? 499;
+        document.getElementById('pro-gift-name').value = data.free_gift_item_name || '1x Cold Drink (Free Gift)';
+        document.getElementById('pro-gift-active').value = data.is_free_gift_active !== false ? 'true' : 'false';
+        document.getElementById('pro-low-stock-limit').value = data.low_stock_threshold ?? 5;
+        document.getElementById('pro-speed-limit').value = data.max_rider_speed_kmh ?? 55;
+        
+        lowStockLimit = Number(data.low_stock_threshold) || 5;
+        maxSpeedLimit = Number(data.max_rider_speed_kmh) || 55;
+      }
+    }
+
+    async function saveProControls() {
+      const minOrd = parseFloat(document.getElementById('pro-min-order').value) || 99;
+      const hubLock = document.getElementById('pro-hub-lock').value === 'true';
+      const cancelSec = parseInt(document.getElementById('pro-cancel-sec').value) || 60;
+      const giftMin = parseFloat(document.getElementById('pro-gift-min').value) || 499;
+      const giftName = document.getElementById('pro-gift-name').value.trim();
+      const giftActive = document.getElementById('pro-gift-active').value === 'true';
+      const lowStock = parseInt(document.getElementById('pro-low-stock-limit').value) || 5;
+      const speedLimit = parseInt(document.getElementById('pro-speed-limit').value) || 55;
+
+      const { error } = await _supabase.from('app_settings').update({
+        min_order_value: minOrd,
+        enable_hub_lock: hubLock,
+        cancel_window_seconds: cancelSec,
+        free_gift_min_order: giftMin,
+        free_gift_item_name: giftName,
+        is_free_gift_active: giftActive,
+        low_stock_threshold: lowStock,
+        max_rider_speed_kmh: speedLimit
+      }).eq('id', 1);
+
+      if (!error) {
+        lowStockLimit = lowStock;
+        maxSpeedLimit = speedLimit;
+        alert('🎉 Sabhi 11 Pro Rules Live Update Ho Gaye!');
+      } else {
+        alert('Error: ' + error.message);
+      }
+    }
+
+    // ============================================
+    // 4. RAIN & NIGHT SURGE + NOTICE
     // ============================================
     async function loadSurgeAndNoticeSettings() {
       const { data } = await _supabase.from('app_settings').select('*').eq('id', 1).single();
@@ -750,6 +1206,20 @@
         currentRainSurgeMode = data.rain_surge_mode || 'OFF';
         currentRainSurgeFee = Number(data.rain_surge_fee) || 0;
         updateSurgeUI();
+
+        document.getElementById('night-start-hr').value = data.night_surge_start_hour ?? 22;
+        document.getElementById('night-end-hr').value = data.night_surge_end_hour ?? 6;
+        document.getElementById('night-fee-amt').value = data.night_surge_fee ?? 20;
+        document.getElementById('night-active-toggle').value = data.is_night_surge_active ? 'true' : 'false';
+
+        const nightTag = document.getElementById('current-night-tag');
+        if (data.is_night_surge_active) {
+          nightTag.innerText = `Night Surge: Active (+₹${data.night_surge_fee})`;
+          nightTag.style.background = '#eff6ff'; nightTag.style.color = '#1d4ed8';
+        } else {
+          nightTag.innerText = 'Night Surge: Disabled';
+          nightTag.style.background = '#f1f5f9'; nightTag.style.color = '#64748b';
+        }
 
         document.getElementById('notice-text-input').value = data.broadcast_notice || '';
         document.getElementById('notice-active-toggle').checked = Boolean(data.is_broadcast_active);
@@ -786,198 +1256,36 @@
       currentRainSurgeMode = mode;
       currentRainSurgeFee = fee;
       updateSurgeUI();
+      await _supabase.from('app_settings').update({ rain_surge_mode: mode, rain_surge_fee: fee }).eq('id', 1);
+    }
+
+    async function saveNightSurgeSettings() {
+      const start = parseInt(document.getElementById('night-start-hr').value) || 22;
+      const end = parseInt(document.getElementById('night-end-hr').value) || 6;
+      const fee = parseFloat(document.getElementById('night-fee-amt').value) || 20;
+      const active = document.getElementById('night-active-toggle').value === 'true';
 
       const { error } = await _supabase.from('app_settings').update({
-        rain_surge_mode: mode,
-        rain_surge_fee: fee
+        night_surge_start_hour: start,
+        night_surge_end_hour: end,
+        night_surge_fee: fee,
+        is_night_surge_active: active
       }).eq('id', 1);
 
-      if (!error) {
-        alert(`🌧️ Rain Surge अपडेट हो गया: ${mode} (+₹${fee})`);
-      } else {
-        alert('त्रुटि: ' + error.message);
-      }
+      if (!error) alert('🌙 Night Surge Schedule Update Ho Gaya!');
+      else alert('Error: ' + error.message);
     }
 
     async function saveBroadcastNotice() {
       const text = document.getElementById('notice-text-input').value.trim();
       const isActive = document.getElementById('notice-active-toggle').checked;
-
-      const { error } = await _supabase.from('app_settings').update({
-        broadcast_notice: text,
-        is_broadcast_active: isActive
-      }).eq('id', 1);
-
-      if (!error) {
-        alert(isActive ? '📢 लाइव नोटिस बार चालू हो गया है!' : '📢 नोटिस बार बंद कर दिया गया है!');
-      } else {
-        alert('त्रुटि: ' + error.message);
-      }
+      await _supabase.from('app_settings').update({ broadcast_notice: text, is_broadcast_active: isActive }).eq('id', 1);
+      alert(isActive ? '📢 लाइव नोटिस बार चालू हो गया है!' : '📢 नोटिस बार बंद कर दिया गया है!');
     }
 
     // ============================================
-    // 1. ORDERS CONTROLLER
+    // 5. SALES & ANALYTICS
     // ============================================
-    async function fetchOrders() {
-      try {
-        const sevenDaysAgo = new Date();
-        sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
-        sevenDaysAgo.setHours(0, 0, 0, 0);
-
-        const { data, error } = await _supabase
-          .from('orders').select('*').gte('created_at', sevenDaysAgo.toISOString()).order('id', { ascending: false });
-
-        if (error) throw error;
-        rawOrders = data || [];
-        updateMetrics();
-        renderOrders();
-        if (currentMasterSec === 'ANALYTICS') renderAnalyticsReport();
-      } catch (err) {
-        document.getElementById('orders-container').innerHTML = 
-          `<div style="text-align:center; color:#dc2626; padding:30px;">Data load error: ${err.message}</div>`;
-      }
-    }
-
-    function updateMetrics() {
-      let pending = 0, running = 0, delivered = 0;
-      rawOrders.forEach(o => {
-        const s = (o.status || '').toLowerCase();
-        if (s.includes('placed') || s.includes('paid online') || s.includes('pending')) pending++;
-        else if (s.includes('out') || s.includes('picked') || s.includes('running')) running++;
-        else if (s.includes('delivered')) delivered++;
-      });
-      document.getElementById('cnt-all').innerText = rawOrders.length;
-      document.getElementById('cnt-pending').innerText = pending;
-      document.getElementById('cnt-running').innerText = running;
-      document.getElementById('cnt-delivered').innerText = delivered;
-    }
-
-    function switchTab(tab, btn) {
-      currentOrderTab = tab;
-      document.querySelectorAll('#section-orders .tab-btn').forEach(b => b.classList.remove('active'));
-      if (btn) btn.classList.add('active');
-      renderOrders();
-    }
-
-    function filterByTab(orders) {
-      if (currentOrderTab === 'PENDING') {
-        return orders.filter(o => {
-          const s = (o.status || '').toLowerCase();
-          return s.includes('placed') || s.includes('paid online') || s.includes('pending');
-        });
-      }
-      if (currentOrderTab === 'RUNNING') {
-        return orders.filter(o => {
-          const s = (o.status || '').toLowerCase();
-          return s.includes('out') || s.includes('picked') || s.includes('running');
-        });
-      }
-      if (currentOrderTab === 'DELIVERED') {
-        return orders.filter(o => (o.status || '').toLowerCase().includes('delivered'));
-      }
-      return orders;
-    }
-
-    function renderOrders() {
-      const container = document.getElementById('orders-container');
-      const filtered = filterByTab(rawOrders);
-
-      if (filtered.length === 0) {
-        container.innerHTML = '<div style="text-align:center; color:var(--muted); padding:40px; font-weight:700;">Is tab me koi order nahi hai.</div>';
-        return;
-      }
-
-      const groupedByDate = {};
-      filtered.forEach(order => {
-        const dateStr = order.created_at ? new Date(order.created_at).toLocaleDateString('hi-IN', {
-          weekday: 'short', day: 'numeric', month: 'short', year: 'numeric'
-        }) : 'Recent Orders';
-        if (!groupedByDate[dateStr]) groupedByDate[dateStr] = [];
-        groupedByDate[dateStr].push(order);
-      });
-
-      let html = '';
-      for (const [date, orders] of Object.entries(groupedByDate)) {
-        html += `<div class="date-divider">📅 ${date} (${orders.length} Orders)</div>`;
-        orders.forEach(order => {
-          const timeStr = order.created_at ? new Date(order.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '';
-          
-          let badgeClass = 'status-pending';
-          if ((order.status || '').includes('Out')) badgeClass = 'status-running';
-          else if ((order.status || '').includes('Delivered')) badgeClass = 'status-delivered';
-          else if ((order.status || '').includes('Paid')) badgeClass = 'status-upi';
-
-          const itemsSummary = Array.isArray(order.items) 
-            ? order.items.map(i => `<div class="item-line"><span>${i.name} × ${i.qty}</span><b>₹${i.subtotal || (i.price * i.qty)}</b></div>`).join('')
-            : 'Koi item vivaran nahi';
-
-          html += `
-            <div class="order-card" id="card-${order.id}">
-              <div class="card-top">
-                <div>
-                  <div class="order-num">ORD #${order.id}</div>
-                  <div class="order-time">⏰ ${timeStr} | Mode: <b>${order.payment_mode || 'COD'}</b></div>
-                </div>
-                <span class="status-badge ${badgeClass}">${order.status || 'Placed'}</span>
-              </div>
-
-              <div class="cust-info">
-                <div class="cust-name">👤 ${order.customer_name || 'N/A'} (📞 <a href="tel:${order.customer_phone}">${order.customer_phone}</a>)</div>
-                <div style="color: #475569; margin-top: 2px;">📍 ${order.delivery_address || 'Pata darj nahi'}</div>
-                ${order.hub_id ? `<div class="utr-tag" style="background:#f0fdf4; border-color:#86efac; color:#15803d;">🏬 Hub #${order.hub_id}</div>` : ''}
-                ${order.assigned_rider_id ? `<div class="utr-tag" style="background:#e0f2fe; border-color:#7dd3fc; color:#0369a1;">🛵 Rider #${order.assigned_rider_id}</div>` : ''}
-                ${order.rain_surge_fee > 0 ? `<div class="utr-tag" style="background:#eff6ff; border-color:#93c5fd; color:#1d4ed8;">🌧️ Rain Surge: ₹${order.rain_surge_fee}</div>` : ''}
-                ${order.coupon_code ? `<div class="utr-tag" style="background:#fdf4ff; border-color:#d8b4fe; color:#7e22ce;">🎟️ Coupon: ${order.coupon_code} (-₹${order.coupon_discount || 0})</div>` : ''}
-                ${order.transaction_id ? `<div class="utr-tag">🔑 UTR No: ${order.transaction_id}</div>` : ''}
-                ${order.delivery_otp ? `<div class="utr-tag" style="background:#fffbeb; border-color:#fde047; color:#b45309;">🔐 OTP: ${order.delivery_otp}</div>` : ''}
-              </div>
-
-              <div class="items-list">${itemsSummary}</div>
-
-              <div style="display:flex; justify-content:space-between; align-items:center; font-size:14px; font-weight:900;">
-                <span>Total Amount:</span>
-                <span style="color:var(--green); font-size:16px;">₹${order.total_amount}</span>
-              </div>
-
-              <div class="card-actions">
-                ${order.status !== 'Out for Delivery' && order.status !== 'Delivered' ? `
-                  <button class="btn-action btn-pack" onclick="updateOrderStatus(${order.id}, 'Out for Delivery')">
-                    🛵 Dispatch
-                  </button>
-                ` : ''}
-
-                ${order.status !== 'Delivered' ? `
-                  <button class="btn-action btn-deliver" onclick="updateOrderStatus(${order.id}, 'Delivered')">
-                    ✅ Mark Delivered
-                  </button>
-                ` : ''}
-
-                <button class="btn-action btn-delete" onclick="deleteFakeOrder(${order.id})">
-                  🗑️ Delete Order
-                </button>
-              </div>
-            </div>
-          `;
-        });
-      }
-      container.innerHTML = html;
-    }
-
-    async function updateOrderStatus(orderId, newStatus) {
-      if (!confirm(`Order #${orderId} ko "${newStatus}" karein?`)) return;
-      await _supabase.from('orders').update({ status: newStatus }).eq('id', orderId);
-      fetchOrders();
-    }
-
-    async function deleteFakeOrder(orderId) {
-      if (!confirm(`Kya aap order #${orderId} ko hatana chahte hain?`)) return;
-      await _supabase.from('orders').delete().eq('id', orderId);
-      fetchOrders();
-    }
-
-    // ====================================================
-    // 3. DAILY PROFIT & SALES ANALYTICS
-    // ====================================================
     function setAnalyticsRange(range, btn) {
       currentAnalyticsRange = range;
       document.querySelectorAll('.report-filter-btn').forEach(b => b.classList.remove('active'));
@@ -993,37 +1301,27 @@
       const yesterdayStr = yesterday.toDateString();
 
       const filteredOrders = rawOrders.filter(o => {
-        if (!o.created_at) return false;
+        if (!o.created_at || (o.status || '').includes('Cancelled')) return false;
         const oDate = new Date(o.created_at).toDateString();
         if (currentAnalyticsRange === 'TODAY') return oDate === todayStr;
         if (currentAnalyticsRange === 'YESTERDAY') return oDate === yesterdayStr;
         return true;
       });
 
-      let totalGross = 0;
-      let codSales = 0;
-      let codCount = 0;
-      let upiSales = 0;
-      let upiCount = 0;
-      let couponLoss = 0;
-
-      const itemSalesMap = {};
-      const hubSalesMap = {};
+      let totalGross = 0, codSales = 0, codCount = 0, upiSales = 0, upiCount = 0, couponLoss = 0;
+      const itemSalesMap = {}, hubSalesMap = {};
 
       filteredOrders.forEach(o => {
         const amt = Number(o.total_amount) || 0;
         totalGross += amt;
 
         if ((o.payment_mode || '').toUpperCase() === 'COD') {
-          codSales += amt;
-          codCount++;
+          codSales += amt; codCount++;
         } else {
-          upiSales += amt;
-          upiCount++;
+          upiSales += amt; upiCount++;
         }
 
         couponLoss += Number(o.coupon_discount) || 0;
-
         const hubId = o.hub_id || 1;
         hubSalesMap[hubId] = (hubSalesMap[hubId] || 0) + amt;
 
@@ -1052,7 +1350,7 @@
       if (sortedItems.length === 0) {
         topItemsContainer.innerHTML = '<div style="font-size:12px; color:var(--muted); padding:10px 0;">Is avadhi me koi bikri nahi hui.</div>';
       } else {
-        let html = '<table class="breakdown-table"><tr><th>Item Name</th><th>Bikri (Qty)</th><th>Kul Revenue</th></tr>';
+        let html = '<table class="breakdown-table"><tr><th>Item Name</th><th>Bikri</th><th>Revenue</th></tr>';
         sortedItems.slice(0, 8).forEach(([name, data]) => {
           html += `<tr><td><b>${name}</b></td><td>${data.qty} pcs</td><td style="color:var(--green); font-weight:800;">₹${data.total}</td></tr>`;
         });
@@ -1068,8 +1366,7 @@
         let html = '<table class="breakdown-table"><tr><th>Hub Details</th><th>Kul Bikri</th></tr>';
         hubEntries.forEach(([hId, amt]) => {
           const hubObj = rawHubs.find(h => h.id == hId);
-          const hubName = hubObj ? hubObj.name : `Hub #${hId}`;
-          html += `<tr><td>🏬 <b>${hubName}</b></td><td style="color:var(--primary); font-weight:900;">₹${amt}</td></tr>`;
+          html += `<tr><td>🏬 <b>${hubObj ? hubObj.name : 'Hub #' + hId}</b></td><td style="color:var(--primary); font-weight:900;">₹${amt}</td></tr>`;
         });
         html += '</table>';
         hubContainer.innerHTML = html;
@@ -1077,12 +1374,13 @@
     }
 
     // ============================================
-    // 4. LIVE FLEET MAP VIEW
+    // 6. FLEET MAP & SPEED GUARD
     // ============================================
     async function loadFleetMap() {
       const { data } = await _supabase.from('riders').select('*').eq('status', 'Active');
       const riders = data || [];
       const btnBox = document.getElementById('fleet-rider-buttons');
+      document.getElementById('map-speed-rule').innerText = `${maxSpeedLimit} km/h`;
 
       if (riders.length === 0) {
         btnBox.innerHTML = '<div style="color:var(--muted); font-size:12px;">Koi active rider uplabdh nahi hai.</div>';
@@ -1091,27 +1389,30 @@
 
       btnBox.innerHTML = riders.map(r => {
         const hasGps = Boolean(r.current_lat && r.current_lng);
+        const speed = Number(r.current_speed_kmh) || 0;
+        const isOver = speed > maxSpeedLimit || r.is_overspeeding;
+
         return `
-          <button class="btn-action" style="background:${hasGps ? '#e0f2fe' : '#f1f5f9'}; color:${hasGps ? '#0369a1' : '#64748b'};" 
-            onclick="focusRiderOnMap(${r.current_lat || 28.2818}, ${r.current_lng || 79.1554}, '${r.name}')">
-            🛵 ${r.name} (${hasGps ? '🟢 Live' : '⚪ No GPS'})
-          </button>
+          <div style="display:flex; align-items:center; gap:6px;">
+            <button class="btn-action" style="background:${hasGps ? '#e0f2fe' : '#f1f5f9'}; color:${hasGps ? '#0369a1' : '#64748b'};" 
+              onclick="focusRiderOnMap(${r.current_lat || 28.2818}, ${r.current_lng || 79.1554}, '${r.name}')">
+              🛵 ${r.name} (${speed} km/h)
+            </button>
+            ${isOver ? `<span class="overspeed-pill">⚠️ FAST!</span>` : ''}
+          </div>
         `;
       }).join('');
 
       const firstLive = riders.find(r => r.current_lat && r.current_lng);
-      if (firstLive) {
-        focusRiderOnMap(firstLive.current_lat, firstLive.current_lng, firstLive.name);
-      }
+      if (firstLive) focusRiderOnMap(firstLive.current_lat, firstLive.current_lng, firstLive.name);
     }
 
     function focusRiderOnMap(lat, lng, name) {
-      const mapFrame = document.getElementById('admin-fleet-map');
-      mapFrame.src = `https://maps.google.com/maps?q=${lat},${lng}&t=&z=16&ie=UTF8&iwloc=&output=embed`;
+      document.getElementById('admin-fleet-map').src = `https://maps.google.com/maps?q=${lat},${lng}&t=&z=16&ie=UTF8&iwloc=&output=embed`;
     }
 
     // ============================================
-    // 5. PROMO COUPONS
+    // 7. COUPONS
     // ============================================
     async function fetchCoupons() {
       const { data } = await _supabase.from('coupons').select('*').order('id', { ascending: false });
@@ -1148,18 +1449,12 @@
       const disc = parseFloat(document.getElementById('cp-disc').value);
       const min = parseFloat(document.getElementById('cp-min').value) || 0;
 
-      if (!code || isNaN(disc)) return alert('Kripya code aur discount amount daalein!');
+      if (!code || isNaN(disc)) return alert('Kripya code aur discount daalein!');
 
-      const { error } = await _supabase.from('coupons').insert([{ code, discount_type: 'FLAT', discount_value: disc, min_order_amount: min, is_active: true }]);
-      if (!error) {
-        alert('✅ Coupon safaltapoorvak jud gaya!');
-        document.getElementById('cp-code').value = '';
-        document.getElementById('cp-disc').value = '';
-        document.getElementById('cp-min').value = '';
-        fetchCoupons();
-      } else {
-        alert('Error: ' + error.message);
-      }
+      await _supabase.from('coupons').insert([{ code, discount_type: 'FLAT', discount_value: disc, min_order_amount: min, is_active: true }]);
+      document.getElementById('cp-code').value = '';
+      document.getElementById('cp-disc').value = '';
+      fetchCoupons();
     }
 
     async function toggleCoupon(id, st) {
@@ -1168,13 +1463,13 @@
     }
 
     async function deleteCoupon(id) {
-      if (!confirm('Kya coupon ko hatana chahte hain?')) return;
+      if (!confirm('Coupon ko hatana chahte hain?')) return;
       await _supabase.from('coupons').delete().eq('id', id);
       fetchCoupons();
     }
 
     // ============================================
-    // 6. VENDOR HUBS
+    // 8. VENDOR HUBS
     // ============================================
     async function fetchHubs() {
       const { data } = await _supabase.from('hubs').select('*').order('id', { ascending: true });
@@ -1212,7 +1507,7 @@
       navigator.geolocation.getCurrentPosition(pos => {
         document.getElementById('hub-lat').value = pos.coords.latitude;
         document.getElementById('hub-lng').value = pos.coords.longitude;
-        alert('✅ GPS location set ho gayi!');
+        alert('✅ GPS set ho gaya!');
       }, err => alert('GPS error: ' + err.message));
     }
 
@@ -1223,19 +1518,16 @@
       const lat = parseFloat(document.getElementById('hub-lat').value);
       const lng = parseFloat(document.getElementById('hub-lng').value);
 
-      if (!name || !addr || isNaN(lat) || isNaN(lng)) return alert('Kripya sabhi details bharein!');
+      if (!name || !addr || isNaN(lat) || isNaN(lng)) return alert('Sabhi hub details bharein!');
 
       await _supabase.from('hubs').insert([{ name, address: addr, phone, lat, lng, status: 'Active' }]);
       document.getElementById('hub-name').value = '';
       document.getElementById('hub-addr').value = '';
-      document.getElementById('hub-phone').value = '';
-      document.getElementById('hub-lat').value = '';
-      document.getElementById('hub-lng').value = '';
       fetchHubs();
     }
 
     async function deleteHub(id) {
-      if (!confirm('Hub ko hatana chahte hain?')) return;
+      if (!confirm('Hub hatana chahte hain?')) return;
       await _supabase.from('hubs').delete().eq('id', id);
       fetchHubs();
     }
@@ -1248,7 +1540,7 @@
     }
 
     // ============================================
-    // 7. PRODUCTS & STOCK
+    // 9. PRODUCTS & INVENTORY STOCK
     // ============================================
     async function fetchProducts() {
       const { data } = await _supabase.from('products').select('*').order('id', { ascending: true });
@@ -1261,8 +1553,9 @@
 
     function updateProductStats() {
       document.getElementById('cnt-prod-all').innerText = rawProducts.length;
-      document.getElementById('cnt-prod-in').innerText = rawProducts.filter(p => !p.is_out_of_stock).length;
-      document.getElementById('cnt-prod-out').innerText = rawProducts.filter(p => p.is_out_of_stock).length;
+      document.getElementById('cnt-prod-in').innerText = rawProducts.filter(p => !p.is_out_of_stock && (p.stock_quantity ?? 50) > lowStockLimit).length;
+      document.getElementById('cnt-prod-low').innerText = rawProducts.filter(p => !p.is_out_of_stock && (p.stock_quantity ?? 50) <= lowStockLimit && (p.stock_quantity ?? 50) > 0).length;
+      document.getElementById('cnt-prod-out').innerText = rawProducts.filter(p => p.is_out_of_stock || (p.stock_quantity ?? 50) <= 0).length;
     }
 
     function filterProductTab(tab, btn) {
@@ -1280,8 +1573,13 @@
 
       let list = rawProducts.filter(p => {
         const matchQ = (p.name || '').toLowerCase().includes(q) || (p.category || '').toLowerCase().includes(q);
-        if (currentProdTab === 'IN_STOCK') return matchQ && !p.is_out_of_stock;
-        if (currentProdTab === 'OUT_OF_STOCK') return matchQ && p.is_out_of_stock;
+        const qty = p.stock_quantity ?? 50;
+        const isOut = p.is_out_of_stock || qty <= 0;
+        const isLow = !isOut && qty <= lowStockLimit;
+
+        if (currentProdTab === 'IN_STOCK') return matchQ && !isOut && !isLow;
+        if (currentProdTab === 'LOW_STOCK') return matchQ && isLow;
+        if (currentProdTab === 'OUT_OF_STOCK') return matchQ && isOut;
         return matchQ;
       });
 
@@ -1291,9 +1589,12 @@
       }
 
       container.innerHTML = list.map(p => {
-        const isOut = p.is_out_of_stock === true;
+        const qty = p.stock_quantity ?? 50;
+        const isOut = p.is_out_of_stock || qty <= 0;
+        const isLow = !isOut && qty <= lowStockLimit;
+
         const linkedHub = rawHubs.find(h => h.id == p.hub_id);
-        const hubNameStr = linkedHub ? `🏬 ${linkedHub.name}` : (p.hub_id ? `Hub #${p.hub_id}` : 'Main Store');
+        const hubNameStr = linkedHub ? `🏬 ${linkedHub.name}` : 'Main Store';
         const discPct = Number(p.discount_percent) || 0;
 
         let originalMrpHtml = '';
@@ -1302,8 +1603,12 @@
           originalMrpHtml = `<span style="text-decoration:line-through; color:#94a3b8; font-size:12px; margin-left:4px;">₹${originalMrp}</span> <span style="color:#16a34a; font-size:11px; font-weight:800;">(${discPct}% OFF)</span>`;
         }
 
+        let badgeTag = '<span class="stock-badge-green">🟢 In Stock</span>';
+        if (isOut) badgeTag = '<span class="stock-badge-red">🔴 Out of Stock</span>';
+        else if (isLow) badgeTag = `<span class="stock-badge-low">⚠️ Low (${qty} left)</span>`;
+
         return `
-          <div class="product-admin-card" style="${isOut ? 'opacity: 0.75; border-color: #fca5a5;' : ''}">
+          <div class="product-admin-card" style="${isOut ? 'opacity: 0.75; border-color: #fca5a5;' : isLow ? 'border-color: #fde047;' : ''}">
             <div style="display:flex; gap:12px; align-items:center;">
               <img class="prod-thumb-box" src="${p.image_url || 'https://via.placeholder.com/80'}">
               <div style="flex:1;">
@@ -1313,10 +1618,11 @@
                 <div style="font-size:15px; font-weight:900; color:var(--primary); margin-top:2px;">
                   ₹${p.price} ${originalMrpHtml}
                 </div>
+                <div style="font-size:11px; color:#334155; margin-top:4px;">
+                  Inventory Stock: <input type="number" value="${qty}" style="width:65px; padding:2px 4px; font-weight:800; border-radius:4px; border:1px solid #cbd5e1;" onchange="updateProductStockQty(${p.id}, this.value)"> pcs
+                </div>
               </div>
-              <span class="${isOut ? 'stock-badge-red' : 'stock-badge-green'}">
-                ${isOut ? '🔴 Out of Stock' : '🟢 In Stock'}
-              </span>
+              <div>${badgeTag}</div>
             </div>
 
             <div style="display:flex; justify-content:space-between; align-items:center; margin-top:12px; padding-top:10px; border-top:1px solid #f1f5f9;">
@@ -1332,6 +1638,12 @@
       }).join('');
     }
 
+    async function updateProductStockQty(prodId, newQty) {
+      const q = parseInt(newQty) || 0;
+      await _supabase.from('products').update({ stock_quantity: q, is_out_of_stock: q <= 0 }).eq('id', prodId);
+      fetchProducts();
+    }
+
     async function toggleProductStock(prodId, setOutOfStock) {
       await _supabase.from('products').update({ is_out_of_stock: setOutOfStock }).eq('id', prodId);
       fetchProducts();
@@ -1341,30 +1653,24 @@
       const name = document.getElementById('np-name').value.trim();
       const price = parseFloat(document.getElementById('np-price').value);
       const discPct = parseFloat(document.getElementById('np-disc-pct').value) || 0;
+      const stockQty = parseInt(document.getElementById('np-stock-qty').value) || 50;
       const unit = document.getElementById('np-unit').value.trim();
       const cat = document.getElementById('np-cat').value.trim();
       const hubId = document.getElementById('np-hub-select').value;
       const img = document.getElementById('np-img').value.trim();
 
-      if (!name || isNaN(price)) return alert('Kripya item ka naam aur price bharein!');
+      if (!name || isNaN(price)) return alert('Kripya item name aur price daalein!');
 
       await _supabase.from('products').insert([{
-        name, 
-        price, 
-        discount_percent: discPct,
-        unit: unit || '1 unit', 
-        category: cat || 'Snacks',
-        hub_id: hubId ? parseInt(hubId) : null, 
+        name, price, discount_percent: discPct, stock_quantity: stockQty,
+        unit: unit || '1 unit', category: cat || 'Snacks',
+        hub_id: hubId ? parseInt(hubId) : null,
         image_url: img || 'https://via.placeholder.com/120',
-        is_out_of_stock: false
+        is_out_of_stock: stockQty <= 0
       }]);
 
       document.getElementById('np-name').value = '';
       document.getElementById('np-price').value = '';
-      document.getElementById('np-disc-pct').value = '';
-      document.getElementById('np-unit').value = '';
-      document.getElementById('np-cat').value = '';
-      document.getElementById('np-img').value = '';
       fetchProducts();
     }
 
@@ -1375,7 +1681,7 @@
     }
 
     // ============================================
-    // 8. APP THEME & GEO-FENCING
+    // 10. APP THEME & BASE RADIUS SETTINGS
     // ============================================
     async function loadAppSettings() {
       const { data } = await _supabase.from('app_settings').select('*').eq('id', 1).single();
@@ -1397,23 +1703,8 @@
         document.getElementById('set-max-radius').value = data.max_delivery_radius_km || 7.0;
         document.getElementById('set-base-km').value = data.base_delivery_km || 3.0;
         document.getElementById('set-per-km').value = data.per_km_charge || 10.0;
-        
-        if (data.store_status) {
-          currentStoreStatus = data.store_status;
-          updateStoreBtnUI();
-        }
       }
     }
-
-    document.getElementById('set-theme-color').addEventListener('input', (e) => {
-      document.getElementById('set-theme-color-text').value = e.target.value;
-    });
-    document.getElementById('set-header-bg').addEventListener('input', (e) => {
-      document.getElementById('set-header-bg-text').value = e.target.value;
-    });
-    document.getElementById('set-purple').addEventListener('input', (e) => {
-      document.getElementById('set-purple-text').value = e.target.value;
-    });
 
     async function saveAppSettings() {
       const themeColor = document.getElementById('set-theme-color-text').value.trim();
@@ -1425,37 +1716,22 @@
       const delCharge = parseInt(document.getElementById('set-del-charge').value) || 25;
       const discMin = parseInt(document.getElementById('set-disc-min').value) || 399;
       const discAmt = parseInt(document.getElementById('set-disc-amt').value) || 49;
-
       const maxRadius = parseFloat(document.getElementById('set-max-radius').value) || 7.0;
       const baseKm = parseFloat(document.getElementById('set-base-km').value) || 3.0;
       const perKm = parseFloat(document.getElementById('set-per-km').value) || 10.0;
 
-      const { error } = await _supabase.from('app_settings').upsert({
-        id: 1,
-        theme_color: themeColor,
-        header_bg: headerBg,
-        primary_purple: purpleColor,
-        banner_title: bannerTitle,
-        banner_subtitle: bannerSub,
-        min_free_delivery: minFreeDel,
-        delivery_charge: delCharge,
-        discount_min_order: discMin,
-        discount_amount: discAmt,
-        store_status: currentStoreStatus,
-        max_delivery_radius_km: maxRadius,
-        base_delivery_km: baseKm,
-        per_km_charge: perKm
-      });
+      await _supabase.from('app_settings').update({
+        theme_color: themeColor, header_bg: headerBg, primary_purple: purpleColor,
+        banner_title: bannerTitle, banner_subtitle: bannerSub, min_free_delivery: minFreeDel,
+        delivery_charge: delCharge, discount_min_order: discMin, discount_amount: discAmt,
+        max_delivery_radius_km: maxRadius, base_delivery_km: baseKm, per_km_charge: perKm
+      }).eq('id', 1);
 
-      if (!error) {
-        alert('🎉 Settings aur delivery dayra live update ho gaya!');
-      } else {
-        alert('Error: ' + error.message);
-      }
+      alert('🎉 Settings Live Update Ho Gayi!');
     }
 
     // ============================================
-    // 9. RIDERS & COD WALLET SETTLEMENT
+    // 11. RIDERS & COD WALLET
     // ============================================
     async function fetchRiders() {
       const { data } = await _supabase.from('riders').select('*').order('id', { ascending: false });
@@ -1473,7 +1749,6 @@
     function renderRiders() {
       const container = document.getElementById('riders-container');
       let filtered = rawRiders;
-
       if (currentRiderTab !== 'ALL') {
         filtered = rawRiders.filter(r => (r.status || 'Pending').toLowerCase() === currentRiderTab.toLowerCase());
       }
@@ -1485,51 +1760,45 @@
 
       container.innerHTML = filtered.map(r => {
         const status = r.status || 'Pending';
-        let badgeClass = 'status-pending';
-        if (status === 'Active') badgeClass = 'status-active';
-        else if (status === 'Blocked' || status === 'Deactivated') badgeClass = 'status-blocked';
-
         const cashOnHand = Number(r.cash_in_hand) || 0;
+        const speed = Number(r.current_speed_kmh) || 0;
+        const isOver = speed > maxSpeedLimit || r.is_overspeeding;
 
         return `
           <div class="rider-card">
             <div class="card-top">
               <div>
                 <div class="order-num">🛵 ${r.name || 'Unnamed'} (RIDER-${r.id})</div>
-                <div class="order-time">📞 <a href="tel:${r.phone}">${r.phone}</a> | Vehicle: <b>${r.vehicle_no || 'N/A'}</b></div>
-                <div style="margin-top:6px;">
-                  <span class="wallet-pill">💵 COD Cash with Rider: ₹${cashOnHand}</span>
+                <div class="order-time">📞 <a href="tel:${r.phone}">${r.phone}</a> | Vehicle: <b>${r.vehicle_no || 'Standard'}</b></div>
+                <div style="margin-top:6px; display:flex; gap:8px; align-items:center;">
+                  <span class="wallet-pill">💵 COD Cash: ₹${cashOnHand}</span>
+                  <span style="font-size:11px; font-weight:800; color:#0369a1;">Speed: ${speed} km/h</span>
+                  ${isOver ? `<span class="overspeed-pill">🚨 OVERSPEED</span>` : ''}
                 </div>
               </div>
-              <span class="status-badge ${badgeClass}">${status}</span>
+              <span class="status-badge ${status === 'Active' ? 'status-active' : 'status-blocked'}">${status}</span>
             </div>
 
             <div class="card-actions">
               ${cashOnHand > 0 ? `
-                <button class="btn-action btn-deliver" onclick="settleRiderCash(${r.id}, '${r.name}', ${cashOnHand})">
-                  ✓ Settle & Clear Cash
+                <button class="btn-action btn-deliver" onclick="settleRiderCash(${r.id}, '${r.name}',${cashOnHand})">
+                  ✓ Settle Cash (₹${cashOnHand})
                 </button>
               ` : ''}
 
               ${status !== 'Active' ? `
-                <button class="btn-action btn-approve" onclick="updateRiderStatus(${r.id}, 'Active')">
-                  ✅ Approve
-                </button>
+                <button class="btn-action btn-approve" onclick="updateRiderStatus(${r.id}, 'Active')">✅ Approve</button>
               ` : `
-                <button class="btn-action btn-deactivate" onclick="updateRiderStatus(${r.id}, 'Blocked')">
-                  🚫 Block
-                </button>
+                <button class="btn-action btn-deactivate" onclick="updateRiderStatus(${r.id}, 'Blocked')">🚫 Block</button>
               `}
 
               ${(r.current_lat && r.current_lng) ? `
                 <button class="btn-action" style="background:#e0f2fe; color:#0369a1;" onclick="switchMasterSection('MAP'); focusRiderOnMap(${r.current_lat}, ${r.current_lng}, '${r.name}')">
-                  🗺️ Live Map
+                  🗺️ Track Live Map
                 </button>
               ` : ''}
 
-              <button class="btn-action btn-delete" onclick="deleteRiderPermanently(${r.id})">
-                🗑️ Remove
-              </button>
+              <button class="btn-action btn-delete" onclick="deleteRiderPermanently(${r.id})">🗑️ Remove</button>
             </div>
           </div>
         `;
@@ -1537,15 +1806,10 @@
     }
 
     async function settleRiderCash(riderId, name, amount) {
-      if (!confirm(`Kya aapne rider ${name} se ₹${amount} cash prapt kar liye hain?\n\nHan dabane par rider ka cash balance 0 ho jayega.`)) return;
-
-      const { error } = await _supabase.from('riders').update({ cash_in_hand: 0 }).eq('id', riderId);
-      if (!error) {
-        alert(`✅ ₹${amount} ka settlement safal raha!`);
-        fetchRiders();
-      } else {
-        alert('Error: ' + error.message);
-      }
+      if (!confirm(`Kya aapne rider ${name} se ₹${amount} cash prapt kar liye hain?`)) return;
+      await _supabase.from('riders').update({ cash_in_hand: 0 }).eq('id', riderId);
+      alert(`✅ ₹${amount} cash settle ho gaya!`);
+      fetchRiders();
     }
 
     async function registerRiderManually() {
@@ -1553,7 +1817,7 @@
       const phone = document.getElementById('new-rider-phone').value.trim();
       const vehicle = document.getElementById('new-rider-vehicle').value.trim();
 
-      if (!name || !/^[6-9]\d{9}$/.test(phone)) return alert('Kripya sahi naam aur 10 anko ka phone number daalein!');
+      if (!name || !/^[6-9]\d{9}$/.test(phone)) return alert('Sahi naam aur 10 anko ka phone number daalein!');
 
       await _supabase.from('riders').insert([{ name, phone, vehicle_no: vehicle || 'Standard', status: 'Active', is_online: true, cash_in_hand: 0 }]);
       document.getElementById('new-rider-name').value = '';
@@ -1573,15 +1837,17 @@
     }
 
     fetchOrders();
-    loadAppSettings();
     loadStoreStatus();
+    loadAppSettings();
+    loadProSettings();
+    loadSurgeAndNoticeSettings();
     fetchHubs();
     fetchCoupons();
-    loadSurgeAndNoticeSettings();
 
     setInterval(() => {
       if (currentMasterSec === 'ORDERS') fetchOrders();
       else if (currentMasterSec === 'ANALYTICS') renderAnalyticsReport();
+      else if (currentMasterSec === 'MAP') loadFleetMap();
     }, 10000);
   </script>
 </body>
