@@ -61,7 +61,7 @@
       overflow-x: hidden;
     }
 
-    /* 1. SIDE DRAWER FIX (बिलकुल बाहर छुपा रहेगा और सही 70px साइज रहेगा) */
+    /* SIDE DRAWER STYLES & FIX */
     .drawer-overlay {
       position: fixed; 
       top: 0; 
@@ -73,7 +73,9 @@
       display: none;
       backdrop-filter: blur(4px);
     }
-    .drawer-overlay.active { display: block; }
+    .drawer-overlay.active { 
+      display: block; 
+    }
     
     .side-drawer {
       position: fixed; 
@@ -88,7 +90,9 @@
       display: flex; 
       flex-direction: column;
     }
-    .side-drawer.active { left: 0 !important; }
+    .side-drawer.active { 
+      left: 0 !important; 
+    }
     
     .drawer-header {
       background: var(--primary-gradient);
@@ -97,14 +101,14 @@
       text-align: left;
     }
     .drawer-logo-img {
-      width: 68px !important; 
-      height: 68px !important; 
-      max-width: 68px !important;
-      max-height: 68px !important;
+      width: 64px !important; 
+      height: 64px !important; 
+      max-width: 64px !important;
+      max-height: 64px !important;
       border-radius: 50% !important;
       object-fit: cover !important; 
       background: #fff; 
-      border: 2.5px solid #ff758c;
+      border: 2px solid #ff758c;
       display: block !important; 
       margin-bottom: 10px; 
       box-shadow: 0 4px 12px rgba(0,0,0,0.3);
@@ -133,9 +137,11 @@
       border-bottom: 1px solid #f8fafc;
       transition: background 0.15s;
     }
-    .drawer-item:active { background: #f1f5f9; }
+    .drawer-item:active { 
+      background: #f1f5f9; 
+    }
 
-    /* 2. BROADCAST NOTICE TICKER */
+    /* BROADCAST NOTICE TICKER */
     .broadcast-ticker-wrap {
       display: none; 
       background: linear-gradient(90deg, #ea580c, #c2410c); 
@@ -158,7 +164,7 @@
       100% { transform: translate3d(-100%, 0, 0); }
     }
 
-    /* 3. TOP HERO HEADER */
+    /* TOP HERO HEADER */
     .top-hero-area {
       background: var(--primary-gradient);
       padding: 16px 16px 20px 16px; 
@@ -268,7 +274,10 @@
       color: #dc2626;
       animation: pulseMic 1s infinite;
     }
-    @keyframes pulseMic { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.18); } }
+    @keyframes pulseMic { 
+      0%, 100% { transform: scale(1); } 
+      50% { transform: scale(1.18); } 
+    }
 
     /* CATEGORIES */
     .category-scroll { 
@@ -341,7 +350,7 @@
       margin-top: 3px; 
     }
 
-    /* 4. PRODUCT CARDS GRID */
+    /* PRODUCT CARDS GRID */
     .main-container { padding: 0 16px; }
     .grid { 
       display: grid; 
@@ -467,7 +476,7 @@
       line-height: 1;
     }
 
-    /* 5. SMART GLOWING UPSELL CARD */
+    /* SMART GLOWING UPSELL CARD */
     .cart-target-banner {
       background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
       border: 1.5px solid #fcd34d;
@@ -503,7 +512,7 @@
       transition: width 0.4s ease;
     }
 
-    /* 6. FLOATING CART & NAV */
+    /* FLOATING CART & NAV */
     .floating-cart-bar {
       position: fixed; 
       bottom: 74px; 
@@ -899,11 +908,13 @@
         <button class="sheet-close" onclick="toggleTrackModal(false)">✕</button>
       </div>
 
+      <!-- 60-Sec Self Cancel -->
       <div id="self-cancel-container" style="display:none; background:#fef2f2; border:1px solid #fca5a5; padding:10px 14px; border-radius:12px; margin-bottom:12px; justify-content:space-between; align-items:center;">
         <span style="font-size:12px; font-weight:800; color:#991b1b;">⏱️ Cancel Order? (<span id="cancel-timer-secs">60</span>s left)</span>
         <button onclick="handleCustomerSelfCancel()" style="background:#dc2626; color:white; border:none; padding:6px 12px; border-radius:8px; font-size:11px; font-weight:800; cursor:pointer;">Cancel ✕</button>
       </div>
 
+      <!-- Live OTP Box -->
       <div class="cust-otp-box" id="cust-otp-container" style="display:none;">
         <div style="font-size:11px; font-weight:800; color:#7e22ce;">🔑 SAFE DELIVERY OTP</div>
         <div class="cust-otp-code" id="cust-live-otp">----</div>
