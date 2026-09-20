@@ -1183,29 +1183,60 @@
     let currentViewingReceiptOrder = null;
     let assignedRiderPhone = null;
 
-    // HINDI-TO-ENGLISH & ENGLISH-TO-HINDI SYNONYM DICTIONARY FOR INSTANT SEARCH
+    // HINDI-TO-ENGLISH & COMMON SYNONYM DICTIONARY
     const keywordSynonyms = {
-      'doodh': 'milk', 'dudh': 'milk', 'दूध': 'milk', 'milk': 'doodh',
-      'aalu': 'potato', 'aloo': 'potato', 'आलू': 'potato', 'potato': 'aalu',
-      'tamatar': 'tomato', 'टमाटर': 'tomato', 'tomato': 'tamatar',
-      'pyaz': 'onion', 'pyaaj': 'onion', 'प्याज': 'onion', 'onion': 'pyaz',
+      'doodh': 'milk', 'dudh': 'milk', 'dud': 'milk', 'दूध': 'milk', 'milk': 'doodh',
+      'aalu': 'potato', 'aloo': 'potato', 'alu': 'potato', 'आलू': 'potato', 'potato': 'aalu',
+      'tamatar': 'tomato', 'tamater': 'tomato', 'टमाटर': 'tomato', 'tomato': 'tamatar',
+      'pyaz': 'onion', 'pyaaj': 'onion', 'pyaj': 'onion', 'प्याज': 'onion', 'onion': 'pyaz',
       'tel': 'oil', 'tail': 'oil', 'तेल': 'oil', 'oil': 'tel',
-      'chawal': 'rice', 'चावल': 'rice', 'rice': 'chawal',
+      'chawal': 'rice', 'chaawal': 'rice', 'चावल': 'rice', 'rice': 'chawal',
       'atta': 'flour', 'aata': 'flour', 'आटा': 'flour', 'flour': 'atta',
       'cheeni': 'sugar', 'chini': 'sugar', 'चीनी': 'sugar', 'sugar': 'cheeni',
       'namak': 'salt', 'नमक': 'salt', 'salt': 'namak',
-      'chai': 'tea', 'चाय': 'tea', 'tea': 'chai',
+      'chai': 'tea', 'chaye': 'tea', 'चाय': 'tea', 'tea': 'chai',
       'dahi': 'curd', 'दही': 'curd', 'curd': 'dahi', 'yogurt': 'dahi',
-      'paneer': 'cheese', 'पनीर': 'paneer', 'cheese': 'paneer',
+      'paneer': 'cheese', 'panir': 'cheese', 'पनीर': 'paneer', 'cheese': 'paneer',
       'biscuit': 'cookie', 'cookies': 'biscuit', 'बिस्कुट': 'biscuit',
-      'pani': 'water', 'पानी': 'water', 'water': 'pani',
+      'pani': 'water', 'paani': 'water', 'पानी': 'water', 'water': 'pani',
       'roti': 'bread', 'रोटी': 'bread', 'bread': 'roti',
       'mirch': 'chilli', 'mirchi': 'chilli', 'मिर्च': 'chilli', 'chilli': 'mirch',
       'nimbu': 'lemon', 'नींबू': 'lemon', 'lemon': 'nimbu',
-      'ghee': 'butter', 'घी': 'ghee', 'butter': 'ghee',
-      'coldrink': 'drink', 'pepsi': 'drink', 'coke': 'drink', 'कोल्ड्रिंक': 'drink',
-      'samosa': 'snack', 'समोसा': 'samosa'
+      'ghee': 'butter', 'ghi': 'ghee', 'घी': 'ghee', 'butter': 'ghee',
+      'coldrink': 'drink', 'cold drink': 'drink', 'pepsi': 'drink', 'coke': 'drink', 'कोल्ड्रिंक': 'drink',
+      'samosa': 'snack', 'समौसा': 'samosa', 'समोसा': 'samosa'
     };
+
+    // LEVENSHTEIN DISTANCE FOR AUTO SPELLING MISTAKE TOLERANCE
+    function getLevenshteinDistance(a, b) {
+      if (!a.length) return b.length;
+      if (!b.length) return a.length;
+      const matrix = [];
+      for (let i = 0; i <= b.length; i++) matrix[i] = [i];
+      for (let j = 0; j <= a.length; j++) matrix[0][j] = j;
+      for (let i = 1; i <= b.length; i++) {
+        for (let j = 1; j <= a.length; j++) {
+          if (b.charAt(i - 1) === a.charAt(j - 1)) {
+            matrix[i][j] = matrix[i - 1][j - 1];
+          } else {
+            matrix[i][j] = Math.min(
+              matrix[i - 1][j - 1] + 1,
+              Math.min(matrix[i][j - 1] + 1, matrix[i - 1][j] + 1)
+            );
+          }
+        }
+      }
+      return matrix[b.length][a.length];
+    }
+
+    function isFuzzyMatch(str1, str2) {
+      if (!str1 || !str2) return false;
+      str1 = str1.toLowerCase().trim();
+      str2 = str2.toLowerCase().trim();
+      if (str1.includes(str2) || str2.includes(str1)) return true;
+      const maxDistance = str2.length <= 4 ? 1 : 2;
+      return getLevenshteinDistance(str1, str2) <= maxDistance;
+    }
 
     let appConfig = {
       theme_color: '#ff3269',
@@ -1255,13 +1286,12 @@
       }
     }
 
-    // SMART BILINGUAL VOICE SEARCH ENGINE (HINDI + ENGLISH EQUIVALENTS)
     function startVoiceSearch() {
       const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
       if (!SpeechRecognition) return alert('आपके ब्राउज़र में वॉइस सर्च सपोर्ट नहीं है।');
 
       const recognition = new SpeechRecognition();
-      recognition.lang = 'hi-IN'; // Picks natural Indian tone
+      recognition.lang = 'hi-IN';
       recognition.interimResults = false;
       recognition.maxAlternatives = 1;
 
@@ -1424,30 +1454,47 @@
       handleFilter();
     }
 
-    // SMART BILINGUAL SYNONYM FILTER FUNCTION
+    // AUTOMATIC SPELLING TOLERANCE (FUZZY) + BILINGUAL SYNONYM SEARCH
     function handleFilter() {
       const rawInput = document.getElementById('search-input').value.toLowerCase().trim();
-      
-      // Look up synonym: "doodh" -> "milk", "potato" -> "aalu", etc.
-      const searchTerms = [rawInput];
-      if (keywordSynonyms[rawInput]) {
-        searchTerms.push(keywordSynonyms[rawInput]);
+      if (!rawInput) {
+        renderProducts(allProducts.filter(p => selectedCat === 'All' || p.category === selectedCat));
+        return;
       }
 
-      // Also split multiple words: "aalu tamatar"
-      rawInput.split(/\s+/).forEach(w => {
-        if (keywordSynonyms[w]) searchTerms.push(keywordSynonyms[w]);
+      const searchTerms = new Set([rawInput]);
+      if (keywordSynonyms[rawInput]) searchTerms.add(keywordSynonyms[rawInput]);
+
+      rawInput.split(/\s+/).forEach(word => {
+        searchTerms.add(word);
+        if (keywordSynonyms[word]) searchTerms.add(keywordSynonyms[word]);
       });
+
+      // Also check if input has fuzzy match with dictionary keys
+      Object.keys(keywordSynonyms).forEach(dictWord => {
+        if (isFuzzyMatch(rawInput, dictWord)) {
+          searchTerms.add(dictWord);
+          searchTerms.add(keywordSynonyms[dictWord]);
+        }
+      });
+
+      const searchTermsArray = Array.from(searchTerms);
 
       const filtered = allProducts.filter(p => {
         const matchC = selectedCat === 'All' || p.category === selectedCat;
         const pName = (p.name || '').toLowerCase();
         const pCat = (p.category || '').toLowerCase();
 
-        // Match either the direct typed word OR its translated synonym
-        const matchQ = searchTerms.some(term => pName.includes(term) || pCat.includes(term));
+        const matchQ = searchTermsArray.some(term => {
+          if (pName.includes(term) || pCat.includes(term)) return true;
+          // Word-by-word fuzzy comparison for spelling mistakes
+          const pWords = pName.split(/\s+/);
+          return pWords.some(w => isFuzzyMatch(w, term));
+        });
+
         return matchC && matchQ;
       });
+
       renderProducts(filtered);
     }
 
@@ -1664,7 +1711,6 @@
       document.getElementById('bill-coupon-amount').innerText = `-₹${couponDisc}`;
     }
 
-    // MANDATORY GPS CURRENT LOCATION HANDLER
     function getCurrentLocation() {
       if (!navigator.geolocation) return alert('आपके ब्राउज़र में GPS सपोर्ट नहीं है।');
 
