@@ -797,7 +797,7 @@
       <button class="menu-trigger-btn" onclick="openSupportModal()" title="Help & Support">🎧</button>
     </div>
 
-    <!-- Search with Hindi Voice -->
+    <!-- Search with English Voice (Speaks Hindi -> Types English) -->
     <div class="search-box-wrap">
       <span class="search-icon-pos">🔍</span>
       <input type="text" id="search-input" class="search-bar-input" placeholder='Search "doodh", "samosa", "drinks"...' oninput="handleFilter()">
@@ -1231,12 +1231,13 @@
       }
     }
 
+    // 5. VOICE SEARCH CONTROLS (en-IN converts Hindi speech to English words)
     function startVoiceSearch() {
       const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
       if (!SpeechRecognition) return alert('आपके ब्राउज़र में वॉइस सर्च सपोर्ट नहीं है।');
 
       const recognition = new SpeechRecognition();
-      recognition.lang = 'hi-IN';
+      recognition.lang = 'en-IN'; // बोलें हिंदी, लिखेगा रोमन अंग्रेज़ी (samosa, milk)
       const micBtn = document.getElementById('voice-search-btn');
       micBtn.classList.add('recording');
 
@@ -1251,6 +1252,7 @@
       recognition.onspeechend = () => { recognition.stop(); micBtn.classList.remove('recording'); };
     }
 
+    // 9. DYNAMIC ETA & DISTANCE CALCULATOR (Haversine)
     function calculateHaversineKm(lat1, lon1, lat2, lon2) {
       const R = 6371;
       const dLat = (lat2 - lat1) * Math.PI / 180;
@@ -1296,6 +1298,7 @@
       }
     }
 
+    // 10. AUTO NIGHT SURGE PRICING CONTROLLER
     function isCurrentlyNightTime() {
       if (!appConfig.is_night_surge_active) return false;
       const hr = new Date().getHours();
@@ -1405,6 +1408,7 @@
       renderProducts(filtered);
     }
 
+    // 8. LOW-STOCK AUTO ALERT & STOCK TRACKER IN UI
     function renderProducts(items) {
       const container = document.getElementById('product-list');
       container.innerHTML = '';
@@ -1461,11 +1465,11 @@
       return `<button class="btn-add-zepto" onclick="updateQty(${id}, 1)">ADD</button>`;
     }
 
+    // 4. SINGLE HUB CART LOCK & ADD TO CART
     function updateQty(id, delta) {
       const prod = allProducts.find(p => p.id === id);
       if (!prod || prod.is_out_of_stock) return;
 
-      // SINGLE HUB CART LOCK CHECK
       if (appConfig.enable_hub_lock && delta > 0 && !cart[id]) {
         const cartItems = Object.values(cart);
         if (cartItems.length > 0) {
@@ -1558,6 +1562,7 @@
       }
     }
 
+    // 4. MIN ORDER VALUE & CART SHEET RENDER
     function renderCartSheet() {
       const box = document.getElementById('cart-items-box');
       if (!box) return;
@@ -1656,6 +1661,7 @@
       );
     }
 
+    // 3. SMART MULTI-ORDER BATCHING & ORDER DISPATCH
     async function placeOrder() {
       if (!isLocationUpdated || !customerCoords) {
         return alert('⚠️ लाइव लोकेशन अपडेट करना अनिवार्य है! कृपया नीले बटन पर क्लिक करके लोकेशन अपडेट करें।');
@@ -1734,6 +1740,7 @@
       }
     }
 
+    // 6. RIDER SPEED & 9. DYNAMIC ETA TRACKING
     function startTracking(orderId) {
       document.getElementById('live-order-strip').style.display = 'flex';
       document.getElementById('t-order-id').innerText = `Order #ORD-${orderId}`;
@@ -1762,7 +1769,7 @@
           document.getElementById('rider-contact-row').style.display = 'flex';
 
           if (data.assigned_rider_id) {
-            const { data: rInfo } = await _supabase.from('riders').select('phone, current_lat, current_lng').eq('id', data.assigned_rider_id).single();
+            const { data: rInfo } = await _supabase.from('riders').select('phone, current_lat, current_lng, current_speed_kmh, is_overspeeding').eq('id', data.assigned_rider_id).single();
             if (rInfo) {
               assignedRiderPhone = rInfo.phone;
               if (rInfo.current_lat && customerCoords) {
@@ -1770,7 +1777,7 @@
                 const mins = Math.max(2, Math.round(km * 3));
                 document.getElementById('live-eta-subtitle').innerText = `राइडर आपसे ${km.toFixed(1)} KM दूर है • ${mins} मिनट में पहुँच रहा है`;
                 document.getElementById('eta-chip-container').style.display = 'block';
-                document.getElementById('eta-chip-text').innerText = `⚡ राइडर आपसे ${km.toFixed(1)} KM दूर है • ETA: ${mins} Mins`;
+                document.getElementById('eta-chip-text').innerText = `⚡ राइडर आपसे ${km.toFixed(1)} KM दूर है • ETA: ${mins} Mins ${rInfo.is_overspeeding ? '(Driving Safe)' : ''}`;
               }
             }
           }
@@ -1787,6 +1794,7 @@
       setInterval(check, 4000);
     }
 
+    // 7. PRIVACY CALL MASK LINK
     function callRiderMasked() {
       if (assignedRiderPhone) {
         window.location.href = `tel:${assignedRiderPhone}`;
@@ -1795,6 +1803,7 @@
       }
     }
 
+    // 1. 60S SELF-CANCEL WINDOW
     function startSelfCancelCountdown() {
       const cancelBox = document.getElementById('self-cancel-container');
       const timerSecs = document.getElementById('cancel-timer-secs');
@@ -1897,7 +1906,7 @@
       if (val) { sendMessage(val); inp.value = ''; }
     }
 
-    // PAST ORDERS HISTORY & PHOTO DISPUTE CLAIM
+    // 2. PAST ORDERS HISTORY & PHOTO DISPUTE CLAIM MANAGER
     function saveOrderToHistory(order) {
       let history = JSON.parse(localStorage.getItem('zepto_order_history') || '[]');
       history.unshift(order);
