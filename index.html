@@ -927,6 +927,13 @@
           <span>Delivery Charge</span>
           <span id="bill-delivery-charge" style="color:var(--accent-green);">FREE</span>
         </div>
+        
+        <!-- YEH RAHA DISTANCE CHARGE KA ALAG ROW (2.5 RS PER KM JAISE ADMIN ME SET HAI) -->
+        <div class="bill-row" id="row-distance-charge" style="display: none; color: #0284c7;">
+          <span id="bill-distance-title">📏 Distance Charge (Extra KM)</span>
+          <span id="bill-distance-amount">+₹0</span>
+        </div>
+
         <div class="bill-row" id="row-rain-surge" style="display: none; color: #1e40af;">
           <span>🌧️ Rain Surge</span>
           <span id="bill-rain-surge-amount">+₹0</span>
@@ -1207,7 +1214,6 @@
       'samosa': 'snack', 'समौसा': 'samosa', 'समोसा': 'samosa'
     };
 
-    // LEVENSHTEIN DISTANCE FOR AUTO SPELLING MISTAKE TOLERANCE
     function getLevenshteinDistance(a, b) {
       if (!a.length) return b.length;
       if (!b.length) return a.length;
@@ -1238,6 +1244,7 @@
       return getLevenshteinDistance(str1, str2) <= maxDistance;
     }
 
+    // Default configuration (Synchronized with Admin Settings)
     let appConfig = {
       theme_color: '#ff3269',
       header_bg: '#f4ecfb',
@@ -1251,8 +1258,8 @@
       discount_amount: 49,
       store_status: 'OPEN',
       max_delivery_radius_km: 7.0,
-      base_delivery_km: 3.0,
-      per_km_charge: 10.0,
+      base_delivery_km: 2.0, // Free Base Distance
+      per_km_charge: 2.5,    // Extra Charge Per KM (₹2.50)
       broadcast_notice: '',
       is_broadcast_active: false,
       rain_surge_mode: 'OFF',
@@ -1454,7 +1461,6 @@
       handleFilter();
     }
 
-    // AUTOMATIC SPELLING TOLERANCE (FUZZY) + BILINGUAL SYNONYM SEARCH
     function handleFilter() {
       const rawInput = document.getElementById('search-input').value.toLowerCase().trim();
       if (!rawInput) {
@@ -1600,6 +1606,7 @@
       if (selectedPaymentMode === 'UPI') refreshUpiQr();
     }
 
+    // DISTANCE EXTRA CHARGE CALCULATIONS (ALAG LINE MEIN)
     function calculateTotals() {
       const entries = Object.values(cart);
       const itemsTotal = entries.reduce((s, e) => s + (e.qty * Number(e.item.price)), 0);
@@ -1610,19 +1617,19 @@
       const minDisc = Number(appConfig.discount_min_order) || 399;
       const discAmt = Number(appConfig.discount_amount) || 49;
 
-      let deliveryCharge = 0;
-      if (itemsTotal > 0) {
-        if (itemsTotal >= minFree) {
-          deliveryCharge = 0;
-        } else {
-          deliveryCharge = baseCharge;
-          const baseKm = Number(appConfig.base_delivery_km) || 3.0;
-          const perKm = Number(appConfig.per_km_charge) || 10.0;
-          if (calculatedKm > baseKm) {
-            const extraKm = Math.ceil(calculatedKm - baseKm);
-            deliveryCharge += (extraKm * perKm);
-          }
-        }
+      let deliveryCharge = (itemsTotal >= minFree || itemsTotal === 0) ? 0 : baseCharge;
+
+      // Base distance free limit (e.g. 2 KM)
+      const baseKm = Number(appConfig.base_delivery_km) || 2.0;
+      // Extra Charge Per KM (e.g. 2.50 Rs)
+      const perKm = Number(appConfig.per_km_charge) || 2.5;
+
+      let distanceCharge = 0;
+      let extraKm = 0;
+
+      if (calculatedKm > baseKm && itemsTotal > 0) {
+        extraKm = parseFloat((calculatedKm - baseKm).toFixed(2));
+        distanceCharge = parseFloat((extraKm * perKm).toFixed(2));
       }
 
       let rainSurge = (itemsTotal > 0 && appConfig.rain_surge_mode !== 'OFF') ? (Number(appConfig.rain_surge_fee) || 0) : 0;
@@ -1631,9 +1638,9 @@
       let discount = (itemsTotal >= minDisc) ? discAmt : 0;
       let couponDisc = appliedCoupon ? appliedCoupon.discount : 0;
 
-      let finalToPay = Math.max(0, itemsTotal + deliveryCharge + rainSurge + nightSurge - discount - couponDisc);
+      let finalToPay = Math.max(0, Math.round(itemsTotal + deliveryCharge + distanceCharge + rainSurge + nightSurge - discount - couponDisc));
 
-      return { itemsTotal, totalQty, deliveryCharge, rainSurge, nightSurge, discount, couponDisc, finalToPay };
+      return { itemsTotal, totalQty, deliveryCharge, distanceCharge, extraKm, rainSurge, nightSurge, discount, couponDisc, finalToPay };
     }
 
     function updateCartBar() {
@@ -1658,10 +1665,11 @@
         document.getElementById('bill-subtotal').innerText = '₹0';
         document.getElementById('bill-grand-total').innerText = '₹0';
         document.getElementById('cart-smart-target-box').style.display = 'none';
+        document.getElementById('row-distance-charge').style.display = 'none';
         return;
       }
 
-      const { itemsTotal, deliveryCharge, rainSurge, nightSurge, discount, couponDisc, finalToPay } = calculateTotals();
+      const { itemsTotal, deliveryCharge, distanceCharge, extraKm, rainSurge, nightSurge, discount, couponDisc, finalToPay } = calculateTotals();
 
       updateSmartCartTarget(itemsTotal);
 
@@ -1693,7 +1701,18 @@
       `).join('');
 
       document.getElementById('bill-subtotal').innerText = `₹${itemsTotal}`;
-      document.getElementById('bill-delivery-charge').innerText = deliveryCharge === 0 ? 'FREE' : `₹${deliveryCharge} ${calculatedKm > 0 ? '(' + calculatedKm.toFixed(1) + ' km)' : ''}`;
+      document.getElementById('bill-delivery-charge').innerText = deliveryCharge === 0 ? 'FREE' : `₹${deliveryCharge}`;
+      
+      // DISTANCE CHARGE ROW RENDER (2.5 RS PER KM EXTRA)
+      const distRow = document.getElementById('row-distance-charge');
+      if (distanceCharge > 0) {
+        distRow.style.display = 'flex';
+        document.getElementById('bill-distance-title').innerText = `📏 Distance Charge (${extraKm} KM extra × ₹${appConfig.per_km_charge || 2.5})`;
+        document.getElementById('bill-distance-amount').innerText = `+₹${distanceCharge.toFixed(2)}`;
+      } else {
+        distRow.style.display = 'none';
+      }
+
       document.getElementById('bill-grand-total').innerText = `₹${finalToPay}`;
 
       document.getElementById('row-rain-surge').style.display = rainSurge > 0 ? 'flex' : 'none';
@@ -1730,7 +1749,7 @@
           } catch (e) {}
 
           const mapsUrl = `https://maps.google.com/?q=${pos.coords.latitude},${pos.coords.longitude}`;
-          statusVal.innerHTML = `🟢 लाइव लोकेशन सफलतापूर्वक अपडेट हुई! (दूरी: ${calculatedKm.toFixed(1)} KM)<br><a href="${mapsUrl}" target="_blank" style="color:#0284c7; font-weight:800;">Google Maps लिंक देखें ↗</a>`;
+          statusVal.innerHTML = `🟢 लाइव लोकेशन सफलतापूर्वक अपडेट हुई! (दूरी: ${calculatedKm.toFixed(2)} KM)<br><a href="${mapsUrl}" target="_blank" style="color:#0284c7; font-weight:800;">Google Maps लिंक देखें ↗</a>`;
 
           renderCartSheet();
         },
@@ -1749,7 +1768,7 @@
         return alert('⚠️ लाइव लोकेशन अपडेट करना अनिवार्य है! कृपया नीले बटन पर क्लिक करके लोकेशन अपडेट करें।');
       }
 
-      const { itemsTotal, finalToPay, couponDisc, rainSurge, nightSurge } = calculateTotals();
+      const { itemsTotal, finalToPay, distanceCharge, couponDisc, rainSurge, nightSurge } = calculateTotals();
       const minReq = Number(appConfig.min_order_value) || 99;
       if (itemsTotal < minReq) {
         return alert(`⚠️ न्यूनतम ऑर्डर वैल्यू ₹${minReq} है!`);
@@ -1772,7 +1791,6 @@
       const entries = Object.values(cart);
       if (entries.length === 0) return alert('थैला खाली है!');
 
-      // FIX: image_url ko yahan explicitly pass kiya gaya hai
       const orderItems = entries.map(({ item, qty }) => ({
         id: item.id, 
         name: item.name, 
@@ -1802,6 +1820,7 @@
           rain_surge_fee: rainSurge,
           night_surge_fee: nightSurge,
           distance_km: Number(calculatedKm.toFixed(2)),
+          distance_charge: distanceCharge,
           hub_id: orderItems[0]?.hub_id || 1,
           free_gift_added: hasFreeGift ? appConfig.free_gift_item_name : null
         }]).select();
