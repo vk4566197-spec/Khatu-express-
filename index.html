@@ -1470,7 +1470,6 @@
         if (keywordSynonyms[word]) searchTerms.add(keywordSynonyms[word]);
       });
 
-      // Also check if input has fuzzy match with dictionary keys
       Object.keys(keywordSynonyms).forEach(dictWord => {
         if (isFuzzyMatch(rawInput, dictWord)) {
           searchTerms.add(dictWord);
@@ -1487,7 +1486,6 @@
 
         const matchQ = searchTermsArray.some(term => {
           if (pName.includes(term) || pCat.includes(term)) return true;
-          // Word-by-word fuzzy comparison for spelling mistakes
           const pWords = pName.split(/\s+/);
           return pWords.some(w => isFuzzyMatch(w, term));
         });
@@ -1774,8 +1772,16 @@
       const entries = Object.values(cart);
       if (entries.length === 0) return alert('थैला खाली है!');
 
+      // FIX: image_url ko yahan explicitly pass kiya gaya hai
       const orderItems = entries.map(({ item, qty }) => ({
-        id: item.id, name: item.name, price: item.price, unit: item.unit, qty, subtotal: item.price * qty, hub_id: item.hub_id || 1
+        id: item.id, 
+        name: item.name, 
+        price: item.price, 
+        unit: item.unit, 
+        qty, 
+        subtotal: item.price * qty, 
+        image_url: item.image_url || '',
+        hub_id: item.hub_id || 1
       }));
 
       const generatedOtp = Math.floor(1000 + Math.random() * 9000).toString();
@@ -2098,7 +2104,7 @@
       cart = {};
       items.forEach(oldItem => {
         const product = allProducts.find(p => p.id === oldItem.id) || {
-          id: oldItem.id, name: oldItem.name, price: oldItem.price, unit: oldItem.unit, hub_id: oldItem.hub_id || 1
+          id: oldItem.id, name: oldItem.name, price: oldItem.price, unit: oldItem.unit, image_url: oldItem.image_url || '', hub_id: oldItem.hub_id || 1
         };
         if (!product.is_out_of_stock) cart[product.id] = { item: product, qty: oldItem.qty };
       });
