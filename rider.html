@@ -130,12 +130,6 @@
     .shift-done { font-size: 15px; font-weight: 900; color: #0f172a; }
     .shift-status-lbl { font-size: 10px; color: #64748b; font-weight: 700; }
 
-    .slot-banner {
-      background: #fff7ed; color: #9a3412; padding: 10px 16px; font-size: 12px; font-weight: 700;
-      display: flex; justify-content: space-between; align-items: center;
-    }
-    .slot-banner a { color: #ea580c; text-decoration: none; font-weight: 800; cursor: pointer; }
-
     .waiting-pill {
       background: linear-gradient(180deg, #243042 0%, #1a2332 100%);
       margin: 14px 16px; padding: 16px; border-radius: 14px; text-align: center;
@@ -167,11 +161,6 @@
       background: var(--accent-pink); color: #fff; box-shadow: 0 2px 8px rgba(225, 29, 72, 0.3);
     }
 
-    .date-badge-pill {
-      background: #334155; color: #38bdf8; font-size: 11px; font-weight: 800;
-      padding: 4px 12px; border-radius: 20px; display: inline-block; margin: 8px 0 8px 0;
-    }
-
     .orders-queue-box { margin: 0 16px 16px 16px; }
     .rider-order-card {
       background: var(--card-dark); border: 1px solid #334155; border-radius: 14px;
@@ -196,7 +185,7 @@
     .b-item.active { color: #ef4444; }
     .b-icon { font-size: 18px; }
 
-    /* SCREEN 1: Bin */
+    /* SCREEN 1: Bin Pick */
     .bin-screen {
       position: fixed; top: 0; left: 0; width: 100%; height: 100%;
       background: #f8fafc; z-index: 500; display: none; flex-direction: column; color: #0f172a;
@@ -208,13 +197,81 @@
     .bin-hash-bar { background: #f1f5f9; padding: 12px 18px; font-size: 15px; font-weight: 900; color: #334155; }
     .bin-shelf-row { padding: 14px 18px; display: flex; justify-content: space-between; align-items: center; font-size: 15px; font-weight: 800; color: #1e293b; }
     .shelf-count-circle { background: #e2e8f0; color: #475569; padding: 2px 8px; border-radius: 12px; font-size: 12px; }
-    .bin-items-row { padding: 0 18px; display: flex; gap: 14px; overflow-x: auto; }
-    .bin-item-card { width: 72px; height: 72px; border: 1.5px solid #e2e8f0; border-radius: 12px; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #fff; position: relative; }
-    .bin-item-card img { width: 44px; height: 44px; object-fit: contain; }
-    .bin-item-qty { position: absolute; bottom: -8px; background: #fff; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 10px; font-weight: 900; padding: 1px 6px; }
-    .bin-floating-bell { position: absolute; bottom: 90px; right: 20px; background: #f3e8ff; border: 1px solid #d8b4fe; width: 50px; height: 50px; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 22px; cursor: pointer; }
+    
+    .bin-items-row { 
+      padding: 10px 18px; 
+      display: flex; 
+      gap: 16px; 
+      overflow-x: auto; 
+    }
+    .bin-item-card { 
+      width: 82px; 
+      height: 82px; 
+      border: 2px solid #cbd5e1; 
+      border-radius: 14px; 
+      display: flex; 
+      flex-direction: column; 
+      align-items: center; 
+      justify-content: center; 
+      background: #fff; 
+      position: relative; 
+      cursor: pointer;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+      transition: transform 0.15s;
+    }
+    .bin-item-card:active { transform: scale(0.95); }
+    .bin-item-card img { 
+      width: 60px; 
+      height: 60px; 
+      object-fit: cover; 
+      border-radius: 10px;
+    }
+    .bin-item-qty { 
+      position: absolute; 
+      bottom: -9px; 
+      background: #0f172a; 
+      color: #fff;
+      border-radius: 6px; 
+      font-size: 10px; 
+      font-weight: 900; 
+      padding: 1px 7px; 
+    }
+    .bin-floating-bell { 
+      position: absolute; bottom: 90px; right: 20px; background: #f3e8ff; border: 1px solid #d8b4fe; width: 50px; height: 50px; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 22px; cursor: pointer; 
+    }
     .bin-bottom-bar { margin-top: auto; padding: 16px; background: #fff; border-top: 1px solid #e2e8f0; }
     .btn-take-photo-trigger { background: var(--zepto-pink); color: white; border: none; width: 100%; padding: 15px; border-radius: 12px; font-size: 15px; font-weight: 900; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; }
+
+    /* ITEM PHOTO FULL ZOOM MODAL */
+    .item-zoom-modal {
+      position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+      background: rgba(15, 23, 42, 0.88); z-index: 1200; display: none;
+      align-items: center; justify-content: center; padding: 20px;
+      backdrop-filter: blur(5px);
+    }
+    .item-zoom-modal.active { display: flex; }
+    .zoom-content-box {
+      background: #ffffff; border-radius: 20px; padding: 20px;
+      width: 100%; max-width: 320px; text-align: center; color: #0f172a;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+      position: relative; animation: popZoom 0.2s ease-out;
+    }
+    @keyframes popZoom {
+      from { transform: scale(0.85); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+    .zoom-img-large {
+      width: 100%; height: 230px; border-radius: 14px;
+      object-fit: cover; background: #f8fafc; border: 1.5px solid #e2e8f0;
+      margin-bottom: 12px;
+    }
+    .zoom-item-name { font-size: 16px; font-weight: 900; margin-bottom: 4px; }
+    .zoom-item-qty { font-size: 13px; font-weight: 800; color: #0284c7; }
+    .btn-close-zoom {
+      background: #0f172a; color: white; border: none;
+      width: 100%; padding: 12px; border-radius: 10px;
+      font-size: 13px; font-weight: 800; margin-top: 14px; cursor: pointer;
+    }
 
     /* SCREEN 2: Photo */
     .photo-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 600; display: none; flex-direction: column; }
@@ -370,7 +427,7 @@
     }
     .chat-drawer.active { display: flex; }
     .chat-top-header {
-      background: #1e293b; color: white; padding: 16px;
+      background: #1e2837; color: white; padding: 16px;
       display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #334155;
     }
     .chat-messages-area { flex: 1; padding: 16px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
@@ -387,10 +444,9 @@
 </head>
 <body>
 
-  <!-- Audio Ringtone Player -->
   <audio id="rider-order-audio" preload="auto" src="alert.mp3"></audio>
 
-  <!-- 1. AUTH SCREEN -->
+  <!-- AUTH SCREEN -->
   <div class="auth-overlay" id="auth-overlay">
     <div class="auth-box">
       <img class="auth-logo" src="logo.png" alt="Logo" onerror="this.style.display='none'">
@@ -418,7 +474,7 @@
     </div>
   </div>
 
-  <!-- 2. MAIN RIDER INTERFACE -->
+  <!-- MAIN RIDER APP -->
   <div id="rider-main-app">
     <div class="top-bar">
       <div class="store-info">
@@ -516,7 +572,7 @@
     </div>
   </div>
 
-  <!-- SCREEN 1: Bin Pick -->
+  <!-- SCREEN 1: Bin Pick with Real Images & Tap to Zoom -->
   <div class="bin-screen" id="bin-screen">
     <div class="bin-header">
       <div class="bin-title">Go to the Bin</div>
@@ -525,7 +581,7 @@
     <div class="bin-hash-bar" id="bin-order-hash">#BABA-ORDER</div>
     <div class="bin-shelf-row">
       <div style="display: flex; align-items: center; gap: 8px;">
-        <span>Pick from Shelf</span>
+        <span>Pick from Shelf (Tap item to enlarge)</span>
         <span class="shelf-count-circle" id="bin-shelf-num">1</span>
       </div>
       <span>⌄</span>
@@ -537,6 +593,16 @@
       <button class="btn-take-photo-trigger" onclick="triggerNativeCamera()">
         📷 Take Photo & Pick Up
       </button>
+    </div>
+  </div>
+
+  <!-- ITEM FULL SIZE ZOOM MODAL -->
+  <div class="item-zoom-modal" id="item-zoom-modal" onclick="closeItemZoom()">
+    <div class="zoom-content-box" onclick="event.stopPropagation()">
+      <img id="zoom-img-target" class="zoom-img-large" src="" alt="Zoom Item">
+      <div class="zoom-item-name" id="zoom-title-target">Item Name</div>
+      <div class="zoom-item-qty" id="zoom-qty-target">Quantity: 1</div>
+      <button class="btn-close-zoom" onclick="closeItemZoom()">✕ Close Preview</button>
     </div>
   </div>
 
@@ -580,7 +646,6 @@
         </div>
       </div>
 
-      <!-- Masked / Direct Call Option -->
       <div style="display:flex; gap:8px; margin: 8px 0;">
         <button onclick="handleCallCustomer()" style="flex:1; background:#10b981; color:white; border:none; padding:11px; border-radius:10px; font-size:12px; font-weight:800; cursor:pointer;">
           📞 Call Customer
@@ -619,7 +684,7 @@
     </div>
   </div>
 
-  <!-- 4-DIGIT OTP VERIFICATION POPUP MODAL -->
+  <!-- 4-DIGIT OTP VERIFICATION MODAL -->
   <div class="otp-modal-overlay" id="otp-modal">
     <div class="otp-card-sheet">
       <div class="otp-icon-circle">🔐</div>
@@ -729,10 +794,10 @@
     <div class="chat-messages-area" id="rider-chat-messages"></div>
 
     <div class="quick-chips-row">
-      <div class="quick-chip" onclick="sendRiderQuickMsg('रास्ते में हूँ, 5 मिनट में पहुँचूँगा (On the way, 5 mins)')">🛵 On the way (5 mins)</div>
-      <div class="quick-chip" onclick="sendRiderQuickMsg('मेन गेट पर आ जाइए (Please come to main gate)')">🚪 Come to main gate</div>
-      <div class="quick-chip" onclick="sendRiderQuickMsg('मैंने डोरबेल बजा दी है (Rung the doorbell)')">🔔 Rung doorbell</div>
-      <div class="quick-chip" onclick="sendRiderQuickMsg('कृपया कैश तैयार रखें (Please keep cash ready)')">💵 Keep cash ready</div>
+      <div class="quick-chip" onclick="sendRiderQuickMsg('रास्ते में हूँ, 5 मिनट में पहुँचूँगा')">🛵 On the way (5 mins)</div>
+      <div class="quick-chip" onclick="sendRiderQuickMsg('मेन गेट पर आ जाइए')">🚪 Come to main gate</div>
+      <div class="quick-chip" onclick="sendRiderQuickMsg('मैंने डोरबेल बजा दी है')">🔔 Rung doorbell</div>
+      <div class="quick-chip" onclick="sendRiderQuickMsg('कृपया कैश तैयार रखें')">💵 Keep cash ready</div>
     </div>
 
     <div class="chat-input-bar">
@@ -787,7 +852,6 @@
       }
     }
 
-    // AUTH
     function checkAuthStatus() {
       if (!loggedInRider) {
         document.getElementById('auth-overlay').classList.add('active');
@@ -908,7 +972,6 @@
     }
     function closeProfileModal(e) { if(e && e.target !== e.currentTarget) return; document.getElementById('profile-modal').classList.remove('active'); }
 
-    // 1. LIVE SPEED TRACKING & OVERSPEED GUARD
     function startRiderLiveGpsAndSpeed() {
       if (!navigator.geolocation || !loggedInRider) return;
 
@@ -920,7 +983,7 @@
           let speedKmh = 0;
 
           if (pos.coords.speed !== null && !isNaN(pos.coords.speed)) {
-            speedKmh = Math.round(pos.coords.speed * 3.6); // m/s to km/h
+            speedKmh = Math.round(pos.coords.speed * 3.6);
           } else if (prevPosition) {
             const dtHours = (pos.timestamp - prevPosition.time) / (1000 * 3600);
             if (dtHours > 0 && dtHours < 0.1) {
@@ -929,7 +992,7 @@
             }
           }
 
-          if (speedKmh > 120) speedKmh = 0; // Filter anomalies
+          if (speedKmh > 120) speedKmh = 0;
           prevPosition = { lat, lng, time: pos.timestamp };
 
           const speedEl = document.getElementById('live-speed-text');
@@ -1061,7 +1124,6 @@
       renderTasks();
     }
 
-    // 2. BATCH DELIVERY ORDERS LOADER
     async function loadRiderOrders() {
       if (!isOnline || !loggedInRider) return;
       try {
@@ -1182,25 +1244,43 @@
       }).join('');
     }
 
-    // CALL MASK / DIRECT CALL
     function handleCallCustomer() {
       if (!currentSelectedOrder || !currentSelectedOrder.customer_phone) return;
       window.location.href = `tel:${currentSelectedOrder.customer_phone}`;
     }
 
+    // BIN SCREEN WITH REAL IMAGES & TAP-TO-ZOOM
     function openBinScreen(order) {
       currentSelectedOrder = order;
       document.getElementById('bin-order-hash').innerText = `#BABA${order.id}DSNI19442A`;
       const items = Array.isArray(order.items) ? order.items : [];
       document.getElementById('bin-shelf-num').innerText = items.length;
-      document.getElementById('bin-items-container').innerHTML = items.map(it => `
-        <div class="bin-item-card">
-          <img src="${it.image_url || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=120'}" alt="${it.name}">
-          <div class="bin-item-qty">×${it.qty}</div>
-        </div>
-      `).join('');
+
+      document.getElementById('bin-items-container').innerHTML = items.map(it => {
+        const itemImg = it.image_url || 'logo.png';
+        const safeName = (it.name || 'Item').replace(/'/g, "\\'");
+        return `
+          <div class="bin-item-card" onclick="openItemZoom('${itemImg}', '${safeName}', ${it.qty || 1})">
+            <img src="${itemImg}" alt="${it.name}">
+            <div class="bin-item-qty">×${it.qty || 1}</div>
+          </div>
+        `;
+      }).join('');
+
       document.getElementById('bin-screen').classList.add('active');
     }
+
+    function openItemZoom(imgUrl, itemName, qty) {
+      document.getElementById('zoom-img-target').src = imgUrl;
+      document.getElementById('zoom-title-target').innerText = itemName;
+      document.getElementById('zoom-qty-target').innerText = `Quantity to pick: ${qty} pcs`;
+      document.getElementById('item-zoom-modal').classList.add('active');
+    }
+
+    function closeItemZoom() {
+      document.getElementById('item-zoom-modal').classList.remove('active');
+    }
+
     function triggerNativeCamera() { document.getElementById('camera-file-input').click(); }
 
     function handlePhotoTaken(input) {
@@ -1387,7 +1467,6 @@
       currentSelectedOrder = null;
     }
 
-    // LIVE CHAT
     function openRiderChat(orderId) {
       activeChatOrderId = orderId;
       document.getElementById('rchat-title').innerText = `Order #${orderId} Chat`;
