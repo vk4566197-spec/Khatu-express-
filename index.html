@@ -555,7 +555,7 @@
     .nav-item.active { color: var(--accent-pink); }
     .nav-item-icon { font-size: 19px; }
 
-    /* FULL-PAGE VIEW FOR CART & ORDER (स्क्रॉलिंग और पर्याप्त पैडिंग के साथ) */
+    /* FULL-PAGE VIEW FOR CART & ORDER */
     .modal-overlay {
       position: fixed; 
       top: 0; 
@@ -575,7 +575,7 @@
       background: white; 
       width: 100%;
       min-height: 100%;
-      padding: 18px 18px 220px 18px; /* नीचे 220px की पैडिंग ताकि कोई भी फ़ील्ड बटन के पीछे न दबे */
+      padding: 18px 18px 220px 18px;
       display: flex;
       flex-direction: column;
     }
@@ -623,7 +623,7 @@
       color: #0f172a; 
     }
     
-    /* नीचे हमेशा दिखने वाली स्टिकी बार */
+    /* STICKY BOTTOM BAR */
     .cart-sticky-bottom-bar {
       position: fixed;
       bottom: 0;
@@ -998,28 +998,28 @@
         <input type="tel" id="upi-utr" class="zepto-input" placeholder="Enter 12-digit UTR No." maxlength="12" style="text-align:center; font-weight:800; letter-spacing:1px; background:#fff;">
       </div>
 
-      <!-- Customer Address & Location Section (ADDRESS BOX SHIFTED UP FOR PERFECT VISIBILITY) -->
+      <!-- Customer Address & Location Section (UDAHARAN WALI LINE POORI TARAH HATAYI GAYI) -->
       <div style="font-size:12px; font-weight:800; color:#64748b; margin-bottom:10px;">DELIVERY DETAILS:</div>
       <div style="display:flex; flex-direction:column; gap:12px;">
         
         <!-- 1. Name -->
         <div>
           <label style="font-size: 11.5px; font-weight: 800; color: #334155; display:block; margin-bottom: 4px;">आपका पूरा नाम (Full Name) *</label>
-          <input type="text" id="c-name" class="zepto-input" placeholder="उदा. विशाल कुमार">
+          <input type="text" id="c-name" class="zepto-input" placeholder="नाम दर्ज करें">
         </div>
 
         <!-- 2. Phone -->
         <div>
           <label style="font-size: 11.5px; font-weight: 800; color: #334155; display:block; margin-bottom: 4px;">10 अंकों का मोबाइल नंबर *</label>
-          <input type="tel" id="c-phone" class="zepto-input" placeholder="उदा. 9711107063" maxlength="10">
+          <input type="tel" id="c-phone" class="zepto-input" placeholder="मोबाइल नंबर दर्ज करें" maxlength="10">
         </div>
 
-        <!-- 3. Full Address (Ab yeh hamesha saaf saamne dikhega) -->
+        <!-- 3. Full Address (Saaf bina udahran ke) -->
         <div style="background: #ffffff; padding: 2px 0;">
           <label style="font-size: 12px; font-weight: 900; color: #0f172a; display:block; margin-bottom: 5px;">
             🏠 घर / दुकान / फ्लैट नंबर और लैंडमार्क (पूरा पता) *
           </label>
-          <input type="text" id="c-address" class="zepto-input" style="border: 2px solid #64748b; font-size: 13.5px;" placeholder="उदा. मकान नंबर 42, शिव मंदिर के पास, मुख्य बाजार">
+          <input type="text" id="c-address" class="zepto-input" style="border: 2px solid #64748b; font-size: 13.5px;" placeholder="अपना पूरा पता यहाँ लिखें">
         </div>
 
         <!-- 4. Mandatory Live Location Button -->
@@ -1711,7 +1711,7 @@
 
       updateSmartCartTarget(itemsTotal);
 
-      // Location lock और ₹99 की जांच
+      // Location lock aur ₹99 check
       const submitBtn = document.getElementById('order-submit-btn');
       const minReq = Number(appConfig.min_order_value) || 99;
       
@@ -1770,7 +1770,7 @@
       document.getElementById('bill-coupon-amount').innerText = `-₹${couponDisc}`;
     }
 
-    // अनिवार्य लाइव GPS लोकेशन फ़ेच
+    // Anivarya live GPS location fetch
     function getCurrentLocation() {
       const statusVal = document.getElementById('gps-status-val');
       const submitBtn = document.getElementById('order-submit-btn');
