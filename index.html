@@ -7,7 +7,7 @@
 
   <link rel="icon" type="image/png" href="logo.png">
   <link rel="manifest" href="manifest-customer.json">
-  <meta name="theme-color" content="#2a0845">
+  <meta name="theme-color" content="#3c006b">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <script>
@@ -30,15 +30,11 @@
       --accent-pink: #ff2a6d;
       --accent-pink-gradient: linear-gradient(135deg, #ff2a6d 0%, #e0115f 100%);
       --accent-green: #059669;
-      --accent-green-bg: #ecfdf5;
       --bg-light: #f8fafc;
-      --card-white: #ffffff;
       --text-main: #0f172a;
       --text-muted: #64748b;
       --border-soft: #f1f5f9;
-      --border-accent: #e2e8f0;
       --shadow-sm: 0 2px 8px rgba(0,0,0,0.04);
-      --shadow-md: 0 6px 20px rgba(0,0,0,0.06);
       --shadow-float: 0 12px 30px rgba(255, 42, 109, 0.35);
     }
 
@@ -65,7 +61,81 @@
       overflow-x: hidden;
     }
 
-    /* 1. PROFESSIONAL TICKER */
+    /* 1. SIDE DRAWER FIX (बिलकुल बाहर छुपा रहेगा और सही 70px साइज रहेगा) */
+    .drawer-overlay {
+      position: fixed; 
+      top: 0; 
+      left: 0; 
+      width: 100vw; 
+      height: 100vh;
+      background: rgba(15, 23, 42, 0.6); 
+      z-index: 998; 
+      display: none;
+      backdrop-filter: blur(4px);
+    }
+    .drawer-overlay.active { display: block; }
+    
+    .side-drawer {
+      position: fixed; 
+      top: 0; 
+      left: -320px; 
+      width: 280px; 
+      height: 100vh;
+      background: #ffffff; 
+      z-index: 999; 
+      box-shadow: 6px 0 25px rgba(0,0,0,0.25);
+      transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
+      display: flex; 
+      flex-direction: column;
+    }
+    .side-drawer.active { left: 0 !important; }
+    
+    .drawer-header {
+      background: var(--primary-gradient);
+      color: white; 
+      padding: 24px 18px 20px 18px;
+      text-align: left;
+    }
+    .drawer-logo-img {
+      width: 68px !important; 
+      height: 68px !important; 
+      max-width: 68px !important;
+      max-height: 68px !important;
+      border-radius: 50% !important;
+      object-fit: cover !important; 
+      background: #fff; 
+      border: 2.5px solid #ff758c;
+      display: block !important; 
+      margin-bottom: 10px; 
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    }
+    .drawer-brand { 
+      font-size: 15px; 
+      font-weight: 900; 
+      color: #ff94b4; 
+      line-height: 1.2; 
+    }
+    .drawer-menu-list { 
+      padding: 12px 0; 
+      flex: 1; 
+      overflow-y: auto; 
+    }
+    .drawer-item {
+      display: flex; 
+      align-items: center; 
+      gap: 12px; 
+      padding: 14px 20px;
+      font-size: 13px; 
+      font-weight: 700; 
+      color: #1e293b; 
+      cursor: pointer; 
+      text-decoration: none;
+      border-bottom: 1px solid #f8fafc;
+      transition: background 0.15s;
+    }
+    .drawer-item:active { background: #f1f5f9; }
+
+    /* 2. BROADCAST NOTICE TICKER */
     .broadcast-ticker-wrap {
       display: none; 
       background: linear-gradient(90deg, #ea580c, #c2410c); 
@@ -88,7 +158,7 @@
       100% { transform: translate3d(-100%, 0, 0); }
     }
 
-    /* 2. MODERN TOP HEADER */
+    /* 3. TOP HERO HEADER */
     .top-hero-area {
       background: var(--primary-gradient);
       padding: 16px 16px 20px 16px; 
@@ -105,13 +175,21 @@
     .brand-cluster {
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 10px;
+    }
+    .header-app-logo {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 1.5px solid #ff758c;
+      background: #fff;
     }
     .menu-trigger-btn {
-      background: rgba(255,255,255,0.12); 
-      border: 1px solid rgba(255,255,255,0.18); 
-      width: 40px; 
-      height: 40px;
+      background: rgba(255,255,255,0.14); 
+      border: 1px solid rgba(255,255,255,0.22); 
+      width: 38px; 
+      height: 38px;
       border-radius: 12px; 
       display: flex; 
       align-items: center; 
@@ -122,13 +200,13 @@
       backdrop-filter: blur(10px);
     }
     .brand-meta h1 {
-      font-size: 15px;
+      font-size: 14px;
       font-weight: 900;
       letter-spacing: -0.2px;
       color: #ffffff;
       display: flex;
       align-items: center;
-      gap: 6px;
+      gap: 5px;
     }
     .eta-pill {
       display: inline-flex;
@@ -139,12 +217,12 @@
       color: #ff94b4;
       font-size: 10px;
       font-weight: 800;
-      padding: 2px 8px;
+      padding: 2px 7px;
       border-radius: 12px;
-      margin-top: 3px;
+      margin-top: 2px;
     }
 
-    /* SEARCH BAR WITH VOICE */
+    /* SEARCH BAR */
     .search-box-wrap { 
       position: relative; 
       margin-bottom: 14px; 
@@ -153,7 +231,7 @@
     }
     .search-bar-input {
       width: 100%; 
-      background: rgba(255, 255, 255, 0.95); 
+      background: rgba(255, 255, 255, 0.96); 
       border: none;
       border-radius: 16px;
       padding: 13px 46px 13px 40px; 
@@ -162,11 +240,6 @@
       color: #1e293b;
       outline: none;
       box-shadow: 0 4px 14px rgba(0,0,0,0.1);
-      transition: all 0.2s ease;
-    }
-    .search-bar-input:focus {
-      background: #ffffff;
-      box-shadow: 0 6px 20px rgba(0,0,0,0.18);
     }
     .search-icon-pos { 
       position: absolute; 
@@ -197,7 +270,7 @@
     }
     @keyframes pulseMic { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.18); } }
 
-    /* CATEGORIES SLIDER */
+    /* CATEGORIES */
     .category-scroll { 
       display: flex; 
       gap: 12px; 
@@ -211,7 +284,7 @@
       flex-direction: column; 
       align-items: center; 
       cursor: pointer; 
-      min-width: 58px; 
+      min-width: 56px; 
     }
     .cat-icon-circle {
       width: 48px; 
@@ -268,7 +341,7 @@
       margin-top: 3px; 
     }
 
-    /* 3. PRODUCT CARDS GRID */
+    /* 4. PRODUCT CARDS GRID */
     .main-container { padding: 0 16px; }
     .grid { 
       display: grid; 
@@ -285,10 +358,6 @@
       justify-content: space-between; 
       position: relative;
       box-shadow: var(--shadow-sm);
-      transition: transform 0.15s ease, box-shadow 0.15s ease;
-    }
-    .product-card:active {
-      transform: scale(0.985);
     }
     .img-box {
       width: 100%; 
@@ -317,7 +386,6 @@
       font-weight: 800; 
       padding: 4px 8px; 
       border-radius: 8px;
-      backdrop-filter: blur(4px);
     }
     .discount-badge-pill {
       position: absolute; 
@@ -377,11 +445,6 @@
       font-size: 12px; 
       cursor: pointer;
       box-shadow: 0 2px 6px rgba(255, 42, 109, 0.12);
-      transition: all 0.15s ease;
-    }
-    .btn-add-zepto:active {
-      background: var(--accent-pink);
-      color: white;
     }
     .qty-counter {
       display: flex; 
@@ -393,7 +456,6 @@
       gap: 10px; 
       font-weight: 900; 
       font-size: 13px;
-      box-shadow: 0 4px 12px rgba(255, 42, 109, 0.3);
     }
     .qty-btn { 
       background: none; 
@@ -405,7 +467,7 @@
       line-height: 1;
     }
 
-    /* 4. SMART GLOWING UPSELL PROGRESS CARD (IN CART) */
+    /* 5. SMART GLOWING UPSELL CARD */
     .cart-target-banner {
       background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
       border: 1.5px solid #fcd34d;
@@ -441,7 +503,7 @@
       transition: width 0.4s ease;
     }
 
-    /* 5. FLOATING CART & BOTTOM BAR */
+    /* 6. FLOATING CART & NAV */
     .floating-cart-bar {
       position: fixed; 
       bottom: 74px; 
@@ -457,7 +519,6 @@
       box-shadow: var(--shadow-float);
       z-index: 150; 
       cursor: pointer;
-      backdrop-filter: blur(10px);
     }
     .bottom-nav-bar {
       position: fixed; 
@@ -483,14 +544,10 @@
       color: #64748b; 
       cursor: pointer; 
     }
-    .nav-item.active { 
-      color: var(--accent-pink); 
-    }
-    .nav-item-icon { 
-      font-size: 19px; 
-    }
+    .nav-item.active { color: var(--accent-pink); }
+    .nav-item-icon { font-size: 19px; }
 
-    /* BOTTOM SHEETS */
+    /* MODALS */
     .modal-overlay {
       position: fixed; 
       top: 0; 
@@ -511,7 +568,6 @@
       padding: 20px 18px 30px 18px;
       max-height: 85vh; 
       overflow-y: auto;
-      box-shadow: 0 -10px 40px rgba(0,0,0,0.15);
     }
     .sheet-head {
       display: flex; 
@@ -521,11 +577,7 @@
       padding-bottom: 12px; 
       border-bottom: 1px solid var(--border-soft);
     }
-    .sheet-title { 
-      font-size: 17px; 
-      font-weight: 900; 
-      color: var(--text-main); 
-    }
+    .sheet-title { font-size: 17px; font-weight: 900; color: var(--text-main); }
     .sheet-close {
       background: #f1f5f9; 
       border: none; 
@@ -582,7 +634,6 @@
       outline: none; 
     }
 
-    /* PAST ORDERS / DISPUTE / RATING CARDS */
     .past-order-box { 
       background: #fff; 
       border-radius: 16px; 
@@ -610,26 +661,19 @@
 </head>
 <body>
 
-  <!-- 1. LIVE BROADCAST NOTICE TICKER -->
+  <!-- 1. BROADCAST NOTICE TICKER -->
   <div class="broadcast-ticker-wrap" id="broadcast-ticker-bar">
     <span class="broadcast-ticker-text" id="broadcast-ticker-content">
       📢 Baba Food Delivery me aapka swagat hai!
     </span>
   </div>
 
-  <!-- Fullscreen Logo Preview -->
-  <div class="logo-modal-overlay" id="logo-preview-modal" onclick="closeLogoPreview()">
-    <button class="btn-close-preview" onclick="closeLogoPreview()">✕</button>
-    <img class="full-logo-view" src="logo.png" alt="Full Logo" onclick="event.stopPropagation()">
-    <div style="color: #fff; font-weight: 800; font-size: 15px; margin-top: 14px;">👑 𝐁𝐀𝐁𝐀 𝐅𝐎𝐎𝐃 𝐃𝐄𝐋𝐈𝐕𝐄𝐑𝐘🏹</div>
-  </div>
-
-  <!-- Side Drawer -->
+  <!-- 2. SIDE DRAWER -->
   <div class="drawer-overlay" id="drawer-overlay" onclick="toggleDrawer(false)"></div>
   <div class="side-drawer" id="side-drawer">
     <div class="drawer-header">
-      <img class="drawer-logo-img" src="logo.png" alt="Logo" title="Tap to view full logo" onclick="openLogoPreview()" onerror="this.style.display='none'">
-      <div class="drawer-brand">👑 𝐁𝐀𝐁𝐀 𝐅𝐎𝐎𝐃 𝐃𝐄𝐋𝐈𝐕𝐄𝐑𝐘🏹</div>
+      <img class="drawer-logo-img" src="logo.png" alt="Logo" onerror="this.style.display='none'">
+      <div class="drawer-brand">👑 BABA FOOD EXPRESS🏹</div>
       <div style="font-size: 11px; color: #fdf4ff; margin-top: 2px;">Fast Express Delivery</div>
     </div>
     <div class="drawer-menu-list">
@@ -648,20 +692,21 @@
     </div>
   </div>
 
-  <!-- 2. TOP HERO HEADER -->
+  <!-- 3. TOP HERO HEADER -->
   <div class="top-hero-area">
     <div class="location-row">
       <div class="brand-cluster">
         <button class="menu-trigger-btn" onclick="toggleDrawer(true)">☰</button>
+        <img class="header-app-logo" src="logo.png" alt="App Logo" onerror="this.style.display='none'">
         <div class="brand-meta">
-          <h1>👑 BABA FOOD EXPRESS</h1>
+          <h1>BABA FOOD EXPRESS</h1>
           <span class="eta-pill">⚡ 10 MINS DELIVERY</span>
         </div>
       </div>
       <button class="menu-trigger-btn" onclick="openSupportModal()" title="Help & Support">🎧</button>
     </div>
 
-    <!-- Modern Search with Hindi Voice -->
+    <!-- Search with Hindi Voice -->
     <div class="search-box-wrap">
       <span class="search-icon-pos">🔍</span>
       <input type="text" id="search-input" class="search-bar-input" placeholder='Search "doodh", "samosa", "drinks"...' oninput="handleFilter()">
@@ -854,13 +899,11 @@
         <button class="sheet-close" onclick="toggleTrackModal(false)">✕</button>
       </div>
 
-      <!-- 60-Sec Self Cancel -->
       <div id="self-cancel-container" style="display:none; background:#fef2f2; border:1px solid #fca5a5; padding:10px 14px; border-radius:12px; margin-bottom:12px; justify-content:space-between; align-items:center;">
         <span style="font-size:12px; font-weight:800; color:#991b1b;">⏱️ Cancel Order? (<span id="cancel-timer-secs">60</span>s left)</span>
         <button onclick="handleCustomerSelfCancel()" style="background:#dc2626; color:white; border:none; padding:6px 12px; border-radius:8px; font-size:11px; font-weight:800; cursor:pointer;">Cancel ✕</button>
       </div>
 
-      <!-- Live OTP Box -->
       <div class="cust-otp-box" id="cust-otp-container" style="display:none;">
         <div style="font-size:11px; font-weight:800; color:#7e22ce;">🔑 SAFE DELIVERY OTP</div>
         <div class="cust-otp-code" id="cust-live-otp">----</div>
@@ -946,15 +989,18 @@
       'All': '🛍️', 'Grocery': '🥦', 'Dairy': '🥛', 'Snacks': '🍿', 'Bakery': '🍞', 'Drinks': '🥤'
     };
 
-    function openLogoPreview() { document.getElementById('logo-preview-modal').classList.add('active'); }
-    function closeLogoPreview() { document.getElementById('logo-preview-modal').classList.remove('active'); }
-
     function toggleDrawer(open) {
-      document.getElementById('side-drawer').className = open ? 'side-drawer active' : 'side-drawer';
-      document.getElementById('drawer-overlay').className = open ? 'drawer-overlay active' : 'drawer-overlay';
+      const drawer = document.getElementById('side-drawer');
+      const overlay = document.getElementById('drawer-overlay');
+      if (open) {
+        drawer.classList.add('active');
+        overlay.classList.add('active');
+      } else {
+        drawer.classList.remove('active');
+        overlay.classList.remove('active');
+      }
     }
 
-    // 1. VOICE SEARCH IN HINDI/ENGLISH
     function startVoiceSearch() {
       const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
       if (!SpeechRecognition) return alert('Aapke browser me voice search support nahi hai.');
@@ -975,7 +1021,6 @@
       recognition.onspeechend = () => { recognition.stop(); micBtn.classList.remove('recording'); };
     }
 
-    // 2. DYNAMIC SMART UPSELL TARGET ENGINE (PRO PROGRESS BAR)
     function updateSmartCartTarget(itemsTotal) {
       const targetBox = document.getElementById('cart-smart-target-box');
       const targetText = document.getElementById('cart-target-text');
@@ -1064,7 +1109,7 @@
       renderPastOrdersUI();
       await loadLiveAppSettings();
       try {
-        const { data } = await _supabase.from('products').select('*').order('id', { ascending: true });
+        const { data, error } = await _supabase.from('products').select('*').order('id', { ascending: true });
         allProducts = data || [];
         document.getElementById('loader').style.display = 'none';
         renderCategories();
@@ -1241,7 +1286,6 @@
 
       const { itemsTotal, deliveryCharge, rainSurge, nightSurge, discount, couponDisc, finalToPay } = calculateTotals();
 
-      // DYNAMIC SMART TARGET CALL
       updateSmartCartTarget(itemsTotal);
 
       box.innerHTML = entries.map(({ item, qty }) => `
@@ -1402,7 +1446,7 @@
 
     function toggleSupportModal(s) { document.getElementById('support-modal').className = s ? 'modal-overlay active' : 'modal-overlay'; }
     function openSupportModal() { toggleSupportModal(true); }
-    function closeSupportModal() { toggleSupportModal(false); }
+    function closeSupportModal(e) { toggleSupportModal(false); }
 
     function scrollToHistory() { document.getElementById('past-orders-section').scrollIntoView({ behavior: 'smooth' }); }
 
