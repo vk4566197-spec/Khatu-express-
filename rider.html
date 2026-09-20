@@ -22,7 +22,6 @@
       --text-sub: #94a3b8;
     }
 
-    /* Google Touch Search Bar aur Anchahe Selection ko Rokne ke liye */
     * { 
       box-sizing: border-box; 
       margin: 0; 
@@ -34,7 +33,6 @@
       user-select: none;
     }
 
-    /* Input aur Textarea me typing aur selection allowed rahe */
     input, textarea {
       -webkit-user-select: auto !important;
       user-select: auto !important;
@@ -77,7 +75,7 @@
       cursor: pointer; width: 100%; margin-top: 6px; box-shadow: 0 4px 12px rgba(255, 50, 105, 0.3);
     }
 
-    /* Top Partner Store Header */
+    /* Top Bar */
     .top-bar {
       background: #ffffff; color: #1e293b; padding: 12px 16px;
       display: flex; justify-content: space-between; align-items: center;
@@ -87,8 +85,7 @@
     .store-name { font-size: 13px; font-weight: 800; }
     .store-id { font-size: 10px; color: #64748b; font-weight: 600; }
 
-    .top-actions { display: flex; align-items: center; gap: 12px; }
-
+    .top-actions { display: flex; align-items: center; gap: 10px; }
     .btn-sos-top {
       background: #dc2626; color: white; border: none; font-size: 11px;
       font-weight: 900; padding: 6px 10px; border-radius: 8px; cursor: pointer;
@@ -107,7 +104,19 @@
     input:checked + .slider { background-color: var(--accent-green); }
     input:checked + .slider:before { transform: translateX(20px); }
 
-    .help-btn { font-size: 12px; font-weight: 700; color: #475569; display: flex; align-items: center; gap: 4px; text-decoration: none; cursor: pointer; }
+    .help-btn { font-size: 12px; font-weight: 700; color: #475569; display: flex; align-items: center; gap: 4px; cursor: pointer; }
+
+    /* SPEED LIVE TICKER BAR */
+    .speed-guard-strip {
+      background: #1e293b; border-bottom: 1px solid #334155; padding: 8px 16px;
+      display: flex; justify-content: space-between; align-items: center; font-size: 12px; font-weight: 800;
+    }
+    .speed-val-box { display: flex; align-items: center; gap: 6px; }
+    .speed-num { font-size: 15px; font-weight: 900; color: #38bdf8; }
+    .speed-alert-badge {
+      display: none; background: #dc2626; color: white; padding: 2px 8px;
+      border-radius: 10px; font-size: 10px; font-weight: 900; animation: pulseSos 1s infinite;
+    }
 
     .shift-box {
       background: #ffffff; color: #1e293b; padding: 12px 16px; border-bottom: 1px solid #f1f5f9;
@@ -126,14 +135,6 @@
       display: flex; justify-content: space-between; align-items: center;
     }
     .slot-banner a { color: #ea580c; text-decoration: none; font-weight: 800; cursor: pointer; }
-
-    .promo-card {
-      background: #fdf2f8; color: #831843; border-radius: 12px; margin: 14px 16px; padding: 12px 14px;
-      display: flex; justify-content: space-between; align-items: center; border: 1px solid #fbcfe8;
-    }
-    .promo-info h4 { font-size: 12px; font-weight: 800; margin-bottom: 2px; }
-    .promo-info p { font-size: 10px; color: #9d174d; }
-    .btn-refer { background: #be185d; color: white; border: none; padding: 6px 12px; border-radius: 6px; font-size: 11px; font-weight: 700; cursor: pointer; }
 
     .waiting-pill {
       background: linear-gradient(180deg, #243042 0%, #1a2332 100%);
@@ -179,6 +180,7 @@
     .r-card-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
     .r-badge { background: #0284c7; color: white; padding: 4px 8px; border-radius: 6px; font-size: 11px; font-weight: 800; }
     .r-badge.delivered { background: var(--accent-green); }
+    .r-badge.batch { background: #8b5cf6; }
     .r-address { font-size: 12px; color: #cbd5e1; margin: 8px 0; line-height: 1.4; white-space: pre-line; }
     .btn-action-rider {
       background: var(--accent-green); color: white; border: none; width: 100%;
@@ -268,7 +270,6 @@
       background: #f8fafc; border: 2px dashed #cbd5e1; border-radius: 14px;
       padding: 16px; margin: 16px 0;
     }
-
     .slider-track {
       position: relative; width: 100%; height: 58px; background: #e2e8f0;
       border-radius: 30px; overflow: hidden; display: flex; align-items: center;
@@ -282,7 +283,7 @@
       font-weight: 900; cursor: grab; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
     }
 
-    /* 4-DIGIT OTP VERIFICATION MODAL FOR RIDER */
+    /* 4-DIGIT OTP VERIFICATION MODAL */
     .otp-modal-overlay {
       position: fixed; top: 0; left: 0; width: 100%; height: 100%;
       background: rgba(15, 23, 42, 0.85); z-index: 880; display: none;
@@ -386,7 +387,7 @@
 </head>
 <body>
 
-  <!-- Audio Ringtone Player (Downloaded alert.mp3) -->
+  <!-- Audio Ringtone Player -->
   <audio id="rider-order-audio" preload="auto" src="alert.mp3"></audio>
 
   <!-- 1. AUTH SCREEN -->
@@ -409,7 +410,7 @@
       <div id="auth-register-form" class="auth-input-group" style="display: none;">
         <input type="text" id="reg-name" class="auth-input" placeholder="Full Name (आपका पूरा नाम) *">
         <input type="tel" id="reg-phone" class="auth-input" placeholder="10-digit Mobile Number *" maxlength="10">
-        <input type="text" id="reg-vehicle" class="auth-input" placeholder="Vehicle No. (गाड़ी नंबर - e.g. UP25-AB-1234)">
+        <input type="text" id="reg-vehicle" class="auth-input" placeholder="Vehicle No. (e.g. UP25-AB-1234)">
         <button class="btn-auth-submit" style="background:#0284c7;" onclick="handleRiderRegister()">
           📝 Submit Request to Admin
         </button>
@@ -429,7 +430,6 @@
       </div>
       <div class="top-actions">
         <button class="btn-sos-top" onclick="openSosModal()">🚨 SOS</button>
-
         <label class="switch">
           <input type="checkbox" id="duty-toggle" checked onchange="toggleDuty(this.checked)">
           <span class="slider"></span>
@@ -438,31 +438,30 @@
       </div>
     </div>
 
+    <!-- LIVE SPEED GUARD BAR -->
+    <div class="speed-guard-strip">
+      <div class="speed-val-box">
+        <span>⚡ Live Speed:</span>
+        <span class="speed-num" id="live-speed-text">0</span>
+        <span>km/h</span>
+      </div>
+      <div class="speed-alert-badge" id="speed-alert-pill">
+        ⚠️ SLOW DOWN (OVERSPEED)
+      </div>
+    </div>
+
     <div class="shift-box">
       <div class="shift-left">
         <span class="shift-icon">⏱️</span>
         <div>
-          <div class="shift-time">1:00 pm - 3:00 pm</div>
-          <div class="shift-break">8 min break left</div>
+          <div class="shift-time">Duty Shift Active</div>
+          <div class="shift-break">Background Safe</div>
         </div>
       </div>
       <div class="shift-right">
         <div class="shift-done" id="live-shift-timer">--m --s</div>
         <div class="shift-status-lbl">Completed</div>
       </div>
-    </div>
-
-    <div class="slot-banner">
-      <span>Book more to earn more 🤑</span>
-      <a onclick="showSlotDetails()">View My Slots ❯</a>
-    </div>
-
-    <div class="promo-card">
-      <div class="promo-info">
-        <h4>Rider Referral Bonus is Live 🎉</h4>
-        <p>Invite friends & earn ₹200 on first 10 orders</p>
-      </div>
-      <button class="btn-refer" onclick="shareReferralLink()">Refer Now ❯</button>
     </div>
 
     <div class="waiting-pill active-duty" id="waiting-pill">
@@ -472,15 +471,14 @@
 
     <div class="earnings-card">
       <div class="main-earning" id="live-total-earning">₹0 <span style="font-size: 14px; font-weight: 600; color: #64748b;">earned</span></div>
-      
       <div class="earning-meta-grid">
         <div class="meta-col" onclick="showEarningsPopup()">
           <div class="meta-top">⏱️ <span id="live-login-hrs">0.0</span></div>
           <div class="meta-sub">Login Hrs ❯</div>
         </div>
-        <div class="meta-col" onclick="showSlotDetails()">
-          <div class="meta-top">📅 2 Days</div>
-          <div class="meta-sub">Active Cycle ❯</div>
+        <div class="meta-col">
+          <div class="meta-top">🛵 <span id="active-tasks-count">0</span></div>
+          <div class="meta-sub">Active Batch ❯</div>
         </div>
         <div class="meta-col" onclick="switchOrderTab('DELIVERED')">
           <div class="meta-top">🛍️ <span id="orders-done-count">0</span></div>
@@ -490,8 +488,8 @@
     </div>
 
     <div class="segment-wrap">
-      <button class="seg-btn active" id="seg-active" onclick="switchOrderTab('ACTIVE')">Active Tasks 🛵</button>
-      <button class="seg-btn" id="seg-delivered" onclick="switchOrderTab('DELIVERED')">Completed (2 Days) ✅</button>
+      <button class="seg-btn active" id="seg-active" onclick="switchOrderTab('ACTIVE')">Active / Batch Tasks 🛵</button>
+      <button class="seg-btn" id="seg-delivered" onclick="switchOrderTab('DELIVERED')">Completed Tasks ✅</button>
     </div>
 
     <div class="orders-queue-box" id="rider-orders-list">
@@ -507,10 +505,6 @@
         <div class="b-icon">👛</div>
         <span>Earnings</span>
       </div>
-      <div class="b-item" onclick="showSlotDetails()">
-        <div class="b-icon">📅</div>
-        <span>Slots</span>
-      </div>
       <div class="b-item" onclick="openSosModal()" style="color:#dc2626;">
         <div class="b-icon">🚨</div>
         <span>SOS Call</span>
@@ -522,17 +516,17 @@
     </div>
   </div>
 
-  <!-- SCREEN 1: Bin -->
+  <!-- SCREEN 1: Bin Pick -->
   <div class="bin-screen" id="bin-screen">
     <div class="bin-header">
       <div class="bin-title">Go to the Bin</div>
       <div class="shelf-icon-badge">📦</div>
     </div>
-    <div class="bin-hash-bar" id="bin-order-hash">#HRUOKDSNI19442A</div>
+    <div class="bin-hash-bar" id="bin-order-hash">#BABA-ORDER</div>
     <div class="bin-shelf-row">
       <div style="display: flex; align-items: center; gap: 8px;">
         <span>Pick from Shelf</span>
-        <span class="shelf-count-circle" id="bin-shelf-num">2</span>
+        <span class="shelf-count-circle" id="bin-shelf-num">1</span>
       </div>
       <span>⌄</span>
     </div>
@@ -546,7 +540,7 @@
     </div>
   </div>
 
-  <!-- SCREEN 2: Photo -->
+  <!-- SCREEN 2: Photo Preview -->
   <div class="photo-screen" id="photo-screen">
     <div class="photo-nav">
       <button class="btn-photo-close" onclick="closePhotoScreen()">✕</button>
@@ -558,32 +552,26 @@
     </div>
     <div class="photo-bottom-panel">
       <div class="thumbs-row">
-        <div class="thumb-box">
-          <img id="thumb-preview" src="" alt="Thumbnail">
-        </div>
+        <div class="thumb-box"><img id="thumb-preview" src="" alt="Thumbnail"></div>
         <div class="thumb-plus-btn" onclick="triggerNativeCamera()">+</div>
       </div>
       <button class="btn-submit-photo" onclick="submitBagPhoto()">Submit Photo</button>
     </div>
   </div>
 
-  <!-- SCREEN 3: On The Way -->
+  <!-- SCREEN 3: On The Way Route -->
   <div class="way-screen" id="way-screen">
     <div class="way-map-container">
       <div class="way-top-bar">
         <button class="btn-sos" onclick="openSosModal()">SOS</button>
-        <button class="btn-help-pill" onclick="openProfileModal()">
-          <span>🎧</span> Help
-        </button>
+        <button class="btn-help-pill" onclick="openProfileModal()"><span>🎧</span> Help</button>
       </div>
       <iframe class="way-map-iframe" id="way-map-frame" src=""></iframe>
-      <a class="btn-floating-navigate" id="native-maps-intent-btn" href="#" target="_blank" title="Start Google Maps Navigation">
-        ↗
-      </a>
+      <a class="btn-floating-navigate" id="native-maps-intent-btn" href="#" target="_blank" title="Start Google Maps Navigation">↗</a>
     </div>
     <div class="way-bottom-sheet">
       <div class="sheet-handle-pill"></div>
-      <div class="way-title">On the Way</div>
+      <div class="way-title">On the Way (Live Tracking)</div>
       <div class="way-address-box">
         <div class="way-nav-arrow-circle">➤</div>
         <div>
@@ -592,9 +580,15 @@
         </div>
       </div>
 
-      <button onclick="openRiderChat(currentSelectedOrder.id)" style="background:#0284c7; color:white; border:none; width:100%; padding:11px; border-radius:10px; font-size:13px; font-weight:800; cursor:pointer; margin-bottom:8px;">
-        💬 Chat with Customer
-      </button>
+      <!-- Masked / Direct Call Option -->
+      <div style="display:flex; gap:8px; margin: 8px 0;">
+        <button onclick="handleCallCustomer()" style="flex:1; background:#10b981; color:white; border:none; padding:11px; border-radius:10px; font-size:12px; font-weight:800; cursor:pointer;">
+          📞 Call Customer
+        </button>
+        <button onclick="openRiderChat(currentSelectedOrder.id)" style="flex:1; background:#0284c7; color:white; border:none; padding:11px; border-radius:10px; font-size:12px; font-weight:800; cursor:pointer;">
+          💬 Chat
+        </button>
+      </div>
 
       <button class="btn-mark-arrived" id="btn-mark-arrived" onclick="handleMarkArrived()">
         Mark Arrived
@@ -625,7 +619,7 @@
     </div>
   </div>
 
-  <!-- 4-DIGIT OTP VERIFICATION POPUP MODAL FOR RIDER -->
+  <!-- 4-DIGIT OTP VERIFICATION POPUP MODAL -->
   <div class="otp-modal-overlay" id="otp-modal">
     <div class="otp-card-sheet">
       <div class="otp-icon-circle">🔐</div>
@@ -705,12 +699,10 @@
           <span>🚑 Ambulance (एम्बुलेंस)</span>
           <span>Call 108 ➔</span>
         </a>
-
         <a class="sos-call-btn sos-call-112" href="tel:112">
           <span>🚓 Police & All Emergency</span>
           <span>Call 112 ➔</span>
         </a>
-
         <a class="sos-call-btn sos-call-admin" href="tel:9711107063">
           <span>👑 Admin Helpline</span>
           <span>9711107063 ➔</span>
@@ -766,25 +758,20 @@
     let rChatInterval = null;
     let gpsTrackerInterval = null;
     let wakeLock = null;
+    let maxAllowedSpeed = 55;
+    let prevPosition = null;
 
-    // Service Worker Register
     if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('sw.js').then(reg => {
-        console.log("Service Worker Active:", reg.scope);
-      }).catch(err => console.warn("SW Error:", err));
+      navigator.serviceWorker.register('sw.js').catch(err => console.warn(err));
     }
 
-    // SCREEN WAKE LOCK (स्क्रीन लॉक होने पर भी ऐप को ज़िंदा रखना)
     async function requestWakeLock() {
       try {
         if ('wakeLock' in navigator) {
           wakeLock = await navigator.wakeLock.request('screen');
-          wakeLock.addEventListener('release', () => {
-            console.log('Wake Lock released');
-          });
         }
       } catch (err) {
-        console.warn('Wake Lock notice:', err);
+        console.warn(err);
       }
     }
 
@@ -794,14 +781,13 @@
       }
     });
 
-    // NOTIFICATION PERMISSION (लॉक स्क्रीन अलर्ट के लिए)
     function initNotificationPermission() {
       if ('Notification' in window && Notification.permission !== 'granted') {
         Notification.requestPermission();
       }
     }
 
-    // AUTHENTICATION
+    // AUTH
     function checkAuthStatus() {
       if (!loggedInRider) {
         document.getElementById('auth-overlay').classList.add('active');
@@ -816,9 +802,17 @@
         document.getElementById('prof-cash').innerText = `₹${loggedInRider.cash_in_hand || 0}`;
         requestWakeLock();
         initNotificationPermission();
-        startRiderLiveGps();
+        loadSpeedRule();
+        startRiderLiveGpsAndSpeed();
         loadRiderOrders();
         syncRiderData();
+      }
+    }
+
+    async function loadSpeedRule() {
+      const { data } = await _supabase.from('app_settings').select('max_rider_speed_kmh').eq('id', 1).single();
+      if (data && data.max_rider_speed_kmh) {
+        maxAllowedSpeed = Number(data.max_rider_speed_kmh);
       }
     }
 
@@ -852,8 +846,8 @@
       const phone = document.getElementById('reg-phone').value.trim();
       const vehicle = document.getElementById('reg-vehicle').value.trim();
 
-      if (name.length < 2) { alert('कृपया अपना पूरा नाम दर्ज करें!'); return; }
-      if (!/^[6-9]\d{9}$/.test(phone)) { alert('कृपया 10 अंकों का सही मोबाइल नंबर दर्ज करें!'); return; }
+      if (name.length < 2) return alert('कृपया सही नाम दर्ज करें!');
+      if (!/^[6-9]\d{9}$/.test(phone)) return alert('कृपया 10 अंकों का सही मोबाइल नंबर डालें!');
 
       try {
         const { data: existing } = await _supabase.from('riders').select('*').eq('phone', phone);
@@ -868,32 +862,23 @@
         }]);
         if (error) throw error;
 
-        alert('✅ रजिस्ट्रेशन सबमिट हो गया! एडमिन द्वारा अप्रूवल मिलने के बाद आप लॉगिन कर पाएँगे।');
+        alert('✅ रजिस्ट्रेशन सबमिट हो गया! एडमिन अप्रूवल का इंतज़ार करें।');
         switchAuthTab('LOGIN');
         document.getElementById('login-phone').value = phone;
       } catch (err) {
-        alert('रजिस्ट्रेशन एरर: ' + err.message);
+        alert('त्रुटि: ' + err.message);
       }
     }
 
     async function handleRiderLogin() {
       const phone = document.getElementById('login-phone').value.trim();
-      if (!/^[6-9]\d{9}$/.test(phone)) { alert('कृपया अपना 10 अंकों का मोबाइल नंबर डालें!'); return; }
+      if (!/^[6-9]\d{9}$/.test(phone)) return alert('कृपया अपना 10 अंकों का मोबाइल नंबर डालें!');
 
       try {
         const { data, error } = await _supabase.from('riders').select('*').eq('phone', phone).single();
-        if (error || !data) {
-          alert('❌ यह नंबर रजिस्टर्ड नहीं है! कृपया पहले New Registration करें।');
-          return;
-        }
-        if (data.status === 'Pending') {
-          alert('⏳ आपका अकाउंट पेंडिंग है! एडमिन द्वारा अप्रूवल का इंतज़ार करें।');
-          return;
-        }
-        if (data.status === 'Blocked' || data.status === 'Deactivated') {
-          alert('🚫 आपका अकाउंट डिएक्टिवेट है। एडमिन से संपर्क करें।');
-          return;
-        }
+        if (error || !data) return alert('❌ यह नंबर रजिस्टर्ड नहीं है! New Registration करें।');
+        if (data.status === 'Pending') return alert('⏳ अकाउंट पेंडिंग है! एडमिन अप्रूवल का इंतज़ार करें।');
+        if (data.status === 'Blocked' || data.status === 'Deactivated') return alert('🚫 अकाउंट डिएक्टिवेट है। एडमिन से संपर्क करें।');
 
         loggedInRider = data;
         localStorage.setItem('baba_logged_rider', JSON.stringify(data));
@@ -923,8 +908,8 @@
     }
     function closeProfileModal(e) { if(e && e.target !== e.currentTarget) return; document.getElementById('profile-modal').classList.remove('active'); }
 
-    // LIVE GPS BACKGROUND SYNC
-    function startRiderLiveGps() {
+    // 1. LIVE SPEED TRACKING & OVERSPEED GUARD
+    function startRiderLiveGpsAndSpeed() {
       if (!navigator.geolocation || !loggedInRider) return;
 
       const pushGps = () => {
@@ -932,79 +917,80 @@
         navigator.geolocation.getCurrentPosition(async (pos) => {
           const lat = pos.coords.latitude;
           const lng = pos.coords.longitude;
+          let speedKmh = 0;
+
+          if (pos.coords.speed !== null && !isNaN(pos.coords.speed)) {
+            speedKmh = Math.round(pos.coords.speed * 3.6); // m/s to km/h
+          } else if (prevPosition) {
+            const dtHours = (pos.timestamp - prevPosition.time) / (1000 * 3600);
+            if (dtHours > 0 && dtHours < 0.1) {
+              const dKm = calculateHaversineKm(prevPosition.lat, prevPosition.lng, lat, lng);
+              speedKmh = Math.round(dKm / dtHours);
+            }
+          }
+
+          if (speedKmh > 120) speedKmh = 0; // Filter anomalies
+          prevPosition = { lat, lng, time: pos.timestamp };
+
+          const speedEl = document.getElementById('live-speed-text');
+          const alertBadge = document.getElementById('speed-alert-pill');
+          if (speedEl) speedEl.innerText = speedKmh;
+
+          const isOver = speedKmh > maxAllowedSpeed;
+          if (alertBadge) alertBadge.style.display = isOver ? 'block' : 'none';
+
           const gpsText = document.getElementById('prof-gps');
           if (gpsText) gpsText.innerText = `${lat.toFixed(4)}, ${lng.toFixed(4)}`;
 
           await _supabase.from('riders').update({
             current_lat: lat,
             current_lng: lng,
+            current_speed_kmh: speedKmh,
+            is_overspeeding: isOver,
             is_online: true,
             last_location_at: new Date().toISOString()
           }).eq('id', loggedInRider.id);
         }, (err) => {
-          console.warn("Rider GPS Ping Notice:", err.message);
+          console.warn("GPS Notice:", err.message);
         }, { enableHighAccuracy: true });
       };
 
       pushGps();
-      if (!gpsTrackerInterval) {
-        gpsTrackerInterval = setInterval(pushGps, 25000);
-      }
+      if (!gpsTrackerInterval) gpsTrackerInterval = setInterval(pushGps, 15000);
     }
 
-    // SOS Functions
-    function openSosModal() { document.getElementById('sos-modal').classList.add('active'); }
-    function closeSosModal(e) {
-      if (e && e.target !== e.currentTarget) return;
-      document.getElementById('sos-modal').classList.remove('active');
+    function calculateHaversineKm(lat1, lon1, lat2, lon2) {
+      const R = 6371;
+      const dLat = (lat2 - lat1) * Math.PI / 180;
+      const dLon = (lon2 - lon1) * Math.PI / 180;
+      const a = Math.sin(dLat/2) * Math.sin(dLat/2) + Math.cos(lat1*Math.PI/180) * Math.cos(lat2*Math.PI/180) * Math.sin(dLon/2)*Math.sin(dLon/2);
+      return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
     }
+
+    function openSosModal() { document.getElementById('sos-modal').classList.add('active'); }
+    function closeSosModal(e) { if (e && e.target !== e.currentTarget) return; document.getElementById('sos-modal').classList.remove('active'); }
 
     function showEarningsPopup() {
-      let count = 0;
-      let cash = 0;
+      let count = 0, cash = 0;
       rawAllOrders.forEach(o => {
-        if (o.status === 'Delivered') {
-          count++;
-          cash += Number(o.total_amount) || 0;
-        }
+        if (o.status === 'Delivered') { count++; cash += Number(o.total_amount) || 0; }
       });
       const inHand = loggedInRider?.cash_in_hand || 0;
-      alert(`👛 Rider Earnings Overview\n\n• कुल डिलीवर किए गए ऑर्डर: ${count}\n• कुल कमाई राशि: ₹${cash}\n• जमा करने योग्य COD कैश: ₹${inHand}\n• चालू शिफ्ट घंटे: ${document.getElementById('live-login-hrs').innerText} hrs`);
+      alert(`👛 Rider Earnings\n\n• कुल डिलीवर किए गए: ${count}\n• कुल कमाई: ₹${cash}\n• जमा करने योग्य COD: ₹${inHand}`);
     }
 
-    function showSlotDetails() {
-      alert(`📅 Today's Rider Duty Slot\n\n• स्लॉट समय: 1:00 PM - 3:00 PM\n• स्टेटस: एक्टिव (On-Duty)\n• ब्रेक टाइम बचा: 8 मिनट\n• एक्टिव टाइम: ${document.getElementById('live-shift-timer').innerText}`);
-    }
-
-    function shareReferralLink() {
-      const code = loggedInRider ? `BABA${loggedInRider.id}` : 'BABA100';
-      const msg = `नमस्ते! Baba Food Delivery पार्टनर बनें और पहले 10 ऑर्डर पर ₹200 का बोनस पाएँ। मेरा रेफ़रल कोड है: ${code}`;
-      window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, '_blank');
-    }
-
-    // ============================================================
-    // PLAY DOWNLOADED AUDIO RINGTONE (LOCK SCREEN + BACKGROUND COMPATIBLE)
-    // ============================================================
     function playLoudEmergencySiren(orderAmount = '') {
       try {
         const audioTag = document.getElementById('rider-order-audio');
         if (audioTag) {
           audioTag.currentTime = 0;
           audioTag.play().catch(() => playSynthesizerFallback());
-        } else {
-          playSynthesizerFallback();
-        }
+        } else playSynthesizerFallback();
 
-        if (navigator.vibrate) {
-          navigator.vibrate([600, 300, 600, 300, 1000]);
-        }
+        if (navigator.vibrate) navigator.vibrate([600, 300, 600, 300, 1000]);
 
-        // Trigger Lock Screen Push Notification via Service Worker
         if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
-          navigator.serviceWorker.controller.postMessage({
-            type: 'NEW_ORDER_ALERT',
-            amount: orderAmount
-          });
+          navigator.serviceWorker.controller.postMessage({ type: 'NEW_ORDER_ALERT', amount: orderAmount });
         }
       } catch (err) {
         playSynthesizerFallback();
@@ -1031,9 +1017,7 @@
           osc.start(cycleStart);
           osc.stop(cycleStart + 0.45);
         }
-      } catch (e) {
-        console.warn(e);
-      }
+      } catch (e) {}
     }
 
     let shiftStartTime = localStorage.getItem('baba_shift_start') || Date.now();
@@ -1049,16 +1033,13 @@
       }
     }
     setInterval(updateLiveTimers, 1000);
-    updateLiveTimers();
 
     function toggleDuty(online) {
       isOnline = online;
       const pill = document.getElementById('waiting-pill');
       const text = document.getElementById('duty-text');
 
-      if (loggedInRider) {
-        _supabase.from('riders').update({ is_online: online }).eq('id', loggedInRider.id);
-      }
+      if (loggedInRider) _supabase.from('riders').update({ is_online: online }).eq('id', loggedInRider.id);
 
       if (online) {
         requestWakeLock();
@@ -1069,8 +1050,7 @@
         if (wakeLock) { wakeLock.release(); wakeLock = null; }
         pill.className = 'waiting-pill';
         text.innerText = 'You are Offline';
-        document.getElementById('rider-orders-list').innerHTML = 
-          '<div style="text-align:center; color: var(--text-sub); padding: 20px; font-size: 12px;">आप ऑफ़लाइन हैं।</div>';
+        document.getElementById('rider-orders-list').innerHTML = '<div style="text-align:center; color: var(--text-sub); padding: 20px; font-size: 12px;">आप ऑफ़लाइन हैं।</div>';
       }
     }
 
@@ -1081,7 +1061,7 @@
       renderTasks();
     }
 
-    // 2-DAY ROLLING ORDERS LOADER WITH NEAREST HUB RIDER FILTER
+    // 2. BATCH DELIVERY ORDERS LOADER
     async function loadRiderOrders() {
       if (!isOnline || !loggedInRider) return;
       try {
@@ -1090,10 +1070,7 @@
         twoDaysAgo.setHours(0, 0, 0, 0);
 
         const { data, error } = await _supabase
-          .from('orders')
-          .select('*')
-          .gte('created_at', twoDaysAgo.toISOString())
-          .order('id', { ascending: false });
+          .from('orders').select('*').gte('created_at', twoDaysAgo.toISOString()).order('id', { ascending: false });
 
         if (error) throw error;
         
@@ -1109,7 +1086,7 @@
           let hasNewOrder = false;
           let newOrderAmt = '';
           rawAllOrders.forEach(o => {
-            if (!processedOrders.has(o.id) && o.status !== 'Delivered') {
+            if (!processedOrders.has(o.id) && o.status !== 'Delivered' && o.status !== 'Cancelled') {
               hasNewOrder = true;
               newOrderAmt = o.total_amount;
               processedOrders.add(o.id);
@@ -1122,14 +1099,13 @@
         }
         renderTasks();
       } catch (e) {
-        console.log("Rider load error:", e);
+        console.log("Load error:", e);
       }
     }
 
     function renderTasks() {
       const container = document.getElementById('rider-orders-list');
-      let deliveredCount = 0;
-      let totalEarnings = 0;
+      let deliveredCount = 0, totalEarnings = 0;
       rawAllOrders.forEach(o => {
         if (o.status === 'Delivered') {
           deliveredCount++;
@@ -1140,89 +1116,76 @@
       document.getElementById('live-total-earning').innerHTML = `₹${totalEarnings} <span style="font-size: 14px; font-weight: 600; color: #64748b;">earned</span>`;
 
       const displayOrders = rawAllOrders.filter(o => {
-        if (currentViewTab === 'ACTIVE') return o.status !== 'Delivered';
+        if (currentViewTab === 'ACTIVE') return o.status !== 'Delivered' && o.status !== 'Cancelled';
         return o.status === 'Delivered';
       });
+
+      const activeBatchCount = rawAllOrders.filter(o => o.status !== 'Delivered' && o.status !== 'Cancelled' && o.assigned_rider_id === loggedInRider.id).length;
+      document.getElementById('active-tasks-count').innerText = activeBatchCount;
 
       if (displayOrders.length === 0) {
         container.innerHTML = currentViewTab === 'ACTIVE'
           ? '<div style="text-align:center; color: var(--text-sub); padding: 25px; font-size: 12px;">Waiting for Order... कोई एक्टिव टास्क नहीं है।</div>'
-          : '<div style="text-align:center; color: var(--text-sub); padding: 25px; font-size: 12px;">पिछले 2 दिनों में कोई डिलीवर्ड ऑर्डर नहीं है।</div>';
+          : '<div style="text-align:center; color: var(--text-sub); padding: 25px; font-size: 12px;">कोई डिलीवर्ड ऑर्डर नहीं है।</div>';
         return;
       }
 
-      const groupedByDate = {};
-      const todayStr = new Date().toDateString();
-      const yesterday = new Date();
-      yesterday.setDate(yesterday.getDate() - 1);
-      const yesterdayStr = yesterday.toDateString();
+      const isMultiBatch = displayOrders.length > 1;
 
-      displayOrders.forEach(order => {
-        const orderDate = order.created_at ? new Date(order.created_at) : new Date();
-        const orderDateStr = orderDate.toDateString();
+      container.innerHTML = displayOrders.map(o => {
+        const timeStr = o.created_at ? new Date(o.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '';
+        const isDelivered = o.status === 'Delivered';
 
-        let label = orderDate.toLocaleDateString('hi-IN', { day: 'numeric', month: 'short', year: 'numeric' });
-        if (orderDateStr === todayStr) label = '🟢 Today (' + label + ')';
-        else if (orderDateStr === yesterdayStr) label = '🟡 Yesterday (' + label + ')';
+        let mapsLink = '';
+        const match = (o.delivery_address || '').match(/https:\/\/maps\.google\.com\/\?q=([^\s]+)/);
+        if (match) mapsLink = match[0];
+        else mapsLink = `https://maps.google.com/?q=${encodeURIComponent(o.delivery_address || '')}`;
 
-        if (!groupedByDate[label]) groupedByDate[label] = [];
-        groupedByDate[label].push(order);
-      });
-
-      let html = '';
-      for (const [dateLabel, dayOrders] of Object.entries(groupedByDate)) {
-        html += `<div class="date-badge-pill">${dateLabel} - ${dayOrders.length} Orders</div>`;
-
-        dayOrders.forEach(o => {
-          const timeStr = o.created_at ? new Date(o.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '';
-          const isDelivered = o.status === 'Delivered';
-
-          let mapsLink = '';
-          const match = (o.delivery_address || '').match(/https:\/\/maps\.google\.com\/\?q=([^\s]+)/);
-          if (match) mapsLink = match[0];
-          else mapsLink = `https://maps.google.com/?q=${encodeURIComponent(o.delivery_address || '')}`;
-
-          html += `
-            <div class="rider-order-card">
-              <div class="r-card-head">
-                <span style="font-weight:900; font-size:14px;">ORD #${o.id} <span style="font-size:10px; color:var(--text-sub); font-weight:600;">⏰ ${timeStr}</span></span>
+        return `
+          <div class="rider-order-card" style="${isMultiBatch ? 'border-left: 4px solid #8b5cf6;' : ''}">
+            <div class="r-card-head">
+              <span style="font-weight:900; font-size:14px;">ORD #${o.id} <span style="font-size:10px; color:var(--text-sub);">⏰ ${timeStr}</span></span>
+              <div>
+                ${isMultiBatch ? '<span class="r-badge batch">Batch 🔀</span>' : ''}
                 <span class="r-badge ${isDelivered ? 'delivered' : ''}">${o.status}</span>
               </div>
-              <div style="font-size:13px; font-weight:700;">👤 ${o.customer_name || 'Customer'} (📞 <a style="color:#38bdf8;" href="tel:${o.customer_phone}">${o.customer_phone}</a>)</div>
-              <div class="r-address">📍 ${o.delivery_address || 'Address Not Provided'}</div>
-              ${o.hub_id ? `<div style="font-size:11px; color:#38bdf8; font-weight:700; margin-bottom:4px;">🏬 Pickup from Hub #${o.hub_id}</div>` : ''}
-              <div style="display:flex; justify-content:space-between; align-items:center; margin:6px 0;">
-                <div style="font-size:13px; font-weight:800; color:var(--accent-green);">To Collect: ₹${o.total_amount} (${o.payment_mode || 'COD'})</div>
-                <a href="${mapsLink}" target="_blank" style="color:#38bdf8; text-decoration:none; font-size:11px; font-weight:800;">🗺️ View Map ↗</a>
-              </div>
-
-              ${!isDelivered ? `
-                <div style="display:flex; gap:8px; margin-top:8px;">
-                  <button onclick='openRiderChat(${o.id})' style="flex:1; background:#0284c7; color:white; border:none; padding:10px; border-radius:8px; font-weight:800; font-size:12px; cursor:pointer;">
-                    💬 Chat
-                  </button>
-                  ${o.status !== 'Out for Delivery' ? `
-                    <button class="btn-action-rider" style="flex:2; margin-top:0;" onclick='openBinScreen(${JSON.stringify(o)})'>
-                      🛍️ Pick Up (Bin)
-                    </button>
-                  ` : `
-                    <button class="btn-action-rider" style="flex:2; margin-top:0; background:#e11d48;" onclick='openWayScreen(${JSON.stringify(o)})'>
-                      🛵 Live Route
-                    </button>
-                  `}
-                </div>
-              ` : ''}
-
-              ${isDelivered ? `
-                <div style="font-size:11px; color:var(--accent-green); font-weight:800; margin-top:8px; padding-top:6px; border-top:1px dashed #334155;">
-                  ✓ Delivered on time
-                </div>
-              ` : ''}
             </div>
-          `;
-        });
-      }
-      container.innerHTML = html;
+            <div style="font-size:13px; font-weight:700;">👤 ${o.customer_name || 'Customer'} (📞 <a style="color:#38bdf8;" href="tel:${o.customer_phone}">${o.customer_phone}</a>)</div>
+            <div class="r-address">📍 ${o.delivery_address || 'Address Not Provided'}</div>
+            ${o.distance_km ? `<div style="font-size:11px; color:#38bdf8; font-weight:700; margin-bottom:2px;">📏 Doori: ${o.distance_km} KM</div>` : ''}
+            ${o.free_gift_added ? `<div style="font-size:11px; color:#f472b6; font-weight:800; margin-bottom:2px;">🎁 Free Gift to give: ${o.free_gift_added}</div>` : ''}
+            ${o.hub_id ? `<div style="font-size:11px; color:#10b981; font-weight:700; margin-bottom:4px;">🏬 Pickup from Hub #${o.hub_id}</div>` : ''}
+            
+            <div style="display:flex; justify-content:space-between; align-items:center; margin:6px 0;">
+              <div style="font-size:13px; font-weight:800; color:var(--accent-green);">To Collect: ₹${o.total_amount} (${o.payment_mode || 'COD'})</div>
+              <a href="${mapsLink}" target="_blank" style="color:#38bdf8; text-decoration:none; font-size:11px; font-weight:800;">🗺️ View Map ↗</a>
+            </div>
+
+            ${!isDelivered ? `
+              <div style="display:flex; gap:8px; margin-top:8px;">
+                <button onclick='openRiderChat(${o.id})' style="flex:1; background:#0284c7; color:white; border:none; padding:10px; border-radius:8px; font-weight:800; font-size:12px; cursor:pointer;">
+                  💬 Chat
+                </button>
+                ${o.status !== 'Out for Delivery' ? `
+                  <button class="btn-action-rider" style="flex:2; margin-top:0;" onclick='openBinScreen(${JSON.stringify(o)})'>
+                    🛍️ Pick Up (Bin)
+                  </button>
+                ` : `
+                  <button class="btn-action-rider" style="flex:2; margin-top:0; background:#e11d48;" onclick='openWayScreen(${JSON.stringify(o)})'>
+                    🛵 Live Route
+                  </button>
+                `}
+              </div>
+            ` : ''}
+          </div>
+        `;
+      }).join('');
+    }
+
+    // CALL MASK / DIRECT CALL
+    function handleCallCustomer() {
+      if (!currentSelectedOrder || !currentSelectedOrder.customer_phone) return;
+      window.location.href = `tel:${currentSelectedOrder.customer_phone}`;
     }
 
     function openBinScreen(order) {
@@ -1258,7 +1221,7 @@
     async function submitBagPhoto() {
       if (!currentSelectedOrder) return;
       const btn = document.querySelector('.btn-submit-photo');
-      btn.innerText = 'Submitting & Starting Delivery...';
+      btn.innerText = 'Starting Delivery...';
       btn.disabled = true;
 
       const { error } = await _supabase.from('orders').update({
@@ -1275,7 +1238,6 @@
         loadRiderOrders();
       } else {
         alert('त्रुटि: ' + error.message);
-        btn.innerText = 'Submit Photo';
         btn.disabled = false;
       }
     }
@@ -1362,44 +1324,29 @@
       document.getElementById('otp-modal').classList.add('active');
       document.getElementById('rider-otp-input').focus();
     }
-
-    function closeOtpModal() {
-      document.getElementById('otp-modal').classList.remove('active');
-    }
+    function closeOtpModal() { document.getElementById('otp-modal').classList.remove('active'); }
 
     async function verifyOtpAndDeliver() {
       const enteredOtp = document.getElementById('rider-otp-input').value.trim();
-      if (enteredOtp.length !== 4) {
-        alert('कृपया 4 अंकों का सही OTP दर्ज करें!');
-        return;
-      }
-
+      if (enteredOtp.length !== 4) return alert('कृपया 4 अंकों का सही OTP दर्ज करें!');
       if (!currentSelectedOrder) return;
 
       try {
         const { data: orderData, error } = await _supabase
-          .from('orders')
-          .select('delivery_otp')
-          .eq('id', currentSelectedOrder.id)
-          .single();
+          .from('orders').select('delivery_otp').eq('id', currentSelectedOrder.id).single();
 
-        if (error || !orderData) {
-          alert('ऑर्डर डेटा नहीं मिला!');
-          return;
-        }
+        if (error || !orderData) return alert('ऑर्डर डेटा नहीं मिला!');
 
         if (orderData.delivery_otp && orderData.delivery_otp.toString() !== enteredOtp) {
-          alert('❌ गलत OTP (Invalid OTP)!\n\nकृपया ग्राहक के मोबाइल ऐप से सही 4-अंकों का कोड देखकर डालें।');
+          alert('❌ गलत OTP!\n\nकृपया ग्राहक के मोबाइल ऐप से सही 4-अंकों का कोड देखकर डालें।');
           document.getElementById('rider-otp-input').value = '';
-          document.getElementById('rider-otp-input').focus();
           return;
         }
 
         closeOtpModal();
         finalizeOrderDelivery();
-
       } catch (err) {
-        alert('OTP सत्यापन एरर: ' + err.message);
+        alert('त्रुटि: ' + err.message);
       }
     }
 
@@ -1431,7 +1378,7 @@
         document.getElementById('success-modal').classList.add('active');
         loadRiderOrders();
       } catch (err) {
-        alert('डिलीवरी अपडेट एरर: ' + err.message);
+        alert('त्रुटि: ' + err.message);
       }
     }
 
@@ -1440,7 +1387,7 @@
       currentSelectedOrder = null;
     }
 
-    // CHAT SYSTEM
+    // LIVE CHAT
     function openRiderChat(orderId) {
       activeChatOrderId = orderId;
       document.getElementById('rchat-title').innerText = `Order #${orderId} Chat`;
@@ -1457,10 +1404,7 @@
     async function loadRiderMessages() {
       if (!activeChatOrderId) return;
       const { data } = await _supabase
-        .from('order_chats')
-        .select('*')
-        .eq('order_id', activeChatOrderId)
-        .order('id', { ascending: true });
+        .from('order_chats').select('*').eq('order_id', activeChatOrderId).order('id', { ascending: true });
 
       const container = document.getElementById('rider-chat-messages');
       if (!data || data.length === 0) {
@@ -1479,33 +1423,21 @@
 
     async function sendRiderMsg(txt) {
       if (!txt || !activeChatOrderId) return;
-      await _supabase.from('order_chats').insert([{
-        order_id: activeChatOrderId,
-        sender: 'rider',
-        message: txt
-      }]);
+      await _supabase.from('order_chats').insert([{ order_id: activeChatOrderId, sender: 'rider', message: txt }]);
       loadRiderMessages();
     }
-
     function sendRiderQuickMsg(t) { sendRiderMsg(t); }
-
     function sendRiderCustomMsg() {
       const inp = document.getElementById('rider-chat-text');
       const val = inp.value.trim();
-      if (val) {
-        sendRiderMsg(val);
-        inp.value = '';
-      }
+      if (val) { sendRiderMsg(val); inp.value = ''; }
     }
 
-    // First Touch Unlocks Audio Context & Notifications
     window.addEventListener('click', () => {
       initNotificationPermission();
       requestWakeLock();
       const audioTag = document.getElementById('rider-order-audio');
-      if (audioTag) {
-        audioTag.load();
-      }
+      if (audioTag) audioTag.load();
       if (!sharedAudioCtx) {
         sharedAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
         sharedAudioCtx.resume();
