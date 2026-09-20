@@ -61,7 +61,7 @@
       overflow-x: hidden;
     }
 
-    /* 1. SIDE DRAWER */
+    /* 1. SIDE DRAWER FIX */
     .drawer-overlay {
       position: fixed; 
       top: 0; 
@@ -135,7 +135,7 @@
     }
     .drawer-item:active { background: #f1f5f9; }
 
-    /* 2. TICKER */
+    /* 2. BROADCAST NOTICE TICKER */
     .broadcast-ticker-wrap {
       display: none; 
       background: linear-gradient(90deg, #ea580c, #c2410c); 
@@ -547,7 +547,7 @@
     .nav-item.active { color: var(--accent-pink); }
     .nav-item-icon { font-size: 19px; }
 
-    /* FULL-PAGE VIEW FOR CART & ORDER */
+    /* FULL-PAGE VIEW FOR CART & ORDER (फुल-पेज लेआउट) */
     .modal-overlay {
       position: fixed; 
       top: 0; 
@@ -639,7 +639,7 @@
       outline: none; 
     }
 
-    /* ALAG-ALAG LIVE LOCATION & ADDRESS CARD */
+    /* अलग-अलग लाइव लोकेशन और एड्रेस कार्ड */
     .loc-card-box {
       background: #f0fdf4;
       border: 1.5px solid #86efac;
@@ -930,7 +930,7 @@
           📍 क्लिक करके लाइव लोकेशन अपडेट करें (अनिवार्य)
         </button>
 
-        <!-- Live Location Card -->
+        <!-- Live Location Status Card -->
         <div class="loc-card-box" id="gps-status-box">
           <div class="loc-card-title">GPS लोकेशन स्थिति (Mandatory):</div>
           <div class="loc-card-val" id="gps-status-val">⚠️ लोकेशन अपडेट नहीं है। ऊपर दिए गए नीले बटन पर क्लिक करें!</div>
@@ -1014,7 +1014,7 @@
     const STORE_UPI_ID = '7037647464-3@axl';
     let customerCoords = null;
     let calculatedKm = 0;
-    let isLocationUpdated = false; // Mandatory GPS Tracker
+    let isLocationUpdated = false; // GPS अनिवार्यता चेक
     let appliedCoupon = null;
     let cancelTimerInterval = null;
 
@@ -1393,7 +1393,7 @@
       const statusVal = document.getElementById('gps-status-val');
       const orderBtn = document.getElementById('order-submit-btn');
 
-      statusVal.innerText = 'लाइव लोकेशन फ़ੈच हो रही है... कृपया प्रतीक्षा करें।';
+      statusVal.innerText = 'लाइव लोकेशन फ़ैच हो रही है... कृपया प्रतीक्षा करें।';
 
       navigator.geolocation.getCurrentPosition(
         (pos) => {
@@ -1410,7 +1410,7 @@
         },
         (err) => {
           isLocationUpdated = false;
-          statusVal.innerHTML = `🔴 लोकेशन फ़ੈच फ़ेल हुई: ${err.message}। कृपया ब्राउज़र में GPS Allow करें!`;
+          statusVal.innerHTML = `🔴 लोकेशन फ़ैच फ़ेल हुई: ${err.message}। कृपया ब्राउज़र में GPS Allow करें!`;
           orderBtn.disabled = true;
           orderBtn.innerText = '⚠️ पहले लाइव लोकेशन अपडेट करें';
         },
