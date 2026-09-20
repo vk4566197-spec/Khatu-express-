@@ -3,13 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>👑 𝐁𝐀𝐁𝐀 𝐅𝐎𝐎𝐃 𝐃𝐄𝐋𝐈𝐕𝐄𝐑𝐘🏹</title>
+  <title>👑 BABA FOOD DELIVERY — 10 Min Express</title>
 
   <link rel="icon" type="image/png" href="logo.png">
   <link rel="manifest" href="manifest-customer.json">
-  <meta name="theme-color" content="#f4ecfb">
+  <meta name="theme-color" content="#2a0845">
   <meta name="mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
@@ -20,26 +20,33 @@
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   
   <style>
     :root {
-      --zepto-header-bg: #f4ecfb;
-      --zepto-purple: #3c006b;
-      --zepto-pink: #ff3269;
-      --zepto-green: #0c831f;
-      --bg-page: #fbfbfd;
-      --card-bg: #ffffff;
-      --text-main: #14171a;
-      --text-muted: #657786;
-      --border-color: #f0edf4;
+      --primary-dark: #1b042d;
+      --primary-purple: #3c006b;
+      --primary-gradient: linear-gradient(135deg, #490082 0%, #1f0237 100%);
+      --accent-pink: #ff2a6d;
+      --accent-pink-gradient: linear-gradient(135deg, #ff2a6d 0%, #e0115f 100%);
+      --accent-green: #059669;
+      --accent-green-bg: #ecfdf5;
+      --bg-light: #f8fafc;
+      --card-white: #ffffff;
+      --text-main: #0f172a;
+      --text-muted: #64748b;
+      --border-soft: #f1f5f9;
+      --border-accent: #e2e8f0;
+      --shadow-sm: 0 2px 8px rgba(0,0,0,0.04);
+      --shadow-md: 0 6px 20px rgba(0,0,0,0.06);
+      --shadow-float: 0 12px 30px rgba(255, 42, 109, 0.35);
     }
 
     * { 
       box-sizing: border-box; 
       margin: 0; 
       padding: 0; 
-      font-family: 'Inter', sans-serif; 
+      font-family: 'Plus Jakarta Sans', 'Inter', sans-serif; 
       -webkit-tap-highlight-color: transparent;
       -webkit-touch-callout: none;
       -webkit-user-select: none;
@@ -51,367 +58,559 @@
       user-select: auto !important;
     }
 
-    body { background-color: var(--bg-page); color: var(--text-main); padding-bottom: 120px; }
+    body { 
+      background-color: var(--bg-light); 
+      color: var(--text-main); 
+      padding-bottom: 120px;
+      overflow-x: hidden;
+    }
 
-    /* BROADCAST NOTICE TICKER */
+    /* 1. PROFESSIONAL TICKER */
     .broadcast-ticker-wrap {
-      display: none; background: #ea580c; color: #ffffff; padding: 7px 12px;
-      font-size: 12px; font-weight: 800; overflow: hidden; white-space: nowrap;
-      box-shadow: 0 2px 6px rgba(234, 88, 12, 0.25);
+      display: none; 
+      background: linear-gradient(90deg, #ea580c, #c2410c); 
+      color: #ffffff; 
+      padding: 8px 14px;
+      font-size: 11.5px; 
+      font-weight: 800; 
+      letter-spacing: 0.3px;
+      overflow: hidden; 
+      white-space: nowrap;
+      box-shadow: 0 2px 8px rgba(234, 88, 12, 0.2);
     }
     .broadcast-ticker-text {
-      display: inline-block; padding-left: 100%;
-      animation: tickerMarquee 18s linear infinite;
+      display: inline-block; 
+      padding-left: 100%;
+      animation: tickerMarquee 20s linear infinite;
     }
     @keyframes tickerMarquee {
       0% { transform: translate3d(0, 0, 0); }
       100% { transform: translate3d(-100%, 0, 0); }
     }
 
-    /* SURGE ALERTS */
-    .rain-surge-alert-bar {
-      display: none; background: #eff6ff; border: 1.5px solid #93c5fd;
-      color: #1e40af; padding: 8px 14px; margin: 10px 14px 0 14px; border-radius: 10px;
-      font-size: 11px; font-weight: 800; display: flex; align-items: center; gap: 8px;
+    /* 2. MODERN TOP HEADER */
+    .top-hero-area {
+      background: var(--primary-gradient);
+      padding: 16px 16px 20px 16px; 
+      border-radius: 0 0 26px 26px;
+      box-shadow: 0 10px 30px rgba(42, 8, 69, 0.2);
+      color: white;
     }
-    .night-surge-alert-bar {
-      display: none; background: #fdf4ff; border: 1.5px solid #f0abfc;
-      color: #86198f; padding: 8px 14px; margin: 6px 14px 0 14px; border-radius: 10px;
-      font-size: 11px; font-weight: 800; display: flex; align-items: center; gap: 8px;
+    .location-row { 
+      display: flex; 
+      justify-content: space-between; 
+      align-items: center; 
+      margin-bottom: 14px; 
+    }
+    .brand-cluster {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .menu-trigger-btn {
+      background: rgba(255,255,255,0.12); 
+      border: 1px solid rgba(255,255,255,0.18); 
+      width: 40px; 
+      height: 40px;
+      border-radius: 12px; 
+      display: flex; 
+      align-items: center; 
+      justify-content: center;
+      font-size: 18px; 
+      color: white;
+      cursor: pointer;
+      backdrop-filter: blur(10px);
+    }
+    .brand-meta h1 {
+      font-size: 15px;
+      font-weight: 900;
+      letter-spacing: -0.2px;
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .eta-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      background: rgba(255, 42, 109, 0.25);
+      border: 1px solid rgba(255, 42, 109, 0.4);
+      color: #ff94b4;
+      font-size: 10px;
+      font-weight: 800;
+      padding: 2px 8px;
+      border-radius: 12px;
+      margin-top: 3px;
     }
 
-    /* Free Gift Bar in Cart */
-    .free-gift-pill-bar {
-      display: none; background: #fdf2f8; border: 1.5px dashed #f472b6;
-      color: #be185d; padding: 10px 12px; border-radius: 10px; font-size: 12px;
-      font-weight: 800; margin-bottom: 10px; text-align: center;
+    /* SEARCH BAR WITH VOICE */
+    .search-box-wrap { 
+      position: relative; 
+      margin-bottom: 14px; 
+      display: flex; 
+      align-items: center; 
+    }
+    .search-bar-input {
+      width: 100%; 
+      background: rgba(255, 255, 255, 0.95); 
+      border: none;
+      border-radius: 16px;
+      padding: 13px 46px 13px 40px; 
+      font-size: 13px; 
+      font-weight: 600;
+      color: #1e293b;
+      outline: none;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.1);
+      transition: all 0.2s ease;
+    }
+    .search-bar-input:focus {
+      background: #ffffff;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.18);
+    }
+    .search-icon-pos { 
+      position: absolute; 
+      left: 14px; 
+      font-size: 15px; 
+      color: #64748b; 
+    }
+    .voice-mic-btn {
+      position: absolute; 
+      right: 8px; 
+      width: 32px; 
+      height: 32px; 
+      border-radius: 50%;
+      background: #f1f5f9; 
+      border: 1px solid #cbd5e1; 
+      color: var(--primary-purple);
+      display: flex; 
+      align-items: center; 
+      justify-content: center; 
+      font-size: 14px; 
+      cursor: pointer;
+    }
+    .voice-mic-btn.recording {
+      background: #fee2e2; 
+      border-color: #f87171; 
+      color: #dc2626;
+      animation: pulseMic 1s infinite;
+    }
+    @keyframes pulseMic { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.18); } }
+
+    /* CATEGORIES SLIDER */
+    .category-scroll { 
+      display: flex; 
+      gap: 12px; 
+      overflow-x: auto; 
+      scrollbar-width: none; 
+      padding-top: 4px;
+    }
+    .category-scroll::-webkit-scrollbar { display: none; }
+    .cat-item { 
+      display: flex; 
+      flex-direction: column; 
+      align-items: center; 
+      cursor: pointer; 
+      min-width: 58px; 
+    }
+    .cat-icon-circle {
+      width: 48px; 
+      height: 48px; 
+      border-radius: 16px; 
+      background: rgba(255,255,255,0.12); 
+      border: 1px solid rgba(255,255,255,0.16);
+      display: flex; 
+      align-items: center; 
+      justify-content: center; 
+      font-size: 22px; 
+      margin-bottom: 6px;
+      backdrop-filter: blur(8px);
+      transition: all 0.2s ease;
+    }
+    .cat-item.active .cat-icon-circle { 
+      background: #ffffff; 
+      border-color: #ffffff;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+    .cat-name { 
+      font-size: 11px; 
+      font-weight: 700; 
+      color: rgba(255,255,255,0.85); 
+    }
+    .cat-item.active .cat-name {
+      color: #ffffff;
+      font-weight: 900;
     }
 
-    /* Fullscreen Logo Preview */
-    .logo-modal-overlay {
-      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(0, 0, 0, 0.88); z-index: 9999; display: none;
-      align-items: center; justify-content: center; flex-direction: column;
+    /* PROMO HERO CARD */
+    .promo-banner {
+      margin: 14px 16px; 
+      background: linear-gradient(135deg, #ffffff 0%, #fff1f5 100%);
+      border-radius: 18px; 
+      padding: 16px 18px; 
+      display: flex; 
+      justify-content: space-between; 
+      align-items: center; 
+      border: 1px solid #ffe4ec;
+      box-shadow: var(--shadow-sm);
+    }
+    .promo-text h3 { 
+      font-size: 14px; 
+      font-weight: 900; 
+      color: var(--primary-purple); 
+      line-height: 1.3; 
+    }
+    .promo-sub { 
+      font-size: 11px; 
+      color: var(--accent-pink); 
+      font-weight: 700; 
+      margin-top: 3px; 
+    }
+
+    /* 3. PRODUCT CARDS GRID */
+    .main-container { padding: 0 16px; }
+    .grid { 
+      display: grid; 
+      grid-template-columns: repeat(2, 1fr); 
+      gap: 14px; 
+    }
+    .product-card {
+      background: #ffffff; 
+      border-radius: 18px; 
+      border: 1px solid var(--border-soft);
+      padding: 10px; 
+      display: flex; 
+      flex-direction: column; 
+      justify-content: space-between; 
+      position: relative;
+      box-shadow: var(--shadow-sm);
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+    .product-card:active {
+      transform: scale(0.985);
+    }
+    .img-box {
+      width: 100%; 
+      height: 125px; 
+      border-radius: 14px; 
+      background: #f8fafc;
+      display: flex; 
+      align-items: center; 
+      justify-content: center; 
+      overflow: hidden; 
+      margin-bottom: 10px; 
+      position: relative;
+    }
+    .img-box img { 
+      width: 100%; 
+      height: 100%; 
+      object-fit: cover; 
+    }
+    .out-of-stock-tag {
+      position: absolute; 
+      top: 8px; 
+      left: 8px; 
+      background: rgba(15, 23, 42, 0.85);
+      color: white; 
+      font-size: 9.5px; 
+      font-weight: 800; 
+      padding: 4px 8px; 
+      border-radius: 8px;
       backdrop-filter: blur(4px);
     }
-    .logo-modal-overlay.active { display: flex; }
-    .full-logo-view {
-      width: 85%; max-width: 340px; border-radius: 50%;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.6);
-      border: 3px solid #ff758c; animation: popIn 0.25s ease-out;
+    .discount-badge-pill {
+      position: absolute; 
+      top: 8px; 
+      right: 8px; 
+      background: linear-gradient(135deg, #10b981, #059669);
+      color: #ffffff; 
+      font-size: 10px; 
+      font-weight: 900; 
+      padding: 3px 8px;
+      border-radius: 8px; 
+      box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
     }
-    .btn-close-preview {
-      position: absolute; top: 25px; right: 25px; background: #fff;
-      color: #000; border: none; width: 38px; height: 38px; border-radius: 50%;
-      font-size: 20px; font-weight: 900; cursor: pointer;
+    .prod-title { 
+      font-size: 13px; 
+      font-weight: 800; 
+      color: #0f172a; 
+      line-height: 1.35; 
+      margin-bottom: 2px; 
+      height: 35px; 
+      display: -webkit-box; 
+      -webkit-line-clamp: 2; 
+      -webkit-box-orient: vertical; 
+      overflow: hidden; 
     }
-    @keyframes popIn {
-      from { transform: scale(0.6); opacity: 0; }
-      to { transform: scale(1); opacity: 1; }
+    .prod-unit { 
+      font-size: 11px; 
+      color: var(--text-muted); 
+      font-weight: 600;
+      margin-bottom: 10px; 
+    }
+    .price-action-row { 
+      display: flex; 
+      align-items: center; 
+      justify-content: space-between; 
+      margin-top: auto; 
+    }
+    .price-tag { 
+      font-size: 15px; 
+      font-weight: 900; 
+      color: #0f172a;
+    }
+    .mrp-cut {
+      text-decoration: line-through; 
+      color: #94a3b8; 
+      font-size: 11px;
+      font-weight: 600; 
+      margin-left: 4px;
+    }
+    .btn-add-zepto {
+      background: #ffffff; 
+      border: 1.5px solid var(--accent-pink); 
+      color: var(--accent-pink);
+      padding: 6px 18px; 
+      border-radius: 10px; 
+      font-weight: 900; 
+      font-size: 12px; 
+      cursor: pointer;
+      box-shadow: 0 2px 6px rgba(255, 42, 109, 0.12);
+      transition: all 0.15s ease;
+    }
+    .btn-add-zepto:active {
+      background: var(--accent-pink);
+      color: white;
+    }
+    .qty-counter {
+      display: flex; 
+      align-items: center; 
+      background: var(--accent-pink-gradient);
+      border-radius: 10px; 
+      color: white; 
+      padding: 4px 8px; 
+      gap: 10px; 
+      font-weight: 900; 
+      font-size: 13px;
+      box-shadow: 0 4px 12px rgba(255, 42, 109, 0.3);
+    }
+    .qty-btn { 
+      background: none; 
+      border: none; 
+      color: white; 
+      font-size: 16px; 
+      font-weight: 900; 
+      cursor: pointer; 
+      line-height: 1;
     }
 
-    /* Side Drawer */
-    .drawer-overlay {
-      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(0, 0, 0, 0.5); z-index: 500; display: none;
+    /* 4. SMART GLOWING UPSELL PROGRESS CARD (IN CART) */
+    .cart-target-banner {
+      background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
+      border: 1.5px solid #fcd34d;
+      border-radius: 16px;
+      padding: 14px 16px;
+      margin-bottom: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      box-shadow: 0 4px 16px rgba(245, 158, 11, 0.12);
     }
-    .drawer-overlay.active { display: block; }
-    .side-drawer {
-      position: fixed; top: 0; left: -290px; width: 280px; height: 100%;
-      background: #fff; z-index: 501; box-shadow: 4px 0 20px rgba(0,0,0,0.15);
-      transition: left 0.3s ease; display: flex; flex-direction: column;
+    .target-headline {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      font-weight: 900;
+      color: #92400e;
+      line-height: 1.35;
     }
-    .side-drawer.active { left: 0; }
-    
-    .drawer-header {
-      background: linear-gradient(135deg, var(--zepto-purple), #240046);
-      color: white; padding: 22px 16px;
+    .target-progress-bg {
+      width: 100%;
+      height: 7px;
+      background: #fde68a;
+      border-radius: 8px;
+      overflow: hidden;
     }
-    .drawer-logo-img {
-      width: 85px !important; height: 85px !important; border-radius: 50% !important;
-      object-fit: cover !important; background: #fff; border: 3px solid #ff758c;
-      display: block !important; margin-bottom: 8px; cursor: pointer;
-    }
-    .drawer-brand { font-size: 15px; font-weight: 900; color: #ff758c; line-height: 1.2; }
-    .drawer-menu-list { padding: 16px 0; flex: 1; overflow-y: auto; }
-    .drawer-item {
-      display: flex; align-items: center; gap: 12px; padding: 14px 20px;
-      font-size: 13px; font-weight: 700; color: #1e293b; cursor: pointer; text-decoration: none;
-      border-bottom: 1px solid #f8fafc;
+    .target-progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #f59e0b, #10b981);
+      width: 0%;
+      border-radius: 8px;
+      transition: width 0.4s ease;
     }
 
-    /* Modals */
+    /* 5. FLOATING CART & BOTTOM BAR */
+    .floating-cart-bar {
+      position: fixed; 
+      bottom: 74px; 
+      left: 14px; 
+      right: 14px;
+      background: var(--accent-pink-gradient);
+      color: white; 
+      border-radius: 18px; 
+      padding: 14px 20px; 
+      display: none;
+      justify-content: space-between; 
+      align-items: center; 
+      box-shadow: var(--shadow-float);
+      z-index: 150; 
+      cursor: pointer;
+      backdrop-filter: blur(10px);
+    }
+    .bottom-nav-bar {
+      position: fixed; 
+      bottom: 0; 
+      left: 0; 
+      width: 100%; 
+      height: 64px;
+      background: rgba(255, 255, 255, 0.95); 
+      backdrop-filter: blur(12px);
+      border-top: 1px solid var(--border-soft); 
+      display: flex;
+      justify-content: space-around; 
+      align-items: center; 
+      z-index: 100;
+    }
+    .nav-item { 
+      display: flex; 
+      flex-direction: column; 
+      align-items: center; 
+      gap: 3px; 
+      font-size: 10px; 
+      font-weight: 700; 
+      color: #64748b; 
+      cursor: pointer; 
+    }
+    .nav-item.active { 
+      color: var(--accent-pink); 
+    }
+    .nav-item-icon { 
+      font-size: 19px; 
+    }
+
+    /* BOTTOM SHEETS */
     .modal-overlay {
-      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(0,0,0,0.6); display: none; justify-content: flex-end;
-      flex-direction: column; z-index: 300;
+      position: fixed; 
+      top: 0; 
+      left: 0; 
+      width: 100%; 
+      height: 100%;
+      background: rgba(15, 23, 42, 0.6); 
+      display: none; 
+      justify-content: flex-end;
+      flex-direction: column; 
+      z-index: 300;
+      backdrop-filter: blur(4px);
     }
     .modal-overlay.active { display: flex; }
     .bottom-sheet {
-      background: white; border-radius: 20px 20px 0 0; padding: 20px 18px 30px 18px;
-      max-height: 85vh; overflow-y: auto;
+      background: white; 
+      border-radius: 26px 26px 0 0; 
+      padding: 20px 18px 30px 18px;
+      max-height: 85vh; 
+      overflow-y: auto;
+      box-shadow: 0 -10px 40px rgba(0,0,0,0.15);
     }
     .sheet-head {
-      display: flex; justify-content: space-between; align-items: center;
-      margin-bottom: 14px; padding-bottom: 10px; border-bottom: 1px solid #f0edf4;
+      display: flex; 
+      justify-content: space-between; 
+      align-items: center;
+      margin-bottom: 14px; 
+      padding-bottom: 12px; 
+      border-bottom: 1px solid var(--border-soft);
     }
-    .sheet-title { font-size: 16px; font-weight: 900; color: var(--zepto-purple); }
+    .sheet-title { 
+      font-size: 17px; 
+      font-weight: 900; 
+      color: var(--text-main); 
+    }
     .sheet-close {
-      background: #f1f3f6; border: none; width: 28px; height: 28px;
-      border-radius: 50%; font-weight: bold; cursor: pointer;
+      background: #f1f5f9; 
+      border: none; 
+      width: 32px; 
+      height: 32px;
+      border-radius: 50%; 
+      font-weight: bold; 
+      cursor: pointer;
     }
 
-    /* Top Hero Header */
-    .top-hero-area {
-      background: linear-gradient(180deg, var(--zepto-header-bg) 0%, #fbf9fe 100%);
-      padding: 12px 16px 14px 16px; border-bottom: 1px solid #eee5f7;
+    .bill-box { 
+      background: #f8fafc; 
+      padding: 14px; 
+      border-radius: 16px; 
+      margin: 14px 0; 
+      font-size: 13px; 
+      border: 1px solid var(--border-soft);
     }
-    .location-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
-    .menu-trigger-btn {
-      background: #fff; border: 1px solid #e7daf5; width: 40px; height: 40px;
-      border-radius: 10px; display: flex; align-items: center; justify-content: center;
-      font-size: 20px; cursor: pointer;
+    .bill-row { 
+      display: flex; 
+      justify-content: space-between; 
+      margin-bottom: 8px; 
+      font-weight: 600;
+      color: #475569;
     }
-    .eta-badge { font-size: 17px; font-weight: 900; color: #111; display: flex; align-items: center; gap: 4px; }
-    .address-line { font-size: 11px; font-weight: 600; color: #475569; margin-top: 1px; }
-
-    .store-pills-row { display: flex; gap: 10px; overflow-x: auto; scrollbar-width: none; margin-bottom: 12px; align-items: center; }
-    .store-pills-row::-webkit-scrollbar { display: none; }
-    .store-pill {
-      background: #fff; padding: 6px 14px; border-radius: 14px;
-      border: 1.5px solid #e7daf5; white-space: nowrap; display: flex; align-items: center; gap: 8px;
+    .bill-row.total { 
+      font-weight: 900; 
+      font-size: 16px; 
+      margin-top: 10px; 
+      padding-top: 10px; 
+      border-top: 1px dashed #cbd5e1; 
+      color: #0f172a; 
     }
-    .store-pill.active { border-color: var(--zepto-purple); color: var(--zepto-purple); }
-    .pill-logo-compact { width: 50px !important; height: 50px !important; border-radius: 50% !important; object-fit: cover !important; border: 1.5px solid var(--zepto-purple); display: inline-block !important; }
-    .pill-text-compact { font-size: 14px !important; font-weight: 900 !important; line-height: 1.2; }
-
-    /* Search Box Wrap with Voice Mic */
-    .search-box-wrap { position: relative; margin-bottom: 12px; display: flex; align-items: center; }
-    .search-bar-input {
-      width: 100%; background: #fff; border: 1px solid #e4d7f5; border-radius: 12px;
-      padding: 11px 44px 11px 38px; font-size: 13px; outline: none;
+    .btn-checkout { 
+      background: var(--accent-pink-gradient); 
+      color: white; 
+      border: none; 
+      padding: 15px; 
+      border-radius: 14px; 
+      font-size: 14px; 
+      font-weight: 900; 
+      cursor: pointer; 
+      width: 100%; 
+      margin-top: 10px; 
+      box-shadow: 0 4px 14px rgba(255, 42, 109, 0.3);
     }
-    .search-icon-pos { position: absolute; left: 12px; font-size: 14px; color: #8c78a5; }
-    .voice-mic-btn {
-      position: absolute; right: 8px; width: 32px; height: 32px; border-radius: 50%;
-      background: #f3e8ff; border: 1px solid #d8b4fe; color: var(--zepto-purple);
-      display: flex; align-items: center; justify-content: center; font-size: 15px; cursor: pointer;
-    }
-    .voice-mic-btn.recording {
-      background: #fee2e2; border-color: #f87171; color: #dc2626;
-      animation: pulseMic 1s infinite;
-    }
-    @keyframes pulseMic { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.15); } }
-
-    .category-scroll { display: flex; gap: 12px; overflow-x: auto; scrollbar-width: none; padding-bottom: 4px; }
-    .category-scroll::-webkit-scrollbar { display: none; }
-    .cat-item { display: flex; flex-direction: column; align-items: center; cursor: pointer; min-width: 52px; }
-    .cat-icon-circle {
-      width: 46px; height: 46px; border-radius: 14px; background: #fff; border: 1px solid #e7daf5;
-      display: flex; align-items: center; justify-content: center; font-size: 20px; margin-bottom: 4px;
-    }
-    .cat-item.active .cat-icon-circle { border-color: var(--zepto-pink); background: #fff0f4; }
-    .cat-name { font-size: 11px; font-weight: 700; color: #333; }
-
-    .store-closed-alert {
-      display: none; background: #fee2e2; border: 1.5px solid #f87171;
-      color: #991b1b; padding: 12px 16px; margin: 10px 14px; border-radius: 12px;
-      font-size: 13px; font-weight: 800; text-align: center;
+    .zepto-input { 
+      width: 100%; 
+      padding: 12px 14px; 
+      border-radius: 12px; 
+      border: 1.5px solid #cbd5e1; 
+      font-size: 13px; 
+      font-weight: 600;
+      outline: none; 
     }
 
-    .radius-blocked-alert {
-      display: none; background: #fffbeb; border: 1.5px solid #fde047;
-      color: #854d0e; padding: 10px 14px; border-radius: 10px;
-      font-size: 12px; font-weight: 800; text-align: center; margin-bottom: 10px;
+    /* PAST ORDERS / DISPUTE / RATING CARDS */
+    .past-order-box { 
+      background: #fff; 
+      border-radius: 16px; 
+      border: 1px solid var(--border-soft); 
+      padding: 14px; 
+      margin-bottom: 12px; 
+      box-shadow: var(--shadow-sm);
     }
-
-    .promo-banner {
-      margin: 12px 14px; background: linear-gradient(100deg, #f7e8ff 0%, #fde2ea 100%);
-      border-radius: 14px; padding: 14px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #eed8f7;
-    }
-    .promo-text h3 { font-size: 14px; font-weight: 900; color: var(--zepto-purple); line-height: 1.3; }
-    .promo-sub { font-size: 11px; color: var(--zepto-pink); font-weight: 700; margin-top: 3px; }
-
-    /* Products Grid */
-    .main-container { padding: 0 14px; }
-    .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
-    .product-card {
-      background: #fff; border-radius: 14px; border: 1px solid var(--border-color);
-      padding: 10px; display: flex; flex-direction: column; justify-content: space-between; position: relative;
-    }
-    .img-box {
-      width: 100%; height: 115px; border-radius: 10px; background: #faf8fd;
-      display: flex; align-items: center; justify-content: center; overflow: hidden; margin-bottom: 8px; position: relative;
-    }
-    .img-box img { width: 100%; height: 100%; object-fit: cover; }
-    .out-of-stock-tag {
-      position: absolute; top: 6px; left: 6px; background: rgba(225, 29, 72, 0.92);
-      color: white; font-size: 10px; font-weight: 900; padding: 3px 6px; border-radius: 6px;
-    }
-
-    .discount-badge-pill {
-      position: absolute; top: 6px; right: 6px; background: #16a34a;
-      color: #ffffff; font-size: 10px; font-weight: 900; padding: 2px 6px;
-      border-radius: 6px; box-shadow: 0 2px 6px rgba(0,0,0,0.15);
-    }
-    .mrp-cut {
-      text-decoration: line-through; color: #94a3b8; font-size: 11px;
-      font-weight: 700; margin-left: 4px;
-    }
-
-    .btn-out-stock-disabled {
-      background: #e2e8f0 !important; color: #94a3b8 !important; border: 1px solid #cbd5e1 !important;
-      cursor: not-allowed !important; padding: 5px 10px !important; font-size: 11px !important; font-weight: 800 !important; border-radius: 8px !important;
-    }
-
-    .prod-title { font-size: 13px; font-weight: 700; color: #14171a; line-height: 1.3; margin-bottom: 2px; height: 34px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-    .prod-unit { font-size: 11px; color: var(--text-muted); margin-bottom: 8px; }
-    .price-action-row { display: flex; align-items: center; justify-content: space-between; margin-top: auto; }
-    .price-tag { font-size: 15px; font-weight: 900; }
-    .btn-add-zepto {
-      background: #fff; border: 1.5px solid var(--zepto-pink); color: var(--zepto-pink);
-      padding: 5px 16px; border-radius: 8px; font-weight: 800; font-size: 12px; cursor: pointer;
-    }
-    .qty-counter {
-      display: flex; align-items: center; background: var(--zepto-pink);
-      border-radius: 8px; color: white; padding: 3px 6px; gap: 8px; font-weight: 800; font-size: 13px;
-    }
-    .qty-btn { background: none; border: none; color: white; font-size: 15px; font-weight: 900; cursor: pointer; }
-
-    .active-order-strip {
-      background: #0f172a; color: white; border-radius: 14px; padding: 12px 14px;
-      margin-bottom: 12px; display: none; justify-content: space-between; align-items: center; cursor: pointer;
-      box-shadow: 0 4px 14px rgba(0,0,0,0.2);
-    }
-
-    .floating-cart-bar {
-      position: fixed; bottom: 70px; left: 14px; right: 14px;
-      background: linear-gradient(90deg, var(--zepto-pink), #e01d51);
-      color: white; border-radius: 14px; padding: 12px 18px; display: none;
-      justify-content: space-between; align-items: center; box-shadow: 0 8px 24px rgba(255, 50, 105, 0.4);
-      z-index: 150; cursor: pointer;
-    }
-
-    .bottom-nav-bar {
-      position: fixed; bottom: 0; left: 0; width: 100%; height: 60px;
-      background: #fff; border-top: 1px solid #eae6ef; display: flex;
-      justify-content: space-around; align-items: center; z-index: 100;
-    }
-    .nav-item { display: flex; flex-direction: column; align-items: center; gap: 3px; font-size: 10px; font-weight: 700; color: #657786; cursor: pointer; }
-    .nav-item.active { color: var(--zepto-pink); }
-    .nav-item-icon { font-size: 18px; }
-
-    .cart-item-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid #f8fafc; }
-    
-    .coupon-box-wrap { display: flex; gap: 8px; margin: 10px 0; }
-    .coupon-input {
-      flex: 1; padding: 10px 12px; border-radius: 10px; border: 1.5px dashed #cbd5e1;
-      font-size: 13px; font-weight: 800; text-transform: uppercase; outline: none; background: #fff;
-    }
-    .btn-apply-coupon {
-      background: var(--zepto-purple); color: white; border: none; padding: 0 16px;
-      border-radius: 10px; font-size: 12px; font-weight: 800; cursor: pointer;
-    }
-    .coupon-success-pill {
-      display: none; background: #f0fdf4; border: 1px solid #86efac; color: #15803d;
-      font-size: 11px; font-weight: 800; padding: 6px 10px; border-radius: 8px; margin-bottom: 8px;
-    }
-
-    .bill-box { background: #f8fafc; padding: 12px; border-radius: 12px; margin: 12px 0; font-size: 13px; }
-    .bill-row { display: flex; justify-content: space-between; margin-bottom: 6px; }
-    .discount-highlight { color: var(--zepto-green); font-weight: 800; }
-    .bill-row.total { font-weight: 900; font-size: 15px; margin-top: 8px; padding-top: 8px; border-top: 1px dashed #cbd5e1; color: #0f172a; }
-
-    .pay-methods-title { font-size: 12px; font-weight: 800; color: #475569; margin-top: 10px; }
-    .pay-methods-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 6px 0 10px 0; }
-    .pay-opt { border: 1.5px solid #cbd5e1; border-radius: 10px; padding: 10px 6px; text-align: center; cursor: pointer; font-size: 12px; font-weight: 800; color: #334155; }
-    .pay-opt.selected { border-color: var(--zepto-pink); background: #fff0f4; color: var(--zepto-pink); }
-
-    .upi-gate-card { background: #faf5ff; border: 1.5px dashed var(--zepto-purple); border-radius: 12px; padding: 14px; text-align: center; margin-bottom: 12px; display: none; }
-    .qr-frame { width: 170px; height: 170px; margin: 8px auto; background: #fff; padding: 6px; border-radius: 8px; }
-    .qr-frame img { width: 100%; height: 100%; }
-
-    .input-group { display: flex; flex-direction: column; gap: 8px; }
-    .zepto-input { width: 100%; padding: 11px 12px; border-radius: 10px; border: 1.5px solid #cbd5e1; font-size: 13px; outline: none; }
-    .btn-checkout { background: linear-gradient(90deg, var(--zepto-pink), #e01d51); color: white; border: none; padding: 14px; border-radius: 10px; font-size: 14px; font-weight: 800; cursor: pointer; width: 100%; margin-top: 10px; }
-
-    /* 60-SEC SELF CANCEL BAR */
-    .self-cancel-box {
-      background: #fef2f2; border: 1.5px solid #fca5a5; border-radius: 12px;
-      padding: 10px 14px; margin: 12px 0; display: none; align-items: center; justify-content: space-between;
-    }
-    .self-cancel-timer { font-size: 12px; font-weight: 800; color: #991b1b; }
-    .btn-self-cancel {
-      background: #dc2626; color: white; border: none; padding: 6px 12px;
-      border-radius: 8px; font-size: 11px; font-weight: 900; cursor: pointer;
-    }
-
-    /* TRACK STEPS & DYNAMIC ETA */
-    .eta-live-chip {
-      background: #0284c7; color: white; padding: 6px 12px; border-radius: 16px;
-      font-size: 12px; font-weight: 800; display: inline-flex; align-items: center; gap: 6px; margin: 10px 0 4px 0;
-    }
-    .track-steps { display: flex; flex-direction: column; gap: 16px; margin: 14px 0 10px 18px; border-left: 2px solid #e2e8f0; padding-left: 18px; }
-    .t-step { position: relative; font-size: 13px; color: #94a3b8; font-weight: 600; }
-    .t-step::after { content: ''; position: absolute; left: -25px; top: 3px; width: 12px; height: 12px; border-radius: 50%; background: #cbd5e1; }
-    .t-step.active { color: #0f172a; font-weight: 800; }
-    .t-step.active::after { background: var(--zepto-green); box-shadow: 0 0 0 4px #dcfce7; }
-
     .cust-otp-box {
       background: linear-gradient(135deg, #fdf4ff, #fae8ff);
-      border: 2px dashed #c084fc; border-radius: 14px;
-      padding: 14px; text-align: center; margin: 14px 0;
+      border: 2px dashed #c084fc; 
+      border-radius: 16px;
+      padding: 14px; 
+      text-align: center; 
+      margin: 14px 0;
     }
-    .cust-otp-title { font-size: 11px; font-weight: 800; color: #7e22ce; text-transform: uppercase; }
-    .cust-otp-code { font-size: 32px; font-weight: 900; color: #581c87; letter-spacing: 6px; margin: 4px 0; }
-
-    .rider-rating-card {
-      background: #ffffff; border: 1.5px solid #fde047; border-radius: 16px;
-      padding: 18px 16px; margin: 16px 0; text-align: center; box-shadow: 0 4px 16px rgba(234, 179, 8, 0.15);
+    .cust-otp-code { 
+      font-size: 32px; 
+      font-weight: 900; 
+      color: #581c87; 
+      letter-spacing: 6px; 
+      margin: 4px 0; 
     }
-    .stars-row { display: flex; justify-content: center; gap: 8px; font-size: 32px; margin: 10px 0; cursor: pointer; }
-    .star-icon { color: #cbd5e1; transition: 0.2s; }
-    .star-icon.filled { color: #eab308; }
-    .rating-chips-row { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; margin: 10px 0; }
-    .rating-chip {
-      background: #f8fafc; border: 1px solid #e2e8f0; color: #475569;
-      font-size: 11px; font-weight: 700; padding: 5px 10px; border-radius: 16px; cursor: pointer;
-    }
-    .rating-chip.selected { background: #fef9c3; border-color: #facc15; color: #854d0e; }
-    .btn-submit-rating { background: #0f172a; color: white; border: none; padding: 11px 20px; border-radius: 10px; font-size: 13px; font-weight: 800; cursor: pointer; width: 100%; }
-
-    /* Past Orders & Dispute Form */
-    .past-order-box { background: #fff; border-radius: 14px; border: 1.5px solid var(--border-color); padding: 14px; margin-bottom: 12px; }
-    .past-order-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
-    .past-order-id { font-size: 13px; font-weight: 900; color: #0f172a; }
-    .past-actions-row { display: flex; gap: 8px; align-items: center; }
-    .btn-past-details { flex: 1; background: #f8fafc; border: 1.5px solid #cbd5e1; color: #334155; font-size: 12px; font-weight: 800; padding: 7px 10px; border-radius: 8px; cursor: pointer; text-align: center; }
-    .btn-past-repeat { flex: 1; background: #fff0f4; border: 1.5px solid var(--zepto-pink); color: var(--zepto-pink); font-size: 12px; font-weight: 800; padding: 7px 10px; border-radius: 8px; cursor: pointer; text-align: center; }
-    
-    .btn-dispute-trigger {
-      background: #fee2e2; border: 1px solid #fca5a5; color: #dc2626;
-      font-size: 11px; font-weight: 800; padding: 6px 10px; border-radius: 8px; cursor: pointer; margin-top: 8px; width: 100%;
-    }
-
-    /* Live Chat */
-    .chat-drawer { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #f8fafc; z-index: 500; display: none; flex-direction: column; }
-    .chat-drawer.active { display: flex; }
-    .chat-top-header { background: var(--zepto-purple); color: white; padding: 16px; display: flex; justify-content: space-between; align-items: center; }
-    .chat-messages-area { flex: 1; padding: 16px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
-    .msg-bubble { max-width: 80%; padding: 10px 14px; border-radius: 14px; font-size: 13px; line-height: 1.4; word-wrap: break-word; font-weight: 600; }
-    .msg-customer { align-self: flex-end; background: var(--zepto-pink); color: white; border-bottom-right-radius: 2px; }
-    .msg-rider { align-self: flex-start; background: #ffffff; color: #0f172a; border: 1px solid #e2e8f0; border-bottom-left-radius: 2px; }
-    .quick-chips-row { display: flex; gap: 8px; padding: 8px 14px; overflow-x: auto; scrollbar-width: none; background: #ffffff; border-top: 1px solid #eee; }
-    .quick-chips-row::-webkit-scrollbar { display: none; }
-    .quick-chip { background: #f1f5f9; color: #334155; padding: 6px 12px; border-radius: 16px; font-size: 11px; font-weight: 800; white-space: nowrap; cursor: pointer; border: 1px solid #cbd5e1; }
-    .chat-input-bar { padding: 10px 14px; background: white; border-top: 1px solid #e2e8f0; display: flex; gap: 8px; align-items: center; }
-    .chat-input-box { flex: 1; padding: 10px 14px; border-radius: 20px; border: 1.5px solid #cbd5e1; font-size: 13px; outline: none; }
-    .chat-send-btn { background: var(--zepto-purple); color: white; border: none; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 16px; cursor: pointer; }
   </style>
 </head>
 <body>
 
-  <!-- 1. BROADCAST NOTICE TICKER -->
+  <!-- 1. LIVE BROADCAST NOTICE TICKER -->
   <div class="broadcast-ticker-wrap" id="broadcast-ticker-bar">
     <span class="broadcast-ticker-text" id="broadcast-ticker-content">
       📢 Baba Food Delivery me aapka swagat hai!
@@ -446,41 +645,30 @@
       <a class="drawer-item" target="_blank" href="https://wa.me/919711107063?text=Hello%20Baba%20Food%20Delivery%20Support">
         <span>🟢</span> WhatsApp: 9711107063
       </a>
-      <div class="drawer-item" onclick="alert('डिलीवरी समय: सुबह 7:00 AM से रात 11:00 PM तक!')">
-        <span>ℹ️</span> Store Hours & FAQs
-      </div>
     </div>
   </div>
 
-  <!-- Top Hero Header -->
+  <!-- 2. TOP HERO HEADER -->
   <div class="top-hero-area">
     <div class="location-row">
-      <div style="display: flex; align-items: center; gap: 10px;">
+      <div class="brand-cluster">
         <button class="menu-trigger-btn" onclick="toggleDrawer(true)">☰</button>
-        <div>
-          <div class="eta-badge">⚡ 10 minutes</div>
-          <div class="address-line">📍 Delivery to Home & Nearby</div>
+        <div class="brand-meta">
+          <h1>👑 BABA FOOD EXPRESS</h1>
+          <span class="eta-pill">⚡ 10 MINS DELIVERY</span>
         </div>
       </div>
       <button class="menu-trigger-btn" onclick="openSupportModal()" title="Help & Support">🎧</button>
     </div>
 
-    <div class="store-pills-row">
-      <div class="store-pill active">
-        <img class="pill-logo-compact" src="logo.png" alt="Logo" onerror="this.style.display='none'">
-        <span class="pill-text-compact">👑 𝐁𝐀𝐁𝐀 𝐅𝐎𝐎𝐃 𝐃𝐄𝐋𝐈𝐕𝐄𝐑𝐘🏹</span>
-      </div>
-      <div class="store-pill"><span class="pill-text-compact">Express Kitchen</span></div>
-      <div class="store-pill"><span class="pill-text-compact">Fresh Mart</span></div>
-    </div>
-
-    <!-- Search Box with Hindi Voice Mic -->
+    <!-- Modern Search with Hindi Voice -->
     <div class="search-box-wrap">
       <span class="search-icon-pos">🔍</span>
-      <input type="text" id="search-input" class="search-bar-input" placeholder='Search items or tap mic to speak...' oninput="handleFilter()">
+      <input type="text" id="search-input" class="search-bar-input" placeholder='Search "doodh", "samosa", "drinks"...' oninput="handleFilter()">
       <button class="voice-mic-btn" id="voice-search-btn" onclick="startVoiceSearch()" title="बोलकर सर्च करें">🎙️</button>
     </div>
 
+    <!-- Category Tabs -->
     <div class="category-scroll" id="category-chips">
       <div class="cat-item active" onclick="setCategory('All', this)">
         <div class="cat-icon-circle">🛍️</div>
@@ -490,33 +678,29 @@
   </div>
 
   <!-- SURGE ALERTS -->
-  <div class="rain-surge-alert-bar" id="rain-surge-alert">
+  <div class="rain-surge-alert-bar" id="rain-surge-alert" style="display:none; margin: 10px 16px; border-radius:12px; padding:10px 14px; background:#eff6ff; border:1px solid #bfdbfe; color:#1e40af; font-size:12px; font-weight:800;">
     <span>🌧️</span>
-    <span id="rain-surge-msg">खराब मौसम / बारिश के कारण डिलीवरी सर्ज शुल्क लागू है।</span>
+    <span id="rain-surge-msg">खराब मौसम के कारण डिलीवरी शुल्क लागू है।</span>
   </div>
-  <div class="night-surge-alert-bar" id="night-surge-alert">
+  <div class="night-surge-alert-bar" id="night-surge-alert" style="display:none; margin: 6px 16px; border-radius:12px; padding:10px 14px; background:#fdf4ff; border:1px solid #f0abfc; color:#86198f; font-size:12px; font-weight:800;">
     <span>🌙</span>
-    <span id="night-surge-msg">देर रात डिलीवरी सेवा: नाइट सर्ज शुल्क लागू है।</span>
+    <span id="night-surge-msg">देर रात डिलीवरी सेवा शुल्क लागू है।</span>
   </div>
 
-  <!-- Store Closed Alert -->
-  <div class="store-closed-alert" id="store-closed-alert">
-    ⚠️ दुकान अभी बंद है। हम नए ऑर्डर स्वीकार नहीं कर रहे हैं।
-  </div>
-
-  <!-- Promo Banner -->
+  <!-- PROMO HERO CARD -->
   <div class="promo-banner">
     <div class="promo-text">
-      <h3 id="dyn-banner-title">₹249+ पर <span style="color: var(--zepto-green);">Free Delivery</span> 🚚</h3>
+      <h3 id="dyn-banner-title">₹249+ पर <span style="color: var(--accent-green);">Free Delivery</span> 🚚</h3>
       <div class="promo-sub" id="dyn-banner-sub">₹399+ के ऑर्डर पर ₹49 का भारी Discount!</div>
     </div>
-    <div style="font-size: 40px;" id="dyn-banner-icon">🎁</div>
+    <div style="font-size: 38px;" id="dyn-banner-icon">🎁</div>
   </div>
 
   <div class="main-container">
-    <div class="active-order-strip" id="live-order-strip" onclick="openTrackModal()">
+    <!-- Active Order Tracker Strip -->
+    <div class="active-order-strip" id="live-order-strip" onclick="openTrackModal()" style="background:#0f172a; color:white; border-radius:16px; padding:14px 16px; margin-bottom:14px; display:none; justify-content:space-between; align-items:center; cursor:pointer;">
       <div style="display: flex; align-items: center; gap: 10px;">
-        <span style="font-size: 20px;">🛵</span>
+        <span style="font-size: 22px;">🛵</span>
         <div>
           <div style="font-size: 13px; font-weight: 800;" id="strip-title">Live Order In Progress</div>
           <div style="font-size: 11px; color: #38bdf8;" id="strip-sub">Tap to view live tracking & OTP</div>
@@ -530,10 +714,10 @@
     </div>
     <div class="grid" id="product-list"></div>
 
-    <!-- Past Orders Section -->
-    <div id="past-orders-section" style="margin-top: 35px; border-top: 2px dashed #eee; padding-top: 22px;">
+    <!-- Past Orders History -->
+    <div id="past-orders-section" style="margin-top: 35px; border-top: 1px solid var(--border-soft); padding-top: 22px;">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
-        <div style="font-size: 16px; font-weight: 900; color: #111;">🕒 Past Orders & Invoices</div>
+        <div style="font-size: 16px; font-weight: 900; color: #0f172a;">🕒 Past Orders & Invoices</div>
         <span style="font-size: 11px; color: #64748b; font-weight: 700;">Tap to view details</span>
       </div>
       <div id="history-container">
@@ -542,16 +726,16 @@
     </div>
   </div>
 
-  <!-- Cart Float Bar -->
+  <!-- FLOATING CART -->
   <div class="floating-cart-bar" id="cart-float-bar" onclick="openCartModal()">
     <div>
-      <div class="cart-summary-text" id="float-qty-text">0 Items Added</div>
-      <div class="cart-amount" id="float-total-text">₹0</div>
+      <div style="font-size:11.5px; font-weight:700; opacity:0.9;" id="float-qty-text">0 Items Added</div>
+      <div style="font-size:16px; font-weight:900;" id="float-total-text">₹0</div>
     </div>
-    <div style="font-size: 13px; font-weight: 800;">View Cart ➔</div>
+    <div style="font-size: 13px; font-weight: 900; display:flex; align-items:center; gap:6px;">View Cart ➔</div>
   </div>
 
-  <!-- Bottom Navigation -->
+  <!-- BOTTOM NAV BAR -->
   <div class="bottom-nav-bar">
     <div class="nav-item active" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">
       <div class="nav-item-icon">🏠</div>
@@ -563,7 +747,7 @@
     </div>
     <div class="nav-item" onclick="scrollToHistory()">
       <div class="nav-item-icon">🕒</div>
-      <span>Past Orders</span>
+      <span>Orders</span>
     </div>
     <div class="nav-item" onclick="openSupportModal()">
       <div class="nav-item-icon">🎧</div>
@@ -571,32 +755,32 @@
     </div>
   </div>
 
-  <!-- Cart Modal -->
+  <!-- CART MODAL (WITH GLOWING SMART TARGET) -->
   <div class="modal-overlay" id="cart-modal" onclick="closeCartModal(event)">
     <div class="bottom-sheet" onclick="event.stopPropagation()">
       <div class="sheet-head">
-        <div class="sheet-title">Your Food Bag 🛍️</div>
+        <div class="sheet-title">My Cart 🛍️</div>
         <button class="sheet-close" onclick="toggleCartModal(false)">✕</button>
       </div>
 
-      <!-- Out of Radius Warning -->
-      <div class="radius-blocked-alert" id="radius-blocked-alert">
-        ⚠️ आपका पता हमारे मुख्य डिलीवरी दायरे से बाहर है।
-      </div>
-
-      <!-- Free Gift Notification Pill in Cart -->
-      <div class="free-gift-pill-bar" id="free-gift-pill">
-        🎁 बधाई! आपके ऑर्डर पर मुफ़्त गिफ़्ट जुड़ गया है: <b id="free-gift-text">--</b>
+      <!-- ATTRACTIVE SMART CART UPSELL PROGRESS BANNER -->
+      <div class="cart-target-banner" id="cart-smart-target-box" style="display: none;">
+        <div class="target-headline" id="cart-target-text">
+          🎉 सामान जोड़ें और इनाम पाएँ!
+        </div>
+        <div class="target-progress-bg">
+          <div class="target-progress-fill" id="cart-target-progress-bar"></div>
+        </div>
       </div>
 
       <div id="cart-items-box"></div>
 
-      <!-- Promo Coupon Code Box -->
-      <div class="coupon-box-wrap">
-        <input type="text" id="cart-coupon-input" class="coupon-input" placeholder="Enter Coupon (e.g. BABA50)">
-        <button class="btn-apply-coupon" onclick="applyCouponCode()">Apply</button>
+      <!-- Coupon Box -->
+      <div style="display:flex; gap:8px; margin: 12px 0;">
+        <input type="text" id="cart-coupon-input" class="zepto-input" style="text-transform:uppercase; font-weight:800;" placeholder="Enter Coupon (e.g. BABA50)">
+        <button onclick="applyCouponCode()" style="background:var(--primary-purple); color:white; border:none; padding:0 18px; border-radius:12px; font-weight:800; font-size:12px; cursor:pointer;">Apply</button>
       </div>
-      <div class="coupon-success-pill" id="coupon-success-pill"></div>
+      <div id="coupon-success-pill" style="display:none; background:#ecfdf5; border:1px solid #a7f3d0; color:#065f46; font-size:11px; font-weight:800; padding:6px 10px; border-radius:8px; margin-bottom:8px;"></div>
 
       <div class="bill-box">
         <div class="bill-row">
@@ -604,24 +788,24 @@
           <span id="bill-subtotal">₹0</span>
         </div>
         <div class="bill-row">
-          <span>Delivery Charge (<span id="bill-free-del-rule">Distance Based</span>)</span>
-          <span id="bill-delivery-charge">₹25</span>
+          <span>Delivery Charge</span>
+          <span id="bill-delivery-charge" style="color:var(--accent-green);">FREE</span>
         </div>
-        <div class="bill-row" id="row-rain-surge" style="display: none; color: #1e40af; font-weight: 800;">
-          <span id="bill-rain-surge-title">🌧️ Rain Surge Fee</span>
+        <div class="bill-row" id="row-rain-surge" style="display: none; color: #1e40af;">
+          <span>🌧️ Rain Surge</span>
           <span id="bill-rain-surge-amount">+₹0</span>
         </div>
-        <div class="bill-row" id="row-night-surge" style="display: none; color: #86198f; font-weight: 800;">
-          <span id="bill-night-surge-title">🌙 Late Night Surge</span>
+        <div class="bill-row" id="row-night-surge" style="display: none; color: #86198f;">
+          <span>🌙 Night Surge</span>
           <span id="bill-night-surge-amount">+₹0</span>
         </div>
-        <div class="bill-row" id="row-discount" style="display: none;">
-          <span class="discount-highlight" id="bill-disc-rule">Special Offer</span>
-          <span class="discount-highlight" id="bill-disc-amount">-₹49</span>
+        <div class="bill-row" id="row-discount" style="display: none; color: var(--accent-green);">
+          <span>Offer Discount</span>
+          <span id="bill-disc-amount">-₹0</span>
         </div>
-        <div class="bill-row" id="row-coupon" style="display: none;">
-          <span class="discount-highlight" id="bill-coupon-title">🎟️ Coupon Discount</span>
-          <span class="discount-highlight" id="bill-coupon-amount">-₹0</span>
+        <div class="bill-row" id="row-coupon" style="display: none; color: var(--accent-green);">
+          <span id="bill-coupon-title">Coupon Discount</span>
+          <span id="bill-coupon-amount">-₹0</span>
         </div>
         <div class="bill-row total">
           <span>To Pay</span>
@@ -629,212 +813,83 @@
         </div>
       </div>
 
-      <div class="pay-methods-title">💳 भुगतान का तरीका चुनें (Payment Mode):</div>
-      <div class="pay-methods-grid">
-        <div class="pay-opt selected" id="opt-cod" onclick="selectPaymentMode('COD')">
+      <!-- Payment Mode -->
+      <div style="font-size:12px; font-weight:800; color:#64748b; margin-bottom:8px;">PAYMENT METHOD:</div>
+      <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px; margin-bottom:12px;">
+        <div id="opt-cod" onclick="selectPaymentMode('COD')" style="border:1.5px solid var(--accent-pink); background:#fff0f4; color:var(--accent-pink); padding:10px; border-radius:12px; text-align:center; font-weight:800; font-size:12px; cursor:pointer;">
           💵 Cash on Delivery
         </div>
-        <div class="pay-opt" id="opt-upi" onclick="selectPaymentMode('UPI')">
-          📱 Online UPI (Direct)
+        <div id="opt-upi" onclick="selectPaymentMode('UPI')" style="border:1.5px solid #cbd5e1; padding:10px; border-radius:12px; text-align:center; font-weight:800; font-size:12px; cursor:pointer; color:#475569;">
+          📱 Online UPI
         </div>
       </div>
 
-      <div class="upi-gate-card" id="upi-box">
-        <div style="font-size: 14px; font-weight: 800; color: var(--zepto-purple);">
-          स्कैन करके पेमेंट करें (₹<span id="upi-box-amount">0</span>):
-        </div>
-        <div style="font-size: 11px; color: #64748b; margin-top: 2px;">UPI ID: <b>7037647464-3@axl</b></div>
-        <div class="qr-frame"><img id="upi-qr-img" src="" alt="Dynamic UPI QR"></div>
-        <div style="margin: 8px 0;">
-          <a id="upi-intent-link" href="#" class="btn-checkout" style="padding: 10px; font-size: 13px; background: #2563eb; text-decoration: none; display: inline-block;">
-            ⚡ Google Pay / PhonePe पर Pay करें
-          </a>
-        </div>
-        <div style="font-size: 11px; color: #475569; margin: 10px 0 6px 0;">पेमेंट पूरा होने पर <b>12-अंकों का UTR No.</b> यहाँ डालें:</div>
-        <input type="tel" id="upi-utr" class="zepto-input" placeholder="12-अंकों का UTR No." maxlength="12" style="background: #fff; text-align: center; font-weight: 800; letter-spacing: 1px;">
+      <div class="upi-gate-card" id="upi-box" style="display:none; background:#faf5ff; border:1px dashed var(--primary-purple); border-radius:14px; padding:14px; text-align:center; margin-bottom:12px;">
+        <div style="font-size:13px; font-weight:800; color:var(--primary-purple);">Scan & Pay ₹<span id="upi-box-amount">0</span></div>
+        <div style="width:160px; height:160px; margin:8px auto; background:#fff; padding:6px; border-radius:10px;"><img id="upi-qr-img" src="" style="width:100%; height:100%;"></div>
+        <input type="tel" id="upi-utr" class="zepto-input" placeholder="Enter 12-digit UTR No." maxlength="12" style="text-align:center; font-weight:800; letter-spacing:1px; background:#fff;">
       </div>
 
-      <div class="input-group">
-        <input type="text" id="c-name" class="zepto-input" placeholder="आपका नाम (Full Name) *">
-        <input type="tel" id="c-phone" class="zepto-input" placeholder="10-digit Mobile (6-9 से शुरू) *" maxlength="10">
-        
-        <button type="button" onclick="getCurrentLocation()" style="background:#f1f5f9; border:1.5px solid #cbd5e1; padding:9px; border-radius:10px; font-size:12px; font-weight:800; color:#334155; display:flex; align-items:center; justify-content:center; gap:6px; cursor:pointer;">
-          📍 Use My Current Location (GPS Auto Distance)
+      <!-- Customer Inputs -->
+      <div style="display:flex; flex-direction:column; gap:8px;">
+        <input type="text" id="c-name" class="zepto-input" placeholder="Your Name *">
+        <input type="tel" id="c-phone" class="zepto-input" placeholder="10-digit Phone Number *" maxlength="10">
+        <button type="button" onclick="getCurrentLocation()" style="background:#f1f5f9; border:1.5px solid #cbd5e1; padding:10px; border-radius:12px; font-size:12px; font-weight:800; color:#334155; cursor:pointer;">
+          📍 Use Current GPS Location
         </button>
-
-        <textarea id="c-address" class="zepto-input" rows="2" placeholder="डिलीवरी पता (House/Flat No, Landmark) *"></textarea>
-        <button class="btn-checkout" id="order-submit-btn" onclick="placeOrder()">Place Delivery Order</button>
+        <textarea id="c-address" class="zepto-input" rows="2" placeholder="Full Delivery Address *"></textarea>
+        <button class="btn-checkout" id="order-submit-btn" onclick="placeOrder()">Place Order</button>
       </div>
     </div>
   </div>
 
-  <!-- Live Status Modal WITH SELF-CANCEL, DYNAMIC ETA & OTP -->
+  <!-- LIVE TRACKING MODAL -->
   <div class="modal-overlay" id="track-modal" onclick="closeTrackModal(event)">
     <div class="bottom-sheet" onclick="event.stopPropagation()">
       <div class="sheet-head">
         <div>
           <div class="sheet-title" id="t-order-id">Live Tracking</div>
-          <div style="font-size: 11px; color: var(--text-muted);" id="t-eta-subtitle">Express Dispatch</div>
+          <div style="font-size: 11px; color: var(--text-muted);">10-Min Fast Dispatch</div>
         </div>
         <button class="sheet-close" onclick="toggleTrackModal(false)">✕</button>
       </div>
 
-      <!-- 60-Second Self Cancel Window -->
-      <div class="self-cancel-box" id="self-cancel-container">
-        <div class="self-cancel-timer">⏱️ गलती से ऑर्डर हुआ? (<span id="cancel-timer-secs">60</span>s बाकी)</div>
-        <button class="btn-self-cancel" onclick="handleCustomerSelfCancel()">Cancel Order ✕</button>
+      <!-- 60-Sec Self Cancel -->
+      <div id="self-cancel-container" style="display:none; background:#fef2f2; border:1px solid #fca5a5; padding:10px 14px; border-radius:12px; margin-bottom:12px; justify-content:space-between; align-items:center;">
+        <span style="font-size:12px; font-weight:800; color:#991b1b;">⏱️ Cancel Order? (<span id="cancel-timer-secs">60</span>s left)</span>
+        <button onclick="handleCustomerSelfCancel()" style="background:#dc2626; color:white; border:none; padding:6px 12px; border-radius:8px; font-size:11px; font-weight:800; cursor:pointer;">Cancel ✕</button>
       </div>
 
-      <!-- Dynamic Live Distance & ETA Chip -->
-      <div style="text-align: center;">
-        <div class="eta-live-chip" id="eta-chip" style="display: none;">
-          <span>⚡</span>
-          <span id="eta-chip-text">राइडर आपसे 1.5 KM दूर है • 6 मिनट में आ रहा है</span>
-        </div>
-      </div>
-
-      <!-- 4-Digit Customer OTP Display -->
+      <!-- Live OTP Box -->
       <div class="cust-otp-box" id="cust-otp-container" style="display:none;">
-        <div class="cust-otp-title">🔑 Safe Delivery OTP</div>
+        <div style="font-size:11px; font-weight:800; color:#7e22ce;">🔑 SAFE DELIVERY OTP</div>
         <div class="cust-otp-code" id="cust-live-otp">----</div>
-        <div class="cust-otp-sub">सामान प्राप्त होने पर यह कोड राइडर को बताएँ</div>
+        <div style="font-size:11px; color:#6b21a8; font-weight:600;">Share this OTP with rider on arrival</div>
       </div>
 
-      <div class="track-steps">
-        <div class="t-step active" id="st-1">✓ Order Confirmed & Packing</div>
-        <div class="t-step" id="st-2">🛵 Out for Delivery (Rider on the way)</div>
-        <div class="t-step" id="st-3">📦 Order Delivered Successfully 🎉</div>
+      <div style="padding: 10px 0 16px 10px;">
+        <div id="st-1" style="font-size:13px; font-weight:800; color:var(--accent-green); margin-bottom:8px;">✓ Order Placed & Packing</div>
+        <div id="st-2" style="font-size:13px; font-weight:800; color:#94a3b8; margin-bottom:8px;">🛵 Out for Delivery</div>
+        <div id="st-3" style="font-size:13px; font-weight:800; color:#94a3b8;">📦 Delivered Successfully</div>
       </div>
 
-      <!-- Star ⭐ Rider Rating & Feedback Section -->
-      <div class="rider-rating-card" id="rider-rating-box" style="display: none;">
-        <div style="font-size: 14px; font-weight: 900; color: #0f172a;">Rate Your Delivery Partner 🛵</div>
-        <div style="font-size: 11px; color: #64748b; margin-top: 2px;">डिलीवरी अनुभव कैसा रहा? स्टार रेटिंग दें:</div>
-
-        <div class="stars-row" id="stars-container">
-          <span class="star-icon" onclick="setRiderStars(1)">★</span>
-          <span class="star-icon" onclick="setRiderStars(2)">★</span>
-          <span class="star-icon" onclick="setRiderStars(3)">★</span>
-          <span class="star-icon" onclick="setRiderStars(4)">★</span>
-          <span class="star-icon" onclick="setRiderStars(5)">★</span>
-        </div>
-
-        <div class="rating-chips-row">
-          <span class="rating-chip" onclick="toggleRatingChip(this, '⚡ Super Fast')">⚡ Super Fast</span>
-          <span class="rating-chip" onclick="toggleRatingChip(this, '😊 Polite Rider')">😊 Polite Rider</span>
-          <span class="rating-chip" onclick="toggleRatingChip(this, '📦 Safe Packaging')">📦 Safe Packaging</span>
-          <span class="rating-chip" onclick="toggleRatingChip(this, '📍 Exact Location')">📍 Exact Location</span>
-        </div>
-
-        <button class="btn-submit-rating" id="btn-submit-rating" onclick="submitRiderRating()">
-          Submit Star Rating ⭐
-        </button>
-      </div>
-
-      <div id="rider-map-box" style="display: none; margin-top: 16px; border-radius: 12px; overflow: hidden; height: 160px; border: 1px solid #e2e8f0;">
-        <iframe id="rider-map" style="width: 100%; height: 100%; border: none;" src=""></iframe>
-      </div>
-
-      <button onclick="openLiveChatModal()" style="background:#f3e8ff; border:1.5px solid #d8b4fe; color:var(--zepto-purple); width:100%; padding:13px; border-radius:12px; font-size:13px; font-weight:800; display:flex; align-items:center; justify-content:center; gap:8px; margin:16px 0 6px 0; cursor:pointer;">
-        💬 Chat with Delivery Partner
-      </button>
-
-      <button class="btn-checkout" style="background: #0f172a; margin-top: 10px;" onclick="toggleTrackModal(false)">Close Tracking</button>
+      <button class="btn-checkout" style="background:#0f172a;" onclick="toggleTrackModal(false)">Close Tracking</button>
     </div>
   </div>
 
-  <!-- Live Chat Drawer -->
-  <div class="chat-drawer" id="chat-drawer">
-    <div class="chat-top-header">
-      <div style="display:flex; align-items:center; gap:10px;">
-        <button onclick="closeLiveChatModal()" style="background:none; border:none; color:white; font-size:20px; font-weight:900; cursor:pointer;">←</button>
-        <div>
-          <div style="font-size:15px; font-weight:900;" id="chat-header-title">Chat with Rider</div>
-          <div style="font-size:11px; color:#d8b4fe;">Online Delivery Partner</div>
-        </div>
-      </div>
-      <a href="tel:9711107063" style="color:white; text-decoration:none; font-size:18px;">📞</a>
-    </div>
-
-    <div class="chat-messages-area" id="chat-messages"></div>
-
-    <div class="quick-chips-row">
-      <div class="quick-chip" onclick="sendQuickMessage('भैया जल्दी आना प्लीज (Please deliver fast)')">⚡ Please deliver fast</div>
-      <div class="quick-chip" onclick="sendQuickMessage('पहुँचकर कॉल करना (Call me on arrival)')">📞 Call me on arrival</div>
-      <div class="quick-chip" onclick="sendQuickMessage('गेट पर छोड़ दो (Leave at the gate)')">🚪 Leave at the gate</div>
-      <div class="quick-chip" onclick="sendQuickMessage('खुल्ले पैसे नहीं हैं, UPI करूँगा (Will pay via UPI)')">📱 Will pay via UPI</div>
-    </div>
-
-    <div class="chat-input-bar">
-      <input type="text" id="chat-user-text" class="chat-input-box" placeholder="Type a message to rider...">
-      <button class="chat-send-btn" onclick="sendCustomMessage()">➔</button>
-    </div>
-  </div>
-
-  <!-- Full Past Order Details / Receipt Modal with Photo Dispute Claim -->
-  <div class="modal-overlay" id="receipt-modal" onclick="closeReceiptModal(event)">
-    <div class="bottom-sheet" onclick="event.stopPropagation()">
-      <div class="sheet-head">
-        <div>
-          <div class="sheet-title" id="rcpt-title">Order Receipt #ORD-00</div>
-          <div style="font-size: 11px; color: #64748b;" id="rcpt-date-mode">Placed on -- | COD</div>
-        </div>
-        <button class="sheet-close" onclick="closeReceiptModal()">✕</button>
-      </div>
-
-      <div style="font-size: 12px; font-weight: 800; color: #334155; margin-bottom: 6px;">ITEMS ORDERED</div>
-      <div id="rcpt-items-list" style="max-height: 200px; overflow-y: auto;"></div>
-
-      <div style="background: #f8fafc; border-radius: 12px; padding: 12px; margin: 12px 0; border: 1px solid #e2e8f0;">
-        <div style="font-size: 11px; font-weight: 800; color: #64748b; margin-bottom: 4px;">DELIVERY ADDRESS</div>
-        <div style="font-size: 12px; font-weight: 700; color: #1e293b; white-space: pre-line;" id="rcpt-address">--</div>
-      </div>
-
-      <div class="bill-box" style="margin: 0 0 12px 0;">
-        <div class="bill-row total">
-          <span>Total Paid</span>
-          <span style="color: var(--zepto-green); font-size: 17px;" id="rcpt-total-amount">₹0</span>
-        </div>
-      </div>
-
-      <button class="btn-checkout" id="rcpt-repeat-btn" style="background: var(--zepto-purple); margin-bottom: 8px;">
-        🔁 Repeat This Entire Order
-      </button>
-
-      <!-- Damaged / Missing Item Dispute Button -->
-      <button class="btn-dispute-trigger" id="rcpt-dispute-btn" onclick="openDisputeForm()">
-        ⚠️ ख़राब या टूटा सामान मिला? रिफ़ंड क्लेम करें
-      </button>
-
-      <!-- Dispute Form Area -->
-      <div id="dispute-form-box" style="display: none; background: #fff5f5; border: 1.5px dashed #fca5a5; border-radius: 12px; padding: 12px; margin-top: 10px;">
-        <div style="font-size: 12px; font-weight: 900; color: #991b1b; margin-bottom: 6px;">Submit Photo Proof & Claim:</div>
-        <textarea id="dispute-note-input" class="zepto-input" rows="2" placeholder="क्या समस्या है? (उदा. सामान टूटा हुआ था)"></textarea>
-        <input type="file" id="dispute-file-input" accept="image/*" capture="environment" style="margin: 8px 0; font-size: 12px;">
-        <button class="btn-checkout" style="background: #dc2626; padding: 10px;" onclick="submitRefundDispute()">
-          📤 Submit Refund Claim to Admin
-        </button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Support Modal -->
+  <!-- SUPPORT MODAL -->
   <div class="modal-overlay" id="support-modal" onclick="closeSupportModal(event)">
     <div class="bottom-sheet" onclick="event.stopPropagation()">
       <div class="sheet-head">
         <div class="sheet-title">Help & Support 🎧</div>
         <button class="sheet-close" onclick="toggleSupportModal(false)">✕</button>
       </div>
-      <div style="padding: 10px 0; font-size: 13px; line-height: 1.6; color: #334155;">
-        <div style="font-weight: 800; font-size: 15px; margin-bottom: 6px;">ऑर्डर में कोई समस्या है?</div>
-        <div>हेल्पलाइन नंबर: <b>+91 9711107063</b> पर संपर्क करें।</div>
-      </div>
-      <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 10px;">
-        <a class="btn-checkout" style="background: #25D366; text-decoration: none; text-align: center;" target="_blank" href="https://wa.me/919711107063?text=Need%20Help%20With%20My%20Baba%20Food%20Order">
+      <div style="display:flex; flex-direction:column; gap:10px; margin-top:10px;">
+        <a class="btn-checkout" style="background:#25D366; text-decoration:none; text-align:center;" target="_blank" href="https://wa.me/919711107063?text=Support%20Needed">
           💬 Chat on WhatsApp (9711107063)
         </a>
-        <a class="btn-checkout" style="background: var(--zepto-purple); text-decoration: none; text-align: center;" href="tel:9711107063">
-          📞 Call Support (9711107063)
+        <a class="btn-checkout" style="background:var(--primary-purple); text-decoration:none; text-align:center;" href="tel:9711107063">
+          📞 Call Helpline (9711107063)
         </a>
       </div>
     </div>
@@ -851,25 +906,17 @@
     let currentOrderId = localStorage.getItem('zepto_active_order') || null;
     let selectedPaymentMode = 'COD';
     const STORE_UPI_ID = '7037647464-3@axl';
-    let chatInterval = null;
-    let audioCtx = null;
-    let lastKnownStatus = null;
-    let selectedStarCount = 5;
-    let selectedChips = new Set();
-    let currentViewingReceiptOrder = null;
-    let cancelTimerInterval = null;
-
-    // Geo & Distance state
     let customerCoords = null;
     let calculatedKm = 0;
     let appliedCoupon = null;
+    let cancelTimerInterval = null;
 
     let appConfig = {
       theme_color: '#ff3269',
       header_bg: '#f4ecfb',
       primary_purple: '#3c006b',
-      banner_title: '₹249+ पर <span style="color: var(--zepto-green);">Free Delivery</span> 🚚',
-      banner_subtitle: '₹399+ के ऑर्डर पर ₹49 का भारी Discount!',
+      banner_title: '₹249+ par <span style="color: #059669;">Free Delivery</span> 🚚',
+      banner_subtitle: '₹399+ ke order par ₹49 ka Discount!',
       banner_icon: '🎁',
       min_free_delivery: 249,
       delivery_charge: 25,
@@ -899,39 +946,6 @@
       'All': '🛍️', 'Grocery': '🥦', 'Dairy': '🥛', 'Snacks': '🍿', 'Bakery': '🍞', 'Drinks': '🥤'
     };
 
-    // AUDIO CHIME
-    function initAudioContext() {
-      if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-      if (audioCtx.state === 'suspended') audioCtx.resume();
-    }
-    window.addEventListener('click', initAudioContext, { once: true });
-    window.addEventListener('touchstart', initAudioContext, { once: true });
-
-    function playLiveStatusChime(type) {
-      try {
-        initAudioContext();
-        if (!audioCtx) return;
-        const now = audioCtx.currentTime;
-        const notes = type === 'Delivered' ? [523.25, 659.25, 783.99, 1046.50] : [587.33, 739.99, 880.00];
-
-        notes.forEach((freq, idx) => {
-          const osc = audioCtx.createOscillator();
-          const gain = audioCtx.createGain();
-          osc.type = 'sine';
-          osc.frequency.setValueAtTime(freq, now + (idx * 0.14));
-          gain.gain.setValueAtTime(0.3, now + (idx * 0.14));
-          gain.gain.exponentialRampToValueAtTime(0.001, now + (idx * 0.14) + 0.35);
-          osc.connect(gain);
-          gain.connect(audioCtx.destination);
-          osc.start(now + (idx * 0.14));
-          osc.stop(now + (idx * 0.14) + 0.36);
-        });
-        if (navigator.vibrate) navigator.vibrate([200, 100, 300]);
-      } catch (err) {
-        console.warn(err);
-      }
-    }
-
     function openLogoPreview() { document.getElementById('logo-preview-modal').classList.add('active'); }
     function closeLogoPreview() { document.getElementById('logo-preview-modal').classList.remove('active'); }
 
@@ -940,125 +954,71 @@
       document.getElementById('drawer-overlay').className = open ? 'drawer-overlay active' : 'drawer-overlay';
     }
 
-    // 1. HINDI / ENGLISH VOICE SEARCH ENGINE
+    // 1. VOICE SEARCH IN HINDI/ENGLISH
     function startVoiceSearch() {
       const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-      if (!SpeechRecognition) {
-        alert('आपके ब्राउज़र में वॉइस सर्च सपोर्ट नहीं है। कृपया टाइप करके खोजें!');
-        return;
-      }
+      if (!SpeechRecognition) return alert('Aapke browser me voice search support nahi hai.');
 
       const recognition = new SpeechRecognition();
       recognition.lang = 'hi-IN';
-      recognition.interimResults = false;
-      recognition.maxAlternatives = 1;
-
       const micBtn = document.getElementById('voice-search-btn');
       micBtn.classList.add('recording');
 
       recognition.start();
 
       recognition.onresult = (event) => {
-        const transcript = event.results[0][0].transcript;
-        document.getElementById('search-input').value = transcript;
+        document.getElementById('search-input').value = event.results[0][0].transcript;
         handleFilter();
         micBtn.classList.remove('recording');
       };
-
-      recognition.onspeechend = () => {
-        recognition.stop();
-        micBtn.classList.remove('recording');
-      };
-
-      recognition.onerror = () => {
-        micBtn.classList.remove('recording');
-      };
+      recognition.onerror = () => micBtn.classList.remove('recording');
+      recognition.onspeechend = () => { recognition.stop(); micBtn.classList.remove('recording'); };
     }
 
-    // HAVERSINE DISTANCE IN KM
-    function calculateHaversineKm(lat1, lon1, lat2, lon2) {
-      const R = 6371;
-      const dLat = (lat2 - lat1) * Math.PI / 180;
-      const dLon = (lon2 - lon1) * Math.PI / 180;
-      const a = 
-        Math.sin(dLat/2) * Math.sin(dLat/2) +
-        Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * 
-        Math.sin(dLon/2) * Math.sin(dLon/2);
-      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-      return (R * c);
-    }
+    // 2. DYNAMIC SMART UPSELL TARGET ENGINE (PRO PROGRESS BAR)
+    function updateSmartCartTarget(itemsTotal) {
+      const targetBox = document.getElementById('cart-smart-target-box');
+      const targetText = document.getElementById('cart-target-text');
+      const progressBar = document.getElementById('cart-target-progress-bar');
 
-    function getCurrentLocation() {
-      if (!navigator.geolocation) { alert('लोकेशन सपोर्ट नहीं है!'); return; }
-      const addrBox = document.getElementById('c-address');
-      addrBox.placeholder = 'Fetching GPS location & calculating distance...';
-
-      navigator.geolocation.getCurrentPosition(
-        async (position) => {
-          const lat = position.coords.latitude;
-          const lng = position.coords.longitude;
-          customerCoords = { lat, lng };
-
-          const mapsLink = `https://maps.google.com/?q=${lat},${lng}`;
-          if (!addrBox.value.includes('http')) {
-            addrBox.value = (addrBox.value ? addrBox.value + '\n' : '') + `📍 GPS: ${mapsLink}`;
-          }
-
-          try {
-            const { data: hubData } = await _supabase.from('hubs').select('*').limit(1).single();
-            if (hubData && hubData.lat && hubData.lng) {
-              calculatedKm = calculateHaversineKm(lat, lng, hubData.lat, hubData.lng);
-              checkRadiusAndRecalculate();
-            }
-          } catch (e) {
-            console.warn(e);
-          }
-
-          alert(`✅ लोकेशन प्राप्त हुई! अनुमानित दूरी: ${calculatedKm.toFixed(1)} KM`);
-        },
-        () => { alert('कृपया लोकेशन परमिशन Allow करें!'); },
-        { enableHighAccuracy: true, timeout: 10000 }
-      );
-    }
-
-    function checkRadiusAndRecalculate() {
-      const maxRadius = Number(appConfig.max_delivery_radius_km) || 7.0;
-      const alertBox = document.getElementById('radius-blocked-alert');
-      const checkoutBtn = document.getElementById('order-submit-btn');
-
-      if (calculatedKm > maxRadius) {
-        if (alertBox) {
-          alertBox.style.display = 'block';
-          alertBox.innerText = `⚠️ आपकी दूरी (${calculatedKm.toFixed(1)} KM) हमारे अधिकतम डिलीवरी दायरे (${maxRadius} KM) से बाहर है।`;
-        }
-        if (checkoutBtn) {
-          checkoutBtn.disabled = true;
-          checkoutBtn.innerText = 'Out of Delivery Area';
-          checkoutBtn.style.background = '#94a3b8';
-        }
-      } else {
-        if (alertBox) alertBox.style.display = 'none';
-        if (checkoutBtn && appConfig.store_status !== 'CLOSED') {
-          checkoutBtn.disabled = false;
-          checkoutBtn.innerText = selectedPaymentMode === 'UPI' ? 'Verify UTR & Place Order' : 'Place Delivery Order';
-          checkoutBtn.style.background = '';
-        }
+      if (!targetBox || itemsTotal <= 0) {
+        if (targetBox) targetBox.style.display = 'none';
+        return;
       }
-      renderCartSheet();
+
+      targetBox.style.display = 'flex';
+
+      const freeDelMin = Number(appConfig.min_free_delivery) || 249;
+      const freeGiftMin = Number(appConfig.free_gift_min_order) || 499;
+      const discountMin = Number(appConfig.discount_min_order) || 399;
+
+      if (itemsTotal < freeDelMin) {
+        const diff = freeDelMin - itemsTotal;
+        const pct = Math.min(100, Math.round((itemsTotal / freeDelMin) * 100));
+        targetText.innerHTML = `🚚 Sirf <b>₹${diff}</b> ki aur kharidari pe <b>FREE Delivery</b>!`;
+        progressBar.style.width = `${pct}%`;
+      } else if (itemsTotal < discountMin) {
+        const diff = discountMin - itemsTotal;
+        const pct = Math.min(100, Math.round((itemsTotal / discountMin) * 100));
+        targetText.innerHTML = `💸 Sirf <b>₹${diff}</b> ki aur kharidari pe <b>₹${appConfig.discount_amount || 49} ka Discount</b>!`;
+        progressBar.style.width = `${pct}%`;
+      } else if (itemsTotal < freeGiftMin && appConfig.is_free_gift_active) {
+        const diff = freeGiftMin - itemsTotal;
+        const pct = Math.min(100, Math.round((itemsTotal / freeGiftMin) * 100));
+        targetText.innerHTML = `🎁 Sirf <b>₹${diff}</b> ki aur kharidari pe <b>${appConfig.free_gift_item_name || '1 Cold Drink Free'}</b>!`;
+        progressBar.style.width = `${pct}%`;
+      } else {
+        targetText.innerHTML = `🎉 Badhai! Aapne sabhi offers (Free Delivery + Discount + Gift) unlock kar liye!`;
+        progressBar.style.width = `100%`;
+      }
     }
 
-    // CHECK IF NIGHT SURGE IS CURRENTLY ACTIVE BASED ON HOUR
     function isCurrentlyNightTime() {
       if (!appConfig.is_night_surge_active) return false;
-      const currentHour = new Date().getHours();
+      const hr = new Date().getHours();
       const start = appConfig.night_surge_start_hour ?? 22;
       const end = appConfig.night_surge_end_hour ?? 6;
-
-      if (start > end) {
-        return currentHour >= start || currentHour < end;
-      } else {
-        return currentHour >= start && currentHour < end;
-      }
+      return start > end ? (hr >= start || hr < end) : (hr >= start && hr < end);
     }
 
     async function loadLiveAppSettings() {
@@ -1068,72 +1028,33 @@
           appConfig = { ...appConfig, ...data };
           applyThemeAndOffers();
         }
-      } catch (err) {
-        console.warn('Settings notice:', err);
-      }
+      } catch (err) { console.warn(err); }
     }
 
     function applyThemeAndOffers() {
-      const root = document.documentElement;
-      root.style.setProperty('--zepto-pink', appConfig.theme_color);
-      root.style.setProperty('--zepto-header-bg', appConfig.header_bg);
-      root.style.setProperty('--zepto-purple', appConfig.primary_purple);
-
-      // 1. BROADCAST NOTICE TICKER
       const tickerBar = document.getElementById('broadcast-ticker-bar');
-      const tickerContent = document.getElementById('broadcast-ticker-content');
       if (appConfig.is_broadcast_active && appConfig.broadcast_notice) {
         tickerBar.style.display = 'block';
-        tickerContent.innerText = `📢 ${appConfig.broadcast_notice}   •   ${appConfig.broadcast_notice}`;
+        document.getElementById('broadcast-ticker-content').innerText = `📢 ${appConfig.broadcast_notice} • ${appConfig.broadcast_notice}`;
       } else {
         tickerBar.style.display = 'none';
       }
 
-      // 2. RAIN SURGE
-      const rainSurgeStrip = document.getElementById('rain-surge-alert');
-      const rainSurgeMsg = document.getElementById('rain-surge-msg');
-      const surgeFee = Number(appConfig.rain_surge_fee) || 0;
-      if (appConfig.rain_surge_mode !== 'OFF' && surgeFee > 0) {
-        rainSurgeStrip.style.display = 'flex';
-        rainSurgeMsg.innerText = `🌧️ खराब मौसम / बारिश के कारण ₹${surgeFee} का डिलीवरी सर्ज शुल्क लागू है।`;
+      const rainStrip = document.getElementById('rain-surge-alert');
+      if (appConfig.rain_surge_mode !== 'OFF' && Number(appConfig.rain_surge_fee) > 0) {
+        rainStrip.style.display = 'flex';
+        document.getElementById('rain-surge-msg').innerText = `🌧️ Kharab mausam/barish ke karan ₹${appConfig.rain_surge_fee} delivery surge lagu hai.`;
       } else {
-        rainSurgeStrip.style.display = 'none';
+        rainStrip.style.display = 'none';
       }
 
-      // 3. NIGHT SURGE
       const nightStrip = document.getElementById('night-surge-alert');
-      const isNight = isCurrentlyNightTime();
-      if (isNight) {
+      if (isCurrentlyNightTime()) {
         nightStrip.style.display = 'flex';
-        document.getElementById('night-surge-msg').innerText = `🌙 देर रात सेवा: ₹${appConfig.night_surge_fee} नाइट सर्ज शुल्क लागू है।`;
+        document.getElementById('night-surge-msg').innerText = `🌙 Der raat seva: ₹${appConfig.night_surge_fee} night surge lagu hai.`;
       } else {
         nightStrip.style.display = 'none';
       }
-
-      // 4. STORE STATUS
-      const isStoreClosed = appConfig.store_status === 'CLOSED';
-      const closedAlert = document.getElementById('store-closed-alert');
-      if (closedAlert) closedAlert.style.display = isStoreClosed ? 'block' : 'none';
-
-      const checkoutBtn = document.getElementById('order-submit-btn');
-      if (checkoutBtn) {
-        if (isStoreClosed) {
-          checkoutBtn.disabled = true;
-          checkoutBtn.innerText = 'Store Closed Currently';
-          checkoutBtn.style.background = '#94a3b8';
-        } else if (!calculatedKm || calculatedKm <= (Number(appConfig.max_delivery_radius_km) || 7.0)) {
-          checkoutBtn.disabled = false;
-          checkoutBtn.innerText = selectedPaymentMode === 'UPI' ? 'Verify UTR & Place Order' : 'Place Delivery Order';
-          checkoutBtn.style.background = '';
-        }
-      }
-
-      if(document.getElementById('dyn-banner-title')) document.getElementById('dyn-banner-title').innerHTML = appConfig.banner_title;
-      if(document.getElementById('dyn-banner-sub')) document.getElementById('dyn-banner-sub').innerText = appConfig.banner_subtitle;
-      if(document.getElementById('dyn-banner-icon')) document.getElementById('dyn-banner-icon').innerText = appConfig.banner_icon || '🎁';
-      if(document.getElementById('bill-free-del-rule')) document.getElementById('bill-free-del-rule').innerText = `Free on ₹${appConfig.min_free_delivery}+`;
-      if(document.getElementById('bill-disc-rule')) document.getElementById('bill-disc-rule').innerText = `Offer (₹${appConfig.discount_min_order}+ Order)`;
-      if(document.getElementById('bill-disc-amount')) document.getElementById('bill-disc-amount').innerText = `-₹${appConfig.discount_amount}`;
 
       renderCartSheet();
       renderProducts(allProducts);
@@ -1143,9 +1064,7 @@
       renderPastOrdersUI();
       await loadLiveAppSettings();
       try {
-        const { data, error } = await _supabase
-          .from('products').select('*').order('id', { ascending: true });
-        if (error) throw error;
+        const { data } = await _supabase.from('products').select('*').order('id', { ascending: true });
         allProducts = data || [];
         document.getElementById('loader').style.display = 'none';
         renderCategories();
@@ -1157,30 +1076,22 @@
       }
     }
 
+    function selectPaymentMode(mode) {
+      selectedPaymentMode = mode;
+      document.getElementById('opt-cod').style.borderColor = mode === 'COD' ? 'var(--accent-pink)' : '#cbd5e1';
+      document.getElementById('opt-cod').style.background = mode === 'COD' ? '#fff0f4' : '#fff';
+      document.getElementById('opt-upi').style.borderColor = mode === 'UPI' ? 'var(--accent-pink)' : '#cbd5e1';
+      document.getElementById('opt-upi').style.background = mode === 'UPI' ? '#fff0f4' : '#fff';
+
+      document.getElementById('upi-box').style.display = mode === 'UPI' ? 'block' : 'none';
+      if (mode === 'UPI') refreshUpiQr();
+    }
+
     function refreshUpiQr() {
       const { finalToPay } = calculateTotals();
       document.getElementById('upi-box-amount').innerText = finalToPay;
-      const upiUrl = `upi://pay?pa=${STORE_UPI_ID}&pn=BabaFoodDelivery&am=${finalToPay}&cu=INR&tn=FoodOrder`;
-      document.getElementById('upi-qr-img').src = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(upiUrl)}`;
-      document.getElementById('upi-intent-link').href = upiUrl;
-    }
-
-    function selectPaymentMode(mode) {
-      selectedPaymentMode = mode;
-      document.getElementById('opt-cod').className = mode === 'COD' ? 'pay-opt selected' : 'pay-opt';
-      document.getElementById('opt-upi').className = mode === 'UPI' ? 'pay-opt selected' : 'pay-opt';
-      
-      const upiBox = document.getElementById('upi-box');
-      const btn = document.getElementById('order-submit-btn');
-
-      if (mode === 'UPI') {
-        refreshUpiQr();
-        upiBox.style.display = 'block';
-        if (appConfig.store_status !== 'CLOSED') btn.innerText = 'Verify UTR & Place Order';
-      } else {
-        upiBox.style.display = 'none';
-        if (appConfig.store_status !== 'CLOSED') btn.innerText = 'Place Delivery Order';
-      }
+      const upiUrl = `upi://pay?pa=${STORE_UPI_ID}&pn=BabaFood&am=${finalToPay}&cu=INR`;
+      document.getElementById('upi-qr-img').src = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(upiUrl)}`;
     }
 
     function renderCategories() {
@@ -1215,7 +1126,7 @@
       const container = document.getElementById('product-list');
       container.innerHTML = '';
       if (items.length === 0) {
-        container.innerHTML = '<div style="grid-column: span 2; text-align: center; color: #94a3b8; padding: 20px;">No products found.</div>';
+        container.innerHTML = '<div style="grid-column: span 2; text-align: center; color: #94a3b8; padding: 30px;">Koi saman nahi mila.</div>';
         return;
       }
 
@@ -1223,7 +1134,7 @@
         const card = document.createElement('div');
         card.className = 'product-card';
         const qty = cart[p.id]?.qty || 0;
-        const isOutOfStock = Boolean(p.is_out_of_stock) || (p.stock_quantity !== undefined && p.stock_quantity <= 0);
+        const isOutOfStock = Boolean(p.is_out_of_stock);
         const discPct = Number(p.discount_percent) || 0;
 
         let originalMrpHtml = '';
@@ -1234,7 +1145,7 @@
 
         card.innerHTML = `
           <div>
-            <div class="img-box" style="${isOutOfStock ? 'filter: grayscale(60%); opacity: 0.8;' : ''}">
+            <div class="img-box" style="${isOutOfStock ? 'opacity: 0.6;' : ''}">
               <img src="${p.image_url || 'https://via.placeholder.com/150'}" alt="${p.name}">
               ${isOutOfStock ? '<div class="out-of-stock-tag">OUT OF STOCK</div>' : ''}
               ${discPct > 0 && !isOutOfStock ? `<div class="discount-badge-pill">${discPct}% OFF</div>` : ''}
@@ -1252,8 +1163,7 @@
     }
 
     function renderButton(id, qty, isOutOfStock) {
-      if (appConfig.store_status === 'CLOSED') return `<button class="btn-out-stock-disabled" disabled>Closed</button>`;
-      if (isOutOfStock) return `<button class="btn-out-stock-disabled" disabled>Out of Stock</button>`;
+      if (isOutOfStock) return `<button style="background:#f1f5f9; border:none; color:#94a3b8; padding:6px 12px; border-radius:8px; font-weight:800; font-size:11px;" disabled>Sold</button>`;
       if (qty > 0) {
         return `
           <div class="qty-counter">
@@ -1266,27 +1176,9 @@
       return `<button class="btn-add-zepto" onclick="updateQty(${id}, 1)">ADD</button>`;
     }
 
-    // UPDATE QTY WITH HUB LOCK PROTECTION
     function updateQty(id, delta) {
-      if (appConfig.store_status === 'CLOSED') {
-        alert('⚠️ दुकान अभी बंद है। ऑर्डर नहीं लिया जा सकता।');
-        return;
-      }
       const prod = allProducts.find(p => p.id === id);
       if (!prod || prod.is_out_of_stock) return;
-
-      // SINGLE HUB LOCK CHECK
-      if (appConfig.enable_hub_lock && delta > 0 && !cart[id]) {
-        const cartEntries = Object.values(cart);
-        if (cartEntries.length > 0) {
-          const existingHubId = cartEntries[0].item.hub_id || 1;
-          const currentItemHubId = prod.hub_id || 1;
-          if (existingHubId !== currentItemHubId) {
-            alert('🔒 Hub Lock Alert!\n\nआपकी कार्ट में पहले से दूसरी दुकान/हब का सामान है। एक समय में केवल एक ही हब से ऑर्डर कर सकते हैं। कृपया पहले कार्ट खाली करें।');
-            return;
-          }
-        }
-      }
 
       if (!cart[id]) cart[id] = { item: prod, qty: 0 };
       cart[id].qty += delta;
@@ -1300,33 +1192,6 @@
       if (selectedPaymentMode === 'UPI') refreshUpiQr();
     }
 
-    async function applyCouponCode() {
-      const codeInput = document.getElementById('cart-coupon-input');
-      const code = codeInput.value.trim().toUpperCase();
-      if (!code) return alert('कृपया कूपन कोड दर्ज करें!');
-
-      const { data, error } = await _supabase
-        .from('coupons').select('*').eq('code', code).eq('is_active', true).single();
-
-      if (error || !data) return alert('❌ अमान्य या समाप्त कूपन कोड!');
-
-      const { itemsTotal } = calculateTotals();
-      if (itemsTotal < (Number(data.min_order_amount) || 0)) {
-        alert(`⚠️ यह कूपन ₹${data.min_order_amount} या अधिक के ऑर्डर पर ही मान्य है!`);
-        return;
-      }
-
-      appliedCoupon = { code: data.code, discount: Number(data.discount_value) || 0 };
-      const pill = document.getElementById('coupon-success-pill');
-      if (pill) {
-        pill.style.display = 'block';
-        pill.innerText = `✓ कूपन '${data.code}' लागू हुआ! ₹${appliedCoupon.discount} की छूट मिली।`;
-      }
-      renderCartSheet();
-      if (selectedPaymentMode === 'UPI') refreshUpiQr();
-    }
-
-    // TOTALS CALCULATOR WITH FREE GIFT, RAIN & NIGHT SURGE
     function calculateTotals() {
       const entries = Object.values(cart);
       const itemsTotal = entries.reduce((s, e) => s + (e.qty * Number(e.item.price)), 0);
@@ -1337,32 +1202,16 @@
       const minDisc = Number(appConfig.discount_min_order) || 399;
       const discAmt = Number(appConfig.discount_amount) || 49;
 
-      let deliveryCharge = 0;
-      if (itemsTotal > 0) {
-        if (itemsTotal >= minFree) {
-          deliveryCharge = 0;
-        } else {
-          deliveryCharge = baseCharge;
-          const baseKm = Number(appConfig.base_delivery_km) || 3.0;
-          const perKm = Number(appConfig.per_km_charge) || 10.0;
-          if (calculatedKm > baseKm) {
-            const extraKm = Math.ceil(calculatedKm - baseKm);
-            deliveryCharge += (extraKm * perKm);
-          }
-        }
-      }
-
+      let deliveryCharge = (itemsTotal >= minFree || itemsTotal === 0) ? 0 : baseCharge;
       let rainSurge = (itemsTotal > 0 && appConfig.rain_surge_mode !== 'OFF') ? (Number(appConfig.rain_surge_fee) || 0) : 0;
       let nightSurge = (itemsTotal > 0 && isCurrentlyNightTime()) ? (Number(appConfig.night_surge_fee) || 0) : 0;
 
       let discount = (itemsTotal >= minDisc) ? discAmt : 0;
       let couponDisc = appliedCoupon ? appliedCoupon.discount : 0;
 
-      let hasFreeGift = (appConfig.is_free_gift_active && itemsTotal >= (Number(appConfig.free_gift_min_order) || 499));
-
       let finalToPay = Math.max(0, itemsTotal + deliveryCharge + rainSurge + nightSurge - discount - couponDisc);
 
-      return { itemsTotal, totalQty, deliveryCharge, rainSurge, nightSurge, discount, couponDisc, hasFreeGift, finalToPay };
+      return { itemsTotal, totalQty, deliveryCharge, rainSurge, nightSurge, discount, couponDisc, finalToPay };
     }
 
     function updateCartBar() {
@@ -1370,7 +1219,7 @@
       const bar = document.getElementById('cart-float-bar');
       if (totalQty > 0) {
         bar.style.display = 'flex';
-        document.getElementById('float-qty-text').innerText = `${totalQty} Item${totalQty > 1 ? 's' : ''} Added`;
+        document.getElementById('float-qty-text').innerText = `${totalQty} Item${totalQty > 1 ? 's' : ''} in Bag`;
         document.getElementById('float-total-text').innerText = `₹${finalToPay}`;
       } else {
         bar.style.display = 'none';
@@ -1383,57 +1232,26 @@
       const entries = Object.values(cart);
 
       if (entries.length === 0) {
-        box.innerHTML = '<div style="text-align:center; padding: 20px; color: #94a3b8;">Cart is empty.</div>';
+        box.innerHTML = '<div style="text-align:center; padding: 24px; color: #94a3b8; font-weight:600;">Bag is empty.</div>';
         document.getElementById('bill-subtotal').innerText = '₹0';
-        document.getElementById('bill-delivery-charge').innerText = '₹0';
-        document.getElementById('row-rain-surge').style.display = 'none';
-        document.getElementById('row-night-surge').style.display = 'none';
-        document.getElementById('row-discount').style.display = 'none';
-        document.getElementById('row-coupon').style.display = 'none';
-        document.getElementById('free-gift-pill').style.display = 'none';
         document.getElementById('bill-grand-total').innerText = '₹0';
-        const submitBtn = document.getElementById('order-submit-btn');
-        if (submitBtn) submitBtn.disabled = true;
+        document.getElementById('cart-smart-target-box').style.display = 'none';
         return;
       }
 
-      const { itemsTotal, deliveryCharge, rainSurge, nightSurge, discount, couponDisc, hasFreeGift, finalToPay } = calculateTotals();
+      const { itemsTotal, deliveryCharge, rainSurge, nightSurge, discount, couponDisc, finalToPay } = calculateTotals();
 
-      // MINIMUM ORDER VALUE ENFORCEMENT
-      const submitBtn = document.getElementById('order-submit-btn');
-      const minOrderReq = Number(appConfig.min_order_value) || 99;
-
-      if (itemsTotal < minOrderReq) {
-        if (submitBtn) {
-          submitBtn.disabled = true;
-          submitBtn.innerText = `Min Order ₹${minOrderReq} Required (Add ₹${minOrderReq - itemsTotal} more)`;
-          submitBtn.style.background = '#94a3b8';
-        }
-      } else {
-        if (submitBtn && appConfig.store_status !== 'CLOSED' && (!calculatedKm || calculatedKm <= (Number(appConfig.max_delivery_radius_km) || 7.0))) {
-          submitBtn.disabled = false;
-          submitBtn.innerText = selectedPaymentMode === 'UPI' ? 'Verify UTR & Place Order' : 'Place Delivery Order';
-          submitBtn.style.background = '';
-        }
-      }
-
-      // FREE GIFT NOTIFICATION
-      const giftPill = document.getElementById('free-gift-pill');
-      if (hasFreeGift) {
-        giftPill.style.display = 'block';
-        document.getElementById('free-gift-text').innerText = appConfig.free_gift_item_name;
-      } else {
-        giftPill.style.display = 'none';
-      }
+      // DYNAMIC SMART TARGET CALL
+      updateSmartCartTarget(itemsTotal);
 
       box.innerHTML = entries.map(({ item, qty }) => `
-        <div class="cart-item-row">
+        <div style="display:flex; justify-content:space-between; align-items:center; padding:10px 0; border-bottom:1px solid #f8fafc;">
           <div>
-            <div style="font-size: 13px; font-weight: 700;">${item.name}</div>
-            <div style="font-size: 11px; color: #64748b;">₹${item.price} × ${qty}</div>
+            <div style="font-size: 13px; font-weight: 800;">${item.name}</div>
+            <div style="font-size: 11px; color: #64748b; font-weight:600;">₹${item.price} × ${qty}</div>
           </div>
           <div style="display: flex; align-items: center; gap: 10px;">
-            <span style="font-size: 13px; font-weight: 800;">₹${item.price * qty}</span>
+            <span style="font-size: 14px; font-weight: 900;">₹${item.price * qty}</span>
             <div class="qty-counter" style="padding: 2px 6px;">
               <button class="qty-btn" onclick="updateQty(${item.id}, -1)">-</button>
               <span>${qty}</span>
@@ -1444,98 +1262,40 @@
       `).join('');
 
       document.getElementById('bill-subtotal').innerText = `₹${itemsTotal}`;
-      document.getElementById('bill-delivery-charge').innerText = deliveryCharge === 0 ? 'FREE' : `₹${deliveryCharge} ${calculatedKm > 0 ? '(' + calculatedKm.toFixed(1) + ' km)' : ''}`;
-      document.getElementById('bill-delivery-charge').style.color = deliveryCharge === 0 ? 'var(--zepto-green)' : '#000';
-
-      const rainSurgeRow = document.getElementById('row-rain-surge');
-      if (rainSurge > 0) {
-        rainSurgeRow.style.display = 'flex';
-        document.getElementById('bill-rain-surge-amount').innerText = `+₹${rainSurge}`;
-      } else {
-        rainSurgeRow.style.display = 'none';
-      }
-
-      const nightSurgeRow = document.getElementById('row-night-surge');
-      if (nightSurge > 0) {
-        nightSurgeRow.style.display = 'flex';
-        document.getElementById('bill-night-surge-amount').innerText = `+₹${nightSurge}`;
-      } else {
-        nightSurgeRow.style.display = 'none';
-      }
-
-      const discountRow = document.getElementById('row-discount');
-      if (discount > 0) discountRow.style.display = 'flex';
-      else discountRow.style.display = 'none';
-
-      const couponRow = document.getElementById('row-coupon');
-      if (couponDisc > 0) {
-        couponRow.style.display = 'flex';
-        document.getElementById('bill-coupon-title').innerText = `🎟️ Coupon (${appliedCoupon.code})`;
-        document.getElementById('bill-coupon-amount').innerText = `-₹${couponDisc}`;
-      } else {
-        couponRow.style.display = 'none';
-      }
-
+      document.getElementById('bill-delivery-charge').innerText = deliveryCharge === 0 ? 'FREE' : `₹${deliveryCharge}`;
       document.getElementById('bill-grand-total').innerText = `₹${finalToPay}`;
+
+      document.getElementById('row-rain-surge').style.display = rainSurge > 0 ? 'flex' : 'none';
+      document.getElementById('bill-rain-surge-amount').innerText = `+₹${rainSurge}`;
+
+      document.getElementById('row-night-surge').style.display = nightSurge > 0 ? 'flex' : 'none';
+      document.getElementById('bill-night-surge-amount').innerText = `+₹${nightSurge}`;
+
+      document.getElementById('row-discount').style.display = discount > 0 ? 'flex' : 'none';
+      document.getElementById('bill-disc-amount').innerText = `-₹${discount}`;
+
+      document.getElementById('row-coupon').style.display = couponDisc > 0 ? 'flex' : 'none';
+      document.getElementById('bill-coupon-amount').innerText = `-₹${couponDisc}`;
     }
 
-    // PLACE ORDER WITH MIN ORDER, GIFT, NIGHT & RAIN SURGE
     async function placeOrder() {
-      if (appConfig.store_status === 'CLOSED') return alert('⚠️ दुकान अभी बंद है!');
-
-      const { itemsTotal, finalToPay, couponDisc, rainSurge, nightSurge, hasFreeGift } = calculateTotals();
-      const minReq = Number(appConfig.min_order_value) || 99;
-
-      if (itemsTotal < minReq) {
-        return alert(`⚠️ न्यूनतम ऑर्डर वैल्यू ₹${minReq} है! कृपया कुछ और सामान जोड़ें।`);
-      }
-
-      const maxRadius = Number(appConfig.max_delivery_radius_km) || 7.0;
-      if (calculatedKm > maxRadius) {
-        return alert(`⚠️ आपका पता हमारे हब से ${calculatedKm.toFixed(1)} KM दूर है (अधिकतम दायरा ${maxRadius} KM है)।`);
-      }
-
       const name = document.getElementById('c-name').value.trim();
-      const phone = document.getElementById('c-phone').value.trim().replace(/\s+/g, '');
+      const phone = document.getElementById('c-phone').value.trim();
       const address = document.getElementById('c-address').value.trim();
-      const utr = document.getElementById('upi-utr').value.trim();
 
-      if (name.length < 2) return alert('कृपया सही नाम दर्ज करें!');
-      if (!/^[6-9]\d{9}$/.test(phone)) return alert('कृपया 10 अंकों का सही मोबाइल नंबर डालें!');
-      if (address.length < 4) return alert('कृपया डिलीवरी का पता दर्ज करें!');
+      if (name.length < 2) return alert('Kripya pura naam darj karein!');
+      if (!/^[6-9]\d{9}$/.test(phone)) return alert('Kripya 10 ankon ka mobile number dalein!');
+      if (address.length < 4) return alert('Kripya delivery pata dalein!');
 
-      if (selectedPaymentMode === 'UPI') {
-        if (!/^\d{12}$/.test(utr)) return alert('कृपया 12 अंकों का सही UTR नंबर डालें!');
-        const { data: existingUtr } = await _supabase.from('orders').select('id').eq('transaction_id', utr);
-        if (existingUtr && existingUtr.length > 0) return alert('⚠️ यह UTR नंबर पहले इस्तेमाल हो चुका है!');
-      }
-
+      const { finalToPay, couponDisc, rainSurge, nightSurge } = calculateTotals();
       const entries = Object.values(cart);
-      if (entries.length === 0) return alert('आपकी कार्ट खाली है!');
+      if (entries.length === 0) return alert('Cart khali hai!');
 
       const orderItems = entries.map(({ item, qty }) => ({
-        id: item.id, name: item.name, price: item.price, unit: item.unit, qty, subtotal: item.price * qty, image_url: item.image_url, hub_id: item.hub_id || 1
+        id: item.id, name: item.name, price: item.price, unit: item.unit, qty, subtotal: item.price * qty
       }));
 
       const generatedOtp = Math.floor(1000 + Math.random() * 9000).toString();
-      const btn = document.getElementById('order-submit-btn');
-      btn.disabled = true;
-      btn.innerText = 'Dispatching to nearest rider...';
-
-      const primaryHubId = orderItems[0]?.hub_id || 1;
-      let assignedRiderId = null;
-
-      try {
-        const { data: hubInfo } = await _supabase.from('hubs').select('lat, lng').eq('id', primaryHubId).single();
-        if (hubInfo && hubInfo.lat && hubInfo.lng) {
-          const { data: nearestRider } = await _supabase.rpc('find_nearest_rider', {
-            target_lat: hubInfo.lat, target_lng: hubInfo.lng
-          });
-          assignedRiderId = nearestRider || null;
-        }
-      } catch (e) { console.warn(e); }
-
-      const initialStatus = selectedPaymentMode === 'UPI' ? 'Payment Verification Pending' : 'Order Placed';
 
       try {
         const { data, error } = await _supabase.from('orders').insert([{
@@ -1544,420 +1304,108 @@
           delivery_address: address,
           items: orderItems,
           total_amount: finalToPay,
-          status: initialStatus,
+          status: 'Order Placed',
           payment_mode: selectedPaymentMode,
-          transaction_id: selectedPaymentMode === 'UPI' ? utr : null,
           delivery_otp: generatedOtp,
-          hub_id: primaryHubId,
-          assigned_rider_id: assignedRiderId,
-          coupon_code: appliedCoupon ? appliedCoupon.code : null,
           coupon_discount: couponDisc,
           rain_surge_fee: rainSurge,
-          night_surge_fee: nightSurge,
-          free_gift_added: hasFreeGift ? appConfig.free_gift_item_name : null,
-          distance_km: calculatedKm ? Number(calculatedKm.toFixed(2)) : 0
+          night_surge_fee: nightSurge
         }]).select();
 
         if (error) throw error;
 
-        const newOrder = data[0];
-        currentOrderId = newOrder.id;
-        lastKnownStatus = initialStatus;
-        localStorage.setItem('zepto_active_order', newOrder.id);
+        currentOrderId = data[0].id;
+        localStorage.setItem('zepto_active_order', currentOrderId);
         localStorage.setItem('baba_order_placed_time', Date.now().toString());
 
         saveOrderToHistory({
-          id: newOrder.id,
+          id: currentOrderId,
           total_amount: finalToPay,
           items: orderItems,
-          customer_name: name,
-          delivery_address: address,
-          payment_mode: selectedPaymentMode,
-          date: new Date().toLocaleDateString('hi-IN', { day: 'numeric', month: 'short' }) + ', ' + new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+          date: new Date().toLocaleDateString('hi-IN', { day: 'numeric', month: 'short' })
         });
 
         cart = {};
-        appliedCoupon = null;
-        document.getElementById('upi-utr').value = '';
         updateCartBar();
         renderProducts(allProducts);
         toggleCartModal(false);
 
-        btn.disabled = false;
-        btn.innerText = 'Place Delivery Order';
-
-        startTracking(newOrder.id);
+        startTracking(currentOrderId);
         openTrackModal();
-        startSelfCancelCountdown();
-
       } catch (e) {
-        alert('Order failed: ' + e.message);
-        btn.disabled = false;
-        btn.innerText = 'Place Delivery Order';
+        alert('Order error: ' + e.message);
       }
     }
 
-    // 2. 60-SECOND AUTO CANCEL WINDOW TIMER
-    function startSelfCancelCountdown() {
-      const cancelBox = document.getElementById('self-cancel-container');
-      const timerSecs = document.getElementById('cancel-timer-secs');
-      let maxSecs = Number(appConfig.cancel_window_seconds) || 60;
-
-      const placedTime = parseInt(localStorage.getItem('baba_order_placed_time') || Date.now().toString());
-      const elapsed = Math.floor((Date.now() - placedTime) / 1000);
-      let remaining = maxSecs - elapsed;
-
-      if (remaining <= 0) {
-        if (cancelBox) cancelBox.style.display = 'none';
-        return;
-      }
-
-      if (cancelBox) cancelBox.style.display = 'flex';
-      if (cancelTimerInterval) clearInterval(cancelTimerInterval);
-
-      cancelTimerInterval = setInterval(() => {
-        remaining--;
-        if (timerSecs) timerSecs.innerText = remaining;
-        if (remaining <= 0) {
-          clearInterval(cancelTimerInterval);
-          if (cancelBox) cancelBox.style.display = 'none';
-        }
-      }, 1000);
-    }
-
-    async function handleCustomerSelfCancel() {
-      if (!confirm('क्या आप वाकई अपना ऑर्डर कैंसिल करना चाहते हैं?')) return;
-      if (!currentOrderId) return;
-
-      const { error } = await _supabase.from('orders').update({
-        status: 'Cancelled',
-        cancelled_by: 'Customer (Self-Cancel)',
-        cancellation_reason: 'Changed mind / Wrong order'
-      }).eq('id', currentOrderId);
-
-      if (!error) {
-        alert('✅ आपका ऑर्डर सफलतापूर्वक कैंसिल कर दिया गया है!');
-        localStorage.removeItem('zepto_active_order');
-        currentOrderId = null;
-        if (cancelTimerInterval) clearInterval(cancelTimerInterval);
-        document.getElementById('self-cancel-container').style.display = 'none';
-        toggleTrackModal(false);
-        document.getElementById('live-order-strip').style.display = 'none';
-      } else {
-        alert('त्रुटि: ' + error.message);
-      }
-    }
-
-    // 3. LIVE TRACKING & DYNAMIC ETA
     function startTracking(orderId) {
       document.getElementById('live-order-strip').style.display = 'flex';
       document.getElementById('t-order-id').innerText = `Order #ORD-${orderId}`;
-      startSelfCancelCountdown();
 
-      const checkStatus = async () => {
+      const check = async () => {
         const { data } = await _supabase.from('orders').select('*').eq('id', orderId).single();
         if (!data) return;
 
-        if (lastKnownStatus && lastKnownStatus !== data.status) {
-          playLiveStatusChime(data.status);
-        }
-        lastKnownStatus = data.status;
-
-        // Cancelled check
-        if (data.status === 'Cancelled') {
-          document.getElementById('strip-title').innerText = 'Order Cancelled';
-          document.getElementById('strip-sub').innerText = 'This order was cancelled';
-          document.getElementById('self-cancel-container').style.display = 'none';
-          return;
-        }
-
-        const otpContainer = document.getElementById('cust-otp-container');
-        const otpText = document.getElementById('cust-live-otp');
         if (data.delivery_otp && data.status !== 'Delivered') {
-          otpContainer.style.display = 'block';
-          otpText.innerText = data.delivery_otp;
-        } else {
-          otpContainer.style.display = 'none';
+          document.getElementById('cust-otp-container').style.display = 'block';
+          document.getElementById('cust-live-otp').innerText = data.delivery_otp;
         }
 
-        // Live ETA calculation based on assigned rider's live GPS
-        if (data.assigned_rider_id && (data.status === 'Out for Delivery' || data.status === 'Picked Up')) {
-          try {
-            const { data: riderInfo } = await _supabase.from('riders').select('current_lat, current_lng').eq('id', data.assigned_rider_id).single();
-            if (riderInfo && riderInfo.current_lat && customerCoords) {
-              const km = calculateHaversineKm(customerCoords.lat, customerCoords.lng, riderInfo.current_lat, riderInfo.current_lng);
-              const mins = Math.max(2, Math.round(km * 3));
-              const etaChip = document.getElementById('eta-chip');
-              etaChip.style.display = 'inline-flex';
-              document.getElementById('eta-chip-text').innerText = `राइडर आपसे ${km.toFixed(1)} KM दूर है • ${mins} मिनट में पहुँच रहा है`;
-            }
-          } catch(e) {}
-        } else {
-          document.getElementById('eta-chip').style.display = 'none';
-        }
-
-        const s1 = document.getElementById('st-1'), s2 = document.getElementById('st-2'), s3 = document.getElementById('st-3');
-        const stripTitle = document.getElementById('strip-title'), stripSub = document.getElementById('strip-sub');
-        const mapBox = document.getElementById('rider-map-box'), mapFrame = document.getElementById('rider-map');
-        const ratingBox = document.getElementById('rider-rating-box');
-
-        s1.className = 't-step'; s2.className = 't-step'; s3.className = 't-step';
-
-        if (data.status === 'Order Placed' || data.status === 'Paid Online (UPI)' || data.status === 'Payment Verification Pending') {
-          s1.className = 't-step active';
-          stripTitle.innerText = data.status === 'Payment Verification Pending' ? 'Payment Verifying...' : 'Order Accepted (Packing)';
-          stripSub.innerText = 'Kitchen is packing your items';
-          mapBox.style.display = 'none';
-          ratingBox.style.display = 'none';
-        } else if (data.status === 'Out for Delivery' || data.status === 'Picked Up') {
-          s1.className = 't-step active'; s2.className = 't-step active';
-          stripTitle.innerText = 'Rider On The Way! ⚡';
-          stripSub.innerText = 'Delivering to your location';
-          mapBox.style.display = 'block';
-          ratingBox.style.display = 'none';
-          document.getElementById('self-cancel-container').style.display = 'none';
-          mapFrame.src = `https://maps.google.com/maps?q=${encodeURIComponent(data.delivery_address)}&t=&z=15&ie=UTF8&iwloc=&output=embed`;
+        if (data.status === 'Out for Delivery') {
+          document.getElementById('st-2').style.color = 'var(--accent-green)';
         } else if (data.status === 'Delivered') {
-          s1.className = 't-step active'; s2.className = 't-step active'; s3.className = 't-step active';
-          stripTitle.innerText = 'Delivered Successfully 🎉';
-          stripSub.innerText = 'Enjoy your fresh food items!';
-          mapBox.style.display = 'none';
-          document.getElementById('self-cancel-container').style.display = 'none';
-
-          const alreadyRated = localStorage.getItem(`baba_rated_${orderId}`);
-          if (!alreadyRated) {
-            ratingBox.style.display = 'block';
-            setRiderStars(5);
-          } else {
-            ratingBox.style.display = 'none';
-          }
+          document.getElementById('st-3').style.color = 'var(--accent-green)';
           localStorage.removeItem('zepto_active_order');
         }
       };
-
-      checkStatus();
-      setInterval(checkStatus, 4000);
+      check();
+      setInterval(check, 4000);
     }
 
-    // STAR RATING
-    function setRiderStars(count) {
-      selectedStarCount = count;
-      document.querySelectorAll('#stars-container .star-icon').forEach((star, idx) => {
-        if (idx < count) star.classList.add('filled');
-        else star.classList.remove('filled');
+    function getCurrentLocation() {
+      if (!navigator.geolocation) return alert('GPS support nahi hai');
+      navigator.geolocation.getCurrentPosition(pos => {
+        document.getElementById('c-address').value = `📍 GPS: https://maps.google.com/?q=${pos.coords.latitude},${pos.coords.longitude}`;
+        alert('Location set ho gayi!');
       });
     }
 
-    function toggleRatingChip(el, text) {
-      if (selectedChips.has(text)) { selectedChips.delete(text); el.classList.remove('selected'); }
-      else { selectedChips.add(text); el.classList.add('selected'); }
-    }
-
-    async function submitRiderRating() {
-      const orderId = currentOrderId || localStorage.getItem('zepto_active_order');
-      if (!orderId) return;
-
-      const btn = document.getElementById('btn-submit-rating');
-      btn.innerText = 'Submitting...'; btn.disabled = true;
-
-      try {
-        await _supabase.from('orders').update({
-          rating: selectedStarCount, feedback: [...selectedChips].join(', ') || 'Good Delivery'
-        }).eq('id', orderId);
-
-        localStorage.setItem(`baba_rated_${orderId}`, 'true');
-        document.getElementById('rider-rating-box').innerHTML = `
-          <div style="font-size:24px; margin-bottom:4px;">🎉</div>
-          <div style="font-size:14px; font-weight:900; color:var(--zepto-green);">धन्यवाद! आपकी रेटिंग दर्ज हो गई है।</div>
-        `;
-      } catch (err) {
-        alert('रेटिंग एरर: ' + err.message);
-        btn.innerText = 'Submit Star Rating ⭐'; btn.disabled = false;
-      }
-    }
-
-    // LIVE CHAT
-    function openLiveChatModal() {
-      if (!currentOrderId) return alert('कोई सक्रिय ऑर्डर नहीं है!');
-      document.getElementById('chat-drawer').classList.add('active');
-      document.getElementById('chat-header-title').innerText = `Order #${currentOrderId} Chat`;
-      loadOrderMessages();
-      if (!chatInterval) chatInterval = setInterval(loadOrderMessages, 2500);
-    }
-
-    function closeLiveChatModal() {
-      document.getElementById('chat-drawer').classList.remove('active');
-      if (chatInterval) { clearInterval(chatInterval); chatInterval = null; }
-    }
-
-    async function loadOrderMessages() {
-      if (!currentOrderId) return;
-      const { data } = await _supabase.from('order_chats').select('*').eq('order_id', currentOrderId).order('id', { ascending: true });
-      const container = document.getElementById('chat-messages');
-      if (!data || data.length === 0) {
-        container.innerHTML = '<div style="text-align:center; font-size:11px; color:#94a3b8; margin:10px 0;">राइडर से बात करने के लिए नीचे से विकल्प चुनें।</div>';
-        return;
-      }
-
-      container.innerHTML = data.map(m => `
-        <div class="msg-bubble ${m.sender === 'customer' ? 'msg-customer' : 'msg-rider'}">
-          <div style="font-size:10px; opacity:0.8; margin-bottom:2px;">${m.sender === 'customer' ? 'You' : '🛵 Rider'}</div>
-          ${m.message}
-        </div>
-      `).join('');
-      container.scrollTop = container.scrollHeight;
-    }
-
-    async function sendMessage(text) {
-      if (!text || !currentOrderId) return;
-      await _supabase.from('order_chats').insert([{ order_id: currentOrderId, sender: 'customer', message: text }]);
-      loadOrderMessages();
-    }
-    function sendQuickMessage(txt) { sendMessage(txt); }
-    function sendCustomMessage() {
-      const inp = document.getElementById('chat-user-text');
-      const val = inp.value.trim();
-      if (val) { sendMessage(val); inp.value = ''; }
-    }
-
-    // PAST ORDERS HISTORY & PHOTO DISPUTE SUBMISSION
-    function saveOrderToHistory(orderObj) {
+    function saveOrderToHistory(order) {
       let history = JSON.parse(localStorage.getItem('zepto_order_history') || '[]');
-      history.unshift(orderObj);
-      if (history.length > 8) history = history.slice(0, 8);
-      localStorage.setItem('zepto_order_history', JSON.stringify(history));
+      history.unshift(order);
+      localStorage.setItem('zepto_order_history', JSON.stringify(history.slice(0, 5)));
       renderPastOrdersUI();
     }
 
     function renderPastOrdersUI() {
       const container = document.getElementById('history-container');
       const history = JSON.parse(localStorage.getItem('zepto_order_history') || '[]');
+      if (history.length === 0) return;
 
-      if (history.length === 0) {
-        container.innerHTML = '<div style="font-size: 12px; color: #94a3b8; padding: 10px 0;">No past orders found.</div>';
-        return;
-      }
-
-      container.innerHTML = history.map((order) => {
-        const itemCount = Array.isArray(order.items) ? order.items.reduce((s, i) => s + (i.qty || 1), 0) : 0;
-        const itemNames = Array.isArray(order.items) ? order.items.map(i => `${i.name} (${i.qty})`).join(', ') : 'Items';
-
-        return `
-          <div class="past-order-box">
-            <div class="past-order-top">
-              <span class="past-order-id">ORD #${order.id}</span>
-              <span style="font-size:11px; color:#64748b;">📅 ${order.date || ''}</span>
-            </div>
-            <div style="font-size:12px; color:#475569; margin-bottom:8px;"><b>${itemCount} Items:</b> ${itemNames}</div>
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-              <span style="font-size:11px; color:#64748b;">Mode: <b>${order.payment_mode || 'COD'}</b></span>
-              <span style="font-size:15px; font-weight:900; color:var(--zepto-green);">₹${order.total_amount}</span>
-            </div>
-            <div class="past-actions-row">
-              <button class="btn-past-details" onclick='openReceiptModal(${JSON.stringify(order)})'>📄 View Receipt & Claim</button>
-              <button class="btn-past-repeat" onclick='repeatOrder(${JSON.stringify(order.items)})'>🔁 Repeat</button>
-            </div>
+      container.innerHTML = history.map(o => `
+        <div class="past-order-box">
+          <div style="display:flex; justify-content:space-between; font-weight:800; font-size:13px; margin-bottom:4px;">
+            <span>ORD #${o.id}</span>
+            <span style="color:var(--accent-green);">₹${o.total_amount}</span>
           </div>
-        `;
-      }).join('');
-    }
-
-    function openReceiptModal(order) {
-      currentViewingReceiptOrder = order;
-      document.getElementById('rcpt-title').innerText = `Order Receipt #ORD-${order.id}`;
-      document.getElementById('rcpt-date-mode').innerText = `Date: ${order.date || ''} | Mode: ${order.payment_mode || 'COD'}`;
-      document.getElementById('rcpt-address').innerText = order.delivery_address || 'Home Address';
-      document.getElementById('rcpt-total-amount').innerText = `₹${order.total_amount}`;
-
-      const itemsListContainer = document.getElementById('rcpt-items-list');
-      const items = Array.isArray(order.items) ? order.items : [];
-
-      itemsListContainer.innerHTML = items.map(item => `
-        <div style="display:flex; align-items:center; gap:10px; padding:8px 0; border-bottom:1px solid #f1f5f9;">
-          <img src="${item.image_url || 'https://via.placeholder.com/50'}" style="width:40px; height:40px; border-radius:6px; object-fit:contain;">
-          <div style="flex:1;">
-            <div style="font-size:12px; font-weight:800;">${item.name}</div>
-            <div style="font-size:10px; color:#64748b;">₹${item.price} × ${item.qty}</div>
-          </div>
-          <div style="font-size:13px; font-weight:900;">₹${item.subtotal || (item.price * item.qty)}</div>
+          <div style="font-size:11px; color:#64748b;">📅 ${o.date}</div>
         </div>
       `).join('');
-
-      document.getElementById('rcpt-repeat-btn').onclick = () => {
-        closeReceiptModal();
-        repeatOrder(order.items);
-      };
-
-      document.getElementById('dispute-form-box').style.display = 'none';
-      document.getElementById('receipt-modal').classList.add('active');
     }
 
-    function closeReceiptModal() { document.getElementById('receipt-modal').classList.remove('active'); }
-
-    function openDisputeForm() {
-      document.getElementById('dispute-form-box').style.display = 'block';
-    }
-
-    // SUBMIT DAMAGED ITEM PHOTO DISPUTE CLAIM
-    async function submitRefundDispute() {
-      if (!currentViewingReceiptOrder) return;
-      const note = document.getElementById('dispute-note-input').value.trim();
-      const fileInput = document.getElementById('dispute-file-input');
-
-      if (!note) return alert('कृपया समस्या का विवरण लिखें!');
-      if (!fileInput.files || fileInput.files.length === 0) return alert('कृपया खराब सामान की फोटो खींचकर अपलोड करें!');
-
-      const file = fileInput.files[0];
-      const reader = new FileReader();
-
-      reader.onload = async function(e) {
-        const base64Photo = e.target.result;
-        try {
-          const { error } = await _supabase.from('orders').update({
-            dispute_status: 'PENDING',
-            dispute_note: note,
-            dispute_photo_url: base64Photo
-          }).eq('id', currentViewingReceiptOrder.id);
-
-          if (error) throw error;
-          alert('✅ आपकी शिकायत और फोटो एडमिन को भेज दी गई है। जल्द ही संपर्क किया जाएगा!');
-          document.getElementById('dispute-form-box').style.display = 'none';
-          closeReceiptModal();
-        } catch(err) {
-          alert('त्रुटि: ' + err.message);
-        }
-      };
-      reader.readAsDataURL(file);
-    }
-
-    function repeatOrder(items) {
-      cart = {};
-      items.forEach(oldItem => {
-        const product = allProducts.find(p => p.id === oldItem.id) || {
-          id: oldItem.id, name: oldItem.name, price: oldItem.price, unit: oldItem.unit, image_url: oldItem.image_url || '', hub_id: oldItem.hub_id || 1
-        };
-        if (!product.is_out_of_stock) cart[product.id] = { item: product, qty: oldItem.qty };
-      });
-      renderProducts(allProducts);
-      updateCartBar();
-      openCartModal();
-    }
-
-    function toggleCartModal(show) { document.getElementById('cart-modal').className = show ? 'modal-overlay active' : 'modal-overlay'; }
+    function toggleCartModal(s) { document.getElementById('cart-modal').className = s ? 'modal-overlay active' : 'modal-overlay'; }
     function openCartModal() { renderCartSheet(); toggleCartModal(true); }
-    function closeCartModal(e) { toggleCartModal(false); }
+    function closeCartModal() { toggleCartModal(false); }
 
-    function toggleTrackModal(show) { document.getElementById('track-modal').className = show ? 'modal-overlay active' : 'modal-overlay'; }
+    function toggleTrackModal(s) { document.getElementById('track-modal').className = s ? 'modal-overlay active' : 'modal-overlay'; }
     function openTrackModal() { toggleTrackModal(true); }
-    function closeTrackModal(e) { toggleTrackModal(false); }
+    function closeTrackModal() { toggleTrackModal(false); }
 
-    function toggleSupportModal(show) { document.getElementById('support-modal').className = show ? 'modal-overlay active' : 'modal-overlay'; }
+    function toggleSupportModal(s) { document.getElementById('support-modal').className = s ? 'modal-overlay active' : 'modal-overlay'; }
     function openSupportModal() { toggleSupportModal(true); }
-    function closeSupportModal(e) { toggleSupportModal(false); }
+    function closeSupportModal() { toggleSupportModal(false); }
 
     function scrollToHistory() { document.getElementById('past-orders-section').scrollIntoView({ behavior: 'smooth' }); }
 
-    setInterval(loadLiveAppSettings, 5000);
     initApp();
   </script>
 </body>
