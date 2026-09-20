@@ -387,6 +387,17 @@
       padding: 4px 8px; 
       border-radius: 8px;
     }
+    .low-stock-tag {
+      position: absolute;
+      top: 8px;
+      left: 8px;
+      background: #f59e0b;
+      color: white;
+      font-size: 9px;
+      font-weight: 800;
+      padding: 3px 6px;
+      border-radius: 6px;
+    }
     .discount-badge-pill {
       position: absolute; 
       top: 8px; 
@@ -735,7 +746,7 @@
     /* DISPUTE FORM */
     .btn-dispute-trigger {
       background: #fee2e2; border: 1px solid #fca5a5; color: #dc2626;
-      font-size: 11px; font-weight: 800; padding: 6px 10px; border-radius: 8px; cursor: pointer; margin-top: 8px; width: 100%;
+      font-size: 11px; font-weight: 800; padding: 8px 12px; border-radius: 8px; cursor: pointer; margin-top: 8px; width: 100%;
     }
   </style>
 </head>
@@ -1002,6 +1013,11 @@
         <button onclick="handleCustomerSelfCancel()" style="background:#dc2626; color:white; border:none; padding:8px 14px; border-radius:8px; font-size:12px; font-weight:800; cursor:pointer;">Cancel ✕</button>
       </div>
 
+      <!-- Live Dynamic ETA Chip -->
+      <div id="eta-chip-container" style="display:none; text-align:center; margin-bottom:12px;">
+        <span id="eta-chip-text" style="background:#0284c7; color:white; font-size:12px; font-weight:800; padding:6px 14px; border-radius:14px;">⚡ राइडर की लाइव दूरी जाँची जा रही है...</span>
+      </div>
+
       <!-- Live OTP Box -->
       <div class="cust-otp-box" id="cust-otp-container" style="display:none;">
         <div style="font-size:11px; font-weight:800; color:#7e22ce;">🔑 SAFE DELIVERY OTP</div>
@@ -1013,6 +1029,16 @@
         <div id="st-1" style="font-size:14px; font-weight:800; color:var(--accent-green); margin-bottom:10px;">✓ Order Placed & Packing</div>
         <div id="st-2" style="font-size:14px; font-weight:800; color:#94a3b8; margin-bottom:10px;">🛵 Out for Delivery</div>
         <div id="st-3" style="font-size:14px; font-weight:800; color:#94a3b8;">📦 Delivered Successfully</div>
+      </div>
+
+      <!-- Privacy Masked Call / Action -->
+      <div id="rider-contact-row" style="display:none; gap:10px; margin-bottom:14px;">
+        <button onclick="callRiderMasked()" style="flex:1; background:#10b981; color:white; border:none; padding:12px; border-radius:12px; font-size:12px; font-weight:800; cursor:pointer;">
+          🛡️ Call Rider (Masked)
+        </button>
+        <button onclick="openLiveChatModal()" style="flex:1; background:#0284c7; color:white; border:none; padding:12px; border-radius:12px; font-size:12px; font-weight:800; cursor:pointer;">
+          💬 Chat with Rider
+        </button>
       </div>
 
       <!-- 5-STAR RIDER RATING CARD -->
@@ -1035,10 +1061,6 @@
           Submit Star Rating ⭐
         </button>
       </div>
-
-      <button onclick="openLiveChatModal()" style="background:#f3e8ff; border:1.5px solid #d8b4fe; color:var(--primary-purple); width:100%; padding:13px; border-radius:12px; font-size:13px; font-weight:800; display:flex; align-items:center; justify-content:center; gap:8px; margin:14px 0 8px 0; cursor:pointer;">
-        💬 Chat with Delivery Partner
-      </button>
 
       <button class="btn-checkout" style="background:#0f172a;" onclick="toggleTrackModal(false)">बंद करें (Close Tracking)</button>
     </div>
@@ -1089,6 +1111,9 @@
         <div style="font-size: 11px; font-weight: 800; color: #64748b; margin-bottom: 4px;">DELIVERY ADDRESS</div>
         <div style="font-size: 12px; font-weight: 700; color: #1e293b; white-space: pre-line;" id="rcpt-address">--</div>
       </div>
+
+      <!-- Dispute Claim Status View -->
+      <div id="rcpt-dispute-status-pill" style="display:none; padding:10px 14px; border-radius:10px; font-size:12px; font-weight:800; margin-bottom:12px;"></div>
 
       <div class="bill-box" style="margin: 0 0 12px 0;">
         <div class="bill-row total">
@@ -1156,6 +1181,7 @@
     let selectedStarCount = 5;
     let selectedChips = new Set();
     let currentViewingReceiptOrder = null;
+    let assignedRiderPhone = null;
 
     let appConfig = {
       theme_color: '#ff3269',
@@ -1185,7 +1211,8 @@
       night_surge_start_hour: 22,
       night_surge_end_hour: 6,
       night_surge_fee: 20,
-      is_night_surge_active: false
+      is_night_surge_active: false,
+      low_stock_threshold: 5
     };
 
     const catEmojiMap = {
@@ -1390,7 +1417,9 @@
         const card = document.createElement('div');
         card.className = 'product-card';
         const qty = cart[p.id]?.qty || 0;
-        const isOutOfStock = Boolean(p.is_out_of_stock);
+        const stockQty = p.stock_quantity ?? 50;
+        const isOutOfStock = Boolean(p.is_out_of_stock) || stockQty <= 0;
+        const isLowStock = !isOutOfStock && stockQty <= (appConfig.low_stock_threshold || 5);
         const discPct = Number(p.discount_percent) || 0;
 
         let originalMrpHtml = '';
@@ -1403,7 +1432,7 @@
           <div>
             <div class="img-box" style="${isOutOfStock ? 'opacity: 0.6;' : ''}">
               <img src="${p.image_url || 'https://via.placeholder.com/150'}" alt="${p.name}">
-              ${isOutOfStock ? '<div class="out-of-stock-tag">OUT OF STOCK</div>' : ''}
+              ${isOutOfStock ? '<div class="out-of-stock-tag">OUT OF STOCK</div>' : isLowStock ? `<div class="low-stock-tag">⚠️ Only ${stockQty} Left</div>` : ''}
               ${discPct > 0 && !isOutOfStock ? `<div class="discount-badge-pill">${discPct}% OFF</div>` : ''}
             </div>
             <div class="prod-title">${p.name}</div>
@@ -1718,6 +1747,7 @@
           document.getElementById('strip-title').innerText = 'Order Cancelled';
           document.getElementById('strip-sub').innerText = 'यह ऑर्डर रद्द कर दिया गया है';
           document.getElementById('self-cancel-container').style.display = 'none';
+          document.getElementById('eta-chip-container').style.display = 'none';
           return;
         }
 
@@ -1729,24 +1759,40 @@
         if (data.status === 'Out for Delivery') {
           document.getElementById('st-2').style.color = 'var(--accent-green)';
           document.getElementById('self-cancel-container').style.display = 'none';
+          document.getElementById('rider-contact-row').style.display = 'flex';
 
           if (data.assigned_rider_id) {
-            const { data: rInfo } = await _supabase.from('riders').select('current_lat, current_lng').eq('id', data.assigned_rider_id).single();
-            if (rInfo && rInfo.current_lat && customerCoords) {
-              const km = calculateHaversineKm(customerCoords.lat, customerCoords.lng, rInfo.current_lat, rInfo.current_lng);
-              const mins = Math.max(2, Math.round(km * 3));
-              document.getElementById('live-eta-subtitle').innerText = `राइडर आपसे ${km.toFixed(1)} KM दूर है • ${mins} मिनट में पहुँच रहा है`;
+            const { data: rInfo } = await _supabase.from('riders').select('phone, current_lat, current_lng').eq('id', data.assigned_rider_id).single();
+            if (rInfo) {
+              assignedRiderPhone = rInfo.phone;
+              if (rInfo.current_lat && customerCoords) {
+                const km = calculateHaversineKm(customerCoords.lat, customerCoords.lng, rInfo.current_lat, rInfo.current_lng);
+                const mins = Math.max(2, Math.round(km * 3));
+                document.getElementById('live-eta-subtitle').innerText = `राइडर आपसे ${km.toFixed(1)} KM दूर है • ${mins} मिनट में पहुँच रहा है`;
+                document.getElementById('eta-chip-container').style.display = 'block';
+                document.getElementById('eta-chip-text').innerText = `⚡ राइडर आपसे ${km.toFixed(1)} KM दूर है • ETA: ${mins} Mins`;
+              }
             }
           }
         } else if (data.status === 'Delivered') {
           document.getElementById('st-3').style.color = 'var(--accent-green)';
           document.getElementById('self-cancel-container').style.display = 'none';
+          document.getElementById('eta-chip-container').style.display = 'none';
+          document.getElementById('rider-contact-row').style.display = 'none';
           document.getElementById('rider-rating-box').style.display = 'block';
           localStorage.removeItem('zepto_active_order');
         }
       };
       check();
       setInterval(check, 4000);
+    }
+
+    function callRiderMasked() {
+      if (assignedRiderPhone) {
+        window.location.href = `tel:${assignedRiderPhone}`;
+      } else {
+        alert('राइडर अभी असाइन हो रहा है...');
+      }
     }
 
     function startSelfCancelCountdown() {
@@ -1878,12 +1924,30 @@
       `).join('');
     }
 
-    function openReceiptModal(order) {
+    async function openReceiptModal(order) {
       currentViewingReceiptOrder = order;
       document.getElementById('rcpt-title').innerText = `Order Receipt #ORD-${order.id}`;
       document.getElementById('rcpt-date-mode').innerText = `Date: ${order.date || ''} | Status: Success`;
       document.getElementById('rcpt-address').innerText = order.delivery_address || 'Home Address';
       document.getElementById('rcpt-total-amount').innerText = `₹${order.total_amount}`;
+
+      const { data: fullOrder } = await _supabase.from('orders').select('dispute_status, dispute_note').eq('id', order.id).single();
+      const statusPill = document.getElementById('rcpt-dispute-status-pill');
+      if (fullOrder && fullOrder.dispute_status) {
+        statusPill.style.display = 'block';
+        if (fullOrder.dispute_status === 'PENDING') {
+          statusPill.style.background = '#fef3c7'; statusPill.style.color = '#b45309';
+          statusPill.innerText = `⚠️ रिफ़ंड क्लेम की समीक्षा चल रही है (PENDING)`;
+        } else if (fullOrder.dispute_status === 'APPROVED') {
+          statusPill.style.background = '#dcfce7'; statusPill.style.color = '#15803d';
+          statusPill.innerText = `✓ रिफ़ंड स्वीकार कर लिया गया है (APPROVED)`;
+        } else {
+          statusPill.style.background = '#fee2e2'; statusPill.style.color = '#b91c1c';
+          statusPill.innerText = `✕ क्लेम अस्वीकार किया गया (REJECTED)`;
+        }
+      } else {
+        statusPill.style.display = 'none';
+      }
 
       const itemsListContainer = document.getElementById('rcpt-items-list');
       const items = Array.isArray(order.items) ? order.items : [];
