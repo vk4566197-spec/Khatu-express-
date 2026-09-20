@@ -44,9 +44,6 @@
       padding: 0; 
       font-family: 'Plus Jakarta Sans', 'Inter', sans-serif; 
       -webkit-tap-highlight-color: transparent;
-      -webkit-touch-callout: none;
-      -webkit-user-select: none;
-      user-select: none;
     }
 
     input, textarea {
@@ -61,7 +58,7 @@
       overflow-x: hidden;
     }
 
-    /* 1. SIDE DRAWER FIX */
+    /* 1. SIDE DRAWER */
     .drawer-overlay {
       position: fixed; 
       top: 0; 
@@ -569,14 +566,18 @@
       display: none; 
       flex-direction: column; 
       z-index: 1000;
-      overflow-y: auto;
+      overflow-y: scroll;
+      -webkit-overflow-scrolling: touch;
     }
     .modal-overlay.active { display: flex; }
+    
     .fullpage-content {
       background: white; 
       width: 100%;
-      min-height: 100vh;
-      padding: 18px 18px 60px 18px;
+      min-height: 100%;
+      padding: 18px 18px 160px 18px; /* नीचे 160px की भरपूर जगह */
+      display: flex;
+      flex-direction: column;
     }
     .fullpage-head {
       display: flex; 
@@ -621,7 +622,26 @@
       border-top: 1px dashed #cbd5e1; 
       color: #0f172a; 
     }
-    .btn-checkout { 
+    
+    /* नीचे हमेशा चिपकी रहने वाली बार (Sticky Bottom Checkout Bar) */
+    .cart-sticky-bottom-bar {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      background: #ffffff;
+      padding: 12px 18px 20px 18px;
+      box-shadow: 0 -8px 25px rgba(0, 0, 0, 0.12);
+      z-index: 1050;
+      border-top: 1.5px solid #f1f5f9;
+      display: none;
+    }
+    .modal-overlay.active ~ .cart-sticky-bottom-bar,
+    .modal-overlay.active .cart-sticky-bottom-bar {
+      display: block;
+    }
+
+    .btn-checkout-sticky { 
       background: var(--accent-pink-gradient); 
       color: white; 
       border: none; 
@@ -631,15 +651,17 @@
       font-weight: 900; 
       cursor: pointer; 
       width: 100%; 
-      margin-top: 14px; 
-      box-shadow: 0 4px 14px rgba(255, 42, 109, 0.3);
+      box-shadow: 0 4px 14px rgba(255, 42, 109, 0.35);
+      display: block;
+      text-align: center;
       transition: all 0.2s;
     }
-    .btn-checkout:disabled {
+    .btn-checkout-sticky:disabled {
       background: #94a3b8 !important;
       cursor: not-allowed;
       box-shadow: none;
     }
+
     .zepto-input { 
       width: 100%; 
       padding: 12px 14px; 
@@ -650,7 +672,6 @@
       outline: none; 
     }
 
-    /* ALAG-ALAG LIVE LOCATION & ADDRESS CARD */
     .loc-card-box {
       background: #f0fdf4;
       border: 1.5px solid #86efac;
@@ -891,7 +912,7 @@
     </div>
   </div>
 
-  <!-- FULL PAGE CART / VIEW ORDER MODAL -->
+  <!-- FULL PAGE CART VIEW -->
   <div class="modal-overlay" id="cart-modal">
     <div class="fullpage-content">
       <div class="fullpage-head">
@@ -899,7 +920,7 @@
         <button class="fullpage-close" onclick="toggleCartModal(false)">✕</button>
       </div>
 
-      <!-- ATTRACTIVE SMART CART UPSELL PROGRESS BANNER -->
+      <!-- SMART CART UPSELL PROGRESS BANNER -->
       <div class="cart-target-banner" id="cart-smart-target-box" style="display: none;">
         <div class="target-headline" id="cart-target-text">
           🎉 सामान जोड़ें और इनाम पाएँ!
@@ -928,7 +949,7 @@
           <span id="bill-delivery-charge" style="color:var(--accent-green);">FREE</span>
         </div>
         
-        <!-- YEH RAHA DISTANCE CHARGE KA ALAG ROW (2.5 RS PER KM JAISE ADMIN ME SET HAI) -->
+        <!-- DISTANCE CHARGE ROW -->
         <div class="bill-row" id="row-distance-charge" style="display: none; color: #0284c7;">
           <span id="bill-distance-title">📏 Distance Charge (Extra KM)</span>
           <span id="bill-distance-amount">+₹0</span>
@@ -973,33 +994,36 @@
         <input type="tel" id="upi-utr" class="zepto-input" placeholder="Enter 12-digit UTR No." maxlength="12" style="text-align:center; font-weight:800; letter-spacing:1px; background:#fff;">
       </div>
 
-      <!-- Customer Address & MANDATORY Location Section -->
+      <!-- Customer Address & Location Section -->
       <div style="font-size:12px; font-weight:800; color:#64748b; margin-bottom:8px;">DELIVERY DETAILS:</div>
       <div style="display:flex; flex-direction:column; gap:10px;">
         <input type="text" id="c-name" class="zepto-input" placeholder="आपका पूरा नाम (Full Name) *">
         <input type="tel" id="c-phone" class="zepto-input" placeholder="10 अंकों का मोबाइल नंबर (Mobile Number) *" maxlength="10">
         
-        <!-- Live Location Button -->
+        <!-- Live Location Mandatory Button -->
         <button type="button" class="btn-fetch-gps" onclick="getCurrentLocation()">
           📍 क्लिक करके लाइव लोकेशन अपडेट करें (अनिवार्य)
         </button>
 
         <!-- Live Location Status Card -->
         <div class="loc-card-box" id="gps-status-box">
-          <div class="loc-card-title">GPS लोकेशन स्थिति (Mandatory):</div>
+          <div class="loc-card-title">GPS लोकेशन स्थिति (MANDATORY):</div>
           <div class="loc-card-val" id="gps-status-val">⚠️ लोकेशन अपडेट नहीं है। ऊपर दिए गए नीले बटन पर क्लिक करें!</div>
         </div>
 
         <!-- Address Textarea -->
         <div>
-          <label style="font-size: 11px; font-weight: 800; color: #475569; display:block; margin-bottom: 4px;">घर / दुकान / फ्लैट नंबर और लैंडमार्क:</label>
-          <textarea id="c-address" class="zepto-input" rows="3" placeholder="उदाहरण: मकान नंबर 42, शिव मंदिर के पास, मुख्य बाजार *"></textarea>
+          <label style="font-size: 11px; font-weight: 800; color: #475569; display:block; margin-bottom: 4px;">घर / दुकान / फ्लैट नंबर और लैंडमार्क (पता): *</label>
+          <textarea id="c-address" class="zepto-input" rows="3" placeholder="उदाहरण: मकान नंबर 42, शिव मंदिर के पास, मुख्य बाजार"></textarea>
         </div>
-
-        <button class="btn-checkout" id="order-submit-btn" onclick="placeOrder()" disabled>
-          ⚠️ पहले लाइव लोकेशन अपडेट करें
-        </button>
       </div>
+    </div>
+
+    <!-- ALWAYS VISIBLE STICKY BOTTOM CHECKOUT BUTTON -->
+    <div class="cart-sticky-bottom-bar" id="cart-sticky-bar">
+      <button class="btn-checkout-sticky" id="order-submit-btn" onclick="placeOrder()" disabled>
+        ⚠️ पहले लाइव लोकेशन अपडेट करें
+      </button>
     </div>
   </div>
 
@@ -1064,12 +1088,12 @@
           <span class="rating-chip" onclick="toggleRatingChip(this, '😊 Polite Rider')">😊 Polite Rider</span>
           <span class="rating-chip" onclick="toggleRatingChip(this, '📦 Safe Packing')">📦 Safe Packing</span>
         </div>
-        <button class="btn-checkout" style="background:#0f172a; padding:12px; margin-top:10px;" onclick="submitRiderRating()">
+        <button class="btn-checkout-sticky" style="background:#0f172a; padding:12px; margin-top:10px;" onclick="submitRiderRating()">
           Submit Star Rating ⭐
         </button>
       </div>
 
-      <button class="btn-checkout" style="background:#0f172a;" onclick="toggleTrackModal(false)">बंद करें (Close Tracking)</button>
+      <button class="btn-checkout-sticky" style="background:#0f172a; margin-top:14px;" onclick="toggleTrackModal(false)">बंद करें (Close Tracking)</button>
     </div>
   </div>
 
@@ -1129,11 +1153,10 @@
         </div>
       </div>
 
-      <button class="btn-checkout" id="rcpt-repeat-btn" style="background: var(--primary-purple); margin-bottom: 8px;">
+      <button class="btn-checkout-sticky" id="rcpt-repeat-btn" style="background: var(--primary-purple); margin-bottom: 8px;">
         🔁 Repeat This Entire Order
       </button>
 
-      <!-- Damaged / Missing Item Dispute Button -->
       <button class="btn-dispute-trigger" id="rcpt-dispute-btn" onclick="openDisputeForm()">
         ⚠️ ख़राब या टूटा सामान मिला? रिफ़ंड क्लेम करें
       </button>
@@ -1143,7 +1166,7 @@
         <div style="font-size: 12px; font-weight: 900; color: #991b1b; margin-bottom: 6px;">Submit Photo Proof & Claim:</div>
         <textarea id="dispute-note-input" class="zepto-input" rows="2" placeholder="क्या समस्या है? (उदा. सामान टूटा हुआ था)"></textarea>
         <input type="file" id="dispute-file-input" accept="image/*" capture="environment" style="margin: 8px 0; font-size: 12px;">
-        <button class="btn-checkout" style="background: #dc2626; padding: 10px;" onclick="submitRefundDispute()">
+        <button class="btn-checkout-sticky" style="background: #dc2626; padding: 10px;" onclick="submitRefundDispute()">
           📤 Submit Refund Claim to Admin
         </button>
       </div>
@@ -1158,10 +1181,10 @@
         <button class="fullpage-close" onclick="toggleSupportModal(false)">✕</button>
       </div>
       <div style="display:flex; flex-direction:column; gap:12px; margin-top:14px;">
-        <a class="btn-checkout" style="background:#25D366; text-decoration:none; text-align:center;" target="_blank" href="https://wa.me/919711107063?text=Support%20Needed">
+        <a class="btn-checkout-sticky" style="background:#25D366; text-decoration:none; text-align:center;" target="_blank" href="https://wa.me/919711107063?text=Support%20Needed">
           💬 WhatsApp पर संपर्क करें (9711107063)
         </a>
-        <a class="btn-checkout" style="background:var(--primary-purple); text-decoration:none; text-align:center;" href="tel:9711107063">
+        <a class="btn-checkout-sticky" style="background:var(--primary-purple); text-decoration:none; text-align:center;" href="tel:9711107063">
           📞 हेल्पलाइन पर कॉल करें (9711107063)
         </a>
       </div>
@@ -1244,7 +1267,6 @@
       return getLevenshteinDistance(str1, str2) <= maxDistance;
     }
 
-    // Default configuration (Synchronized with Admin Settings)
     let appConfig = {
       theme_color: '#ff3269',
       header_bg: '#f4ecfb',
@@ -1258,8 +1280,8 @@
       discount_amount: 49,
       store_status: 'OPEN',
       max_delivery_radius_km: 7.0,
-      base_delivery_km: 2.0, // Free Base Distance
-      per_km_charge: 2.5,    // Extra Charge Per KM (₹2.50)
+      base_delivery_km: 2.0,
+      per_km_charge: 2.5,
       broadcast_notice: '',
       is_broadcast_active: false,
       rain_surge_mode: 'OFF',
@@ -1357,7 +1379,7 @@
         targetText.innerHTML = `🎁 सिर्फ <b>₹${diff}</b> की और खरीदारी पर <b>${appConfig.free_gift_item_name || '1 Cold Drink Free'}</b>!`;
         progressBar.style.width = `${pct}%`;
       } else {
-        targetText.innerHTML = `🎉 बधाई हो! आपने सभी ऑफ़र (Free Delivery + Discount + Gift) अनलॉक कर लिए हैं!`;
+        targetText.innerHTML = `🎉 बधाई हो! आपने सभी ऑफ़र अनलॉक कर लिए हैं!`;
         progressBar.style.width = `100%`;
       }
     }
@@ -1384,7 +1406,7 @@
       const tickerBar = document.getElementById('broadcast-ticker-bar');
       if (appConfig.is_broadcast_active && appConfig.broadcast_notice) {
         tickerBar.style.display = 'block';
-        document.getElementById('broadcast-ticker-content').innerText = `📢 ${appConfig.broadcast_notice} • ${appConfig.broadcast_notice}`;
+        document.getElementById('broadcast-ticker-content').innerText = `📢 ${appConfig.broadcast_notice}`;
       } else {
         tickerBar.style.display = 'none';
       }
@@ -1568,7 +1590,7 @@
           const firstHub = cartItems[0].item.hub_id || 1;
           const currentHub = prod.hub_id || 1;
           if (firstHub !== currentHub) {
-            alert('🔒 Hub Lock Alert!\n\nआपकी कार्ट में पहले से दूसरे हब का सामान मौजूद है। एक समय में सिर्फ एक ही हब/स्टोर से ऑर्डर कर सकते हैं।');
+            alert('🔒 Hub Lock Alert!\n\nआपकी कार्ट में पहले से दूसरे हब का सामान मौजूद है। एक समय में सिर्फ एक ही हब से ऑर्डर कर सकते हैं।');
             return;
           }
         }
@@ -1606,7 +1628,6 @@
       if (selectedPaymentMode === 'UPI') refreshUpiQr();
     }
 
-    // DISTANCE EXTRA CHARGE CALCULATIONS (ALAG LINE MEIN)
     function calculateTotals() {
       const entries = Object.values(cart);
       const itemsTotal = entries.reduce((s, e) => s + (e.qty * Number(e.item.price)), 0);
@@ -1619,9 +1640,7 @@
 
       let deliveryCharge = (itemsTotal >= minFree || itemsTotal === 0) ? 0 : baseCharge;
 
-      // Base distance free limit (e.g. 2 KM)
       const baseKm = Number(appConfig.base_delivery_km) || 2.0;
-      // Extra Charge Per KM (e.g. 2.50 Rs)
       const perKm = Number(appConfig.per_km_charge) || 2.5;
 
       let distanceCharge = 0;
@@ -1673,14 +1692,19 @@
 
       updateSmartCartTarget(itemsTotal);
 
-      const minReq = Number(appConfig.min_order_value) || 99;
+      // लोकेशन लॉक और ₹99 का नियम
       const submitBtn = document.getElementById('order-submit-btn');
+      const minReq = Number(appConfig.min_order_value) || 99;
+      
       if (itemsTotal < minReq) {
         submitBtn.disabled = true;
         submitBtn.innerText = `कम से कम ₹${minReq} का ऑर्डर आवश्यक है (₹${minReq - itemsTotal} और जोड़ें)`;
-      } else if (isLocationUpdated) {
+      } else if (!isLocationUpdated || !customerCoords) {
+        submitBtn.disabled = true;
+        submitBtn.innerText = '⚠️ पहले लाइव लोकेशन अपडेट करें';
+      } else {
         submitBtn.disabled = false;
-        submitBtn.innerText = selectedPaymentMode === 'UPI' ? 'Verify UTR & Place Order' : 'Place Delivery Order';
+        submitBtn.innerText = selectedPaymentMode === 'UPI' ? 'Verify UTR & Place Order' : '🚀 Place Delivery Order';
       }
 
       box.innerHTML = entries.map(({ item, qty }) => `
@@ -1703,7 +1727,6 @@
       document.getElementById('bill-subtotal').innerText = `₹${itemsTotal}`;
       document.getElementById('bill-delivery-charge').innerText = deliveryCharge === 0 ? 'FREE' : `₹${deliveryCharge}`;
       
-      // DISTANCE CHARGE ROW RENDER (2.5 RS PER KM EXTRA)
       const distRow = document.getElementById('row-distance-charge');
       if (distanceCharge > 0) {
         distRow.style.display = 'flex';
@@ -1728,13 +1751,17 @@
       document.getElementById('bill-coupon-amount').innerText = `-₹${couponDisc}`;
     }
 
+    // अनिवार्य लाइव GPS लोकेशन फ़ेच
     function getCurrentLocation() {
-      if (!navigator.geolocation) return alert('आपके ब्राउज़र में GPS सपोर्ट नहीं है।');
-
       const statusVal = document.getElementById('gps-status-val');
-      const orderBtn = document.getElementById('order-submit-btn');
-
+      const submitBtn = document.getElementById('order-submit-btn');
       statusVal.innerText = 'लाइव लोकेशन फ़ैच हो रही है... कृपया प्रतीक्षा करें।';
+
+      if (!navigator.geolocation) {
+        alert('आपके फ़ोन में GPS सपोर्ट नहीं मिला।');
+        statusVal.innerText = '🔴 GPS सपोर्ट उपलब्ध नहीं है।';
+        return;
+      }
 
       navigator.geolocation.getCurrentPosition(
         async (pos) => {
@@ -1755,9 +1782,10 @@
         },
         (err) => {
           isLocationUpdated = false;
-          statusVal.innerHTML = `🔴 लोकेशन फ़ैच फ़ेल हुई: ${err.message}। कृपया ब्राउज़र में GPS Allow करें!`;
-          orderBtn.disabled = true;
-          orderBtn.innerText = '⚠️ पहले लाइव लोकेशन अपडेट करें';
+          customerCoords = null;
+          statusVal.innerHTML = `🔴 लोकेशन फ़ैच फ़ेल हुई: ${err.message}। कृपया मोबाइल सेटिंग्स में GPS चालू और ब्राउज़र को Location Allow करें!`;
+          submitBtn.disabled = true;
+          submitBtn.innerText = '⚠️ पहले लाइव लोकेशन अपडेट करें';
         },
         { enableHighAccuracy: true, timeout: 10000 }
       );
@@ -1781,13 +1809,14 @@
 
       if (name.length < 2) return alert('कृपया अपना पूरा नाम दर्ज करें!');
       if (!/^[6-9]\d{9}$/.test(phone)) return alert('कृपया 10 अंकों का सही मोबाइल नंबर दर्ज करें!');
-      if (manualAddress.length < 4) return alert('कृपया घर/दुकान का पता और लैंडमार्क लिखें!');
+      if (manualAddress.length < 4) return alert('कृपया घर/दुकान का पूरा पता और लैंडमार्क लिखें!');
 
       if (selectedPaymentMode === 'UPI' && !/^\d{12}$/.test(utr)) {
         return alert('कृपया 12 अंकों का सही UTR नंबर डालें!');
       }
 
       const combinedAddress = `📍 GPS: https://maps.google.com/?q=${customerCoords.lat},${customerCoords.lng}\n🏠 House/Street: ${manualAddress}`;
+
       const entries = Object.values(cart);
       if (entries.length === 0) return alert('थैला खाली है!');
 
@@ -1887,7 +1916,7 @@
                 const mins = Math.max(2, Math.round(km * 3));
                 document.getElementById('live-eta-subtitle').innerText = `राइडर आपसे ${km.toFixed(1)} KM दूर है • ${mins} मिनट में पहुँच रहा है`;
                 document.getElementById('eta-chip-container').style.display = 'block';
-                document.getElementById('eta-chip-text').innerText = `⚡ राइडर आपसे ${km.toFixed(1)} KM दूर है • ETA: ${mins} Mins ${rInfo.is_overspeeding ? '(Driving Safe)' : ''}`;
+                document.getElementById('eta-chip-text').innerText = `⚡ राइडर आपसे ${km.toFixed(1)} KM दूर है • ETA: ${mins} Mins`;
               }
             }
           }
@@ -2132,7 +2161,10 @@
       openCartModal();
     }
 
-    function toggleCartModal(s) { document.getElementById('cart-modal').className = s ? 'modal-overlay active' : 'modal-overlay'; }
+    function toggleCartModal(s) { 
+      document.getElementById('cart-modal').className = s ? 'modal-overlay active' : 'modal-overlay';
+      document.getElementById('cart-sticky-bar').style.display = s ? 'block' : 'none';
+    }
     function openCartModal() { renderCartSheet(); toggleCartModal(true); }
     function closeCartModal() { toggleCartModal(false); }
 
