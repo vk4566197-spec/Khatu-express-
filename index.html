@@ -61,7 +61,7 @@
       overflow-x: hidden;
     }
 
-    /* SIDE DRAWER STYLES & FIX */
+    /* 1. SIDE DRAWER */
     .drawer-overlay {
       position: fixed; 
       top: 0; 
@@ -73,9 +73,7 @@
       display: none;
       backdrop-filter: blur(4px);
     }
-    .drawer-overlay.active { 
-      display: block; 
-    }
+    .drawer-overlay.active { display: block; }
     
     .side-drawer {
       position: fixed; 
@@ -90,9 +88,7 @@
       display: flex; 
       flex-direction: column;
     }
-    .side-drawer.active { 
-      left: 0 !important; 
-    }
+    .side-drawer.active { left: 0 !important; }
     
     .drawer-header {
       background: var(--primary-gradient);
@@ -137,11 +133,9 @@
       border-bottom: 1px solid #f8fafc;
       transition: background 0.15s;
     }
-    .drawer-item:active { 
-      background: #f1f5f9; 
-    }
+    .drawer-item:active { background: #f1f5f9; }
 
-    /* BROADCAST NOTICE TICKER */
+    /* 2. TICKER */
     .broadcast-ticker-wrap {
       display: none; 
       background: linear-gradient(90deg, #ea580c, #c2410c); 
@@ -164,7 +158,7 @@
       100% { transform: translate3d(-100%, 0, 0); }
     }
 
-    /* TOP HERO HEADER */
+    /* 3. TOP HERO HEADER */
     .top-hero-area {
       background: var(--primary-gradient);
       padding: 16px 16px 20px 16px; 
@@ -274,10 +268,7 @@
       color: #dc2626;
       animation: pulseMic 1s infinite;
     }
-    @keyframes pulseMic { 
-      0%, 100% { transform: scale(1); } 
-      50% { transform: scale(1.18); } 
-    }
+    @keyframes pulseMic { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.18); } }
 
     /* CATEGORIES */
     .category-scroll { 
@@ -556,43 +547,42 @@
     .nav-item.active { color: var(--accent-pink); }
     .nav-item-icon { font-size: 19px; }
 
-    /* MODALS */
+    /* FULL-PAGE VIEW FOR CART & ORDER */
     .modal-overlay {
       position: fixed; 
       top: 0; 
       left: 0; 
-      width: 100%; 
-      height: 100%;
-      background: rgba(15, 23, 42, 0.6); 
+      width: 100vw; 
+      height: 100vh;
+      background: #ffffff; 
       display: none; 
-      justify-content: flex-end;
       flex-direction: column; 
-      z-index: 300;
-      backdrop-filter: blur(4px);
-    }
-    .modal-overlay.active { display: flex; }
-    .bottom-sheet {
-      background: white; 
-      border-radius: 26px 26px 0 0; 
-      padding: 20px 18px 30px 18px;
-      max-height: 85vh; 
+      z-index: 1000;
       overflow-y: auto;
     }
-    .sheet-head {
+    .modal-overlay.active { display: flex; }
+    .fullpage-content {
+      background: white; 
+      width: 100%;
+      min-height: 100vh;
+      padding: 18px 18px 50px 18px;
+    }
+    .fullpage-head {
       display: flex; 
       justify-content: space-between; 
       align-items: center;
-      margin-bottom: 14px; 
-      padding-bottom: 12px; 
+      margin-bottom: 16px; 
+      padding-bottom: 14px; 
       border-bottom: 1px solid var(--border-soft);
     }
-    .sheet-title { font-size: 17px; font-weight: 900; color: var(--text-main); }
-    .sheet-close {
+    .fullpage-title { font-size: 18px; font-weight: 900; color: var(--text-main); }
+    .fullpage-close {
       background: #f1f5f9; 
       border: none; 
-      width: 32px; 
-      height: 32px;
+      width: 36px; 
+      height: 36px;
       border-radius: 50%; 
+      font-size: 16px;
       font-weight: bold; 
       cursor: pointer;
     }
@@ -624,14 +614,20 @@
       background: var(--accent-pink-gradient); 
       color: white; 
       border: none; 
-      padding: 15px; 
+      padding: 16px; 
       border-radius: 14px; 
-      font-size: 14px; 
+      font-size: 15px; 
       font-weight: 900; 
       cursor: pointer; 
       width: 100%; 
-      margin-top: 10px; 
+      margin-top: 14px; 
       box-shadow: 0 4px 14px rgba(255, 42, 109, 0.3);
+      transition: all 0.2s;
+    }
+    .btn-checkout:disabled {
+      background: #94a3b8 !important;
+      cursor: not-allowed;
+      box-shadow: none;
     }
     .zepto-input { 
       width: 100%; 
@@ -641,6 +637,45 @@
       font-size: 13px; 
       font-weight: 600;
       outline: none; 
+    }
+
+    /* ALAG-ALAG LIVE LOCATION & ADDRESS CARD */
+    .loc-card-box {
+      background: #f0fdf4;
+      border: 1.5px solid #86efac;
+      border-radius: 14px;
+      padding: 12px 14px;
+      margin-bottom: 12px;
+    }
+    .loc-card-title {
+      font-size: 11px;
+      font-weight: 800;
+      color: #166534;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+    .loc-card-val {
+      font-size: 12px;
+      font-weight: 700;
+      color: #15803d;
+      word-break: break-all;
+    }
+    .btn-fetch-gps {
+      background: #0284c7;
+      color: white;
+      border: none;
+      width: 100%;
+      padding: 12px;
+      border-radius: 12px;
+      font-size: 13px;
+      font-weight: 800;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      box-shadow: 0 2px 8px rgba(2, 132, 199, 0.25);
+      margin-bottom: 10px;
     }
 
     .past-order-box { 
@@ -757,14 +792,14 @@
         <span style="font-size: 22px;">🛵</span>
         <div>
           <div style="font-size: 13px; font-weight: 800;" id="strip-title">Live Order In Progress</div>
-          <div style="font-size: 11px; color: #38bdf8;" id="strip-sub">Tap to view live tracking & OTP</div>
+          <div style="font-size: 11px; color: #38bdf8;" id="strip-sub">टैप करके लाइव ट्रैकिंग और OTP देखें</div>
         </div>
       </div>
       <span style="font-size: 16px; color: #94a3b8;">➔</span>
     </div>
 
     <div id="loader" style="text-align: center; padding: 40px; font-size: 13px; color: var(--text-muted);">
-      Loading fresh items...
+      ताज़ा आइटम्स लोड हो रहे हैं...
     </div>
     <div class="grid" id="product-list"></div>
 
@@ -772,10 +807,10 @@
     <div id="past-orders-section" style="margin-top: 35px; border-top: 1px solid var(--border-soft); padding-top: 22px;">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
         <div style="font-size: 16px; font-weight: 900; color: #0f172a;">🕒 Past Orders & Invoices</div>
-        <span style="font-size: 11px; color: #64748b; font-weight: 700;">Tap to view details</span>
+        <span style="font-size: 11px; color: #64748b; font-weight: 700;">विवरण देखने के लिए टैप करें</span>
       </div>
       <div id="history-container">
-        <div style="font-size: 12px; color: #94a3b8; padding: 10px 0;">No past orders found.</div>
+        <div style="font-size: 12px; color: #94a3b8; padding: 10px 0;">कोई पिछला ऑर्डर नहीं मिला।</div>
       </div>
     </div>
   </div>
@@ -786,7 +821,7 @@
       <div style="font-size:11.5px; font-weight:700; opacity:0.9;" id="float-qty-text">0 Items Added</div>
       <div style="font-size:16px; font-weight:900;" id="float-total-text">₹0</div>
     </div>
-    <div style="font-size: 13px; font-weight: 900; display:flex; align-items:center; gap:6px;">View Cart ➔</div>
+    <div style="font-size: 13px; font-weight: 900; display:flex; align-items:center; gap:6px;">View Full Cart ➔</div>
   </div>
 
   <!-- BOTTOM NAV BAR -->
@@ -809,12 +844,12 @@
     </div>
   </div>
 
-  <!-- CART MODAL (WITH GLOWING SMART TARGET) -->
-  <div class="modal-overlay" id="cart-modal" onclick="closeCartModal(event)">
-    <div class="bottom-sheet" onclick="event.stopPropagation()">
-      <div class="sheet-head">
-        <div class="sheet-title">My Cart 🛍️</div>
-        <button class="sheet-close" onclick="toggleCartModal(false)">✕</button>
+  <!-- FULL PAGE CART / VIEW ORDER MODAL -->
+  <div class="modal-overlay" id="cart-modal">
+    <div class="fullpage-content">
+      <div class="fullpage-head">
+        <div class="fullpage-title">🛍️ Order Summary & Checkout</div>
+        <button class="fullpage-close" onclick="toggleCartModal(false)">✕</button>
       </div>
 
       <!-- ATTRACTIVE SMART CART UPSELL PROGRESS BANNER -->
@@ -830,7 +865,7 @@
       <div id="cart-items-box"></div>
 
       <!-- Coupon Box -->
-      <div style="display:flex; gap:8px; margin: 12px 0;">
+      <div style="display:flex; gap:8px; margin: 14px 0;">
         <input type="text" id="cart-coupon-input" class="zepto-input" style="text-transform:uppercase; font-weight:800;" placeholder="Enter Coupon (e.g. BABA50)">
         <button onclick="applyCouponCode()" style="background:var(--primary-purple); color:white; border:none; padding:0 18px; border-radius:12px; font-weight:800; font-size:12px; cursor:pointer;">Apply</button>
       </div>
@@ -862,88 +897,105 @@
           <span id="bill-coupon-amount">-₹0</span>
         </div>
         <div class="bill-row total">
-          <span>To Pay</span>
+          <span>Total To Pay</span>
           <span id="bill-grand-total">₹0</span>
         </div>
       </div>
 
       <!-- Payment Mode -->
-      <div style="font-size:12px; font-weight:800; color:#64748b; margin-bottom:8px;">PAYMENT METHOD:</div>
-      <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px; margin-bottom:12px;">
-        <div id="opt-cod" onclick="selectPaymentMode('COD')" style="border:1.5px solid var(--accent-pink); background:#fff0f4; color:var(--accent-pink); padding:10px; border-radius:12px; text-align:center; font-weight:800; font-size:12px; cursor:pointer;">
+      <div style="font-size:12px; font-weight:800; color:#64748b; margin:14px 0 8px 0;">SELECT PAYMENT METHOD:</div>
+      <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px; margin-bottom:14px;">
+        <div id="opt-cod" onclick="selectPaymentMode('COD')" style="border:1.5px solid var(--accent-pink); background:#fff0f4; color:var(--accent-pink); padding:12px; border-radius:12px; text-align:center; font-weight:800; font-size:13px; cursor:pointer;">
           💵 Cash on Delivery
         </div>
-        <div id="opt-upi" onclick="selectPaymentMode('UPI')" style="border:1.5px solid #cbd5e1; padding:10px; border-radius:12px; text-align:center; font-weight:800; font-size:12px; cursor:pointer; color:#475569;">
+        <div id="opt-upi" onclick="selectPaymentMode('UPI')" style="border:1.5px solid #cbd5e1; padding:12px; border-radius:12px; text-align:center; font-weight:800; font-size:13px; cursor:pointer; color:#475569;">
           📱 Online UPI
         </div>
       </div>
 
-      <div class="upi-gate-card" id="upi-box" style="display:none; background:#faf5ff; border:1px dashed var(--primary-purple); border-radius:14px; padding:14px; text-align:center; margin-bottom:12px;">
+      <div class="upi-gate-card" id="upi-box" style="display:none; background:#faf5ff; border:1px dashed var(--primary-purple); border-radius:14px; padding:14px; text-align:center; margin-bottom:14px;">
         <div style="font-size:13px; font-weight:800; color:var(--primary-purple);">Scan & Pay ₹<span id="upi-box-amount">0</span></div>
         <div style="width:160px; height:160px; margin:8px auto; background:#fff; padding:6px; border-radius:10px;"><img id="upi-qr-img" src="" style="width:100%; height:100%;"></div>
         <input type="tel" id="upi-utr" class="zepto-input" placeholder="Enter 12-digit UTR No." maxlength="12" style="text-align:center; font-weight:800; letter-spacing:1px; background:#fff;">
       </div>
 
-      <!-- Customer Inputs -->
-      <div style="display:flex; flex-direction:column; gap:8px;">
-        <input type="text" id="c-name" class="zepto-input" placeholder="Your Name *">
-        <input type="tel" id="c-phone" class="zepto-input" placeholder="10-digit Phone Number *" maxlength="10">
-        <button type="button" onclick="getCurrentLocation()" style="background:#f1f5f9; border:1.5px solid #cbd5e1; padding:10px; border-radius:12px; font-size:12px; font-weight:800; color:#334155; cursor:pointer;">
-          📍 Use Current GPS Location
+      <!-- Customer Address & MANDATORY Location Section -->
+      <div style="font-size:12px; font-weight:800; color:#64748b; margin-bottom:8px;">DELIVERY DETAILS:</div>
+      <div style="display:flex; flex-direction:column; gap:10px;">
+        <input type="text" id="c-name" class="zepto-input" placeholder="आपका पूरा नाम (Full Name) *">
+        <input type="tel" id="c-phone" class="zepto-input" placeholder="10 अंकों का मोबाइल नंबर (Mobile Number) *" maxlength="10">
+        
+        <!-- Live Location Button -->
+        <button type="button" class="btn-fetch-gps" onclick="getCurrentLocation()">
+          📍 क्लिक करके लाइव लोकेशन अपडेट करें (अनिवार्य)
         </button>
-        <textarea id="c-address" class="zepto-input" rows="2" placeholder="Full Delivery Address *"></textarea>
-        <button class="btn-checkout" id="order-submit-btn" onclick="placeOrder()">Place Order</button>
+
+        <!-- Live Location Card -->
+        <div class="loc-card-box" id="gps-status-box">
+          <div class="loc-card-title">GPS लोकेशन स्थिति (Mandatory):</div>
+          <div class="loc-card-val" id="gps-status-val">⚠️ लोकेशन अपडेट नहीं है। ऊपर दिए गए नीले बटन पर क्लिक करें!</div>
+        </div>
+
+        <!-- Address Textarea -->
+        <div>
+          <label style="font-size: 11px; font-weight: 800; color: #475569; display:block; margin-bottom: 4px;">घर / दुकान / फ्लैट नंबर और लैंडमार्क:</label>
+          <textarea id="c-address" class="zepto-input" rows="3" placeholder="उदाहरण: मकान नंबर 42, शिव मंदिर के पास, मुख्य बाजार *"></textarea>
+        </div>
+
+        <button class="btn-checkout" id="order-submit-btn" onclick="placeOrder()" disabled>
+          ⚠️ पहले लाइव लोकेशन अपडेट करें
+        </button>
       </div>
     </div>
   </div>
 
-  <!-- LIVE TRACKING MODAL -->
-  <div class="modal-overlay" id="track-modal" onclick="closeTrackModal(event)">
-    <div class="bottom-sheet" onclick="event.stopPropagation()">
-      <div class="sheet-head">
+  <!-- FULL PAGE LIVE TRACKING MODAL -->
+  <div class="modal-overlay" id="track-modal">
+    <div class="fullpage-content">
+      <div class="fullpage-head">
         <div>
-          <div class="sheet-title" id="t-order-id">Live Tracking</div>
+          <div class="fullpage-title" id="t-order-id">Live Tracking</div>
           <div style="font-size: 11px; color: var(--text-muted);">10-Min Fast Dispatch</div>
         </div>
-        <button class="sheet-close" onclick="toggleTrackModal(false)">✕</button>
+        <button class="fullpage-close" onclick="toggleTrackModal(false)">✕</button>
       </div>
 
       <!-- 60-Sec Self Cancel -->
-      <div id="self-cancel-container" style="display:none; background:#fef2f2; border:1px solid #fca5a5; padding:10px 14px; border-radius:12px; margin-bottom:12px; justify-content:space-between; align-items:center;">
-        <span style="font-size:12px; font-weight:800; color:#991b1b;">⏱️ Cancel Order? (<span id="cancel-timer-secs">60</span>s left)</span>
-        <button onclick="handleCustomerSelfCancel()" style="background:#dc2626; color:white; border:none; padding:6px 12px; border-radius:8px; font-size:11px; font-weight:800; cursor:pointer;">Cancel ✕</button>
+      <div id="self-cancel-container" style="display:none; background:#fef2f2; border:1px solid #fca5a5; padding:12px 14px; border-radius:12px; margin-bottom:14px; justify-content:space-between; align-items:center;">
+        <span style="font-size:12px; font-weight:800; color:#991b1b;">⏱️ ऑर्डर रद्द करना है? (<span id="cancel-timer-secs">60</span>s बाकी)</span>
+        <button onclick="handleCustomerSelfCancel()" style="background:#dc2626; color:white; border:none; padding:8px 14px; border-radius:8px; font-size:12px; font-weight:800; cursor:pointer;">Cancel ✕</button>
       </div>
 
       <!-- Live OTP Box -->
       <div class="cust-otp-box" id="cust-otp-container" style="display:none;">
         <div style="font-size:11px; font-weight:800; color:#7e22ce;">🔑 SAFE DELIVERY OTP</div>
         <div class="cust-otp-code" id="cust-live-otp">----</div>
-        <div style="font-size:11px; color:#6b21a8; font-weight:600;">Share this OTP with rider on arrival</div>
+        <div style="font-size:11px; color:#6b21a8; font-weight:600;">सामान मिलने पर यह कोड राइडर को बताएँ</div>
       </div>
 
-      <div style="padding: 10px 0 16px 10px;">
-        <div id="st-1" style="font-size:13px; font-weight:800; color:var(--accent-green); margin-bottom:8px;">✓ Order Placed & Packing</div>
-        <div id="st-2" style="font-size:13px; font-weight:800; color:#94a3b8; margin-bottom:8px;">🛵 Out for Delivery</div>
-        <div id="st-3" style="font-size:13px; font-weight:800; color:#94a3b8;">📦 Delivered Successfully</div>
+      <div style="padding: 14px 0 20px 10px;">
+        <div id="st-1" style="font-size:14px; font-weight:800; color:var(--accent-green); margin-bottom:10px;">✓ Order Placed & Packing</div>
+        <div id="st-2" style="font-size:14px; font-weight:800; color:#94a3b8; margin-bottom:10px;">🛵 Out for Delivery</div>
+        <div id="st-3" style="font-size:14px; font-weight:800; color:#94a3b8;">📦 Delivered Successfully</div>
       </div>
 
-      <button class="btn-checkout" style="background:#0f172a;" onclick="toggleTrackModal(false)">Close Tracking</button>
+      <button class="btn-checkout" style="background:#0f172a;" onclick="toggleTrackModal(false)">बंद करें (Close Tracking)</button>
     </div>
   </div>
 
   <!-- SUPPORT MODAL -->
-  <div class="modal-overlay" id="support-modal" onclick="closeSupportModal(event)">
-    <div class="bottom-sheet" onclick="event.stopPropagation()">
-      <div class="sheet-head">
-        <div class="sheet-title">Help & Support 🎧</div>
-        <button class="sheet-close" onclick="toggleSupportModal(false)">✕</button>
+  <div class="modal-overlay" id="support-modal">
+    <div class="fullpage-content">
+      <div class="fullpage-head">
+        <div class="fullpage-title">Help & Support 🎧</div>
+        <button class="fullpage-close" onclick="toggleSupportModal(false)">✕</button>
       </div>
-      <div style="display:flex; flex-direction:column; gap:10px; margin-top:10px;">
+      <div style="display:flex; flex-direction:column; gap:12px; margin-top:14px;">
         <a class="btn-checkout" style="background:#25D366; text-decoration:none; text-align:center;" target="_blank" href="https://wa.me/919711107063?text=Support%20Needed">
-          💬 Chat on WhatsApp (9711107063)
+          💬 WhatsApp पर संपर्क करें (9711107063)
         </a>
         <a class="btn-checkout" style="background:var(--primary-purple); text-decoration:none; text-align:center;" href="tel:9711107063">
-          📞 Call Helpline (9711107063)
+          📞 हेल्पलाइन पर कॉल करें (9711107063)
         </a>
       </div>
     </div>
@@ -962,6 +1014,7 @@
     const STORE_UPI_ID = '7037647464-3@axl';
     let customerCoords = null;
     let calculatedKm = 0;
+    let isLocationUpdated = false; // Mandatory GPS Tracker
     let appliedCoupon = null;
     let cancelTimerInterval = null;
 
@@ -969,8 +1022,8 @@
       theme_color: '#ff3269',
       header_bg: '#f4ecfb',
       primary_purple: '#3c006b',
-      banner_title: '₹249+ par <span style="color: #059669;">Free Delivery</span> 🚚',
-      banner_subtitle: '₹399+ ke order par ₹49 ka Discount!',
+      banner_title: '₹249+ पर <span style="color: #059669;">Free Delivery</span> 🚚',
+      banner_subtitle: '₹399+ के ऑर्डर पर ₹49 का भारी Discount!',
       banner_icon: '🎁',
       min_free_delivery: 249,
       delivery_charge: 25,
@@ -1014,7 +1067,7 @@
 
     function startVoiceSearch() {
       const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-      if (!SpeechRecognition) return alert('Aapke browser me voice search support nahi hai.');
+      if (!SpeechRecognition) return alert('आपके ब्राउज़र में वॉइस सर्च सपोर्ट नहीं है।');
 
       const recognition = new SpeechRecognition();
       recognition.lang = 'hi-IN';
@@ -1051,20 +1104,20 @@
       if (itemsTotal < freeDelMin) {
         const diff = freeDelMin - itemsTotal;
         const pct = Math.min(100, Math.round((itemsTotal / freeDelMin) * 100));
-        targetText.innerHTML = `🚚 Sirf <b>₹${diff}</b> ki aur kharidari pe <b>FREE Delivery</b>!`;
+        targetText.innerHTML = `🚚 सिर्फ <b>₹${diff}</b> की और खरीदारी पर <b>FREE Delivery</b>!`;
         progressBar.style.width = `${pct}%`;
       } else if (itemsTotal < discountMin) {
         const diff = discountMin - itemsTotal;
         const pct = Math.min(100, Math.round((itemsTotal / discountMin) * 100));
-        targetText.innerHTML = `💸 Sirf <b>₹${diff}</b> ki aur kharidari pe <b>₹${appConfig.discount_amount || 49} ka Discount</b>!`;
+        targetText.innerHTML = `💸 सिर्फ <b>₹${diff}</b> की और खरीदारी पर <b>₹${appConfig.discount_amount || 49} का Discount</b>!`;
         progressBar.style.width = `${pct}%`;
       } else if (itemsTotal < freeGiftMin && appConfig.is_free_gift_active) {
         const diff = freeGiftMin - itemsTotal;
         const pct = Math.min(100, Math.round((itemsTotal / freeGiftMin) * 100));
-        targetText.innerHTML = `🎁 Sirf <b>₹${diff}</b> ki aur kharidari pe <b>${appConfig.free_gift_item_name || '1 Cold Drink Free'}</b>!`;
+        targetText.innerHTML = `🎁 सिर्फ <b>₹${diff}</b> की और खरीदारी पर <b>${appConfig.free_gift_item_name || '1 Cold Drink Free'}</b>!`;
         progressBar.style.width = `${pct}%`;
       } else {
-        targetText.innerHTML = `🎉 Badhai! Aapne sabhi offers (Free Delivery + Discount + Gift) unlock kar liye!`;
+        targetText.innerHTML = `🎉 बधाई हो! आपने सभी ऑफ़र (Free Delivery + Discount + Gift) अनलॉक कर लिए हैं!`;
         progressBar.style.width = `100%`;
       }
     }
@@ -1099,7 +1152,7 @@
       const rainStrip = document.getElementById('rain-surge-alert');
       if (appConfig.rain_surge_mode !== 'OFF' && Number(appConfig.rain_surge_fee) > 0) {
         rainStrip.style.display = 'flex';
-        document.getElementById('rain-surge-msg').innerText = `🌧️ Kharab mausam/barish ke karan ₹${appConfig.rain_surge_fee} delivery surge lagu hai.`;
+        document.getElementById('rain-surge-msg').innerText = `🌧️ खराब मौसम के कारण ₹${appConfig.rain_surge_fee} डिलीवरी सर्ज लागू है।`;
       } else {
         rainStrip.style.display = 'none';
       }
@@ -1107,7 +1160,7 @@
       const nightStrip = document.getElementById('night-surge-alert');
       if (isCurrentlyNightTime()) {
         nightStrip.style.display = 'flex';
-        document.getElementById('night-surge-msg').innerText = `🌙 Der raat seva: ₹${appConfig.night_surge_fee} night surge lagu hai.`;
+        document.getElementById('night-surge-msg').innerText = `🌙 देर रात सेवा: ₹${appConfig.night_surge_fee} नाइट सर्ज शुल्क लागू है।`;
       } else {
         nightStrip.style.display = 'none';
       }
@@ -1182,7 +1235,7 @@
       const container = document.getElementById('product-list');
       container.innerHTML = '';
       if (items.length === 0) {
-        container.innerHTML = '<div style="grid-column: span 2; text-align: center; color: #94a3b8; padding: 30px;">Koi saman nahi mila.</div>';
+        container.innerHTML = '<div style="grid-column: span 2; text-align: center; color: #94a3b8; padding: 30px;">कोई सामान नहीं मिला।</div>';
         return;
       }
 
@@ -1288,7 +1341,7 @@
       const entries = Object.values(cart);
 
       if (entries.length === 0) {
-        box.innerHTML = '<div style="text-align:center; padding: 24px; color: #94a3b8; font-weight:600;">Bag is empty.</div>';
+        box.innerHTML = '<div style="text-align:center; padding: 24px; color: #94a3b8; font-weight:600;">थैला खाली है (Cart is empty).</div>';
         document.getElementById('bill-subtotal').innerText = '₹0';
         document.getElementById('bill-grand-total').innerText = '₹0';
         document.getElementById('cart-smart-target-box').style.display = 'none';
@@ -1333,18 +1386,56 @@
       document.getElementById('bill-coupon-amount').innerText = `-₹${couponDisc}`;
     }
 
+    // MANDATORY GPS CURRENT LOCATION HANDLER
+    function getCurrentLocation() {
+      if (!navigator.geolocation) return alert('आपके ब्राउज़र में GPS सपोर्ट नहीं है।');
+
+      const statusVal = document.getElementById('gps-status-val');
+      const orderBtn = document.getElementById('order-submit-btn');
+
+      statusVal.innerText = 'लाइव लोकेशन फ़ੈच हो रही है... कृपया प्रतीक्षा करें।';
+
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          customerCoords = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+          isLocationUpdated = true;
+
+          const mapsUrl = `https://maps.google.com/?q=${pos.coords.latitude},${pos.coords.longitude}`;
+          statusVal.innerHTML = `🟢 लाइव लोकेशन सफलतापूर्वक अपडेट हुई!<br><a href="${mapsUrl}" target="_blank" style="color:#0284c7; font-weight:800;">लिंक देखें ↗</a>`;
+
+          // Order Button Unlock
+          orderBtn.disabled = false;
+          orderBtn.innerText = selectedPaymentMode === 'UPI' ? 'Verify UTR & Place Order' : 'Place Delivery Order';
+          orderBtn.style.background = 'var(--accent-pink-gradient)';
+        },
+        (err) => {
+          isLocationUpdated = false;
+          statusVal.innerHTML = `🔴 लोकेशन फ़ੈच फ़ेल हुई: ${err.message}। कृपया ब्राउज़र में GPS Allow करें!`;
+          orderBtn.disabled = true;
+          orderBtn.innerText = '⚠️ पहले लाइव लोकेशन अपडेट करें';
+        },
+        { enableHighAccuracy: true, timeout: 10000 }
+      );
+    }
+
     async function placeOrder() {
+      if (!isLocationUpdated || !customerCoords) {
+        return alert('⚠️ लाइव लोकेशन अपडेट करना अनिवार्य है! कृपया नीले बटन पर क्लिक करके लोकेशन अपडेट करें।');
+      }
+
       const name = document.getElementById('c-name').value.trim();
       const phone = document.getElementById('c-phone').value.trim();
-      const address = document.getElementById('c-address').value.trim();
+      const manualAddress = document.getElementById('c-address').value.trim();
 
-      if (name.length < 2) return alert('Kripya pura naam darj karein!');
-      if (!/^[6-9]\d{9}$/.test(phone)) return alert('Kripya 10 ankon ka mobile number dalein!');
-      if (address.length < 4) return alert('Kripya delivery pata dalein!');
+      if (name.length < 2) return alert('कृपया अपना पूरा नाम दर्ज करें!');
+      if (!/^[6-9]\d{9}$/.test(phone)) return alert('कृपया 10 अंकों का सही मोबाइल नंबर दर्ज करें!');
+      if (manualAddress.length < 4) return alert('कृपया घर/दुकान का पता और लैंडमार्क लिखें!');
+
+      const combinedAddress = `📍 GPS Link: https://maps.google.com/?q=${customerCoords.lat},${customerCoords.lng}\n🏠 House/Street: ${manualAddress}`;
 
       const { finalToPay, couponDisc, rainSurge, nightSurge } = calculateTotals();
       const entries = Object.values(cart);
-      if (entries.length === 0) return alert('Cart khali hai!');
+      if (entries.length === 0) return alert('थैला खाली है!');
 
       const orderItems = entries.map(({ item, qty }) => ({
         id: item.id, name: item.name, price: item.price, unit: item.unit, qty, subtotal: item.price * qty
@@ -1356,7 +1447,7 @@
         const { data, error } = await _supabase.from('orders').insert([{
           customer_name: name,
           customer_phone: phone,
-          delivery_address: address,
+          delivery_address: combinedAddress,
           items: orderItems,
           total_amount: finalToPay,
           status: 'Order Placed',
@@ -1414,14 +1505,6 @@
       };
       check();
       setInterval(check, 4000);
-    }
-
-    function getCurrentLocation() {
-      if (!navigator.geolocation) return alert('GPS support nahi hai');
-      navigator.geolocation.getCurrentPosition(pos => {
-        document.getElementById('c-address').value = `📍 GPS: https://maps.google.com/?q=${pos.coords.latitude},${pos.coords.longitude}`;
-        alert('Location set ho gayi!');
-      });
     }
 
     function saveOrderToHistory(order) {
