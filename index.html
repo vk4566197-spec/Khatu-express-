@@ -3,30 +3,46 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>👑 Baba Food Rider Partner</title>
+  <title>👑 BABA FOOD DELIVERY — 10 Min Express</title>
+
   <link rel="icon" type="image/png" href="logo.png">
-  <link rel="manifest" href="manifest.json">
+  <link rel="manifest" href="manifest-customer.json">
+  <meta name="theme-color" content="#3c006b">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('sw.js');
+      });
+    }
+  </script>
+
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  
   <style>
     :root {
-      --bg-dark: #121927;
-      --card-dark: #1e2837;
-      --card-white: #ffffff;
-      --accent-green: #10b981;
-      --accent-pink: #e11d48;
-      --zepto-pink: #ff3269;
-      --text-white: #ffffff;
-      --text-sub: #94a3b8;
+      --primary-dark: #1b042d;
+      --primary-purple: #3c006b;
+      --primary-gradient: linear-gradient(135deg, #490082 0%, #1f0237 100%);
+      --accent-pink: #ff2a6d;
+      --accent-pink-gradient: linear-gradient(135deg, #ff2a6d 0%, #e0115f 100%);
+      --accent-green: #059669;
+      --bg-light: #f8fafc;
+      --text-main: #0f172a;
+      --text-muted: #64748b;
+      --border-soft: #f1f5f9;
+      --shadow-sm: 0 2px 8px rgba(0,0,0,0.04);
+      --shadow-float: 0 12px 30px rgba(255, 42, 109, 0.35);
     }
 
     * { 
       box-sizing: border-box; 
       margin: 0; 
       padding: 0; 
-      font-family: 'Inter', sans-serif; 
+      font-family: 'Plus Jakarta Sans', 'Inter', sans-serif; 
       -webkit-tap-highlight-color: transparent;
       -webkit-touch-callout: none;
       -webkit-user-select: none;
@@ -38,771 +54,1110 @@
       user-select: auto !important;
     }
 
-    body { background-color: var(--bg-dark); color: var(--text-white); padding-bottom: 90px; }
-
-    /* AUTH SCREEN */
-    .auth-overlay {
-      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      background: #0b0f19; z-index: 1000; display: none;
-      align-items: center; justify-content: center; padding: 20px;
-    }
-    .auth-overlay.active { display: flex; }
-    .auth-box {
-      background: #1e2837; width: 100%; max-width: 380px; border-radius: 20px;
-      padding: 26px 20px; border: 1px solid #334155; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-      text-align: center;
-    }
-    .auth-logo { width: 68px; height: 68px; border-radius: 50%; border: 2px solid #ff758c; margin: 0 auto 12px auto; display: block; background: #fff; }
-    .auth-title { font-size: 18px; font-weight: 900; color: #fff; }
-    .auth-sub { font-size: 12px; color: #94a3b8; margin: 4px 0 18px 0; }
-
-    .auth-tabs { display: flex; background: #111827; padding: 4px; border-radius: 10px; margin-bottom: 18px; }
-    .auth-tab-btn {
-      flex: 1; padding: 9px; border: none; background: transparent; color: #94a3b8;
-      font-weight: 800; font-size: 12px; border-radius: 8px; cursor: pointer;
-    }
-    .auth-tab-btn.active { background: var(--zepto-pink); color: #fff; }
-
-    .auth-input-group { display: flex; flex-direction: column; gap: 10px; text-align: left; }
-    .auth-input {
-      background: #0f172a; border: 1.5px solid #334155; color: #fff; padding: 12px 14px;
-      border-radius: 10px; font-size: 13px; font-weight: 600; outline: none; width: 100%;
-    }
-    .auth-input:focus { border-color: var(--zepto-pink); }
-    .btn-auth-submit {
-      background: linear-gradient(90deg, #ff3269, #e11d48); color: white; border: none;
-      padding: 14px; border-radius: 10px; font-size: 14px; font-weight: 900;
-      cursor: pointer; width: 100%; margin-top: 6px; box-shadow: 0 4px 12px rgba(255, 50, 105, 0.3);
+    body { 
+      background-color: var(--bg-light); 
+      color: var(--text-main); 
+      padding-bottom: 120px;
+      overflow-x: hidden;
     }
 
-    /* Top Bar */
-    .top-bar {
-      background: #ffffff; color: #1e293b; padding: 12px 16px;
-      display: flex; justify-content: space-between; align-items: center;
+    /* 1. SIDE DRAWER FIX */
+    .drawer-overlay {
+      position: fixed; 
+      top: 0; 
+      left: 0; 
+      width: 100vw; 
+      height: 100vh;
+      background: rgba(15, 23, 42, 0.6); 
+      z-index: 998; 
+      display: none;
+      backdrop-filter: blur(4px);
     }
-    .store-info { display: flex; align-items: center; gap: 10px; }
-    .store-icon { width: 34px; height: 34px; border-radius: 8px; background: #6b21a8; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 16px; }
-    .store-name { font-size: 13px; font-weight: 800; }
-    .store-id { font-size: 10px; color: #64748b; font-weight: 600; }
-
-    .top-actions { display: flex; align-items: center; gap: 10px; }
-    .btn-sos-top {
-      background: #dc2626; color: white; border: none; font-size: 11px;
-      font-weight: 900; padding: 6px 10px; border-radius: 8px; cursor: pointer;
-      display: flex; align-items: center; gap: 4px; box-shadow: 0 2px 8px rgba(220, 38, 38, 0.3);
-      animation: pulseSos 1.8s infinite;
-    }
-    @keyframes pulseSos {
-      0%, 100% { transform: scale(1); }
-      50% { transform: scale(1.05); }
-    }
+    .drawer-overlay.active { display: block; }
     
-    .switch { position: relative; display: inline-block; width: 44px; height: 24px; }
-    .switch input { opacity: 0; width: 0; height: 0; }
-    .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #cbd5e1; transition: .3s; border-radius: 24px; }
-    .slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: white; transition: .3s; border-radius: 50%; }
-    input:checked + .slider { background-color: var(--accent-green); }
-    input:checked + .slider:before { transform: translateX(20px); }
-
-    .help-btn { font-size: 12px; font-weight: 700; color: #475569; display: flex; align-items: center; gap: 4px; cursor: pointer; }
-
-    /* SPEED LIVE TICKER BAR */
-    .speed-guard-strip {
-      background: #1e293b; border-bottom: 1px solid #334155; padding: 8px 16px;
-      display: flex; justify-content: space-between; align-items: center; font-size: 12px; font-weight: 800;
-    }
-    .speed-val-box { display: flex; align-items: center; gap: 6px; }
-    .speed-num { font-size: 15px; font-weight: 900; color: #38bdf8; }
-    .speed-alert-badge {
-      display: none; background: #dc2626; color: white; padding: 2px 8px;
-      border-radius: 10px; font-size: 10px; font-weight: 900; animation: pulseSos 1s infinite;
-    }
-
-    .shift-box {
-      background: #ffffff; color: #1e293b; padding: 12px 16px; border-bottom: 1px solid #f1f5f9;
-      display: flex; justify-content: space-between; align-items: center;
-    }
-    .shift-left { display: flex; align-items: center; gap: 10px; }
-    .shift-icon { font-size: 20px; }
-    .shift-time { font-size: 15px; font-weight: 800; }
-    .shift-break { font-size: 11px; color: #64748b; font-weight: 600; }
-    .shift-right { text-align: right; }
-    .shift-done { font-size: 15px; font-weight: 900; color: #0f172a; }
-    .shift-status-lbl { font-size: 10px; color: #64748b; font-weight: 700; }
-
-    .waiting-pill {
-      background: linear-gradient(180deg, #243042 0%, #1a2332 100%);
-      margin: 14px 16px; padding: 16px; border-radius: 14px; text-align: center;
-      display: flex; align-items: center; justify-content: center; gap: 10px;
-      border: 1px solid #334155; box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-    }
-    .waiting-pill.active-duty { border-color: var(--accent-green); }
-    .waiting-text { font-size: 15px; font-weight: 800; color: #f8fafc; }
-
-    .earnings-card {
-      background: var(--card-white); color: #0f172a; border-radius: 16px; margin: 0 16px 16px 16px;
-      padding: 18px 16px; box-shadow: 0 4px 16px rgba(0,0,0,0.15);
-    }
-    .main-earning { font-size: 26px; font-weight: 900; margin-bottom: 14px; }
-    .earning-meta-grid { display: grid; grid-template-columns: repeat(3, 1fr); border-top: 1px solid #f1f5f9; padding-top: 12px; }
-    .meta-col { display: flex; flex-direction: column; gap: 2px; cursor: pointer; }
-    .meta-top { font-size: 14px; font-weight: 800; display: flex; align-items: center; gap: 4px; }
-    .meta-sub { font-size: 10px; font-weight: 700; color: #64748b; }
-
-    .segment-wrap {
-      display: flex; gap: 8px; margin: 0 16px 14px 16px; background: #1e2837;
-      padding: 4px; border-radius: 12px; border: 1px solid #334155;
-    }
-    .seg-btn {
-      flex: 1; padding: 8px 12px; border-radius: 9px; border: none; background: transparent;
-      color: #94a3b8; font-size: 12px; font-weight: 800; cursor: pointer; transition: 0.2s;
-    }
-    .seg-btn.active {
-      background: var(--accent-pink); color: #fff; box-shadow: 0 2px 8px rgba(225, 29, 72, 0.3);
-    }
-
-    .orders-queue-box { margin: 0 16px 16px 16px; }
-    .rider-order-card {
-      background: var(--card-dark); border: 1px solid #334155; border-radius: 14px;
-      padding: 16px; margin-bottom: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.25);
-    }
-    .r-card-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
-    .r-badge { background: #0284c7; color: white; padding: 4px 8px; border-radius: 6px; font-size: 11px; font-weight: 800; }
-    .r-badge.delivered { background: var(--accent-green); }
-    .r-badge.batch { background: #8b5cf6; }
-    .r-address { font-size: 12px; color: #cbd5e1; margin: 8px 0; line-height: 1.4; white-space: pre-line; }
-    .btn-action-rider {
-      background: var(--accent-green); color: white; border: none; width: 100%;
-      padding: 12px; border-radius: 10px; font-size: 13px; font-weight: 800; cursor: pointer; margin-top: 8px;
-    }
-
-    .bottom-nav {
-      position: fixed; bottom: 0; left: 0; width: 100%; height: 62px;
-      background: #ffffff; border-top: 1px solid #e2e8f0; display: flex;
-      justify-content: space-around; align-items: center; z-index: 200;
-    }
-    .b-item { display: flex; flex-direction: column; align-items: center; gap: 3px; font-size: 10px; font-weight: 700; color: #64748b; text-decoration: none; cursor: pointer; }
-    .b-item.active { color: #ef4444; }
-    .b-icon { font-size: 18px; }
-
-    /* SCREEN 1: Bin Pick */
-    .bin-screen {
-      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      background: #f8fafc; z-index: 500; display: none; flex-direction: column; color: #0f172a;
-    }
-    .bin-screen.active { display: flex; }
-    .bin-header { padding: 22px 18px 12px 18px; display: flex; justify-content: space-between; align-items: center; }
-    .bin-title { font-size: 26px; font-weight: 900; letter-spacing: -0.5px; }
-    .shelf-icon-badge { background: #ede9fe; padding: 6px 10px; border-radius: 8px; font-size: 18px; }
-    .bin-hash-bar { background: #f1f5f9; padding: 12px 18px; font-size: 15px; font-weight: 900; color: #334155; }
-    .bin-shelf-row { padding: 14px 18px; display: flex; justify-content: space-between; align-items: center; font-size: 15px; font-weight: 800; color: #1e293b; }
-    .shelf-count-circle { background: #e2e8f0; color: #475569; padding: 2px 8px; border-radius: 12px; font-size: 12px; }
-    
-    .bin-items-row { 
-      padding: 10px 18px; 
+    .side-drawer {
+      position: fixed; 
+      top: 0; 
+      left: -320px; 
+      width: 280px; 
+      height: 100vh;
+      background: #ffffff; 
+      z-index: 999; 
+      box-shadow: 6px 0 25px rgba(0,0,0,0.25);
+      transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
       display: flex; 
-      gap: 16px; 
-      overflow-x: auto; 
+      flex-direction: column;
     }
-    .bin-item-card { 
-      width: 82px; 
-      height: 82px; 
-      border: 2px solid #cbd5e1; 
-      border-radius: 14px; 
+    .side-drawer.active { left: 0 !important; }
+    
+    .drawer-header {
+      background: var(--primary-gradient);
+      color: white; 
+      padding: 24px 18px 20px 18px;
+      text-align: left;
+    }
+    .drawer-logo-img {
+      width: 64px !important; 
+      height: 64px !important; 
+      max-width: 64px !important;
+      max-height: 64px !important;
+      border-radius: 50% !important;
+      object-fit: cover !important; 
+      background: #fff; 
+      border: 2px solid #ff758c;
+      display: block !important; 
+      margin-bottom: 10px; 
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    }
+    .drawer-brand { 
+      font-size: 15px; 
+      font-weight: 900; 
+      color: #ff94b4; 
+      line-height: 1.2; 
+    }
+    .drawer-menu-list { 
+      padding: 12px 0; 
+      flex: 1; 
+      overflow-y: auto; 
+    }
+    .drawer-item {
+      display: flex; 
+      align-items: center; 
+      gap: 12px; 
+      padding: 14px 20px;
+      font-size: 13px; 
+      font-weight: 700; 
+      color: #1e293b; 
+      cursor: pointer; 
+      text-decoration: none;
+      border-bottom: 1px solid #f8fafc;
+      transition: background 0.15s;
+    }
+    .drawer-item:active { background: #f1f5f9; }
+
+    /* 2. BROADCAST NOTICE TICKER */
+    .broadcast-ticker-wrap {
+      display: none; 
+      background: linear-gradient(90deg, #ea580c, #c2410c); 
+      color: #ffffff; 
+      padding: 8px 14px;
+      font-size: 11.5px; 
+      font-weight: 800; 
+      letter-spacing: 0.3px;
+      overflow: hidden; 
+      white-space: nowrap;
+      box-shadow: 0 2px 8px rgba(234, 88, 12, 0.2);
+    }
+    .broadcast-ticker-text {
+      display: inline-block; 
+      padding-left: 100%;
+      animation: tickerMarquee 20s linear infinite;
+    }
+    @keyframes tickerMarquee {
+      0% { transform: translate3d(0, 0, 0); }
+      100% { transform: translate3d(-100%, 0, 0); }
+    }
+
+    /* 3. TOP HERO HEADER */
+    .top-hero-area {
+      background: var(--primary-gradient);
+      padding: 16px 16px 20px 16px; 
+      border-radius: 0 0 26px 26px;
+      box-shadow: 0 10px 30px rgba(42, 8, 69, 0.2);
+      color: white;
+    }
+    .location-row { 
+      display: flex; 
+      justify-content: space-between; 
+      align-items: center; 
+      margin-bottom: 14px; 
+    }
+    .brand-cluster {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .header-app-logo {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 1.5px solid #ff758c;
+      background: #fff;
+    }
+    .menu-trigger-btn {
+      background: rgba(255,255,255,0.14); 
+      border: 1px solid rgba(255,255,255,0.22); 
+      width: 38px; 
+      height: 38px;
+      border-radius: 12px; 
+      display: flex; 
+      align-items: center; 
+      justify-content: center;
+      font-size: 18px; 
+      color: white;
+      cursor: pointer;
+      backdrop-filter: blur(10px);
+    }
+    .brand-meta h1 {
+      font-size: 14px;
+      font-weight: 900;
+      letter-spacing: -0.2px;
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .eta-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      background: rgba(255, 42, 109, 0.25);
+      border: 1px solid rgba(255, 42, 109, 0.4);
+      color: #ff94b4;
+      font-size: 10px;
+      font-weight: 800;
+      padding: 2px 7px;
+      border-radius: 12px;
+      margin-top: 2px;
+    }
+
+    /* SEARCH BAR */
+    .search-box-wrap { 
+      position: relative; 
+      margin-bottom: 14px; 
+      display: flex; 
+      align-items: center; 
+    }
+    .search-bar-input {
+      width: 100%; 
+      background: rgba(255, 255, 255, 0.96); 
+      border: none;
+      border-radius: 16px;
+      padding: 13px 46px 13px 40px; 
+      font-size: 13px; 
+      font-weight: 600;
+      color: #1e293b;
+      outline: none;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.1);
+    }
+    .search-icon-pos { 
+      position: absolute; 
+      left: 14px; 
+      font-size: 15px; 
+      color: #64748b; 
+    }
+    .voice-mic-btn {
+      position: absolute; 
+      right: 8px; 
+      width: 32px; 
+      height: 32px; 
+      border-radius: 50%;
+      background: #f1f5f9; 
+      border: 1px solid #cbd5e1; 
+      color: var(--primary-purple);
+      display: flex; 
+      align-items: center; 
+      justify-content: center; 
+      font-size: 14px; 
+      cursor: pointer;
+    }
+    .voice-mic-btn.recording {
+      background: #fee2e2; 
+      border-color: #f87171; 
+      color: #dc2626;
+      animation: pulseMic 1s infinite;
+    }
+    @keyframes pulseMic { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.18); } }
+
+    /* CATEGORIES */
+    .category-scroll { 
+      display: flex; 
+      gap: 12px; 
+      overflow-x: auto; 
+      scrollbar-width: none; 
+      padding-top: 4px;
+    }
+    .category-scroll::-webkit-scrollbar { display: none; }
+    .cat-item { 
       display: flex; 
       flex-direction: column; 
       align-items: center; 
+      cursor: pointer; 
+      min-width: 56px; 
+    }
+    .cat-icon-circle {
+      width: 48px; 
+      height: 48px; 
+      border-radius: 16px; 
+      background: rgba(255,255,255,0.12); 
+      border: 1px solid rgba(255,255,255,0.16);
+      display: flex; 
+      align-items: center; 
       justify-content: center; 
-      background: #fff; 
-      position: relative; 
-      cursor: pointer;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.06);
-      transition: transform 0.15s;
+      font-size: 22px; 
+      margin-bottom: 6px;
+      backdrop-filter: blur(8px);
+      transition: all 0.2s ease;
     }
-    .bin-item-card:active { transform: scale(0.95); }
-    .bin-item-card img { 
-      width: 60px; 
-      height: 60px; 
+    .cat-item.active .cat-icon-circle { 
+      background: #ffffff; 
+      border-color: #ffffff;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+    .cat-name { 
+      font-size: 11px; 
+      font-weight: 700; 
+      color: rgba(255,255,255,0.85); 
+    }
+    .cat-item.active .cat-name {
+      color: #ffffff;
+      font-weight: 900;
+    }
+
+    /* PROMO HERO CARD */
+    .promo-banner {
+      margin: 14px 16px; 
+      background: linear-gradient(135deg, #ffffff 0%, #fff1f5 100%);
+      border-radius: 18px; 
+      padding: 16px 18px; 
+      display: flex; 
+      justify-content: space-between; 
+      align-items: center; 
+      border: 1px solid #ffe4ec;
+      box-shadow: var(--shadow-sm);
+    }
+    .promo-text h3 { 
+      font-size: 14px; 
+      font-weight: 900; 
+      color: var(--primary-purple); 
+      line-height: 1.3; 
+    }
+    .promo-sub { 
+      font-size: 11px; 
+      color: var(--accent-pink); 
+      font-weight: 700; 
+      margin-top: 3px; 
+    }
+
+    /* PRODUCT CARDS GRID */
+    .main-container { padding: 0 16px; }
+    .grid { 
+      display: grid; 
+      grid-template-columns: repeat(2, 1fr); 
+      gap: 14px; 
+    }
+    .product-card {
+      background: #ffffff; 
+      border-radius: 18px; 
+      border: 1px solid var(--border-soft);
+      padding: 10px; 
+      display: flex; 
+      flex-direction: column; 
+      justify-content: space-between; 
+      position: relative;
+      box-shadow: var(--shadow-sm);
+    }
+    .img-box {
+      width: 100%; 
+      height: 125px; 
+      border-radius: 14px; 
+      background: #f8fafc;
+      display: flex; 
+      align-items: center; 
+      justify-content: center; 
+      overflow: hidden; 
+      margin-bottom: 10px; 
+      position: relative;
+    }
+    .img-box img { 
+      width: 100%; 
+      height: 100%; 
       object-fit: cover; 
-      border-radius: 10px;
     }
-    .bin-item-qty { 
+    .out-of-stock-tag {
       position: absolute; 
-      bottom: -9px; 
-      background: #0f172a; 
-      color: #fff;
-      border-radius: 6px; 
+      top: 8px; 
+      left: 8px; 
+      background: rgba(15, 23, 42, 0.85);
+      color: white; 
+      font-size: 9.5px; 
+      font-weight: 800; 
+      padding: 4px 8px; 
+      border-radius: 8px;
+    }
+    .low-stock-tag {
+      position: absolute;
+      top: 8px;
+      left: 8px;
+      background: #f59e0b;
+      color: white;
+      font-size: 9px;
+      font-weight: 800;
+      padding: 3px 6px;
+      border-radius: 6px;
+    }
+    .discount-badge-pill {
+      position: absolute; 
+      top: 8px; 
+      right: 8px; 
+      background: linear-gradient(135deg, #10b981, #059669);
+      color: #ffffff; 
       font-size: 10px; 
       font-weight: 900; 
-      padding: 1px 7px; 
+      padding: 3px 8px;
+      border-radius: 8px; 
+      box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
     }
-    .bin-floating-bell { 
-      position: absolute; bottom: 90px; right: 20px; background: #f3e8ff; border: 1px solid #d8b4fe; width: 50px; height: 50px; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 22px; cursor: pointer; 
+    .prod-title { 
+      font-size: 13px; 
+      font-weight: 800; 
+      color: #0f172a; 
+      line-height: 1.35; 
+      margin-bottom: 2px; 
+      height: 35px; 
+      display: -webkit-box; 
+      -webkit-line-clamp: 2; 
+      -webkit-box-orient: vertical; 
+      overflow: hidden; 
     }
-    .bin-bottom-bar { margin-top: auto; padding: 16px; background: #fff; border-top: 1px solid #e2e8f0; }
-    .btn-take-photo-trigger { background: var(--zepto-pink); color: white; border: none; width: 100%; padding: 15px; border-radius: 12px; font-size: 15px; font-weight: 900; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; }
+    .prod-unit { 
+      font-size: 11px; 
+      color: var(--text-muted); 
+      font-weight: 600;
+      margin-bottom: 10px; 
+    }
+    .price-action-row { 
+      display: flex; 
+      align-items: center; 
+      justify-content: space-between; 
+      margin-top: auto; 
+    }
+    .price-tag { 
+      font-size: 15px; 
+      font-weight: 900; 
+      color: #0f172a;
+    }
+    .mrp-cut {
+      text-decoration: line-through; 
+      color: #94a3b8; 
+      font-size: 11px;
+      font-weight: 600; 
+      margin-left: 4px;
+    }
+    .btn-add-zepto {
+      background: #ffffff; 
+      border: 1.5px solid var(--accent-pink); 
+      color: var(--accent-pink);
+      padding: 6px 18px; 
+      border-radius: 10px; 
+      font-weight: 900; 
+      font-size: 12px; 
+      cursor: pointer;
+      box-shadow: 0 2px 6px rgba(255, 42, 109, 0.12);
+    }
+    .qty-counter {
+      display: flex; 
+      align-items: center; 
+      background: var(--accent-pink-gradient);
+      border-radius: 10px; 
+      color: white; 
+      padding: 4px 8px; 
+      gap: 10px; 
+      font-weight: 900; 
+      font-size: 13px;
+    }
+    .qty-btn { 
+      background: none; 
+      border: none; 
+      color: white; 
+      font-size: 16px; 
+      font-weight: 900; 
+      cursor: pointer; 
+      line-height: 1;
+    }
 
-    /* ITEM PHOTO FULL ZOOM MODAL */
-    .item-zoom-modal {
-      position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-      background: rgba(15, 23, 42, 0.88); z-index: 1200; display: none;
-      align-items: center; justify-content: center; padding: 20px;
-      backdrop-filter: blur(5px);
+    /* SMART GLOWING UPSELL CARD */
+    .cart-target-banner {
+      background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
+      border: 1.5px solid #fcd34d;
+      border-radius: 16px;
+      padding: 14px 16px;
+      margin-bottom: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      box-shadow: 0 4px 16px rgba(245, 158, 11, 0.12);
     }
-    .item-zoom-modal.active { display: flex; }
-    .zoom-content-box {
-      background: #ffffff; border-radius: 20px; padding: 20px;
-      width: 100%; max-width: 320px; text-align: center; color: #0f172a;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-      position: relative; animation: popZoom 0.2s ease-out;
+    .target-headline {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      font-weight: 900;
+      color: #92400e;
+      line-height: 1.35;
     }
-    @keyframes popZoom {
-      from { transform: scale(0.85); opacity: 0; }
-      to { transform: scale(1); opacity: 1; }
+    .target-progress-bg {
+      width: 100%;
+      height: 7px;
+      background: #fde68a;
+      border-radius: 8px;
+      overflow: hidden;
     }
-    .zoom-img-large {
-      width: 100%; height: 230px; border-radius: 14px;
-      object-fit: cover; background: #f8fafc; border: 1.5px solid #e2e8f0;
+    .target-progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #f59e0b, #10b981);
+      width: 0%;
+      border-radius: 8px;
+      transition: width 0.4s ease;
+    }
+
+    /* FLOATING CART & NAV */
+    .floating-cart-bar {
+      position: fixed; 
+      bottom: 74px; 
+      left: 14px; 
+      right: 14px;
+      background: var(--accent-pink-gradient);
+      color: white; 
+      border-radius: 18px; 
+      padding: 14px 20px; 
+      display: none;
+      justify-content: space-between; 
+      align-items: center; 
+      box-shadow: var(--shadow-float);
+      z-index: 150; 
+      cursor: pointer;
+    }
+    .bottom-nav-bar {
+      position: fixed; 
+      bottom: 0; 
+      left: 0; 
+      width: 100%; 
+      height: 64px;
+      background: rgba(255, 255, 255, 0.95); 
+      backdrop-filter: blur(12px);
+      border-top: 1px solid var(--border-soft); 
+      display: flex;
+      justify-content: space-around; 
+      align-items: center; 
+      z-index: 100;
+    }
+    .nav-item { 
+      display: flex; 
+      flex-direction: column; 
+      align-items: center; 
+      gap: 3px; 
+      font-size: 10px; 
+      font-weight: 700; 
+      color: #64748b; 
+      cursor: pointer; 
+    }
+    .nav-item.active { color: var(--accent-pink); }
+    .nav-item-icon { font-size: 19px; }
+
+    /* FULL-PAGE VIEW FOR CART & ORDER */
+    .modal-overlay {
+      position: fixed; 
+      top: 0; 
+      left: 0; 
+      width: 100vw; 
+      height: 100vh;
+      background: #ffffff; 
+      display: none; 
+      flex-direction: column; 
+      z-index: 1000;
+      overflow-y: auto;
+    }
+    .modal-overlay.active { display: flex; }
+    .fullpage-content {
+      background: white; 
+      width: 100%;
+      min-height: 100vh;
+      padding: 18px 18px 60px 18px;
+    }
+    .fullpage-head {
+      display: flex; 
+      justify-content: space-between; 
+      align-items: center;
+      margin-bottom: 16px; 
+      padding-bottom: 14px; 
+      border-bottom: 1px solid var(--border-soft);
+    }
+    .fullpage-title { font-size: 18px; font-weight: 900; color: var(--text-main); }
+    .fullpage-close {
+      background: #f1f5f9; 
+      border: none; 
+      width: 36px; 
+      height: 36px;
+      border-radius: 50%; 
+      font-size: 16px;
+      font-weight: bold; 
+      cursor: pointer;
+    }
+
+    .bill-box { 
+      background: #f8fafc; 
+      padding: 14px; 
+      border-radius: 16px; 
+      margin: 14px 0; 
+      font-size: 13px; 
+      border: 1px solid var(--border-soft);
+    }
+    .bill-row { 
+      display: flex; 
+      justify-content: space-between; 
+      margin-bottom: 8px; 
+      font-weight: 600;
+      color: #475569;
+    }
+    .bill-row.total { 
+      font-weight: 900; 
+      font-size: 16px; 
+      margin-top: 10px; 
+      padding-top: 10px; 
+      border-top: 1px dashed #cbd5e1; 
+      color: #0f172a; 
+    }
+    .btn-checkout { 
+      background: var(--accent-pink-gradient); 
+      color: white; 
+      border: none; 
+      padding: 16px; 
+      border-radius: 14px; 
+      font-size: 15px; 
+      font-weight: 900; 
+      cursor: pointer; 
+      width: 100%; 
+      margin-top: 14px; 
+      box-shadow: 0 4px 14px rgba(255, 42, 109, 0.3);
+      transition: all 0.2s;
+    }
+    .btn-checkout:disabled {
+      background: #94a3b8 !important;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+    .zepto-input { 
+      width: 100%; 
+      padding: 12px 14px; 
+      border-radius: 12px; 
+      border: 1.5px solid #cbd5e1; 
+      font-size: 13px; 
+      font-weight: 600;
+      outline: none; 
+    }
+
+    /* ALAG-ALAG LIVE LOCATION & ADDRESS CARD */
+    .loc-card-box {
+      background: #f0fdf4;
+      border: 1.5px solid #86efac;
+      border-radius: 14px;
+      padding: 12px 14px;
       margin-bottom: 12px;
     }
-    .zoom-item-name { font-size: 16px; font-weight: 900; margin-bottom: 4px; }
-    .zoom-item-qty { font-size: 13px; font-weight: 800; color: #0284c7; }
-    .btn-close-zoom {
-      background: #0f172a; color: white; border: none;
-      width: 100%; padding: 12px; border-radius: 10px;
-      font-size: 13px; font-weight: 800; margin-top: 14px; cursor: pointer;
+    .loc-card-title {
+      font-size: 11px;
+      font-weight: 800;
+      color: #166534;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+    .loc-card-val {
+      font-size: 12px;
+      font-weight: 700;
+      color: #15803d;
+      word-break: break-all;
+    }
+    .btn-fetch-gps {
+      background: #0284c7;
+      color: white;
+      border: none;
+      width: 100%;
+      padding: 12px;
+      border-radius: 12px;
+      font-size: 13px;
+      font-weight: 800;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      box-shadow: 0 2px 8px rgba(2, 132, 199, 0.25);
+      margin-bottom: 10px;
     }
 
-    /* SCREEN 2: Photo */
-    .photo-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 600; display: none; flex-direction: column; }
-    .photo-screen.active { display: flex; }
-    .photo-nav { position: absolute; top: 0; left: 0; width: 100%; padding: 16px; display: flex; align-items: center; gap: 14px; color: white; z-index: 10; background: linear-gradient(180deg, rgba(0,0,0,0.7) 0%, transparent 100%); }
-    .photo-nav-title { font-size: 16px; font-weight: 800; }
-    .btn-photo-close { background: none; border: none; color: white; font-size: 20px; font-weight: 900; cursor: pointer; }
-    .camera-live-frame { width: 100%; flex: 1; display: flex; align-items: center; justify-content: center; position: relative; background: #111; overflow: hidden; }
-    .camera-live-frame img { width: 100%; height: 100%; object-fit: contain; }
-    .btn-trash-photo { position: absolute; bottom: 20px; background: #fff; border: 1px solid #e2e8f0; width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; color: #be185d; cursor: pointer; }
-    .photo-bottom-panel { background: #fff; padding: 14px 18px 24px 18px; border-radius: 20px 20px 0 0; }
-    .thumbs-row { display: flex; gap: 12px; margin-bottom: 14px; }
-    .thumb-box { width: 60px; height: 60px; border-radius: 8px; border: 2px solid #000; overflow: hidden; display: flex; align-items: center; justify-content: center; }
-    .thumb-box img { width: 100%; height: 100%; object-fit: cover; }
-    .thumb-plus-btn { width: 60px; height: 60px; border-radius: 8px; border: 1px solid #e2e8f0; background: #f8fafc; display: flex; align-items: center; justify-content: center; font-size: 20px; color: #64748b; cursor: pointer; }
-    .btn-submit-photo { background: #e11d48; color: white; border: none; width: 100%; padding: 15px; border-radius: 10px; font-size: 16px; font-weight: 800; cursor: pointer; }
-
-    /* SCREEN 3: On The Way */
-    .way-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #f1f5f9; z-index: 700; display: none; flex-direction: column; }
-    .way-screen.active { display: flex; }
-    .way-map-container { position: relative; width: 100%; height: 58%; background: #e2e8f0; overflow: hidden; }
-    .way-map-iframe { width: 100%; height: 100%; border: none; }
-    .way-top-bar { position: absolute; top: 16px; right: 16px; display: flex; align-items: center; gap: 10px; z-index: 10; }
-    .btn-sos { background: #dc2626; color: white; font-size: 13px; font-weight: 900; width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(220, 38, 38, 0.4); border: none; cursor: pointer; }
-    .btn-help-pill { background: #ffffff; color: #1e293b; font-size: 13px; font-weight: 800; padding: 10px 18px; border-radius: 24px; display: flex; align-items: center; gap: 6px; box-shadow: 0 4px 14px rgba(0,0,0,0.12); text-decoration: none; border: none; cursor: pointer; }
-    .btn-floating-navigate { position: absolute; bottom: 20px; right: 16px; width: 48px; height: 48px; background: #7e22ce; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 22px; cursor: pointer; box-shadow: 0 4px 14px rgba(126, 34, 206, 0.4); text-decoration: none; z-index: 10; }
-    .way-bottom-sheet { flex: 1; background: #ffffff; border-radius: 24px 24px 0 0; padding: 14px 20px 24px 20px; display: flex; flex-direction: column; justify-content: space-between; box-shadow: 0 -4px 20px rgba(0,0,0,0.08); margin-top: -16px; z-index: 20; color: #0f172a; }
-    .sheet-handle-pill { width: 40px; height: 4px; background: #cbd5e1; border-radius: 4px; margin: 0 auto 12px auto; }
-    .way-title { font-size: 20px; font-weight: 900; text-align: center; color: #1e293b; margin-bottom: 12px; }
-    .way-address-box { display: flex; gap: 12px; align-items: flex-start; margin-bottom: auto; }
-    .way-nav-arrow-circle { width: 36px; height: 36px; border-radius: 50%; background: #e0f2fe; color: #0284c7; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
-    .way-addr-label { font-size: 11px; font-weight: 700; color: #64748b; margin-bottom: 2px; }
-    .way-addr-content { font-size: 13px; font-weight: 800; color: #0f172a; line-height: 1.4; max-height: 80px; overflow-y: auto; }
-    .btn-mark-arrived { background: #e11d48; color: white; border: none; width: 100%; padding: 15px; border-radius: 12px; font-size: 15px; font-weight: 900; cursor: pointer; }
-
-    /* COD Slide Modal */
-    .cod-modal-overlay {
-      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(0, 0, 0, 0.8); z-index: 850; display: none;
-      align-items: flex-end; justify-content: center; backdrop-filter: blur(4px);
+    .past-order-box { 
+      background: #fff; 
+      border-radius: 16px; 
+      border: 1px solid var(--border-soft); 
+      padding: 14px; 
+      margin-bottom: 12px; 
+      box-shadow: var(--shadow-sm);
     }
-    .cod-modal-overlay.active { display: flex; }
-    .cod-sheet {
-      background: #ffffff; width: 100%; max-width: 480px; border-radius: 26px 26px 0 0;
-      padding: 24px 20px 30px 20px; text-align: center; color: #0f172a;
+    .cust-otp-box {
+      background: linear-gradient(135deg, #fdf4ff, #fae8ff);
+      border: 2px dashed #c084fc; 
+      border-radius: 16px;
+      padding: 14px; 
+      text-align: center; 
+      margin: 14px 0;
     }
-    .cod-cash-icon {
-      width: 65px; height: 65px; border-radius: 50%; background: #fef3c7;
-      color: #b45309; display: flex; align-items: center; justify-content: center;
-      font-size: 32px; margin: 0 auto 10px auto;
-    }
-    .cod-collect-banner {
-      background: #f8fafc; border: 2px dashed #cbd5e1; border-radius: 14px;
-      padding: 16px; margin: 16px 0;
-    }
-    .slider-track {
-      position: relative; width: 100%; height: 58px; background: #e2e8f0;
-      border-radius: 30px; overflow: hidden; display: flex; align-items: center;
-      justify-content: center; user-select: none; touch-action: none;
-    }
-    .slider-track-text { font-size: 13px; font-weight: 800; color: #475569; pointer-events: none; }
-    .slider-thumb {
-      position: absolute; left: 4px; top: 4px; width: 50px; height: 50px;
-      background: var(--accent-green); border-radius: 50%; display: flex;
-      align-items: center; justify-content: center; color: white; font-size: 22px;
-      font-weight: 900; cursor: grab; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+    .cust-otp-code { 
+      font-size: 32px; 
+      font-weight: 900; 
+      color: #581c87; 
+      letter-spacing: 6px; 
+      margin: 4px 0; 
     }
 
-    /* 4-DIGIT OTP VERIFICATION MODAL */
-    .otp-modal-overlay {
-      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(15, 23, 42, 0.85); z-index: 880; display: none;
-      align-items: center; justify-content: center; padding: 20px; backdrop-filter: blur(4px);
+    /* RATING SYSTEM */
+    .rider-rating-card {
+      background: #ffffff; border: 1.5px solid #fde047; border-radius: 16px;
+      padding: 18px 16px; margin: 16px 0; text-align: center; box-shadow: 0 4px 16px rgba(234, 179, 8, 0.15);
     }
-    .otp-modal-overlay.active { display: flex; }
-    .otp-card-sheet {
-      background: #ffffff; width: 100%; max-width: 360px; border-radius: 20px;
-      padding: 24px 20px; text-align: center; color: #0f172a;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+    .stars-row { display: flex; justify-content: center; gap: 8px; font-size: 32px; margin: 10px 0; cursor: pointer; }
+    .star-icon { color: #cbd5e1; transition: 0.2s; }
+    .star-icon.filled { color: #eab308; }
+    .rating-chips-row { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; margin: 10px 0; }
+    .rating-chip {
+      background: #f8fafc; border: 1px solid #e2e8f0; color: #475569;
+      font-size: 11px; font-weight: 700; padding: 5px 10px; border-radius: 16px; cursor: pointer;
     }
-    .otp-icon-circle {
-      width: 60px; height: 60px; border-radius: 50%; background: #f3e8ff;
-      color: #7e22ce; display: flex; align-items: center; justify-content: center;
-      font-size: 28px; margin: 0 auto 12px auto;
-    }
-    .otp-input-field {
-      width: 100%; padding: 14px; border-radius: 12px; border: 2px solid #cbd5e1;
-      font-size: 26px; font-weight: 900; text-align: center; letter-spacing: 10px;
-      outline: none; color: #1e293b; background: #f8fafc; margin: 16px 0;
-    }
-    .otp-input-field:focus { border-color: var(--accent-green); background: #ffffff; }
+    .rating-chip.selected { background: #fef9c3; border-color: #facc15; color: #854d0e; }
 
-    /* Success Modal */
-    .success-modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.75); z-index: 900; display: none; align-items: flex-end; justify-content: center; backdrop-filter: blur(4px); }
-    .success-modal-overlay.active { display: flex; }
-    .success-sheet { background: #ffffff; width: 100%; max-width: 480px; border-radius: 24px 24px 0 0; padding: 24px 20px 30px 20px; text-align: center; color: #0f172a; }
-    .success-check-circle { width: 70px; height: 70px; border-radius: 50%; background: #dcfce7; color: var(--accent-green); display: flex; align-items: center; justify-content: center; font-size: 36px; margin: 0 auto 12px auto; }
-    .success-amount-pill { background: #f8fafc; border: 1.5px dashed #cbd5e1; border-radius: 12px; padding: 12px; margin: 16px 0; font-size: 14px; font-weight: 800; }
-
-    /* Profile Modal */
-    .profile-modal-overlay {
-      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(0, 0, 0, 0.7); z-index: 950; display: none;
-      align-items: flex-end; justify-content: center; backdrop-filter: blur(4px);
-    }
-    .profile-modal-overlay.active { display: flex; }
-    .profile-sheet {
-      background: #ffffff; width: 100%; max-width: 480px; border-radius: 24px 24px 0 0;
-      padding: 24px 20px 30px 20px; color: #0f172a;
-    }
-    .profile-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; border-bottom: 1px solid #f1f5f9; padding-bottom: 12px; }
-    .profile-info-box { background: #f8fafc; border-radius: 14px; padding: 14px; border: 1px solid #e2e8f0; margin-bottom: 16px; }
-    .p-row { display: flex; justify-content: space-between; font-size: 13px; padding: 5px 0; }
-    .p-label { color: #64748b; font-weight: 700; }
-    .p-val { font-weight: 900; color: #0f172a; }
-    .btn-help-link { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 13px; border-radius: 10px; font-size: 13px; font-weight: 800; text-decoration: none; margin-bottom: 10px; }
-    .btn-logout { background: #fee2e2; color: #dc2626; border: 1.5px solid #fca5a5; width: 100%; padding: 13px; border-radius: 10px; font-size: 14px; font-weight: 900; cursor: pointer; margin-top: 6px; }
-
-    /* SOS Emergency Modal */
-    .sos-modal-overlay {
-      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(15, 23, 42, 0.85); z-index: 999; display: none;
-      align-items: center; justify-content: center; padding: 20px; backdrop-filter: blur(5px);
-    }
-    .sos-modal-overlay.active { display: flex; }
-    .sos-sheet {
-      background: #ffffff; width: 100%; max-width: 360px; border-radius: 20px;
-      padding: 22px 20px; text-align: center; color: #0f172a; border-top: 6px solid #dc2626;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.4);
-    }
-    .sos-icon-head { font-size: 42px; margin-bottom: 6px; }
-    .sos-title { font-size: 18px; font-weight: 900; color: #dc2626; }
-    .sos-desc { font-size: 12px; color: #64748b; margin: 4px 0 16px 0; }
-    .sos-btn-grid { display: flex; flex-direction: column; gap: 10px; }
-    .sos-call-btn {
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 13px 16px; border-radius: 12px; font-size: 14px; font-weight: 900;
-      text-decoration: none; color: white; cursor: pointer; transition: 0.2s;
-    }
-    .sos-call-108 { background: linear-gradient(90deg, #ea580c, #c2410c); }
-    .sos-call-112 { background: linear-gradient(90deg, #dc2626, #991b1b); }
-    .sos-call-admin { background: #1e293b; }
-    .sos-close-btn {
-      background: #f1f5f9; border: none; width: 100%; padding: 11px;
-      border-radius: 10px; font-size: 13px; font-weight: 800; color: #475569;
-      cursor: pointer; margin-top: 12px;
-    }
-
-    /* Rider Chat Drawer */
-    .chat-drawer {
-      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      background: #0f172a; z-index: 960; display: none; flex-direction: column;
-    }
+    /* IN-APP CHAT DRAWER */
+    .chat-drawer { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #f8fafc; z-index: 1100; display: none; flex-direction: column; }
     .chat-drawer.active { display: flex; }
-    .chat-top-header {
-      background: #1e2837; color: white; padding: 16px;
-      display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #334155;
-    }
+    .chat-top-header { background: var(--primary-purple); color: white; padding: 16px; display: flex; justify-content: space-between; align-items: center; }
     .chat-messages-area { flex: 1; padding: 16px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
     .msg-bubble { max-width: 80%; padding: 10px 14px; border-radius: 14px; font-size: 13px; line-height: 1.4; word-wrap: break-word; font-weight: 600; }
-    .msg-rider-send { align-self: flex-end; background: #0284c7; color: white; border-bottom-right-radius: 2px; }
-    .msg-cust-receive { align-self: flex-start; background: #1e293b; color: white; border: 1px solid #334155; border-bottom-left-radius: 2px; }
-    .quick-chips-row { display: flex; gap: 8px; padding: 8px 14px; overflow-x: auto; scrollbar-width: none; background: #1e2837; border-top: 1px solid #334155; }
+    .msg-customer { align-self: flex-end; background: var(--accent-pink); color: white; border-bottom-right-radius: 2px; }
+    .msg-rider { align-self: flex-start; background: #ffffff; color: #0f172a; border: 1px solid #e2e8f0; border-bottom-left-radius: 2px; }
+    .quick-chips-row { display: flex; gap: 8px; padding: 8px 14px; overflow-x: auto; scrollbar-width: none; background: #ffffff; border-top: 1px solid #eee; }
     .quick-chips-row::-webkit-scrollbar { display: none; }
-    .quick-chip { background: #334155; color: #e2e8f0; padding: 6px 12px; border-radius: 16px; font-size: 11px; font-weight: 800; white-space: nowrap; cursor: pointer; }
-    .chat-input-bar { padding: 10px 14px; background: #1e2837; border-top: 1px solid #334155; display: flex; gap: 8px; align-items: center; }
-    .chat-input-box { flex: 1; padding: 10px 14px; border-radius: 20px; border: 1px solid #475569; background: #0f172a; color: white; font-size: 13px; outline: none; }
-    .chat-send-btn { background: var(--accent-green); color: white; border: none; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 16px; cursor: pointer; }
+    .quick-chip { background: #f1f5f9; color: #334155; padding: 6px 12px; border-radius: 16px; font-size: 11px; font-weight: 800; white-space: nowrap; cursor: pointer; border: 1px solid #cbd5e1; }
+    .chat-input-bar { padding: 10px 14px; background: white; border-top: 1px solid #e2e8f0; display: flex; gap: 8px; align-items: center; }
+    .chat-input-box { flex: 1; padding: 10px 14px; border-radius: 20px; border: 1.5px solid #cbd5e1; font-size: 13px; outline: none; }
+    .chat-send-btn { background: var(--primary-purple); color: white; border: none; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 16px; cursor: pointer; }
+
+    /* DISPUTE FORM */
+    .btn-dispute-trigger {
+      background: #fee2e2; border: 1px solid #fca5a5; color: #dc2626;
+      font-size: 11px; font-weight: 800; padding: 8px 12px; border-radius: 8px; cursor: pointer; margin-top: 8px; width: 100%;
+    }
   </style>
 </head>
 <body>
 
-  <audio id="rider-order-audio" preload="auto" src="alert.mp3"></audio>
-
-  <!-- AUTH SCREEN -->
-  <div class="auth-overlay" id="auth-overlay">
-    <div class="auth-box">
-      <img class="auth-logo" src="logo.png" alt="Logo" onerror="this.style.display='none'">
-      <div class="auth-title">👑 Baba Food Rider Partner</div>
-      <div class="auth-sub">डिलीवरी पार्टनर पोर्टल में आपका स्वागत है</div>
-
-      <div class="auth-tabs">
-        <button class="auth-tab-btn active" id="tab-btn-login" onclick="switchAuthTab('LOGIN')">Rider Login</button>
-        <button class="auth-tab-btn" id="tab-btn-reg" onclick="switchAuthTab('REGISTER')">New Registration</button>
-      </div>
-
-      <div id="auth-login-form" class="auth-input-group">
-        <input type="tel" id="login-phone" class="auth-input" placeholder="Registered 10-digit Phone No." maxlength="10">
-        <button class="btn-auth-submit" onclick="handleRiderLogin()">🛵 Login to Duty</button>
-      </div>
-
-      <div id="auth-register-form" class="auth-input-group" style="display: none;">
-        <input type="text" id="reg-name" class="auth-input" placeholder="Full Name (आपका पूरा नाम) *">
-        <input type="tel" id="reg-phone" class="auth-input" placeholder="10-digit Mobile Number *" maxlength="10">
-        <input type="text" id="reg-vehicle" class="auth-input" placeholder="Vehicle No. (e.g. UP25-AB-1234)">
-        <button class="btn-auth-submit" style="background:#0284c7;" onclick="handleRiderRegister()">
-          📝 Submit Request to Admin
-        </button>
-      </div>
-    </div>
+  <!-- 1. BROADCAST NOTICE TICKER -->
+  <div class="broadcast-ticker-wrap" id="broadcast-ticker-bar">
+    <span class="broadcast-ticker-text" id="broadcast-ticker-content">
+      📢 Baba Food Delivery me aapka swagat hai!
+    </span>
   </div>
 
-  <!-- MAIN RIDER APP -->
-  <div id="rider-main-app">
-    <div class="top-bar">
-      <div class="store-info">
-        <div class="store-icon">👑</div>
-        <div>
-          <div class="store-name" id="top-rider-name">DEL-KHATU SHYAM</div>
-          <div class="store-id" id="top-rider-id">BABA18-R5533</div>
-        </div>
-      </div>
-      <div class="top-actions">
-        <button class="btn-sos-top" onclick="openSosModal()">🚨 SOS</button>
-        <label class="switch">
-          <input type="checkbox" id="duty-toggle" checked onchange="toggleDuty(this.checked)">
-          <span class="slider"></span>
-        </label>
-        <div class="help-btn" onclick="openProfileModal()">❓ Help</div>
-      </div>
+  <!-- 2. SIDE DRAWER -->
+  <div class="drawer-overlay" id="drawer-overlay" onclick="toggleDrawer(false)"></div>
+  <div class="side-drawer" id="side-drawer">
+    <div class="drawer-header">
+      <img class="drawer-logo-img" src="logo.png" alt="Logo" onerror="this.style.display='none'">
+      <div class="drawer-brand">👑 BABA FOOD EXPRESS🏹</div>
+      <div style="font-size: 11px; color: #fdf4ff; margin-top: 2px;">Fast Express Delivery</div>
     </div>
-
-    <!-- LIVE SPEED GUARD BAR -->
-    <div class="speed-guard-strip">
-      <div class="speed-val-box">
-        <span>⚡ Live Speed:</span>
-        <span class="speed-num" id="live-speed-text">0</span>
-        <span>km/h</span>
+    <div class="drawer-menu-list">
+      <div class="drawer-item" onclick="toggleDrawer(false); scrollToHistory();">
+        <span>🕒</span> Past Orders & Receipts
       </div>
-      <div class="speed-alert-badge" id="speed-alert-pill">
-        ⚠️ SLOW DOWN (OVERSPEED)
+      <div class="drawer-item" onclick="openSupportModal()">
+        <span>💬</span> 24x7 Help & Support
       </div>
-    </div>
-
-    <div class="shift-box">
-      <div class="shift-left">
-        <span class="shift-icon">⏱️</span>
-        <div>
-          <div class="shift-time">Duty Shift Active</div>
-          <div class="shift-break">Background Safe</div>
-        </div>
-      </div>
-      <div class="shift-right">
-        <div class="shift-done" id="live-shift-timer">--m --s</div>
-        <div class="shift-status-lbl">Completed</div>
-      </div>
-    </div>
-
-    <div class="waiting-pill active-duty" id="waiting-pill">
-      <span style="font-size: 18px;">🛍️</span>
-      <span class="waiting-text" id="duty-text">Waiting for Order... (Screen Lock Protected)</span>
-    </div>
-
-    <div class="earnings-card">
-      <div class="main-earning" id="live-total-earning">₹0 <span style="font-size: 14px; font-weight: 600; color: #64748b;">earned</span></div>
-      <div class="earning-meta-grid">
-        <div class="meta-col" onclick="showEarningsPopup()">
-          <div class="meta-top">⏱️ <span id="live-login-hrs">0.0</span></div>
-          <div class="meta-sub">Login Hrs ❯</div>
-        </div>
-        <div class="meta-col">
-          <div class="meta-top">🛵 <span id="active-tasks-count">0</span></div>
-          <div class="meta-sub">Active Batch ❯</div>
-        </div>
-        <div class="meta-col" onclick="switchOrderTab('DELIVERED')">
-          <div class="meta-top">🛍️ <span id="orders-done-count">0</span></div>
-          <div class="meta-sub">Delivered ❯</div>
-        </div>
-      </div>
-    </div>
-
-    <div class="segment-wrap">
-      <button class="seg-btn active" id="seg-active" onclick="switchOrderTab('ACTIVE')">Active / Batch Tasks 🛵</button>
-      <button class="seg-btn" id="seg-delivered" onclick="switchOrderTab('DELIVERED')">Completed Tasks ✅</button>
-    </div>
-
-    <div class="orders-queue-box" id="rider-orders-list">
-      <div style="text-align:center; color: var(--text-sub); padding: 20px; font-size: 12px;">Waiting for Order... कोई नया ऑर्डर नहीं है।</div>
-    </div>
-
-    <div class="bottom-nav">
-      <div class="b-item active" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">
-        <div class="b-icon">🏠</div>
-        <span>Home</span>
-      </div>
-      <div class="b-item" onclick="showEarningsPopup()">
-        <div class="b-icon">👛</div>
-        <span>Earnings</span>
-      </div>
-      <div class="b-item" onclick="openSosModal()" style="color:#dc2626;">
-        <div class="b-icon">🚨</div>
-        <span>SOS Call</span>
-      </div>
-      <div class="b-item" onclick="openProfileModal()">
-        <div class="b-icon">👤</div>
-        <span>Profile</span>
-      </div>
-    </div>
-  </div>
-
-  <!-- SCREEN 1: Bin Pick with Real Images & Tap to Zoom -->
-  <div class="bin-screen" id="bin-screen">
-    <div class="bin-header">
-      <div class="bin-title">Go to the Bin</div>
-      <div class="shelf-icon-badge">📦</div>
-    </div>
-    <div class="bin-hash-bar" id="bin-order-hash">#BABA-ORDER</div>
-    <div class="bin-shelf-row">
-      <div style="display: flex; align-items: center; gap: 8px;">
-        <span>Pick from Shelf (Tap item to enlarge)</span>
-        <span class="shelf-count-circle" id="bin-shelf-num">1</span>
-      </div>
-      <span>⌄</span>
-    </div>
-    <div class="bin-items-row" id="bin-items-container"></div>
-    <div class="bin-floating-bell" onclick="playLoudEmergencySiren()">🚨</div>
-    <div class="bin-bottom-bar">
-      <input type="file" id="camera-file-input" accept="image/*" capture="environment" style="display:none;" onchange="handlePhotoTaken(this)">
-      <button class="btn-take-photo-trigger" onclick="triggerNativeCamera()">
-        📷 Take Photo & Pick Up
-      </button>
-    </div>
-  </div>
-
-  <!-- ITEM FULL SIZE ZOOM MODAL -->
-  <div class="item-zoom-modal" id="item-zoom-modal" onclick="closeItemZoom()">
-    <div class="zoom-content-box" onclick="event.stopPropagation()">
-      <img id="zoom-img-target" class="zoom-img-large" src="" alt="Zoom Item">
-      <div class="zoom-item-name" id="zoom-title-target">Item Name</div>
-      <div class="zoom-item-qty" id="zoom-qty-target">Quantity: 1</div>
-      <button class="btn-close-zoom" onclick="closeItemZoom()">✕ Close Preview</button>
-    </div>
-  </div>
-
-  <!-- SCREEN 2: Photo Preview -->
-  <div class="photo-screen" id="photo-screen">
-    <div class="photo-nav">
-      <button class="btn-photo-close" onclick="closePhotoScreen()">✕</button>
-      <div class="photo-nav-title">Take Photo of Items in Bag</div>
-    </div>
-    <div class="camera-live-frame">
-      <img id="captured-bag-img" src="" alt="Captured Bag">
-      <div class="btn-trash-photo" onclick="retakePhoto()">🗑️</div>
-    </div>
-    <div class="photo-bottom-panel">
-      <div class="thumbs-row">
-        <div class="thumb-box"><img id="thumb-preview" src="" alt="Thumbnail"></div>
-        <div class="thumb-plus-btn" onclick="triggerNativeCamera()">+</div>
-      </div>
-      <button class="btn-submit-photo" onclick="submitBagPhoto()">Submit Photo</button>
-    </div>
-  </div>
-
-  <!-- SCREEN 3: On The Way Route -->
-  <div class="way-screen" id="way-screen">
-    <div class="way-map-container">
-      <div class="way-top-bar">
-        <button class="btn-sos" onclick="openSosModal()">SOS</button>
-        <button class="btn-help-pill" onclick="openProfileModal()"><span>🎧</span> Help</button>
-      </div>
-      <iframe class="way-map-iframe" id="way-map-frame" src=""></iframe>
-      <a class="btn-floating-navigate" id="native-maps-intent-btn" href="#" target="_blank" title="Start Google Maps Navigation">↗</a>
-    </div>
-    <div class="way-bottom-sheet">
-      <div class="sheet-handle-pill"></div>
-      <div class="way-title">On the Way (Live Tracking)</div>
-      <div class="way-address-box">
-        <div class="way-nav-arrow-circle">➤</div>
-        <div>
-          <div class="way-addr-label">Customer Address</div>
-          <div class="way-addr-content" id="way-customer-address">Loading customer address...</div>
-        </div>
-      </div>
-
-      <div style="display:flex; gap:8px; margin: 8px 0;">
-        <button onclick="handleCallCustomer()" style="flex:1; background:#10b981; color:white; border:none; padding:11px; border-radius:10px; font-size:12px; font-weight:800; cursor:pointer;">
-          📞 Call Customer
-        </button>
-        <button onclick="openRiderChat(currentSelectedOrder.id)" style="flex:1; background:#0284c7; color:white; border:none; padding:11px; border-radius:10px; font-size:12px; font-weight:800; cursor:pointer;">
-          💬 Chat
-        </button>
-      </div>
-
-      <button class="btn-mark-arrived" id="btn-mark-arrived" onclick="handleMarkArrived()">
-        Mark Arrived
-      </button>
-    </div>
-  </div>
-
-  <!-- COD Slide Modal -->
-  <div class="cod-modal-overlay" id="cod-modal">
-    <div class="cod-sheet">
-      <div class="cod-cash-icon">💵</div>
-      <div style="font-size: 19px; font-weight: 900;">Collect Cash Payment</div>
-      <div style="font-size: 12px; color: #64748b; margin-top: 2px;">डिलीवरी देने से पहले ग्राहक से नकद प्राप्त करें</div>
-
-      <div class="cod-collect-banner">
-        <div style="font-size: 11px; font-weight: 800; color: #64748b;">AMOUNT TO COLLECT:</div>
-        <div style="font-size: 32px; font-weight: 900; color: var(--accent-green); margin-top: 4px;" id="cod-amount-display">₹0</div>
-      </div>
-
-      <div class="slider-track" id="slider-track">
-        <span class="slider-track-text">Slide to Confirm Cash ➔</span>
-        <div class="slider-thumb" id="slider-thumb">➔</div>
-      </div>
-
-      <button onclick="closeCodModal()" style="background:none; border:none; color:#64748b; font-size:12px; font-weight:800; margin-top:14px; cursor:pointer;">
-        ✕ Cancel
-      </button>
-    </div>
-  </div>
-
-  <!-- 4-DIGIT OTP VERIFICATION MODAL -->
-  <div class="otp-modal-overlay" id="otp-modal">
-    <div class="otp-card-sheet">
-      <div class="otp-icon-circle">🔐</div>
-      <div style="font-size: 18px; font-weight: 900; color: #0f172a;">Customer OTP Verify</div>
-      <div style="font-size: 12px; color: #64748b; margin-top: 4px;">ग्राहक के मोबाइल ऐप से 4-अंकों का OTP पूछकर यहाँ दर्ज करें:</div>
-
-      <input type="tel" id="rider-otp-input" class="otp-input-field" placeholder="••••" maxlength="4" autofocus>
-
-      <button class="btn-action-rider" style="background: var(--accent-green); padding: 14px;" onclick="verifyOtpAndDeliver()">
-        ✓ Verify OTP & Complete Delivery
-      </button>
-
-      <button onclick="closeOtpModal()" style="background:none; border:none; color:#64748b; font-size:12px; font-weight:800; margin-top:14px; cursor:pointer;">
-        ✕ Cancel
-      </button>
-    </div>
-  </div>
-
-  <!-- Success Modal -->
-  <div class="success-modal-overlay" id="success-modal">
-    <div class="success-sheet">
-      <div class="success-check-circle">✓</div>
-      <div style="font-size: 20px; font-weight: 900; margin-bottom: 4px;">Order Delivered!</div>
-      <div style="font-size: 12px; color: #64748b;" id="success-order-id">ORD #00 Delivered to customer</div>
-      <div class="success-amount-pill">
-        <div style="font-size: 11px; color: #64748b; margin-bottom: 2px;">COLLECTED PAYMENT</div>
-        <div style="font-size: 22px; font-weight: 900; color: var(--accent-green);" id="success-cash-text">₹0</div>
-      </div>
-      <button class="btn-action-rider" style="background: #0f172a; padding: 14px;" onclick="closeSuccessModal()">
-        Next Task ➔
-      </button>
-    </div>
-  </div>
-
-  <!-- Profile Modal -->
-  <div class="profile-modal-overlay" id="profile-modal" onclick="closeProfileModal(event)">
-    <div class="profile-sheet" onclick="event.stopPropagation()">
-      <div class="profile-head">
-        <div style="font-size: 16px; font-weight: 900;">Rider Profile & Support</div>
-        <button onclick="closeProfileModal()" style="background:#f1f5f9; border:none; width:28px; height:28px; border-radius:50%; font-weight:bold; cursor:pointer;">✕</button>
-      </div>
-
-      <div class="profile-info-box">
-        <div class="p-row"><span class="p-label">Rider Name:</span><span class="p-val" id="prof-name">--</span></div>
-        <div class="p-row"><span class="p-label">Mobile Number:</span><span class="p-val" id="prof-phone">--</span></div>
-        <div class="p-row"><span class="p-label">Vehicle No:</span><span class="p-val" id="prof-vehicle">--</span></div>
-        <div class="p-row"><span class="p-label">Status:</span><span class="p-val" style="color:var(--accent-green);" id="prof-status">Active Partner</span></div>
-        <div class="p-row"><span class="p-label">Live GPS:</span><span class="p-val" style="color:#0284c7;" id="prof-gps">Locating...</span></div>
-        <div class="p-row"><span class="p-label">Cash In Hand:</span><span class="p-val" style="color:#ea580c;" id="prof-cash">₹0</span></div>
-      </div>
-
-      <button type="button" class="btn-action-rider" style="background:#0284c7; margin-bottom:10px;" onclick="playLoudEmergencySiren()">
-        🔔 Test Alert Ringtone
-      </button>
-
-      <a class="btn-help-link" style="background: #25D366; color:white;" target="_blank" href="https://wa.me/919711107063?text=Rider%20Support%20Needed">
-        🟢 WhatsApp Support (9711107063)
+      <a class="drawer-item" href="tel:9711107063">
+        <span>📞</span> Helpline: 9711107063
       </a>
-      <a class="btn-help-link" style="background: #0284c7; color:white;" href="tel:9711107063">
-        📞 Call Admin Helpline
+      <a class="drawer-item" target="_blank" href="https://wa.me/919711107063?text=Hello%20Baba%20Food%20Delivery%20Support">
+        <span>🟢</span> WhatsApp: 9711107063
       </a>
-      <button class="btn-logout" onclick="handleRiderLogout()">
-        🚪 Logout from App
-      </button>
     </div>
   </div>
 
-  <!-- SOS Emergency Modal -->
-  <div class="sos-modal-overlay" id="sos-modal" onclick="closeSosModal(event)">
-    <div class="sos-sheet" onclick="event.stopPropagation()">
-      <div class="sos-icon-head">🚨</div>
-      <div class="sos-title">EMERGENCY SOS</div>
-      <div class="sos-desc">सड़क दुर्घटना या आपातकालीन स्थिति में तुरंत कॉल करें:</div>
+  <!-- 3. TOP HERO HEADER -->
+  <div class="top-hero-area">
+    <div class="location-row">
+      <div class="brand-cluster">
+        <button class="menu-trigger-btn" onclick="toggleDrawer(true)">☰</button>
+        <img class="header-app-logo" src="logo.png" alt="App Logo" onerror="this.style.display='none'">
+        <div class="brand-meta">
+          <h1>BABA FOOD EXPRESS</h1>
+          <span class="eta-pill">⚡ 10 MINS DELIVERY</span>
+        </div>
+      </div>
+      <button class="menu-trigger-btn" onclick="openSupportModal()" title="Help & Support">🎧</button>
+    </div>
 
-      <div class="sos-btn-grid">
-        <a class="sos-call-btn sos-call-108" href="tel:108">
-          <span>🚑 Ambulance (एम्बुलेंस)</span>
-          <span>Call 108 ➔</span>
-        </a>
-        <a class="sos-call-btn sos-call-112" href="tel:112">
-          <span>🚓 Police & All Emergency</span>
-          <span>Call 112 ➔</span>
-        </a>
-        <a class="sos-call-btn sos-call-admin" href="tel:9711107063">
-          <span>👑 Admin Helpline</span>
-          <span>9711107063 ➔</span>
-        </a>
+    <!-- Search with Voice -->
+    <div class="search-box-wrap">
+      <span class="search-icon-pos">🔍</span>
+      <input type="text" id="search-input" class="search-bar-input" placeholder='Search "milk", "potato", "doodh", "aalu"...' oninput="handleFilter()">
+      <button class="voice-mic-btn" id="voice-search-btn" onclick="startVoiceSearch()" title="बोलकर सर्च करें">🎙️</button>
+    </div>
+
+    <!-- Category Tabs -->
+    <div class="category-scroll" id="category-chips">
+      <div class="cat-item active" onclick="setCategory('All', this)">
+        <div class="cat-icon-circle">🛍️</div>
+        <div class="cat-name">All</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SURGE ALERTS -->
+  <div class="rain-surge-alert-bar" id="rain-surge-alert" style="display:none; margin: 10px 16px; border-radius:12px; padding:10px 14px; background:#eff6ff; border:1px solid #bfdbfe; color:#1e40af; font-size:12px; font-weight:800;">
+    <span>🌧️</span>
+    <span id="rain-surge-msg">खराब मौसम के कारण डिलीवरी शुल्क लागू है।</span>
+  </div>
+  <div class="night-surge-alert-bar" id="night-surge-alert" style="display:none; margin: 6px 16px; border-radius:12px; padding:10px 14px; background:#fdf4ff; border:1px solid #f0abfc; color:#86198f; font-size:12px; font-weight:800;">
+    <span>🌙</span>
+    <span id="night-surge-msg">देर रात डिलीवरी सेवा शुल्क लागू है।</span>
+  </div>
+
+  <!-- PROMO HERO CARD -->
+  <div class="promo-banner">
+    <div class="promo-text">
+      <h3 id="dyn-banner-title">₹249+ पर <span style="color: var(--accent-green);">Free Delivery</span> 🚚</h3>
+      <div class="promo-sub" id="dyn-banner-sub">₹399+ के ऑर्डर पर ₹49 का भारी Discount!</div>
+    </div>
+    <div style="font-size: 38px;" id="dyn-banner-icon">🎁</div>
+  </div>
+
+  <div class="main-container">
+    <!-- Active Order Tracker Strip -->
+    <div class="active-order-strip" id="live-order-strip" onclick="openTrackModal()" style="background:#0f172a; color:white; border-radius:16px; padding:14px 16px; margin-bottom:14px; display:none; justify-content:space-between; align-items:center; cursor:pointer;">
+      <div style="display: flex; align-items: center; gap: 10px;">
+        <span style="font-size: 22px;">🛵</span>
+        <div>
+          <div style="font-size: 13px; font-weight: 800;" id="strip-title">Live Order In Progress</div>
+          <div style="font-size: 11px; color: #38bdf8;" id="strip-sub">टैप करके लाइव ट्रैकिंग और OTP देखें</div>
+        </div>
+      </div>
+      <span style="font-size: 16px; color: #94a3b8;">➔</span>
+    </div>
+
+    <div id="loader" style="text-align: center; padding: 40px; font-size: 13px; color: var(--text-muted);">
+      ताज़ा आइटम्स लोड हो रहे हैं...
+    </div>
+    <div class="grid" id="product-list"></div>
+
+    <!-- Past Orders History -->
+    <div id="past-orders-section" style="margin-top: 35px; border-top: 1px solid var(--border-soft); padding-top: 22px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
+        <div style="font-size: 16px; font-weight: 900; color: #0f172a;">🕒 Past Orders & Invoices</div>
+        <span style="font-size: 11px; color: #64748b; font-weight: 700;">विवरण देखने के लिए टैप करें</span>
+      </div>
+      <div id="history-container">
+        <div style="font-size: 12px; color: #94a3b8; padding: 10px 0;">कोई पिछला ऑर्डर नहीं मिला।</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FLOATING CART -->
+  <div class="floating-cart-bar" id="cart-float-bar" onclick="openCartModal()">
+    <div>
+      <div style="font-size:11.5px; font-weight:700; opacity:0.9;" id="float-qty-text">0 Items Added</div>
+      <div style="font-size:16px; font-weight:900;" id="float-total-text">₹0</div>
+    </div>
+    <div style="font-size: 13px; font-weight: 900; display:flex; align-items:center; gap:6px;">View Full Cart ➔</div>
+  </div>
+
+  <!-- BOTTOM NAV BAR -->
+  <div class="bottom-nav-bar">
+    <div class="nav-item active" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">
+      <div class="nav-item-icon">🏠</div>
+      <span>Home</span>
+    </div>
+    <div class="nav-item" onclick="openTrackModal()">
+      <div class="nav-item-icon">🛵</div>
+      <span>Track</span>
+    </div>
+    <div class="nav-item" onclick="scrollToHistory()">
+      <div class="nav-item-icon">🕒</div>
+      <span>Orders</span>
+    </div>
+    <div class="nav-item" onclick="openSupportModal()">
+      <div class="nav-item-icon">🎧</div>
+      <span>Support</span>
+    </div>
+  </div>
+
+  <!-- FULL PAGE CART / VIEW ORDER MODAL -->
+  <div class="modal-overlay" id="cart-modal">
+    <div class="fullpage-content">
+      <div class="fullpage-head">
+        <div class="fullpage-title">🛍️ Order Summary & Checkout</div>
+        <button class="fullpage-close" onclick="toggleCartModal(false)">✕</button>
       </div>
 
-      <button class="sos-close-btn" onclick="closeSosModal()">✕ Cancel & Return</button>
+      <!-- ATTRACTIVE SMART CART UPSELL PROGRESS BANNER -->
+      <div class="cart-target-banner" id="cart-smart-target-box" style="display: none;">
+        <div class="target-headline" id="cart-target-text">
+          🎉 सामान जोड़ें और इनाम पाएँ!
+        </div>
+        <div class="target-progress-bg">
+          <div class="target-progress-fill" id="cart-target-progress-bar"></div>
+        </div>
+      </div>
+
+      <div id="cart-items-box"></div>
+
+      <!-- Coupon Box -->
+      <div style="display:flex; gap:8px; margin: 14px 0;">
+        <input type="text" id="cart-coupon-input" class="zepto-input" style="text-transform:uppercase; font-weight:800;" placeholder="Enter Coupon (e.g. BABA50)">
+        <button onclick="applyCouponCode()" style="background:var(--primary-purple); color:white; border:none; padding:0 18px; border-radius:12px; font-weight:800; font-size:12px; cursor:pointer;">Apply</button>
+      </div>
+      <div id="coupon-success-pill" style="display:none; background:#ecfdf5; border:1px solid #a7f3d0; color:#065f46; font-size:11px; font-weight:800; padding:6px 10px; border-radius:8px; margin-bottom:8px;"></div>
+
+      <div class="bill-box">
+        <div class="bill-row">
+          <span>Items Total</span>
+          <span id="bill-subtotal">₹0</span>
+        </div>
+        <div class="bill-row">
+          <span>Delivery Charge</span>
+          <span id="bill-delivery-charge" style="color:var(--accent-green);">FREE</span>
+        </div>
+        <div class="bill-row" id="row-rain-surge" style="display: none; color: #1e40af;">
+          <span>🌧️ Rain Surge</span>
+          <span id="bill-rain-surge-amount">+₹0</span>
+        </div>
+        <div class="bill-row" id="row-night-surge" style="display: none; color: #86198f;">
+          <span>🌙 Night Surge</span>
+          <span id="bill-night-surge-amount">+₹0</span>
+        </div>
+        <div class="bill-row" id="row-discount" style="display: none; color: var(--accent-green);">
+          <span>Offer Discount</span>
+          <span id="bill-disc-amount">-₹0</span>
+        </div>
+        <div class="bill-row" id="row-coupon" style="display: none; color: var(--accent-green);">
+          <span id="bill-coupon-title">Coupon Discount</span>
+          <span id="bill-coupon-amount">-₹0</span>
+        </div>
+        <div class="bill-row total">
+          <span>Total To Pay</span>
+          <span id="bill-grand-total">₹0</span>
+        </div>
+      </div>
+
+      <!-- Payment Mode -->
+      <div style="font-size:12px; font-weight:800; color:#64748b; margin:14px 0 8px 0;">SELECT PAYMENT METHOD:</div>
+      <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px; margin-bottom:14px;">
+        <div id="opt-cod" onclick="selectPaymentMode('COD')" style="border:1.5px solid var(--accent-pink); background:#fff0f4; color:var(--accent-pink); padding:12px; border-radius:12px; text-align:center; font-weight:800; font-size:13px; cursor:pointer;">
+          💵 Cash on Delivery
+        </div>
+        <div id="opt-upi" onclick="selectPaymentMode('UPI')" style="border:1.5px solid #cbd5e1; padding:12px; border-radius:12px; text-align:center; font-weight:800; font-size:13px; cursor:pointer; color:#475569;">
+          📱 Online UPI
+        </div>
+      </div>
+
+      <div class="upi-gate-card" id="upi-box" style="display:none; background:#faf5ff; border:1px dashed var(--primary-purple); border-radius:14px; padding:14px; text-align:center; margin-bottom:14px;">
+        <div style="font-size:13px; font-weight:800; color:var(--primary-purple);">Scan & Pay ₹<span id="upi-box-amount">0</span></div>
+        <div style="width:160px; height:160px; margin:8px auto; background:#fff; padding:6px; border-radius:10px;"><img id="upi-qr-img" src="" style="width:100%; height:100%;"></div>
+        <input type="tel" id="upi-utr" class="zepto-input" placeholder="Enter 12-digit UTR No." maxlength="12" style="text-align:center; font-weight:800; letter-spacing:1px; background:#fff;">
+      </div>
+
+      <!-- Customer Address & MANDATORY Location Section -->
+      <div style="font-size:12px; font-weight:800; color:#64748b; margin-bottom:8px;">DELIVERY DETAILS:</div>
+      <div style="display:flex; flex-direction:column; gap:10px;">
+        <input type="text" id="c-name" class="zepto-input" placeholder="आपका पूरा नाम (Full Name) *">
+        <input type="tel" id="c-phone" class="zepto-input" placeholder="10 अंकों का मोबाइल नंबर (Mobile Number) *" maxlength="10">
+        
+        <!-- Live Location Button -->
+        <button type="button" class="btn-fetch-gps" onclick="getCurrentLocation()">
+          📍 क्लिक करके लाइव लोकेशन अपडेट करें (अनिवार्य)
+        </button>
+
+        <!-- Live Location Status Card -->
+        <div class="loc-card-box" id="gps-status-box">
+          <div class="loc-card-title">GPS लोकेशन स्थिति (Mandatory):</div>
+          <div class="loc-card-val" id="gps-status-val">⚠️ लोकेशन अपडेट नहीं है। ऊपर दिए गए नीले बटन पर क्लिक करें!</div>
+        </div>
+
+        <!-- Address Textarea -->
+        <div>
+          <label style="font-size: 11px; font-weight: 800; color: #475569; display:block; margin-bottom: 4px;">घर / दुकान / फ्लैट नंबर और लैंडमार्क:</label>
+          <textarea id="c-address" class="zepto-input" rows="3" placeholder="उदाहरण: मकान नंबर 42, शिव मंदिर के पास, मुख्य बाजार *"></textarea>
+        </div>
+
+        <button class="btn-checkout" id="order-submit-btn" onclick="placeOrder()" disabled>
+          ⚠️ पहले लाइव लोकेशन अपडेट करें
+        </button>
+      </div>
     </div>
   </div>
 
-  <!-- Rider Chat Drawer -->
-  <div class="chat-drawer" id="rider-chat-drawer">
+  <!-- FULL PAGE LIVE TRACKING MODAL -->
+  <div class="modal-overlay" id="track-modal">
+    <div class="fullpage-content">
+      <div class="fullpage-head">
+        <div>
+          <div class="fullpage-title" id="t-order-id">Live Tracking</div>
+          <div style="font-size: 11px; color: var(--text-muted);" id="live-eta-subtitle">10-Min Fast Dispatch</div>
+        </div>
+        <button class="fullpage-close" onclick="toggleTrackModal(false)">✕</button>
+      </div>
+
+      <!-- 60-Sec Self Cancel -->
+      <div id="self-cancel-container" style="display:none; background:#fef2f2; border:1px solid #fca5a5; padding:12px 14px; border-radius:12px; margin-bottom:14px; justify-content:space-between; align-items:center;">
+        <span style="font-size:12px; font-weight:800; color:#991b1b;">⏱️ ऑर्डर रद्द करना है? (<span id="cancel-timer-secs">60</span>s बाकी)</span>
+        <button onclick="handleCustomerSelfCancel()" style="background:#dc2626; color:white; border:none; padding:8px 14px; border-radius:8px; font-size:12px; font-weight:800; cursor:pointer;">Cancel ✕</button>
+      </div>
+
+      <!-- Live Dynamic ETA Chip -->
+      <div id="eta-chip-container" style="display:none; text-align:center; margin-bottom:12px;">
+        <span id="eta-chip-text" style="background:#0284c7; color:white; font-size:12px; font-weight:800; padding:6px 14px; border-radius:14px;">⚡ राइडर की लाइव दूरी जाँची जा रही है...</span>
+      </div>
+
+      <!-- Live OTP Box -->
+      <div class="cust-otp-box" id="cust-otp-container" style="display:none;">
+        <div style="font-size:11px; font-weight:800; color:#7e22ce;">🔑 SAFE DELIVERY OTP</div>
+        <div class="cust-otp-code" id="cust-live-otp">----</div>
+        <div style="font-size:11px; color:#6b21a8; font-weight:600;">सामान मिलने पर यह कोड राइडर को बताएँ</div>
+      </div>
+
+      <div style="padding: 14px 0 20px 10px;">
+        <div id="st-1" style="font-size:14px; font-weight:800; color:var(--accent-green); margin-bottom:10px;">✓ Order Placed & Packing</div>
+        <div id="st-2" style="font-size:14px; font-weight:800; color:#94a3b8; margin-bottom:10px;">🛵 Out for Delivery</div>
+        <div id="st-3" style="font-size:14px; font-weight:800; color:#94a3b8;">📦 Delivered Successfully</div>
+      </div>
+
+      <!-- Privacy Masked Call / Action -->
+      <div id="rider-contact-row" style="display:none; gap:10px; margin-bottom:14px;">
+        <button onclick="callRiderMasked()" style="flex:1; background:#10b981; color:white; border:none; padding:12px; border-radius:12px; font-size:12px; font-weight:800; cursor:pointer;">
+          🛡️ Call Rider (Masked)
+        </button>
+        <button onclick="openLiveChatModal()" style="flex:1; background:#0284c7; color:white; border:none; padding:12px; border-radius:12px; font-size:12px; font-weight:800; cursor:pointer;">
+          💬 Chat with Rider
+        </button>
+      </div>
+
+      <!-- 5-STAR RIDER RATING CARD -->
+      <div class="rider-rating-card" id="rider-rating-box" style="display: none;">
+        <div style="font-size: 14px; font-weight: 900; color: #0f172a;">Rate Your Delivery Partner 🛵</div>
+        <div style="font-size: 11px; color: #64748b; margin-top: 2px;">डिलीवरी अनुभव कैसा रहा? स्टार रेटिंग दें:</div>
+        <div class="stars-row" id="stars-container">
+          <span class="star-icon" onclick="setRiderStars(1)">★</span>
+          <span class="star-icon" onclick="setRiderStars(2)">★</span>
+          <span class="star-icon" onclick="setRiderStars(3)">★</span>
+          <span class="star-icon" onclick="setRiderStars(4)">★</span>
+          <span class="star-icon" onclick="setRiderStars(5)">★</span>
+        </div>
+        <div class="rating-chips-row">
+          <span class="rating-chip" onclick="toggleRatingChip(this, '⚡ Fast Delivery')">⚡ Fast Delivery</span>
+          <span class="rating-chip" onclick="toggleRatingChip(this, '😊 Polite Rider')">😊 Polite Rider</span>
+          <span class="rating-chip" onclick="toggleRatingChip(this, '📦 Safe Packing')">📦 Safe Packing</span>
+        </div>
+        <button class="btn-checkout" style="background:#0f172a; padding:12px; margin-top:10px;" onclick="submitRiderRating()">
+          Submit Star Rating ⭐
+        </button>
+      </div>
+
+      <button class="btn-checkout" style="background:#0f172a;" onclick="toggleTrackModal(false)">बंद करें (Close Tracking)</button>
+    </div>
+  </div>
+
+  <!-- IN-APP LIVE CHAT DRAWER -->
+  <div class="chat-drawer" id="chat-drawer">
     <div class="chat-top-header">
       <div style="display:flex; align-items:center; gap:10px;">
-        <button onclick="closeRiderChat()" style="background:none; border:none; color:white; font-size:20px; font-weight:900; cursor:pointer;">←</button>
+        <button onclick="closeLiveChatModal()" style="background:none; border:none; color:white; font-size:20px; font-weight:900; cursor:pointer;">←</button>
         <div>
-          <div style="font-size:15px; font-weight:900;" id="rchat-title">Chat with Customer</div>
-          <div style="font-size:11px; color:var(--accent-green);">Live Order Chat</div>
+          <div style="font-size:15px; font-weight:900;" id="chat-header-title">Chat with Rider</div>
+          <div style="font-size:11px; color:#d8b4fe;">Online Delivery Partner</div>
         </div>
       </div>
-      <div style="font-size: 18px;">👤</div>
+      <a href="tel:9711107063" style="color:white; text-decoration:none; font-size:18px;">📞</a>
     </div>
 
-    <div class="chat-messages-area" id="rider-chat-messages"></div>
+    <div class="chat-messages-area" id="chat-messages"></div>
 
     <div class="quick-chips-row">
-      <div class="quick-chip" onclick="sendRiderQuickMsg('रास्ते में हूँ, 5 मिनट में पहुँचूँगा')">🛵 On the way (5 mins)</div>
-      <div class="quick-chip" onclick="sendRiderQuickMsg('मेन गेट पर आ जाइए')">🚪 Come to main gate</div>
-      <div class="quick-chip" onclick="sendRiderQuickMsg('मैंने डोरबेल बजा दी है')">🔔 Rung doorbell</div>
-      <div class="quick-chip" onclick="sendRiderQuickMsg('कृपया कैश तैयार रखें')">💵 Keep cash ready</div>
+      <div class="quick-chip" onclick="sendQuickMessage('भैया जल्दी आना प्लीज')">⚡ जल्दी आना प्लीज</div>
+      <div class="quick-chip" onclick="sendQuickMessage('पहुँचकर कॉल करना')">📞 पहुँचकर कॉल करना</div>
+      <div class="quick-chip" onclick="sendQuickMessage('गेट पर छोड़ दो')">🚪 गेट पर छोड़ दो</div>
     </div>
 
     <div class="chat-input-bar">
-      <input type="text" id="rider-chat-text" class="chat-input-box" placeholder="Type reply to customer...">
-      <button class="chat-send-btn" onclick="sendRiderCustomMsg()">➔</button>
+      <input type="text" id="chat-user-text" class="chat-input-box" placeholder="Type a message to rider...">
+      <button class="chat-send-btn" onclick="sendCustomMessage()">➔</button>
+    </div>
+  </div>
+
+  <!-- FULL RECEIPT & PHOTO DISPUTE CLAIM MODAL -->
+  <div class="modal-overlay" id="receipt-modal">
+    <div class="fullpage-content">
+      <div class="fullpage-head">
+        <div>
+          <div class="fullpage-title" id="rcpt-title">Order Receipt #ORD-00</div>
+          <div style="font-size: 11px; color: #64748b;" id="rcpt-date-mode">Placed on -- | COD</div>
+        </div>
+        <button class="fullpage-close" onclick="closeReceiptModal()">✕</button>
+      </div>
+
+      <div style="font-size: 12px; font-weight: 800; color: #334155; margin-bottom: 6px;">ITEMS ORDERED</div>
+      <div id="rcpt-items-list" style="max-height: 200px; overflow-y: auto;"></div>
+
+      <div style="background: #f8fafc; border-radius: 12px; padding: 12px; margin: 12px 0; border: 1px solid #e2e8f0;">
+        <div style="font-size: 11px; font-weight: 800; color: #64748b; margin-bottom: 4px;">DELIVERY ADDRESS</div>
+        <div style="font-size: 12px; font-weight: 700; color: #1e293b; white-space: pre-line;" id="rcpt-address">--</div>
+      </div>
+
+      <!-- Dispute Claim Status View -->
+      <div id="rcpt-dispute-status-pill" style="display:none; padding:10px 14px; border-radius:10px; font-size:12px; font-weight:800; margin-bottom:12px;"></div>
+
+      <div class="bill-box" style="margin: 0 0 12px 0;">
+        <div class="bill-row total">
+          <span>Total Paid</span>
+          <span style="color: var(--accent-green); font-size: 17px;" id="rcpt-total-amount">₹0</span>
+        </div>
+      </div>
+
+      <button class="btn-checkout" id="rcpt-repeat-btn" style="background: var(--primary-purple); margin-bottom: 8px;">
+        🔁 Repeat This Entire Order
+      </button>
+
+      <!-- Damaged / Missing Item Dispute Button -->
+      <button class="btn-dispute-trigger" id="rcpt-dispute-btn" onclick="openDisputeForm()">
+        ⚠️ ख़राब या टूटा सामान मिला? रिफ़ंड क्लेम करें
+      </button>
+
+      <!-- Dispute Form Area -->
+      <div id="dispute-form-box" style="display: none; background: #fff5f5; border: 1.5px dashed #fca5a5; border-radius: 12px; padding: 12px; margin-top: 10px;">
+        <div style="font-size: 12px; font-weight: 900; color: #991b1b; margin-bottom: 6px;">Submit Photo Proof & Claim:</div>
+        <textarea id="dispute-note-input" class="zepto-input" rows="2" placeholder="क्या समस्या है? (उदा. सामान टूटा हुआ था)"></textarea>
+        <input type="file" id="dispute-file-input" accept="image/*" capture="environment" style="margin: 8px 0; font-size: 12px;">
+        <button class="btn-checkout" style="background: #dc2626; padding: 10px;" onclick="submitRefundDispute()">
+          📤 Submit Refund Claim to Admin
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SUPPORT MODAL -->
+  <div class="modal-overlay" id="support-modal">
+    <div class="fullpage-content">
+      <div class="fullpage-head">
+        <div class="fullpage-title">Help & Support 🎧</div>
+        <button class="fullpage-close" onclick="toggleSupportModal(false)">✕</button>
+      </div>
+      <div style="display:flex; flex-direction:column; gap:12px; margin-top:14px;">
+        <a class="btn-checkout" style="background:#25D366; text-decoration:none; text-align:center;" target="_blank" href="https://wa.me/919711107063?text=Support%20Needed">
+          💬 WhatsApp पर संपर्क करें (9711107063)
+        </a>
+        <a class="btn-checkout" style="background:var(--primary-purple); text-decoration:none; text-align:center;" href="tel:9711107063">
+          📞 हेल्पलाइन पर कॉल करें (9711107063)
+        </a>
+      </div>
     </div>
   </div>
 
@@ -811,720 +1166,962 @@
     const SUPABASE_KEY = 'sb_publishable_2_wD-pbi_pNf8niiHxFbYA_saCIhApN';
     const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    let loggedInRider = JSON.parse(localStorage.getItem('baba_logged_rider') || 'null');
-    let isOnline = true;
-    let isFirstTimeLoad = true;
-    let processedOrders = new Set(JSON.parse(localStorage.getItem('baba_processed_orders') || '[]'));
-    let currentSelectedOrder = null;
-    let sharedAudioCtx = null;
-    let currentViewTab = 'ACTIVE';
-    let rawAllOrders = [];
-    let activeChatOrderId = null;
-    let rChatInterval = null;
-    let gpsTrackerInterval = null;
-    let wakeLock = null;
-    let maxAllowedSpeed = 55;
-    let prevPosition = null;
+    let allProducts = [];
+    let cart = {}; 
+    let selectedCat = 'All';
+    let currentOrderId = localStorage.getItem('zepto_active_order') || null;
+    let selectedPaymentMode = 'COD';
+    const STORE_UPI_ID = '7037647464-3@axl';
+    let customerCoords = null;
+    let calculatedKm = 0;
+    let isLocationUpdated = false; 
+    let appliedCoupon = null;
+    let cancelTimerInterval = null;
+    let chatInterval = null;
+    let selectedStarCount = 5;
+    let selectedChips = new Set();
+    let currentViewingReceiptOrder = null;
+    let assignedRiderPhone = null;
 
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('sw.js').catch(err => console.warn(err));
-    }
+    // HINDI-TO-ENGLISH & COMMON SYNONYM DICTIONARY
+    const keywordSynonyms = {
+      'doodh': 'milk', 'dudh': 'milk', 'dud': 'milk', 'दूध': 'milk', 'milk': 'doodh',
+      'aalu': 'potato', 'aloo': 'potato', 'alu': 'potato', 'आलू': 'potato', 'potato': 'aalu',
+      'tamatar': 'tomato', 'tamater': 'tomato', 'टमाटर': 'tomato', 'tomato': 'tamatar',
+      'pyaz': 'onion', 'pyaaj': 'onion', 'pyaj': 'onion', 'प्याज': 'onion', 'onion': 'pyaz',
+      'tel': 'oil', 'tail': 'oil', 'तेल': 'oil', 'oil': 'tel',
+      'chawal': 'rice', 'chaawal': 'rice', 'चावल': 'rice', 'rice': 'chawal',
+      'atta': 'flour', 'aata': 'flour', 'आटा': 'flour', 'flour': 'atta',
+      'cheeni': 'sugar', 'chini': 'sugar', 'चीनी': 'sugar', 'sugar': 'cheeni',
+      'namak': 'salt', 'नमक': 'salt', 'salt': 'namak',
+      'chai': 'tea', 'chaye': 'tea', 'चाय': 'tea', 'tea': 'chai',
+      'dahi': 'curd', 'दही': 'curd', 'curd': 'dahi', 'yogurt': 'dahi',
+      'paneer': 'cheese', 'panir': 'cheese', 'पनीर': 'paneer', 'cheese': 'paneer',
+      'biscuit': 'cookie', 'cookies': 'biscuit', 'बिस्कुट': 'biscuit',
+      'pani': 'water', 'paani': 'water', 'पानी': 'water', 'water': 'pani',
+      'roti': 'bread', 'रोटी': 'bread', 'bread': 'roti',
+      'mirch': 'chilli', 'mirchi': 'chilli', 'मिर्च': 'chilli', 'chilli': 'mirch',
+      'nimbu': 'lemon', 'नींबू': 'lemon', 'lemon': 'nimbu',
+      'ghee': 'butter', 'ghi': 'ghee', 'घी': 'ghee', 'butter': 'ghee',
+      'coldrink': 'drink', 'cold drink': 'drink', 'pepsi': 'drink', 'coke': 'drink', 'कोल्ड्रिंक': 'drink',
+      'samosa': 'snack', 'समौसा': 'samosa', 'समोसा': 'samosa'
+    };
 
-    async function requestWakeLock() {
-      try {
-        if ('wakeLock' in navigator) {
-          wakeLock = await navigator.wakeLock.request('screen');
-        }
-      } catch (err) {
-        console.warn(err);
-      }
-    }
-
-    document.addEventListener('visibilitychange', async () => {
-      if (wakeLock !== null && document.visibilityState === 'visible') {
-        await requestWakeLock();
-      }
-    });
-
-    function initNotificationPermission() {
-      if ('Notification' in window && Notification.permission !== 'granted') {
-        Notification.requestPermission();
-      }
-    }
-
-    function checkAuthStatus() {
-      if (!loggedInRider) {
-        document.getElementById('auth-overlay').classList.add('active');
-      } else {
-        document.getElementById('auth-overlay').classList.remove('active');
-        document.getElementById('top-rider-name').innerText = loggedInRider.name;
-        document.getElementById('top-rider-id').innerText = `RIDER-${loggedInRider.id}`;
-        document.getElementById('prof-name').innerText = loggedInRider.name;
-        document.getElementById('prof-phone').innerText = loggedInRider.phone;
-        document.getElementById('prof-vehicle').innerText = loggedInRider.vehicle_no || 'Standard';
-        document.getElementById('prof-status').innerText = loggedInRider.status || 'Active';
-        document.getElementById('prof-cash').innerText = `₹${loggedInRider.cash_in_hand || 0}`;
-        requestWakeLock();
-        initNotificationPermission();
-        loadSpeedRule();
-        startRiderLiveGpsAndSpeed();
-        loadRiderOrders();
-        syncRiderData();
-      }
-    }
-
-    async function loadSpeedRule() {
-      const { data } = await _supabase.from('app_settings').select('max_rider_speed_kmh').eq('id', 1).single();
-      if (data && data.max_rider_speed_kmh) {
-        maxAllowedSpeed = Number(data.max_rider_speed_kmh);
-      }
-    }
-
-    async function syncRiderData() {
-      if (!loggedInRider) return;
-      const { data } = await _supabase.from('riders').select('*').eq('id', loggedInRider.id).single();
-      if (data) {
-        loggedInRider = data;
-        localStorage.setItem('baba_logged_rider', JSON.stringify(data));
-        const cashElem = document.getElementById('prof-cash');
-        if (cashElem) cashElem.innerText = `₹${data.cash_in_hand || 0}`;
-      }
-    }
-
-    function switchAuthTab(tab) {
-      if (tab === 'LOGIN') {
-        document.getElementById('tab-btn-login').className = 'auth-tab-btn active';
-        document.getElementById('tab-btn-reg').className = 'auth-tab-btn';
-        document.getElementById('auth-login-form').style.display = 'flex';
-        document.getElementById('auth-register-form').style.display = 'none';
-      } else {
-        document.getElementById('tab-btn-reg').className = 'auth-tab-btn active';
-        document.getElementById('tab-btn-login').className = 'auth-tab-btn';
-        document.getElementById('auth-register-form').style.display = 'flex';
-        document.getElementById('auth-login-form').style.display = 'none';
-      }
-    }
-
-    async function handleRiderRegister() {
-      const name = document.getElementById('reg-name').value.trim();
-      const phone = document.getElementById('reg-phone').value.trim();
-      const vehicle = document.getElementById('reg-vehicle').value.trim();
-
-      if (name.length < 2) return alert('कृपया सही नाम दर्ज करें!');
-      if (!/^[6-9]\d{9}$/.test(phone)) return alert('कृपया 10 अंकों का सही मोबाइल नंबर डालें!');
-
-      try {
-        const { data: existing } = await _supabase.from('riders').select('*').eq('phone', phone);
-        if (existing && existing.length > 0) {
-          alert('⚠️ यह फोन नंबर पहले से रजिस्टर्ड है! कृपया लॉगिन करें।');
-          switchAuthTab('LOGIN');
-          return;
-        }
-
-        const { error } = await _supabase.from('riders').insert([{
-          name: name, phone: phone, vehicle_no: vehicle || 'Standard', status: 'Pending', is_online: true, cash_in_hand: 0
-        }]);
-        if (error) throw error;
-
-        alert('✅ रजिस्ट्रेशन सबमिट हो गया! एडमिन अप्रूवल का इंतज़ार करें।');
-        switchAuthTab('LOGIN');
-        document.getElementById('login-phone').value = phone;
-      } catch (err) {
-        alert('त्रुटि: ' + err.message);
-      }
-    }
-
-    async function handleRiderLogin() {
-      const phone = document.getElementById('login-phone').value.trim();
-      if (!/^[6-9]\d{9}$/.test(phone)) return alert('कृपया अपना 10 अंकों का मोबाइल नंबर डालें!');
-
-      try {
-        const { data, error } = await _supabase.from('riders').select('*').eq('phone', phone).single();
-        if (error || !data) return alert('❌ यह नंबर रजिस्टर्ड नहीं है! New Registration करें।');
-        if (data.status === 'Pending') return alert('⏳ अकाउंट पेंडिंग है! एडमिन अप्रूवल का इंतज़ार करें।');
-        if (data.status === 'Blocked' || data.status === 'Deactivated') return alert('🚫 अकाउंट डिएक्टिवेट है। एडमिन से संपर्क करें।');
-
-        loggedInRider = data;
-        localStorage.setItem('baba_logged_rider', JSON.stringify(data));
-        alert(`🎉 स्वागत है, ${data.name}!`);
-        checkAuthStatus();
-      } catch (e) {
-        alert('लॉगिन एरर: ' + e.message);
-      }
-    }
-
-    function handleRiderLogout() {
-      if (!confirm('क्या आप वाकई Logout करना चाहते हैं?')) return;
-      if (loggedInRider) {
-        _supabase.from('riders').update({ is_online: false }).eq('id', loggedInRider.id);
-      }
-      localStorage.removeItem('baba_logged_rider');
-      loggedInRider = null;
-      if (wakeLock) { wakeLock.release(); wakeLock = null; }
-      if (gpsTrackerInterval) clearInterval(gpsTrackerInterval);
-      closeProfileModal();
-      checkAuthStatus();
-    }
-
-    function openProfileModal() { 
-      syncRiderData();
-      document.getElementById('profile-modal').classList.add('active'); 
-    }
-    function closeProfileModal(e) { if(e && e.target !== e.currentTarget) return; document.getElementById('profile-modal').classList.remove('active'); }
-
-    function startRiderLiveGpsAndSpeed() {
-      if (!navigator.geolocation || !loggedInRider) return;
-
-      const pushGps = () => {
-        if (!isOnline) return;
-        navigator.geolocation.getCurrentPosition(async (pos) => {
-          const lat = pos.coords.latitude;
-          const lng = pos.coords.longitude;
-          let speedKmh = 0;
-
-          if (pos.coords.speed !== null && !isNaN(pos.coords.speed)) {
-            speedKmh = Math.round(pos.coords.speed * 3.6);
-          } else if (prevPosition) {
-            const dtHours = (pos.timestamp - prevPosition.time) / (1000 * 3600);
-            if (dtHours > 0 && dtHours < 0.1) {
-              const dKm = calculateHaversineKm(prevPosition.lat, prevPosition.lng, lat, lng);
-              speedKmh = Math.round(dKm / dtHours);
-            }
+    // LEVENSHTEIN DISTANCE FOR AUTO SPELLING MISTAKE TOLERANCE
+    function getLevenshteinDistance(a, b) {
+      if (!a.length) return b.length;
+      if (!b.length) return a.length;
+      const matrix = [];
+      for (let i = 0; i <= b.length; i++) matrix[i] = [i];
+      for (let j = 0; j <= a.length; j++) matrix[0][j] = j;
+      for (let i = 1; i <= b.length; i++) {
+        for (let j = 1; j <= a.length; j++) {
+          if (b.charAt(i - 1) === a.charAt(j - 1)) {
+            matrix[i][j] = matrix[i - 1][j - 1];
+          } else {
+            matrix[i][j] = Math.min(
+              matrix[i - 1][j - 1] + 1,
+              Math.min(matrix[i][j - 1] + 1, matrix[i - 1][j] + 1)
+            );
           }
+        }
+      }
+      return matrix[b.length][a.length];
+    }
 
-          if (speedKmh > 120) speedKmh = 0;
-          prevPosition = { lat, lng, time: pos.timestamp };
+    function isFuzzyMatch(str1, str2) {
+      if (!str1 || !str2) return false;
+      str1 = str1.toLowerCase().trim();
+      str2 = str2.toLowerCase().trim();
+      if (str1.includes(str2) || str2.includes(str1)) return true;
+      const maxDistance = str2.length <= 4 ? 1 : 2;
+      return getLevenshteinDistance(str1, str2) <= maxDistance;
+    }
 
-          const speedEl = document.getElementById('live-speed-text');
-          const alertBadge = document.getElementById('speed-alert-pill');
-          if (speedEl) speedEl.innerText = speedKmh;
+    let appConfig = {
+      theme_color: '#ff3269',
+      header_bg: '#f4ecfb',
+      primary_purple: '#3c006b',
+      banner_title: '₹249+ पर <span style="color: #059669;">Free Delivery</span> 🚚',
+      banner_subtitle: '₹399+ के ऑर्डर पर ₹49 का भारी Discount!',
+      banner_icon: '🎁',
+      min_free_delivery: 249,
+      delivery_charge: 25,
+      discount_min_order: 399,
+      discount_amount: 49,
+      store_status: 'OPEN',
+      max_delivery_radius_km: 7.0,
+      base_delivery_km: 3.0,
+      per_km_charge: 10.0,
+      broadcast_notice: '',
+      is_broadcast_active: false,
+      rain_surge_mode: 'OFF',
+      rain_surge_fee: 0,
+      min_order_value: 99,
+      enable_hub_lock: true,
+      cancel_window_seconds: 60,
+      free_gift_min_order: 499,
+      free_gift_item_name: '1x Cold Drink (Free Gift)',
+      is_free_gift_active: true,
+      night_surge_start_hour: 22,
+      night_surge_end_hour: 6,
+      night_surge_fee: 20,
+      is_night_surge_active: false,
+      low_stock_threshold: 5
+    };
 
-          const isOver = speedKmh > maxAllowedSpeed;
-          if (alertBadge) alertBadge.style.display = isOver ? 'block' : 'none';
+    const catEmojiMap = {
+      'All': '🛍️', 'Grocery': '🥦', 'Dairy': '🥛', 'Snacks': '🍿', 'Bakery': '🍞', 'Drinks': '🥤'
+    };
 
-          const gpsText = document.getElementById('prof-gps');
-          if (gpsText) gpsText.innerText = `${lat.toFixed(4)}, ${lng.toFixed(4)}`;
+    function toggleDrawer(open) {
+      const drawer = document.getElementById('side-drawer');
+      const overlay = document.getElementById('drawer-overlay');
+      if (open) {
+        drawer.classList.add('active');
+        overlay.classList.add('active');
+      } else {
+        drawer.classList.remove('active');
+        overlay.classList.remove('active');
+      }
+    }
 
-          await _supabase.from('riders').update({
-            current_lat: lat,
-            current_lng: lng,
-            current_speed_kmh: speedKmh,
-            is_overspeeding: isOver,
-            is_online: true,
-            last_location_at: new Date().toISOString()
-          }).eq('id', loggedInRider.id);
-        }, (err) => {
-          console.warn("GPS Notice:", err.message);
-        }, { enableHighAccuracy: true });
+    function startVoiceSearch() {
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (!SpeechRecognition) return alert('आपके ब्राउज़र में वॉइस सर्च सपोर्ट नहीं है।');
+
+      const recognition = new SpeechRecognition();
+      recognition.lang = 'hi-IN';
+      recognition.interimResults = false;
+      recognition.maxAlternatives = 1;
+
+      const micBtn = document.getElementById('voice-search-btn');
+      micBtn.classList.add('recording');
+
+      recognition.start();
+
+      recognition.onresult = (event) => {
+        let transcript = event.results[0][0].transcript.toLowerCase().trim();
+        document.getElementById('search-input').value = transcript;
+        handleFilter();
+        micBtn.classList.remove('recording');
       };
-
-      pushGps();
-      if (!gpsTrackerInterval) gpsTrackerInterval = setInterval(pushGps, 15000);
+      recognition.onerror = () => micBtn.classList.remove('recording');
+      recognition.onspeechend = () => { recognition.stop(); micBtn.classList.remove('recording'); };
     }
 
     function calculateHaversineKm(lat1, lon1, lat2, lon2) {
       const R = 6371;
       const dLat = (lat2 - lat1) * Math.PI / 180;
       const dLon = (lon2 - lon1) * Math.PI / 180;
-      const a = Math.sin(dLat/2) * Math.sin(dLat/2) + Math.cos(lat1*Math.PI/180) * Math.cos(lat2*Math.PI/180) * Math.sin(dLon/2)*Math.sin(dLon/2);
-      return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+      const a = Math.sin(dLat/2) * Math.sin(dLat/2) + Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.sin(dLon/2) * Math.sin(dLon/2);
+      return R * (2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)));
     }
 
-    function openSosModal() { document.getElementById('sos-modal').classList.add('active'); }
-    function closeSosModal(e) { if (e && e.target !== e.currentTarget) return; document.getElementById('sos-modal').classList.remove('active'); }
+    function updateSmartCartTarget(itemsTotal) {
+      const targetBox = document.getElementById('cart-smart-target-box');
+      const targetText = document.getElementById('cart-target-text');
+      const progressBar = document.getElementById('cart-target-progress-bar');
 
-    function showEarningsPopup() {
-      let count = 0, cash = 0;
-      rawAllOrders.forEach(o => {
-        if (o.status === 'Delivered') { count++; cash += Number(o.total_amount) || 0; }
-      });
-      const inHand = loggedInRider?.cash_in_hand || 0;
-      alert(`👛 Rider Earnings\n\n• कुल डिलीवर किए गए: ${count}\n• कुल कमाई: ₹${cash}\n• जमा करने योग्य COD: ₹${inHand}`);
-    }
-
-    function playLoudEmergencySiren(orderAmount = '') {
-      try {
-        const audioTag = document.getElementById('rider-order-audio');
-        if (audioTag) {
-          audioTag.currentTime = 0;
-          audioTag.play().catch(() => playSynthesizerFallback());
-        } else playSynthesizerFallback();
-
-        if (navigator.vibrate) navigator.vibrate([600, 300, 600, 300, 1000]);
-
-        if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
-          navigator.serviceWorker.controller.postMessage({ type: 'NEW_ORDER_ALERT', amount: orderAmount });
-        }
-      } catch (err) {
-        playSynthesizerFallback();
-      }
-    }
-
-    function playSynthesizerFallback() {
-      try {
-        if (!sharedAudioCtx) sharedAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        if (sharedAudioCtx.state === 'suspended') sharedAudioCtx.resume();
-        const now = sharedAudioCtx.currentTime;
-        for (let i = 0; i < 5; i++) {
-          const osc = sharedAudioCtx.createOscillator();
-          const gain = sharedAudioCtx.createGain();
-          osc.type = 'sawtooth';
-          const cycleStart = now + (i * 0.45);
-          osc.frequency.setValueAtTime(650, cycleStart);
-          osc.frequency.linearRampToValueAtTime(980, cycleStart + 0.22);
-          osc.frequency.linearRampToValueAtTime(650, cycleStart + 0.44);
-          gain.gain.setValueAtTime(0.8, cycleStart);
-          gain.gain.linearRampToValueAtTime(0.01, cycleStart + 0.44);
-          osc.connect(gain);
-          gain.connect(sharedAudioCtx.destination);
-          osc.start(cycleStart);
-          osc.stop(cycleStart + 0.45);
-        }
-      } catch (e) {}
-    }
-
-    let shiftStartTime = localStorage.getItem('baba_shift_start') || Date.now();
-    localStorage.setItem('baba_shift_start', shiftStartTime);
-
-    function updateLiveTimers() {
-      if (isOnline && loggedInRider) {
-        const elapsedSecs = Math.floor((Date.now() - parseInt(shiftStartTime)) / 1000);
-        const m = Math.floor(elapsedSecs / 60);
-        const s = elapsedSecs % 60;
-        document.getElementById('live-shift-timer').innerText = `${m}m ${s}s`;
-        document.getElementById('live-login-hrs').innerText = (elapsedSecs / 3600).toFixed(1);
-      }
-    }
-    setInterval(updateLiveTimers, 1000);
-
-    function toggleDuty(online) {
-      isOnline = online;
-      const pill = document.getElementById('waiting-pill');
-      const text = document.getElementById('duty-text');
-
-      if (loggedInRider) _supabase.from('riders').update({ is_online: online }).eq('id', loggedInRider.id);
-
-      if (online) {
-        requestWakeLock();
-        pill.className = 'waiting-pill active-duty';
-        text.innerText = 'Waiting for Order... (Lock Screen Safe)';
-        loadRiderOrders();
-      } else {
-        if (wakeLock) { wakeLock.release(); wakeLock = null; }
-        pill.className = 'waiting-pill';
-        text.innerText = 'You are Offline';
-        document.getElementById('rider-orders-list').innerHTML = '<div style="text-align:center; color: var(--text-sub); padding: 20px; font-size: 12px;">आप ऑफ़लाइन हैं।</div>';
-      }
-    }
-
-    function switchOrderTab(tab) {
-      currentViewTab = tab;
-      document.getElementById('seg-active').className = tab === 'ACTIVE' ? 'seg-btn active' : 'seg-btn';
-      document.getElementById('seg-delivered').className = tab === 'DELIVERED' ? 'seg-btn active' : 'seg-btn';
-      renderTasks();
-    }
-
-    async function loadRiderOrders() {
-      if (!isOnline || !loggedInRider) return;
-      try {
-        const twoDaysAgo = new Date();
-        twoDaysAgo.setDate(twoDaysAgo.getDate() - 1);
-        twoDaysAgo.setHours(0, 0, 0, 0);
-
-        const { data, error } = await _supabase
-          .from('orders').select('*').gte('created_at', twoDaysAgo.toISOString()).order('id', { ascending: false });
-
-        if (error) throw error;
-        
-        rawAllOrders = (data || []).filter(o => {
-          return !o.assigned_rider_id || o.assigned_rider_id === loggedInRider.id;
-        });
-
-        if (isFirstTimeLoad) {
-          rawAllOrders.forEach(o => processedOrders.add(o.id));
-          localStorage.setItem('baba_processed_orders', JSON.stringify([...processedOrders]));
-          isFirstTimeLoad = false;
-        } else {
-          let hasNewOrder = false;
-          let newOrderAmt = '';
-          rawAllOrders.forEach(o => {
-            if (!processedOrders.has(o.id) && o.status !== 'Delivered' && o.status !== 'Cancelled') {
-              hasNewOrder = true;
-              newOrderAmt = o.total_amount;
-              processedOrders.add(o.id);
-            }
-          });
-          if (hasNewOrder) {
-            localStorage.setItem('baba_processed_orders', JSON.stringify([...processedOrders]));
-            playLoudEmergencySiren(newOrderAmt);
-          }
-        }
-        renderTasks();
-      } catch (e) {
-        console.log("Load error:", e);
-      }
-    }
-
-    function renderTasks() {
-      const container = document.getElementById('rider-orders-list');
-      let deliveredCount = 0, totalEarnings = 0;
-      rawAllOrders.forEach(o => {
-        if (o.status === 'Delivered') {
-          deliveredCount++;
-          totalEarnings += Number(o.total_amount) || 0;
-        }
-      });
-      document.getElementById('orders-done-count').innerText = deliveredCount;
-      document.getElementById('live-total-earning').innerHTML = `₹${totalEarnings} <span style="font-size: 14px; font-weight: 600; color: #64748b;">earned</span>`;
-
-      const displayOrders = rawAllOrders.filter(o => {
-        if (currentViewTab === 'ACTIVE') return o.status !== 'Delivered' && o.status !== 'Cancelled';
-        return o.status === 'Delivered';
-      });
-
-      const activeBatchCount = rawAllOrders.filter(o => o.status !== 'Delivered' && o.status !== 'Cancelled' && o.assigned_rider_id === loggedInRider.id).length;
-      document.getElementById('active-tasks-count').innerText = activeBatchCount;
-
-      if (displayOrders.length === 0) {
-        container.innerHTML = currentViewTab === 'ACTIVE'
-          ? '<div style="text-align:center; color: var(--text-sub); padding: 25px; font-size: 12px;">Waiting for Order... कोई एक्टिव टास्क नहीं है।</div>'
-          : '<div style="text-align:center; color: var(--text-sub); padding: 25px; font-size: 12px;">कोई डिलीवर्ड ऑर्डर नहीं है।</div>';
+      if (!targetBox || itemsTotal <= 0) {
+        if (targetBox) targetBox.style.display = 'none';
         return;
       }
 
-      const isMultiBatch = displayOrders.length > 1;
+      targetBox.style.display = 'flex';
 
-      container.innerHTML = displayOrders.map(o => {
-        const timeStr = o.created_at ? new Date(o.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '';
-        const isDelivered = o.status === 'Delivered';
+      const freeDelMin = Number(appConfig.min_free_delivery) || 249;
+      const freeGiftMin = Number(appConfig.free_gift_min_order) || 499;
+      const discountMin = Number(appConfig.discount_min_order) || 399;
 
-        let mapsLink = '';
-        const match = (o.delivery_address || '').match(/https:\/\/maps\.google\.com\/\?q=([^\s]+)/);
-        if (match) mapsLink = match[0];
-        else mapsLink = `https://maps.google.com/?q=${encodeURIComponent(o.delivery_address || '')}`;
+      if (itemsTotal < freeDelMin) {
+        const diff = freeDelMin - itemsTotal;
+        const pct = Math.min(100, Math.round((itemsTotal / freeDelMin) * 100));
+        targetText.innerHTML = `🚚 सिर्फ <b>₹${diff}</b> की और खरीदारी पर <b>FREE Delivery</b>!`;
+        progressBar.style.width = `${pct}%`;
+      } else if (itemsTotal < discountMin) {
+        const diff = discountMin - itemsTotal;
+        const pct = Math.min(100, Math.round((itemsTotal / discountMin) * 100));
+        targetText.innerHTML = `💸 सिर्फ <b>₹${diff}</b> की और खरीदारी पर <b>₹${appConfig.discount_amount || 49} का Discount</b>!`;
+        progressBar.style.width = `${pct}%`;
+      } else if (itemsTotal < freeGiftMin && appConfig.is_free_gift_active) {
+        const diff = freeGiftMin - itemsTotal;
+        const pct = Math.min(100, Math.round((itemsTotal / freeGiftMin) * 100));
+        targetText.innerHTML = `🎁 सिर्फ <b>₹${diff}</b> की और खरीदारी पर <b>${appConfig.free_gift_item_name || '1 Cold Drink Free'}</b>!`;
+        progressBar.style.width = `${pct}%`;
+      } else {
+        targetText.innerHTML = `🎉 बधाई हो! आपने सभी ऑफ़र (Free Delivery + Discount + Gift) अनलॉक कर लिए हैं!`;
+        progressBar.style.width = `100%`;
+      }
+    }
 
-        return `
-          <div class="rider-order-card" style="${isMultiBatch ? 'border-left: 4px solid #8b5cf6;' : ''}">
-            <div class="r-card-head">
-              <span style="font-weight:900; font-size:14px;">ORD #${o.id} <span style="font-size:10px; color:var(--text-sub);">⏰ ${timeStr}</span></span>
-              <div>
-                ${isMultiBatch ? '<span class="r-badge batch">Batch 🔀</span>' : ''}
-                <span class="r-badge ${isDelivered ? 'delivered' : ''}">${o.status}</span>
-              </div>
+    function isCurrentlyNightTime() {
+      if (!appConfig.is_night_surge_active) return false;
+      const hr = new Date().getHours();
+      const start = appConfig.night_surge_start_hour ?? 22;
+      const end = appConfig.night_surge_end_hour ?? 6;
+      return start > end ? (hr >= start || hr < end) : (hr >= start && hr < end);
+    }
+
+    async function loadLiveAppSettings() {
+      try {
+        const { data } = await _supabase.from('app_settings').select('*').eq('id', 1).single();
+        if (data) {
+          appConfig = { ...appConfig, ...data };
+          applyThemeAndOffers();
+        }
+      } catch (err) { console.warn(err); }
+    }
+
+    function applyThemeAndOffers() {
+      const tickerBar = document.getElementById('broadcast-ticker-bar');
+      if (appConfig.is_broadcast_active && appConfig.broadcast_notice) {
+        tickerBar.style.display = 'block';
+        document.getElementById('broadcast-ticker-content').innerText = `📢 ${appConfig.broadcast_notice} • ${appConfig.broadcast_notice}`;
+      } else {
+        tickerBar.style.display = 'none';
+      }
+
+      const rainStrip = document.getElementById('rain-surge-alert');
+      if (appConfig.rain_surge_mode !== 'OFF' && Number(appConfig.rain_surge_fee) > 0) {
+        rainStrip.style.display = 'flex';
+        document.getElementById('rain-surge-msg').innerText = `🌧️ खराब मौसम के कारण ₹${appConfig.rain_surge_fee} डिलीवरी सर्ज लागू है।`;
+      } else {
+        rainStrip.style.display = 'none';
+      }
+
+      const nightStrip = document.getElementById('night-surge-alert');
+      if (isCurrentlyNightTime()) {
+        nightStrip.style.display = 'flex';
+        document.getElementById('night-surge-msg').innerText = `🌙 देर रात सेवा: ₹${appConfig.night_surge_fee} नाइट सर्ज शुल्क लागू है।`;
+      } else {
+        nightStrip.style.display = 'none';
+      }
+
+      renderCartSheet();
+      renderProducts(allProducts);
+    }
+
+    async function initApp() {
+      renderPastOrdersUI();
+      await loadLiveAppSettings();
+      try {
+        const { data, error } = await _supabase.from('products').select('*').order('id', { ascending: true });
+        allProducts = data || [];
+        document.getElementById('loader').style.display = 'none';
+        renderCategories();
+        renderProducts(allProducts);
+
+        if (currentOrderId) startTracking(currentOrderId);
+      } catch (err) {
+        document.getElementById('loader').innerText = 'Error: ' + err.message;
+      }
+    }
+
+    function selectPaymentMode(mode) {
+      selectedPaymentMode = mode;
+      document.getElementById('opt-cod').style.borderColor = mode === 'COD' ? 'var(--accent-pink)' : '#cbd5e1';
+      document.getElementById('opt-cod').style.background = mode === 'COD' ? '#fff0f4' : '#fff';
+      document.getElementById('opt-upi').style.borderColor = mode === 'UPI' ? 'var(--accent-pink)' : '#cbd5e1';
+      document.getElementById('opt-upi').style.background = mode === 'UPI' ? '#fff0f4' : '#fff';
+
+      document.getElementById('upi-box').style.display = mode === 'UPI' ? 'block' : 'none';
+      if (mode === 'UPI') refreshUpiQr();
+    }
+
+    function refreshUpiQr() {
+      const { finalToPay } = calculateTotals();
+      document.getElementById('upi-box-amount').innerText = finalToPay;
+      const upiUrl = `upi://pay?pa=${STORE_UPI_ID}&pn=BabaFood&am=${finalToPay}&cu=INR`;
+      document.getElementById('upi-qr-img').src = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(upiUrl)}`;
+    }
+
+    function renderCategories() {
+      const bar = document.getElementById('category-chips');
+      const cats = ['All', ...new Set(allProducts.map(p => p.category).filter(Boolean))];
+      bar.innerHTML = cats.map(c => `
+        <div class="cat-item ${c === selectedCat ? 'active' : ''}" onclick="setCategory('${c}', this)">
+          <div class="cat-icon-circle">${catEmojiMap[c] || '📦'}</div>
+          <div class="cat-name">${c}</div>
+        </div>
+      `).join('');
+    }
+
+    function setCategory(cat, el) {
+      selectedCat = cat;
+      document.querySelectorAll('.cat-item').forEach(c => c.classList.remove('active'));
+      if (el) el.classList.add('active');
+      handleFilter();
+    }
+
+    // AUTOMATIC SPELLING TOLERANCE (FUZZY) + BILINGUAL SYNONYM SEARCH
+    function handleFilter() {
+      const rawInput = document.getElementById('search-input').value.toLowerCase().trim();
+      if (!rawInput) {
+        renderProducts(allProducts.filter(p => selectedCat === 'All' || p.category === selectedCat));
+        return;
+      }
+
+      const searchTerms = new Set([rawInput]);
+      if (keywordSynonyms[rawInput]) searchTerms.add(keywordSynonyms[rawInput]);
+
+      rawInput.split(/\s+/).forEach(word => {
+        searchTerms.add(word);
+        if (keywordSynonyms[word]) searchTerms.add(keywordSynonyms[word]);
+      });
+
+      // Also check if input has fuzzy match with dictionary keys
+      Object.keys(keywordSynonyms).forEach(dictWord => {
+        if (isFuzzyMatch(rawInput, dictWord)) {
+          searchTerms.add(dictWord);
+          searchTerms.add(keywordSynonyms[dictWord]);
+        }
+      });
+
+      const searchTermsArray = Array.from(searchTerms);
+
+      const filtered = allProducts.filter(p => {
+        const matchC = selectedCat === 'All' || p.category === selectedCat;
+        const pName = (p.name || '').toLowerCase();
+        const pCat = (p.category || '').toLowerCase();
+
+        const matchQ = searchTermsArray.some(term => {
+          if (pName.includes(term) || pCat.includes(term)) return true;
+          // Word-by-word fuzzy comparison for spelling mistakes
+          const pWords = pName.split(/\s+/);
+          return pWords.some(w => isFuzzyMatch(w, term));
+        });
+
+        return matchC && matchQ;
+      });
+
+      renderProducts(filtered);
+    }
+
+    function renderProducts(items) {
+      const container = document.getElementById('product-list');
+      container.innerHTML = '';
+      if (items.length === 0) {
+        container.innerHTML = '<div style="grid-column: span 2; text-align: center; color: #94a3b8; padding: 30px;">कोई सामान नहीं मिला।</div>';
+        return;
+      }
+
+      items.forEach(p => {
+        const card = document.createElement('div');
+        card.className = 'product-card';
+        const qty = cart[p.id]?.qty || 0;
+        const stockQty = p.stock_quantity ?? 50;
+        const isOutOfStock = Boolean(p.is_out_of_stock) || stockQty <= 0;
+        const isLowStock = !isOutOfStock && stockQty <= (appConfig.low_stock_threshold || 5);
+        const discPct = Number(p.discount_percent) || 0;
+
+        let originalMrpHtml = '';
+        if (discPct > 0) {
+          const originalMrp = Math.round(p.price / (1 - discPct / 100));
+          originalMrpHtml = `<span class="mrp-cut">₹${originalMrp}</span>`;
+        }
+
+        card.innerHTML = `
+          <div>
+            <div class="img-box" style="${isOutOfStock ? 'opacity: 0.6;' : ''}">
+              <img src="${p.image_url || 'https://via.placeholder.com/150'}" alt="${p.name}">
+              ${isOutOfStock ? '<div class="out-of-stock-tag">OUT OF STOCK</div>' : isLowStock ? `<div class="low-stock-tag">⚠️ Only ${stockQty} Left</div>` : ''}
+              ${discPct > 0 && !isOutOfStock ? `<div class="discount-badge-pill">${discPct}% OFF</div>` : ''}
             </div>
-            <div style="font-size:13px; font-weight:700;">👤 ${o.customer_name || 'Customer'} (📞 <a style="color:#38bdf8;" href="tel:${o.customer_phone}">${o.customer_phone}</a>)</div>
-            <div class="r-address">📍 ${o.delivery_address || 'Address Not Provided'}</div>
-            ${o.distance_km ? `<div style="font-size:11px; color:#38bdf8; font-weight:700; margin-bottom:2px;">📏 Doori: ${o.distance_km} KM</div>` : ''}
-            ${o.free_gift_added ? `<div style="font-size:11px; color:#f472b6; font-weight:800; margin-bottom:2px;">🎁 Free Gift to give: ${o.free_gift_added}</div>` : ''}
-            ${o.hub_id ? `<div style="font-size:11px; color:#10b981; font-weight:700; margin-bottom:4px;">🏬 Pickup from Hub #${o.hub_id}</div>` : ''}
-            
-            <div style="display:flex; justify-content:space-between; align-items:center; margin:6px 0;">
-              <div style="font-size:13px; font-weight:800; color:var(--accent-green);">To Collect: ₹${o.total_amount} (${o.payment_mode || 'COD'})</div>
-              <a href="${mapsLink}" target="_blank" style="color:#38bdf8; text-decoration:none; font-size:11px; font-weight:800;">🗺️ View Map ↗</a>
-            </div>
-
-            ${!isDelivered ? `
-              <div style="display:flex; gap:8px; margin-top:8px;">
-                <button onclick='openRiderChat(${o.id})' style="flex:1; background:#0284c7; color:white; border:none; padding:10px; border-radius:8px; font-weight:800; font-size:12px; cursor:pointer;">
-                  💬 Chat
-                </button>
-                ${o.status !== 'Out for Delivery' ? `
-                  <button class="btn-action-rider" style="flex:2; margin-top:0;" onclick='openBinScreen(${JSON.stringify(o)})'>
-                    🛍️ Pick Up (Bin)
-                  </button>
-                ` : `
-                  <button class="btn-action-rider" style="flex:2; margin-top:0; background:#e11d48;" onclick='openWayScreen(${JSON.stringify(o)})'>
-                    🛵 Live Route
-                  </button>
-                `}
-              </div>
-            ` : ''}
+            <div class="prod-title">${p.name}</div>
+            <div class="prod-unit">${p.unit || '1 unit'}</div>
+          </div>
+          <div class="price-action-row">
+            <div class="price-tag">₹${p.price} ${originalMrpHtml}</div>
+            <div id="btn-box-${p.id}">${renderButton(p.id, qty, isOutOfStock)}</div>
           </div>
         `;
-      }).join('');
+        container.appendChild(card);
+      });
     }
 
-    function handleCallCustomer() {
-      if (!currentSelectedOrder || !currentSelectedOrder.customer_phone) return;
-      window.location.href = `tel:${currentSelectedOrder.customer_phone}`;
-    }
-
-    // BIN SCREEN WITH REAL IMAGES & TAP-TO-ZOOM
-    function openBinScreen(order) {
-      currentSelectedOrder = order;
-      document.getElementById('bin-order-hash').innerText = `#BABA${order.id}DSNI19442A`;
-      const items = Array.isArray(order.items) ? order.items : [];
-      document.getElementById('bin-shelf-num').innerText = items.length;
-
-      document.getElementById('bin-items-container').innerHTML = items.map(it => {
-        const itemImg = it.image_url || 'logo.png';
-        const safeName = (it.name || 'Item').replace(/'/g, "\\'");
+    function renderButton(id, qty, isOutOfStock) {
+      if (isOutOfStock) return `<button style="background:#f1f5f9; border:none; color:#94a3b8; padding:6px 12px; border-radius:8px; font-weight:800; font-size:11px;" disabled>Sold</button>`;
+      if (qty > 0) {
         return `
-          <div class="bin-item-card" onclick="openItemZoom('${itemImg}', '${safeName}', ${it.qty || 1})">
-            <img src="${itemImg}" alt="${it.name}">
-            <div class="bin-item-qty">×${it.qty || 1}</div>
+          <div class="qty-counter">
+            <button class="qty-btn" onclick="updateQty(${id}, -1)">-</button>
+            <span>${qty}</span>
+            <button class="qty-btn" onclick="updateQty(${id}, 1)">+</button>
           </div>
         `;
-      }).join('');
-
-      document.getElementById('bin-screen').classList.add('active');
-    }
-
-    function openItemZoom(imgUrl, itemName, qty) {
-      document.getElementById('zoom-img-target').src = imgUrl;
-      document.getElementById('zoom-title-target').innerText = itemName;
-      document.getElementById('zoom-qty-target').innerText = `Quantity to pick: ${qty} pcs`;
-      document.getElementById('item-zoom-modal').classList.add('active');
-    }
-
-    function closeItemZoom() {
-      document.getElementById('item-zoom-modal').classList.remove('active');
-    }
-
-    function triggerNativeCamera() { document.getElementById('camera-file-input').click(); }
-
-    function handlePhotoTaken(input) {
-      if (input.files && input.files[0]) {
-        const reader = new FileReader();
-        reader.onload = function(e) {
-          const photoUrl = e.target.result;
-          document.getElementById('captured-bag-img').src = photoUrl;
-          document.getElementById('thumb-preview').src = photoUrl;
-          document.getElementById('photo-screen').classList.add('active');
-        };
-        reader.readAsDataURL(input.files[0]);
       }
-    }
-    function retakePhoto() { document.getElementById('camera-file-input').click(); }
-    function closePhotoScreen() { document.getElementById('photo-screen').classList.remove('active'); }
-
-    async function submitBagPhoto() {
-      if (!currentSelectedOrder) return;
-      const btn = document.querySelector('.btn-submit-photo');
-      btn.innerText = 'Starting Delivery...';
-      btn.disabled = true;
-
-      const { error } = await _supabase.from('orders').update({
-        status: 'Out for Delivery',
-        assigned_rider_id: loggedInRider.id
-      }).eq('id', currentSelectedOrder.id);
-
-      if (!error) {
-        document.getElementById('photo-screen').classList.remove('active');
-        document.getElementById('bin-screen').classList.remove('active');
-        btn.innerText = 'Submit Photo';
-        btn.disabled = false;
-        openWayScreen(currentSelectedOrder);
-        loadRiderOrders();
-      } else {
-        alert('त्रुटि: ' + error.message);
-        btn.disabled = false;
-      }
+      return `<button class="btn-add-zepto" onclick="updateQty(${id}, 1)">ADD</button>`;
     }
 
-    function openWayScreen(order) {
-      currentSelectedOrder = order;
-      const addressText = order.delivery_address || 'Address Not Provided';
-      document.getElementById('way-customer-address').innerText = addressText;
-      let queryLoc = addressText;
-      const match = addressText.match(/https:\/\/maps\.google\.com\/\?q=([^\s]+)/);
-      if (match) queryLoc = match[1];
+    function updateQty(id, delta) {
+      const prod = allProducts.find(p => p.id === id);
+      if (!prod || prod.is_out_of_stock) return;
 
-      document.getElementById('way-map-frame').src = `https://maps.google.com/maps?q=${encodeURIComponent(queryLoc)}&t=&z=16&ie=UTF8&iwloc=&output=embed`;
-      document.getElementById('native-maps-intent-btn').href = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(queryLoc)}`;
-      document.getElementById('way-screen').classList.add('active');
-    }
-
-    function handleMarkArrived() {
-      if (!currentSelectedOrder) return;
-      if (currentSelectedOrder.payment_mode === 'COD') {
-        document.getElementById('cod-amount-display').innerText = `₹${currentSelectedOrder.total_amount}`;
-        initCodSlider();
-        document.getElementById('cod-modal').classList.add('active');
-      } else {
-        openOtpModal();
-      }
-    }
-
-    function closeCodModal() { document.getElementById('cod-modal').classList.remove('active'); }
-
-    function initCodSlider() {
-      const track = document.getElementById('slider-track');
-      const thumb = document.getElementById('slider-thumb');
-      let isDragging = false;
-      let startX = 0;
-      let maxSlide = track.clientWidth - thumb.clientWidth - 8;
-
-      thumb.style.left = '4px';
-      thumb.innerText = '➔';
-      thumb.style.background = 'var(--accent-green)';
-
-      const onStart = (e) => {
-        isDragging = true;
-        startX = (e.touches ? e.touches[0].clientX : e.clientX) - thumb.offsetLeft;
-      };
-
-      const onMove = (e) => {
-        if (!isDragging) return;
-        maxSlide = track.clientWidth - thumb.clientWidth - 8;
-        let currentX = (e.touches ? e.touches[0].clientX : e.clientX) - startX;
-        if (currentX < 4) currentX = 4;
-        if (currentX > maxSlide) currentX = maxSlide;
-        thumb.style.left = currentX + 'px';
-
-        if (currentX >= maxSlide * 0.92) {
-          isDragging = false;
-          thumb.style.left = maxSlide + 'px';
-          thumb.innerText = '✓';
-          thumb.style.background = '#059669';
-          setTimeout(() => {
-            closeCodModal();
-            openOtpModal();
-          }, 250);
+      if (appConfig.enable_hub_lock && delta > 0 && !cart[id]) {
+        const cartItems = Object.values(cart);
+        if (cartItems.length > 0) {
+          const firstHub = cartItems[0].item.hub_id || 1;
+          const currentHub = prod.hub_id || 1;
+          if (firstHub !== currentHub) {
+            alert('🔒 Hub Lock Alert!\n\nआपकी कार्ट में पहले से दूसरे हब का सामान मौजूद है। एक समय में सिर्फ एक ही हब/स्टोर से ऑर्डर कर सकते हैं।');
+            return;
+          }
         }
-      };
+      }
 
-      const onEnd = () => {
-        if (!isDragging) return;
-        isDragging = false;
-        maxSlide = track.clientWidth - thumb.clientWidth - 8;
-        if (parseInt(thumb.style.left) < maxSlide * 0.9) {
-          thumb.style.transition = 'left 0.2s ease';
-          thumb.style.left = '4px';
-          setTimeout(() => thumb.style.transition = '', 200);
+      if (!cart[id]) cart[id] = { item: prod, qty: 0 };
+      cart[id].qty += delta;
+      if (cart[id].qty <= 0) delete cart[id];
+
+      const box = document.getElementById(`btn-box-${id}`);
+      if (box) box.innerHTML = renderButton(id, cart[id]?.qty || 0, false);
+
+      updateCartBar();
+      renderCartSheet();
+      if (selectedPaymentMode === 'UPI') refreshUpiQr();
+    }
+
+    async function applyCouponCode() {
+      const code = document.getElementById('cart-coupon-input').value.trim().toUpperCase();
+      if (!code) return alert('कूपन कोड दर्ज करें!');
+
+      const { data, error } = await _supabase.from('coupons').select('*').eq('code', code).eq('is_active', true).single();
+      if (error || !data) return alert('❌ अमान्य या समाप्त कूपन!');
+
+      const { itemsTotal } = calculateTotals();
+      if (itemsTotal < (Number(data.min_order_amount) || 0)) {
+        return alert(`⚠️ यह कूपन न्यूनतम ₹${data.min_order_amount} के ऑर्डर पर ही मान्य है!`);
+      }
+
+      appliedCoupon = { code: data.code, discount: Number(data.discount_value) || 0 };
+      const pill = document.getElementById('coupon-success-pill');
+      pill.style.display = 'block';
+      pill.innerText = `✓ कूपन '${data.code}' लागू हुआ! ₹${appliedCoupon.discount} की छूट मिली।`;
+      renderCartSheet();
+      if (selectedPaymentMode === 'UPI') refreshUpiQr();
+    }
+
+    function calculateTotals() {
+      const entries = Object.values(cart);
+      const itemsTotal = entries.reduce((s, e) => s + (e.qty * Number(e.item.price)), 0);
+      const totalQty = entries.reduce((s, e) => s + e.qty, 0);
+
+      const minFree = Number(appConfig.min_free_delivery) || 249;
+      const baseCharge = Number(appConfig.delivery_charge) || 25;
+      const minDisc = Number(appConfig.discount_min_order) || 399;
+      const discAmt = Number(appConfig.discount_amount) || 49;
+
+      let deliveryCharge = 0;
+      if (itemsTotal > 0) {
+        if (itemsTotal >= minFree) {
+          deliveryCharge = 0;
+        } else {
+          deliveryCharge = baseCharge;
+          const baseKm = Number(appConfig.base_delivery_km) || 3.0;
+          const perKm = Number(appConfig.per_km_charge) || 10.0;
+          if (calculatedKm > baseKm) {
+            const extraKm = Math.ceil(calculatedKm - baseKm);
+            deliveryCharge += (extraKm * perKm);
+          }
         }
-      };
+      }
 
-      thumb.onmousedown = onStart; window.onmousemove = onMove; window.onmouseup = onEnd;
-      thumb.ontouchstart = onStart; window.ontouchmove = onMove; window.ontouchend = onEnd;
+      let rainSurge = (itemsTotal > 0 && appConfig.rain_surge_mode !== 'OFF') ? (Number(appConfig.rain_surge_fee) || 0) : 0;
+      let nightSurge = (itemsTotal > 0 && isCurrentlyNightTime()) ? (Number(appConfig.night_surge_fee) || 0) : 0;
+
+      let discount = (itemsTotal >= minDisc) ? discAmt : 0;
+      let couponDisc = appliedCoupon ? appliedCoupon.discount : 0;
+
+      let finalToPay = Math.max(0, itemsTotal + deliveryCharge + rainSurge + nightSurge - discount - couponDisc);
+
+      return { itemsTotal, totalQty, deliveryCharge, rainSurge, nightSurge, discount, couponDisc, finalToPay };
     }
 
-    function openOtpModal() {
-      document.getElementById('rider-otp-input').value = '';
-      document.getElementById('otp-modal').classList.add('active');
-      document.getElementById('rider-otp-input').focus();
+    function updateCartBar() {
+      const { totalQty, finalToPay } = calculateTotals();
+      const bar = document.getElementById('cart-float-bar');
+      if (totalQty > 0) {
+        bar.style.display = 'flex';
+        document.getElementById('float-qty-text').innerText = `${totalQty} Item${totalQty > 1 ? 's' : ''} in Bag`;
+        document.getElementById('float-total-text').innerText = `₹${finalToPay}`;
+      } else {
+        bar.style.display = 'none';
+      }
     }
-    function closeOtpModal() { document.getElementById('otp-modal').classList.remove('active'); }
 
-    async function verifyOtpAndDeliver() {
-      const enteredOtp = document.getElementById('rider-otp-input').value.trim();
-      if (enteredOtp.length !== 4) return alert('कृपया 4 अंकों का सही OTP दर्ज करें!');
-      if (!currentSelectedOrder) return;
+    function renderCartSheet() {
+      const box = document.getElementById('cart-items-box');
+      if (!box) return;
+      const entries = Object.values(cart);
+
+      if (entries.length === 0) {
+        box.innerHTML = '<div style="text-align:center; padding: 24px; color: #94a3b8; font-weight:600;">थैला खाली है (Cart is empty).</div>';
+        document.getElementById('bill-subtotal').innerText = '₹0';
+        document.getElementById('bill-grand-total').innerText = '₹0';
+        document.getElementById('cart-smart-target-box').style.display = 'none';
+        return;
+      }
+
+      const { itemsTotal, deliveryCharge, rainSurge, nightSurge, discount, couponDisc, finalToPay } = calculateTotals();
+
+      updateSmartCartTarget(itemsTotal);
+
+      const minReq = Number(appConfig.min_order_value) || 99;
+      const submitBtn = document.getElementById('order-submit-btn');
+      if (itemsTotal < minReq) {
+        submitBtn.disabled = true;
+        submitBtn.innerText = `कम से कम ₹${minReq} का ऑर्डर आवश्यक है (₹${minReq - itemsTotal} और जोड़ें)`;
+      } else if (isLocationUpdated) {
+        submitBtn.disabled = false;
+        submitBtn.innerText = selectedPaymentMode === 'UPI' ? 'Verify UTR & Place Order' : 'Place Delivery Order';
+      }
+
+      box.innerHTML = entries.map(({ item, qty }) => `
+        <div style="display:flex; justify-content:space-between; align-items:center; padding:10px 0; border-bottom:1px solid #f8fafc;">
+          <div>
+            <div style="font-size: 13px; font-weight: 800;">${item.name}</div>
+            <div style="font-size: 11px; color: #64748b; font-weight:600;">₹${item.price} × ${qty}</div>
+          </div>
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <span style="font-size: 14px; font-weight: 900;">₹${item.price * qty}</span>
+            <div class="qty-counter" style="padding: 2px 6px;">
+              <button class="qty-btn" onclick="updateQty(${item.id}, -1)">-</button>
+              <span>${qty}</span>
+              <button class="qty-btn" onclick="updateQty(${item.id}, 1)">+</button>
+            </div>
+          </div>
+        </div>
+      `).join('');
+
+      document.getElementById('bill-subtotal').innerText = `₹${itemsTotal}`;
+      document.getElementById('bill-delivery-charge').innerText = deliveryCharge === 0 ? 'FREE' : `₹${deliveryCharge} ${calculatedKm > 0 ? '(' + calculatedKm.toFixed(1) + ' km)' : ''}`;
+      document.getElementById('bill-grand-total').innerText = `₹${finalToPay}`;
+
+      document.getElementById('row-rain-surge').style.display = rainSurge > 0 ? 'flex' : 'none';
+      document.getElementById('bill-rain-surge-amount').innerText = `+₹${rainSurge}`;
+
+      document.getElementById('row-night-surge').style.display = nightSurge > 0 ? 'flex' : 'none';
+      document.getElementById('bill-night-surge-amount').innerText = `+₹${nightSurge}`;
+
+      document.getElementById('row-discount').style.display = discount > 0 ? 'flex' : 'none';
+      document.getElementById('bill-disc-amount').innerText = `-₹${discount}`;
+
+      document.getElementById('row-coupon').style.display = couponDisc > 0 ? 'flex' : 'none';
+      document.getElementById('bill-coupon-amount').innerText = `-₹${couponDisc}`;
+    }
+
+    function getCurrentLocation() {
+      if (!navigator.geolocation) return alert('आपके ब्राउज़र में GPS सपोर्ट नहीं है।');
+
+      const statusVal = document.getElementById('gps-status-val');
+      const orderBtn = document.getElementById('order-submit-btn');
+
+      statusVal.innerText = 'लाइव लोकेशन फ़ैच हो रही है... कृपया प्रतीक्षा करें।';
+
+      navigator.geolocation.getCurrentPosition(
+        async (pos) => {
+          customerCoords = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+          isLocationUpdated = true;
+
+          try {
+            const { data: hubInfo } = await _supabase.from('hubs').select('*').limit(1).single();
+            if (hubInfo && hubInfo.lat && hubInfo.lng) {
+              calculatedKm = calculateHaversineKm(customerCoords.lat, customerCoords.lng, hubInfo.lat, hubInfo.lng);
+            }
+          } catch (e) {}
+
+          const mapsUrl = `https://maps.google.com/?q=${pos.coords.latitude},${pos.coords.longitude}`;
+          statusVal.innerHTML = `🟢 लाइव लोकेशन सफलतापूर्वक अपडेट हुई! (दूरी: ${calculatedKm.toFixed(1)} KM)<br><a href="${mapsUrl}" target="_blank" style="color:#0284c7; font-weight:800;">Google Maps लिंक देखें ↗</a>`;
+
+          renderCartSheet();
+        },
+        (err) => {
+          isLocationUpdated = false;
+          statusVal.innerHTML = `🔴 लोकेशन फ़ैच फ़ेल हुई: ${err.message}। कृपया ब्राउज़र में GPS Allow करें!`;
+          orderBtn.disabled = true;
+          orderBtn.innerText = '⚠️ पहले लाइव लोकेशन अपडेट करें';
+        },
+        { enableHighAccuracy: true, timeout: 10000 }
+      );
+    }
+
+    async function placeOrder() {
+      if (!isLocationUpdated || !customerCoords) {
+        return alert('⚠️ लाइव लोकेशन अपडेट करना अनिवार्य है! कृपया नीले बटन पर क्लिक करके लोकेशन अपडेट करें।');
+      }
+
+      const { itemsTotal, finalToPay, couponDisc, rainSurge, nightSurge } = calculateTotals();
+      const minReq = Number(appConfig.min_order_value) || 99;
+      if (itemsTotal < minReq) {
+        return alert(`⚠️ न्यूनतम ऑर्डर वैल्यू ₹${minReq} है!`);
+      }
+
+      const name = document.getElementById('c-name').value.trim();
+      const phone = document.getElementById('c-phone').value.trim();
+      const manualAddress = document.getElementById('c-address').value.trim();
+      const utr = document.getElementById('upi-utr').value.trim();
+
+      if (name.length < 2) return alert('कृपया अपना पूरा नाम दर्ज करें!');
+      if (!/^[6-9]\d{9}$/.test(phone)) return alert('कृपया 10 अंकों का सही मोबाइल नंबर दर्ज करें!');
+      if (manualAddress.length < 4) return alert('कृपया घर/दुकान का पता और लैंडमार्क लिखें!');
+
+      if (selectedPaymentMode === 'UPI' && !/^\d{12}$/.test(utr)) {
+        return alert('कृपया 12 अंकों का सही UTR नंबर डालें!');
+      }
+
+      const combinedAddress = `📍 GPS: https://maps.google.com/?q=${customerCoords.lat},${customerCoords.lng}\n🏠 House/Street: ${manualAddress}`;
+      const entries = Object.values(cart);
+      if (entries.length === 0) return alert('थैला खाली है!');
+
+      const orderItems = entries.map(({ item, qty }) => ({
+        id: item.id, name: item.name, price: item.price, unit: item.unit, qty, subtotal: item.price * qty, hub_id: item.hub_id || 1
+      }));
+
+      const generatedOtp = Math.floor(1000 + Math.random() * 9000).toString();
+      const hasFreeGift = appConfig.is_free_gift_active && itemsTotal >= (Number(appConfig.free_gift_min_order) || 499);
 
       try {
-        const { data: orderData, error } = await _supabase
-          .from('orders').select('delivery_otp').eq('id', currentSelectedOrder.id).single();
+        const { data, error } = await _supabase.from('orders').insert([{
+          customer_name: name,
+          customer_phone: phone,
+          delivery_address: combinedAddress,
+          items: orderItems,
+          total_amount: finalToPay,
+          status: selectedPaymentMode === 'UPI' ? 'Paid Online (UPI)' : 'Order Placed',
+          payment_mode: selectedPaymentMode,
+          transaction_id: selectedPaymentMode === 'UPI' ? utr : null,
+          delivery_otp: generatedOtp,
+          coupon_discount: couponDisc,
+          rain_surge_fee: rainSurge,
+          night_surge_fee: nightSurge,
+          distance_km: Number(calculatedKm.toFixed(2)),
+          hub_id: orderItems[0]?.hub_id || 1,
+          free_gift_added: hasFreeGift ? appConfig.free_gift_item_name : null
+        }]).select();
 
-        if (error || !orderData) return alert('ऑर्डर डेटा नहीं मिला!');
+        if (error) throw error;
 
-        if (orderData.delivery_otp && orderData.delivery_otp.toString() !== enteredOtp) {
-          alert('❌ गलत OTP!\n\nकृपया ग्राहक के मोबाइल ऐप से सही 4-अंकों का कोड देखकर डालें।');
-          document.getElementById('rider-otp-input').value = '';
+        currentOrderId = data[0].id;
+        localStorage.setItem('zepto_active_order', currentOrderId);
+        localStorage.setItem('baba_order_placed_time', Date.now().toString());
+
+        saveOrderToHistory({
+          id: currentOrderId,
+          total_amount: finalToPay,
+          items: orderItems,
+          date: new Date().toLocaleDateString('hi-IN', { day: 'numeric', month: 'short' }),
+          delivery_address: combinedAddress
+        });
+
+        cart = {};
+        updateCartBar();
+        renderProducts(allProducts);
+        toggleCartModal(false);
+
+        startTracking(currentOrderId);
+        openTrackModal();
+      } catch (e) {
+        alert('Order error: ' + e.message);
+      }
+    }
+
+    function startTracking(orderId) {
+      document.getElementById('live-order-strip').style.display = 'flex';
+      document.getElementById('t-order-id').innerText = `Order #ORD-${orderId}`;
+      startSelfCancelCountdown();
+
+      const check = async () => {
+        const { data } = await _supabase.from('orders').select('*').eq('id', orderId).single();
+        if (!data) return;
+
+        if (data.status === 'Cancelled') {
+          document.getElementById('strip-title').innerText = 'Order Cancelled';
+          document.getElementById('strip-sub').innerText = 'यह ऑर्डर रद्द कर दिया गया है';
+          document.getElementById('self-cancel-container').style.display = 'none';
+          document.getElementById('eta-chip-container').style.display = 'none';
           return;
         }
 
-        closeOtpModal();
-        finalizeOrderDelivery();
-      } catch (err) {
-        alert('त्रुटि: ' + err.message);
-      }
-    }
-
-    async function finalizeOrderDelivery() {
-      if (!currentSelectedOrder) return;
-      try {
-        const { error: orderErr } = await _supabase.from('orders').update({
-          status: 'Delivered',
-          assigned_rider_id: loggedInRider.id
-        }).eq('id', currentSelectedOrder.id);
-
-        if (orderErr) throw orderErr;
-
-        if (currentSelectedOrder.payment_mode === 'COD') {
-          const codAmount = Number(currentSelectedOrder.total_amount) || 0;
-          const currentCash = Number(loggedInRider.cash_in_hand) || 0;
-          const newCash = currentCash + codAmount;
-
-          await _supabase.from('riders').update({ cash_in_hand: newCash }).eq('id', loggedInRider.id);
-          loggedInRider.cash_in_hand = newCash;
-          localStorage.setItem('baba_logged_rider', JSON.stringify(loggedInRider));
-          const cashElem = document.getElementById('prof-cash');
-          if (cashElem) cashElem.innerText = `₹${newCash}`;
+        if (data.delivery_otp && data.status !== 'Delivered') {
+          document.getElementById('cust-otp-container').style.display = 'block';
+          document.getElementById('cust-live-otp').innerText = data.delivery_otp;
         }
 
-        document.getElementById('way-screen').classList.remove('active');
-        document.getElementById('success-order-id').innerText = `ORD #${currentSelectedOrder.id} Delivered to ${currentSelectedOrder.customer_name || 'Customer'}`;
-        document.getElementById('success-cash-text').innerText = `₹${currentSelectedOrder.total_amount} (${currentSelectedOrder.payment_mode || 'COD'})`;
-        document.getElementById('success-modal').classList.add('active');
-        loadRiderOrders();
-      } catch (err) {
-        alert('त्रुटि: ' + err.message);
+        if (data.status === 'Out for Delivery') {
+          document.getElementById('st-2').style.color = 'var(--accent-green)';
+          document.getElementById('self-cancel-container').style.display = 'none';
+          document.getElementById('rider-contact-row').style.display = 'flex';
+
+          if (data.assigned_rider_id) {
+            const { data: rInfo } = await _supabase.from('riders').select('phone, current_lat, current_lng, current_speed_kmh, is_overspeeding').eq('id', data.assigned_rider_id).single();
+            if (rInfo) {
+              assignedRiderPhone = rInfo.phone;
+              if (rInfo.current_lat && customerCoords) {
+                const km = calculateHaversineKm(customerCoords.lat, customerCoords.lng, rInfo.current_lat, rInfo.current_lng);
+                const mins = Math.max(2, Math.round(km * 3));
+                document.getElementById('live-eta-subtitle').innerText = `राइडर आपसे ${km.toFixed(1)} KM दूर है • ${mins} मिनट में पहुँच रहा है`;
+                document.getElementById('eta-chip-container').style.display = 'block';
+                document.getElementById('eta-chip-text').innerText = `⚡ राइडर आपसे ${km.toFixed(1)} KM दूर है • ETA: ${mins} Mins ${rInfo.is_overspeeding ? '(Driving Safe)' : ''}`;
+              }
+            }
+          }
+        } else if (data.status === 'Delivered') {
+          document.getElementById('st-3').style.color = 'var(--accent-green)';
+          document.getElementById('self-cancel-container').style.display = 'none';
+          document.getElementById('eta-chip-container').style.display = 'none';
+          document.getElementById('rider-contact-row').style.display = 'none';
+          document.getElementById('rider-rating-box').style.display = 'block';
+          localStorage.removeItem('zepto_active_order');
+        }
+      };
+      check();
+      setInterval(check, 4000);
+    }
+
+    function callRiderMasked() {
+      if (assignedRiderPhone) {
+        window.location.href = `tel:${assignedRiderPhone}`;
+      } else {
+        alert('राइडर अभी असाइन हो रहा है...');
       }
     }
 
-    function closeSuccessModal() {
-      document.getElementById('success-modal').classList.remove('active');
-      currentSelectedOrder = null;
+    function startSelfCancelCountdown() {
+      const cancelBox = document.getElementById('self-cancel-container');
+      const timerSecs = document.getElementById('cancel-timer-secs');
+      let maxSecs = Number(appConfig.cancel_window_seconds) || 60;
+      const placedTime = parseInt(localStorage.getItem('baba_order_placed_time') || Date.now().toString());
+      let remaining = maxSecs - Math.floor((Date.now() - placedTime) / 1000);
+
+      if (remaining <= 0) { cancelBox.style.display = 'none'; return; }
+      cancelBox.style.display = 'flex';
+      if (cancelTimerInterval) clearInterval(cancelTimerInterval);
+
+      cancelTimerInterval = setInterval(() => {
+        remaining--;
+        if (timerSecs) timerSecs.innerText = remaining;
+        if (remaining <= 0) {
+          clearInterval(cancelTimerInterval);
+          cancelBox.style.display = 'none';
+        }
+      }, 1000);
     }
 
-    function openRiderChat(orderId) {
-      activeChatOrderId = orderId;
-      document.getElementById('rchat-title').innerText = `Order #${orderId} Chat`;
-      document.getElementById('rider-chat-drawer').classList.add('active');
-      loadRiderMessages();
-      if (!rChatInterval) rChatInterval = setInterval(loadRiderMessages, 2500);
+    async function handleCustomerSelfCancel() {
+      if (!confirm('क्या आप वाकई अपना ऑर्डर रद्द करना चाहते हैं?')) return;
+      if (!currentOrderId) return;
+
+      await _supabase.from('orders').update({
+        status: 'Cancelled',
+        cancelled_by: 'Customer (Self-Cancel)',
+        cancellation_reason: 'Changed mind'
+      }).eq('id', currentOrderId);
+
+      alert('✅ आपका ऑर्डर सफलतापूर्वक कैंसिल हो गया!');
+      localStorage.removeItem('zepto_active_order');
+      currentOrderId = null;
+      toggleTrackModal(false);
+      document.getElementById('live-order-strip').style.display = 'none';
     }
 
-    function closeRiderChat() {
-      document.getElementById('rider-chat-drawer').classList.remove('active');
-      if (rChatInterval) { clearInterval(rChatInterval); rChatInterval = null; }
+    function setRiderStars(count) {
+      selectedStarCount = count;
+      document.querySelectorAll('#stars-container .star-icon').forEach((star, idx) => {
+        if (idx < count) star.classList.add('filled');
+        else star.classList.remove('filled');
+      });
     }
 
-    async function loadRiderMessages() {
-      if (!activeChatOrderId) return;
-      const { data } = await _supabase
-        .from('order_chats').select('*').eq('order_id', activeChatOrderId).order('id', { ascending: true });
+    function toggleRatingChip(el, text) {
+      if (selectedChips.has(text)) { selectedChips.delete(text); el.classList.remove('selected'); }
+      else { selectedChips.add(text); el.classList.add('selected'); }
+    }
 
-      const container = document.getElementById('rider-chat-messages');
+    async function submitRiderRating() {
+      if (!currentOrderId) return;
+      await _supabase.from('orders').update({
+        rating: selectedStarCount, feedback: [...selectedChips].join(', ') || 'Good'
+      }).eq('id', currentOrderId);
+      document.getElementById('rider-rating-box').innerHTML = '<div style="color:var(--accent-green); font-weight:800;">धन्यवाद! आपकी रेटिंग दर्ज हो गई है। ⭐</div>';
+    }
+
+    function openLiveChatModal() {
+      if (!currentOrderId) return alert('कोई सक्रिय ऑर्डर नहीं है!');
+      document.getElementById('chat-drawer').classList.add('active');
+      loadOrderMessages();
+      if (!chatInterval) chatInterval = setInterval(loadOrderMessages, 2500);
+    }
+
+    function closeLiveChatModal() {
+      document.getElementById('chat-drawer').classList.remove('active');
+      if (chatInterval) { clearInterval(chatInterval); chatInterval = null; }
+    }
+
+    async function loadOrderMessages() {
+      if (!currentOrderId) return;
+      const { data } = await _supabase.from('order_chats').select('*').eq('order_id', currentOrderId).order('id', { ascending: true });
+      const container = document.getElementById('chat-messages');
       if (!data || data.length === 0) {
-        container.innerHTML = '<div style="text-align:center; font-size:11px; color:#94a3b8; margin:10px 0;">कोई संदेश नहीं है। नीचे से रिप्लाई भेजें।</div>';
+        container.innerHTML = '<div style="text-align:center; font-size:11px; color:#94a3b8; margin:10px 0;">राइडर को मैसेज भेजने के लिए नीचे टाइप करें।</div>';
         return;
       }
-
       container.innerHTML = data.map(m => `
-        <div class="msg-bubble ${m.sender === 'rider' ? 'msg-rider-send' : 'msg-cust-receive'}">
-          <div style="font-size:10px; opacity:0.8; margin-bottom:2px;">${m.sender === 'rider' ? 'You' : '👤 Customer'}</div>
+        <div class="msg-bubble ${m.sender === 'customer' ? 'msg-customer' : 'msg-rider'}">
+          <div style="font-size:10px; opacity:0.8; margin-bottom:2px;">${m.sender === 'customer' ? 'You' : '🛵 Rider'}</div>
           ${m.message}
         </div>
       `).join('');
       container.scrollTop = container.scrollHeight;
     }
 
-    async function sendRiderMsg(txt) {
-      if (!txt || !activeChatOrderId) return;
-      await _supabase.from('order_chats').insert([{ order_id: activeChatOrderId, sender: 'rider', message: txt }]);
-      loadRiderMessages();
+    async function sendMessage(text) {
+      if (!text || !currentOrderId) return;
+      await _supabase.from('order_chats').insert([{ order_id: currentOrderId, sender: 'customer', message: text }]);
+      loadOrderMessages();
     }
-    function sendRiderQuickMsg(t) { sendRiderMsg(t); }
-    function sendRiderCustomMsg() {
-      const inp = document.getElementById('rider-chat-text');
+    function sendQuickMessage(txt) { sendMessage(txt); }
+    function sendCustomMessage() {
+      const inp = document.getElementById('chat-user-text');
       const val = inp.value.trim();
-      if (val) { sendRiderMsg(val); inp.value = ''; }
+      if (val) { sendMessage(val); inp.value = ''; }
     }
 
-    window.addEventListener('click', () => {
-      initNotificationPermission();
-      requestWakeLock();
-      const audioTag = document.getElementById('rider-order-audio');
-      if (audioTag) audioTag.load();
-      if (!sharedAudioCtx) {
-        sharedAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        sharedAudioCtx.resume();
-      }
-    }, { once: true });
+    function saveOrderToHistory(order) {
+      let history = JSON.parse(localStorage.getItem('zepto_order_history') || '[]');
+      history.unshift(order);
+      localStorage.setItem('zepto_order_history', JSON.stringify(history.slice(0, 8)));
+      renderPastOrdersUI();
+    }
 
-    checkAuthStatus();
-    setInterval(loadRiderOrders, 4000);
+    function renderPastOrdersUI() {
+      const container = document.getElementById('history-container');
+      const history = JSON.parse(localStorage.getItem('zepto_order_history') || '[]');
+      if (history.length === 0) return;
+
+      container.innerHTML = history.map(o => `
+        <div class="past-order-box">
+          <div style="display:flex; justify-content:space-between; font-weight:800; font-size:13px; margin-bottom:4px;">
+            <span>ORD #${o.id}</span>
+            <span style="color:var(--accent-green);">₹${o.total_amount}</span>
+          </div>
+          <div style="font-size:11px; color:#64748b; margin-bottom:8px;">📅 ${o.date}</div>
+          <button onclick='openReceiptModal(${JSON.stringify(o)})' style="background:#f8fafc; border:1px solid #cbd5e1; padding:6px 12px; border-radius:8px; font-size:12px; font-weight:800; cursor:pointer;">
+            📄 View Receipt & Claim
+          </button>
+        </div>
+      `).join('');
+    }
+
+    async function openReceiptModal(order) {
+      currentViewingReceiptOrder = order;
+      document.getElementById('rcpt-title').innerText = `Order Receipt #ORD-${order.id}`;
+      document.getElementById('rcpt-date-mode').innerText = `Date: ${order.date || ''} | Status: Success`;
+      document.getElementById('rcpt-address').innerText = order.delivery_address || 'Home Address';
+      document.getElementById('rcpt-total-amount').innerText = `₹${order.total_amount}`;
+
+      const { data: fullOrder } = await _supabase.from('orders').select('dispute_status, dispute_note').eq('id', order.id).single();
+      const statusPill = document.getElementById('rcpt-dispute-status-pill');
+      if (fullOrder && fullOrder.dispute_status) {
+        statusPill.style.display = 'block';
+        if (fullOrder.dispute_status === 'PENDING') {
+          statusPill.style.background = '#fef3c7'; statusPill.style.color = '#b45309';
+          statusPill.innerText = `⚠️ रिफ़ंड क्लेम की समीक्षा चल रही है (PENDING)`;
+        } else if (fullOrder.dispute_status === 'APPROVED') {
+          statusPill.style.background = '#dcfce7'; statusPill.style.color = '#15803d';
+          statusPill.innerText = `✓ रिफ़ंड स्वीकार कर लिया गया है (APPROVED)`;
+        } else {
+          statusPill.style.background = '#fee2e2'; statusPill.style.color = '#b91c1c';
+          statusPill.innerText = `✕ क्लेम अस्वीकार किया गया (REJECTED)`;
+        }
+      } else {
+        statusPill.style.display = 'none';
+      }
+
+      const itemsListContainer = document.getElementById('rcpt-items-list');
+      const items = Array.isArray(order.items) ? order.items : [];
+
+      itemsListContainer.innerHTML = items.map(item => `
+        <div style="display:flex; align-items:center; justify-content:space-between; padding:8px 0; border-bottom:1px solid #f1f5f9;">
+          <div>
+            <div style="font-size:12px; font-weight:800;">${item.name}</div>
+            <div style="font-size:10px; color:#64748b;">₹${item.price} × ${item.qty}</div>
+          </div>
+          <div style="font-size:13px; font-weight:900;">₹${item.subtotal || (item.price * item.qty)}</div>
+        </div>
+      `).join('');
+
+      document.getElementById('rcpt-repeat-btn').onclick = () => {
+        closeReceiptModal();
+        repeatOrder(order.items);
+      };
+
+      document.getElementById('dispute-form-box').style.display = 'none';
+      document.getElementById('receipt-modal').classList.add('active');
+    }
+
+    function closeReceiptModal() { document.getElementById('receipt-modal').classList.remove('active'); }
+    function openDisputeForm() { document.getElementById('dispute-form-box').style.display = 'block'; }
+
+    async function submitRefundDispute() {
+      if (!currentViewingReceiptOrder) return;
+      const note = document.getElementById('dispute-note-input').value.trim();
+      const fileInput = document.getElementById('dispute-file-input');
+
+      if (!note) return alert('कृपया समस्या का विवरण लिखें!');
+      if (!fileInput.files || fileInput.files.length === 0) return alert('कृपया खराब सामान की फोटो अपलोड करें!');
+
+      const file = fileInput.files[0];
+      const reader = new FileReader();
+
+      reader.onload = async function(e) {
+        const base64Photo = e.target.result;
+        try {
+          const { error } = await _supabase.from('orders').update({
+            dispute_status: 'PENDING',
+            dispute_note: note,
+            dispute_photo_url: base64Photo
+          }).eq('id', currentViewingReceiptOrder.id);
+
+          if (error) throw error;
+          alert('✅ आपकी शिकायत और फोटो एडमिन को भेज दी गई है।');
+          document.getElementById('dispute-form-box').style.display = 'none';
+          closeReceiptModal();
+        } catch(err) {
+          alert('त्रुटि: ' + err.message);
+        }
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function repeatOrder(items) {
+      cart = {};
+      items.forEach(oldItem => {
+        const product = allProducts.find(p => p.id === oldItem.id) || {
+          id: oldItem.id, name: oldItem.name, price: oldItem.price, unit: oldItem.unit, hub_id: oldItem.hub_id || 1
+        };
+        if (!product.is_out_of_stock) cart[product.id] = { item: product, qty: oldItem.qty };
+      });
+      renderProducts(allProducts);
+      updateCartBar();
+      openCartModal();
+    }
+
+    function toggleCartModal(s) { document.getElementById('cart-modal').className = s ? 'modal-overlay active' : 'modal-overlay'; }
+    function openCartModal() { renderCartSheet(); toggleCartModal(true); }
+    function closeCartModal() { toggleCartModal(false); }
+
+    function toggleTrackModal(s) { document.getElementById('track-modal').className = s ? 'modal-overlay active' : 'modal-overlay'; }
+    function openTrackModal() { toggleTrackModal(true); }
+    function closeTrackModal() { toggleTrackModal(false); }
+
+    function toggleSupportModal(s) { document.getElementById('support-modal').className = s ? 'modal-overlay active' : 'modal-overlay'; }
+    function openSupportModal() { toggleSupportModal(true); }
+    function closeSupportModal(e) { toggleSupportModal(false); }
+
+    function scrollToHistory() { document.getElementById('past-orders-section').scrollIntoView({ behavior: 'smooth' }); }
+
+    initApp();
   </script>
 </body>
 </html>
