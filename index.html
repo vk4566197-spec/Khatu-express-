@@ -575,7 +575,7 @@
       background: white; 
       width: 100%;
       min-height: 100%;
-      padding: 18px 18px 160px 18px; /* नीचे 160px की भरपूर जगह */
+      padding: 18px 18px 20px 18px;
       display: flex;
       flex-direction: column;
     }
@@ -623,15 +623,15 @@
       color: #0f172a; 
     }
     
-    /* नीचे हमेशा चिपकी रहने वाली बार (Sticky Bottom Checkout Bar) */
+    /* STICKY BOTTOM CHECKOUT FOOTER */
     .cart-sticky-bottom-bar {
       position: fixed;
       bottom: 0;
       left: 0;
       width: 100%;
       background: #ffffff;
-      padding: 12px 18px 20px 18px;
-      box-shadow: 0 -8px 25px rgba(0, 0, 0, 0.12);
+      padding: 12px 18px 18px 18px;
+      box-shadow: 0 -8px 25px rgba(0, 0, 0, 0.15);
       z-index: 1050;
       border-top: 1.5px solid #f1f5f9;
       display: none;
@@ -670,6 +670,7 @@
       font-size: 13px; 
       font-weight: 600;
       outline: none; 
+      background: #fff;
     }
 
     .loc-card-box {
@@ -677,7 +678,7 @@
       border: 1.5px solid #86efac;
       border-radius: 14px;
       padding: 12px 14px;
-      margin-bottom: 12px;
+      margin-bottom: 6px;
     }
     .loc-card-title {
       font-size: 11px;
@@ -707,7 +708,6 @@
       justify-content: center;
       gap: 6px;
       box-shadow: 0 2px 8px rgba(2, 132, 199, 0.25);
-      margin-bottom: 10px;
     }
 
     .past-order-box { 
@@ -994,9 +994,9 @@
         <input type="tel" id="upi-utr" class="zepto-input" placeholder="Enter 12-digit UTR No." maxlength="12" style="text-align:center; font-weight:800; letter-spacing:1px; background:#fff;">
       </div>
 
-      <!-- Customer Address & Location Section -->
+      <!-- Customer Address & Location Section (Fix: Added bottom clearance so input is always visible) -->
       <div style="font-size:12px; font-weight:800; color:#64748b; margin-bottom:8px;">DELIVERY DETAILS:</div>
-      <div style="display:flex; flex-direction:column; gap:10px;">
+      <div style="display:flex; flex-direction:column; gap:10px; margin-bottom: 90px;">
         <input type="text" id="c-name" class="zepto-input" placeholder="आपका पूरा नाम (Full Name) *">
         <input type="tel" id="c-phone" class="zepto-input" placeholder="10 अंकों का मोबाइल नंबर (Mobile Number) *" maxlength="10">
         
@@ -1011,10 +1011,10 @@
           <div class="loc-card-val" id="gps-status-val">⚠️ लोकेशन अपडेट नहीं है। ऊपर दिए गए नीले बटन पर क्लिक करें!</div>
         </div>
 
-        <!-- Address Textarea -->
+        <!-- Address Box (Always Clean & Visible) -->
         <div>
-          <label style="font-size: 11px; font-weight: 800; color: #475569; display:block; margin-bottom: 4px;">घर / दुकान / फ्लैट नंबर और लैंडमार्क (पता): *</label>
-          <textarea id="c-address" class="zepto-input" rows="3" placeholder="उदाहरण: मकान नंबर 42, शिव मंदिर के पास, मुख्य बाजार"></textarea>
+          <label style="font-size: 11.5px; font-weight: 800; color: #334155; display:block; margin-bottom: 5px;">घर / दुकान / फ्लैट नंबर और लैंडमार्क (पता): *</label>
+          <input type="text" id="c-address" class="zepto-input" style="height: 48px; border: 2px solid #94a3b8;" placeholder="उदा. मकान नंबर 42, शिव मंदिर के पास, मुख्य बाजार">
         </div>
       </div>
     </div>
@@ -1692,7 +1692,7 @@
 
       updateSmartCartTarget(itemsTotal);
 
-      // लोकेशन लॉक और ₹99 का नियम
+      // Location lock and ₹99 check
       const submitBtn = document.getElementById('order-submit-btn');
       const minReq = Number(appConfig.min_order_value) || 99;
       
@@ -1751,7 +1751,6 @@
       document.getElementById('bill-coupon-amount').innerText = `-₹${couponDisc}`;
     }
 
-    // अनिवार्य लाइव GPS लोकेशन फ़ेच
     function getCurrentLocation() {
       const statusVal = document.getElementById('gps-status-val');
       const submitBtn = document.getElementById('order-submit-btn');
