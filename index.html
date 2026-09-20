@@ -555,7 +555,7 @@
     .nav-item.active { color: var(--accent-pink); }
     .nav-item-icon { font-size: 19px; }
 
-    /* FULL-PAGE VIEW FOR CART & ORDER */
+    /* FULL-PAGE VIEW FOR CART & ORDER (स्क्रॉलिंग और पर्याप्त पैडिंग के साथ) */
     .modal-overlay {
       position: fixed; 
       top: 0; 
@@ -575,7 +575,7 @@
       background: white; 
       width: 100%;
       min-height: 100%;
-      padding: 18px 18px 20px 18px;
+      padding: 18px 18px 220px 18px; /* नीचे 220px की पैडिंग ताकि कोई भी फ़ील्ड बटन के पीछे न दबे */
       display: flex;
       flex-direction: column;
     }
@@ -623,7 +623,7 @@
       color: #0f172a; 
     }
     
-    /* STICKY BOTTOM CHECKOUT FOOTER */
+    /* नीचे हमेशा दिखने वाली स्टिकी बार */
     .cart-sticky-bottom-bar {
       position: fixed;
       bottom: 0;
@@ -664,7 +664,7 @@
 
     .zepto-input { 
       width: 100%; 
-      padding: 12px 14px; 
+      padding: 14px 16px; 
       border-radius: 12px; 
       border: 1.5px solid #cbd5e1; 
       font-size: 13px; 
@@ -672,13 +672,17 @@
       outline: none; 
       background: #fff;
     }
+    .zepto-input:focus {
+      border-color: var(--accent-pink);
+    }
 
     .loc-card-box {
       background: #f0fdf4;
       border: 1.5px solid #86efac;
       border-radius: 14px;
       padding: 12px 14px;
-      margin-bottom: 6px;
+      margin-top: 4px;
+      margin-bottom: 12px;
     }
     .loc-card-title {
       font-size: 11px;
@@ -698,7 +702,7 @@
       color: white;
       border: none;
       width: 100%;
-      padding: 12px;
+      padding: 14px;
       border-radius: 12px;
       font-size: 13px;
       font-weight: 800;
@@ -994,28 +998,43 @@
         <input type="tel" id="upi-utr" class="zepto-input" placeholder="Enter 12-digit UTR No." maxlength="12" style="text-align:center; font-weight:800; letter-spacing:1px; background:#fff;">
       </div>
 
-      <!-- Customer Address & Location Section (Fix: Added bottom clearance so input is always visible) -->
-      <div style="font-size:12px; font-weight:800; color:#64748b; margin-bottom:8px;">DELIVERY DETAILS:</div>
-      <div style="display:flex; flex-direction:column; gap:10px; margin-bottom: 90px;">
-        <input type="text" id="c-name" class="zepto-input" placeholder="आपका पूरा नाम (Full Name) *">
-        <input type="tel" id="c-phone" class="zepto-input" placeholder="10 अंकों का मोबाइल नंबर (Mobile Number) *" maxlength="10">
+      <!-- Customer Address & Location Section (ADDRESS BOX SHIFTED UP FOR PERFECT VISIBILITY) -->
+      <div style="font-size:12px; font-weight:800; color:#64748b; margin-bottom:10px;">DELIVERY DETAILS:</div>
+      <div style="display:flex; flex-direction:column; gap:12px;">
         
-        <!-- Live Location Mandatory Button -->
-        <button type="button" class="btn-fetch-gps" onclick="getCurrentLocation()">
-          📍 क्लिक करके लाइव लोकेशन अपडेट करें (अनिवार्य)
-        </button>
+        <!-- 1. Name -->
+        <div>
+          <label style="font-size: 11.5px; font-weight: 800; color: #334155; display:block; margin-bottom: 4px;">आपका पूरा नाम (Full Name) *</label>
+          <input type="text" id="c-name" class="zepto-input" placeholder="उदा. विशाल कुमार">
+        </div>
 
-        <!-- Live Location Status Card -->
+        <!-- 2. Phone -->
+        <div>
+          <label style="font-size: 11.5px; font-weight: 800; color: #334155; display:block; margin-bottom: 4px;">10 अंकों का मोबाइल नंबर *</label>
+          <input type="tel" id="c-phone" class="zepto-input" placeholder="उदा. 9711107063" maxlength="10">
+        </div>
+
+        <!-- 3. Full Address (Ab yeh hamesha saaf saamne dikhega) -->
+        <div style="background: #ffffff; padding: 2px 0;">
+          <label style="font-size: 12px; font-weight: 900; color: #0f172a; display:block; margin-bottom: 5px;">
+            🏠 घर / दुकान / फ्लैट नंबर और लैंडमार्क (पूरा पता) *
+          </label>
+          <input type="text" id="c-address" class="zepto-input" style="border: 2px solid #64748b; font-size: 13.5px;" placeholder="उदा. मकान नंबर 42, शिव मंदिर के पास, मुख्य बाजार">
+        </div>
+
+        <!-- 4. Mandatory Live Location Button -->
+        <div style="margin-top: 6px;">
+          <button type="button" class="btn-fetch-gps" onclick="getCurrentLocation()">
+            📍 क्लिक करके लाइव लोकेशन अपडेट करें (अनिवार्य)
+          </button>
+        </div>
+
+        <!-- 5. GPS Status Pill -->
         <div class="loc-card-box" id="gps-status-box">
-          <div class="loc-card-title">GPS लोकेशन स्थिति (MANDATORY):</div>
+          <div class="loc-card-title">GPS स्थिति (MANDATORY):</div>
           <div class="loc-card-val" id="gps-status-val">⚠️ लोकेशन अपडेट नहीं है। ऊपर दिए गए नीले बटन पर क्लिक करें!</div>
         </div>
 
-        <!-- Address Box (Always Clean & Visible) -->
-        <div>
-          <label style="font-size: 11.5px; font-weight: 800; color: #334155; display:block; margin-bottom: 5px;">घर / दुकान / फ्लैट नंबर और लैंडमार्क (पता): *</label>
-          <input type="text" id="c-address" class="zepto-input" style="height: 48px; border: 2px solid #94a3b8;" placeholder="उदा. मकान नंबर 42, शिव मंदिर के पास, मुख्य बाजार">
-        </div>
       </div>
     </div>
 
@@ -1692,7 +1711,7 @@
 
       updateSmartCartTarget(itemsTotal);
 
-      // Location lock and ₹99 check
+      // Location lock और ₹99 की जांच
       const submitBtn = document.getElementById('order-submit-btn');
       const minReq = Number(appConfig.min_order_value) || 99;
       
@@ -1751,6 +1770,7 @@
       document.getElementById('bill-coupon-amount').innerText = `-₹${couponDisc}`;
     }
 
+    // अनिवार्य लाइव GPS लोकेशन फ़ेच
     function getCurrentLocation() {
       const statusVal = document.getElementById('gps-status-val');
       const submitBtn = document.getElementById('order-submit-btn');
@@ -1782,7 +1802,7 @@
         (err) => {
           isLocationUpdated = false;
           customerCoords = null;
-          statusVal.innerHTML = `🔴 लोकेशन फ़ैच फ़ेल हुई: ${err.message}। कृपया मोबाइल सेटिंग्स में GPS चालू और ब्राउज़र को Location Allow करें!`;
+          statusVal.innerHTML = `🔴 लोकेशन फ़ैच फ़ेल हुई: ${err.message}। कृपया मोबाइल में GPS चालू रखें और ब्राउज़र में Location Allow करें!`;
           submitBtn.disabled = true;
           submitBtn.innerText = '⚠️ पहले लाइव लोकेशन अपडेट करें';
         },
