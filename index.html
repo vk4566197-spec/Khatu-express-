@@ -712,6 +712,7 @@
       justify-content: center;
       gap: 6px;
       box-shadow: 0 2px 8px rgba(2, 132, 199, 0.25);
+      transition: background 0.3s ease;
     }
 
     .past-order-box { 
@@ -998,7 +999,7 @@
         <input type="tel" id="upi-utr" class="zepto-input" placeholder="Enter 12-digit UTR No." maxlength="12" style="text-align:center; font-weight:800; letter-spacing:1px; background:#fff;">
       </div>
 
-      <!-- Customer Address & Location Section (UDAHARAN WALI LINE POORI TARAH HATAYI GAYI) -->
+      <!-- Customer Address & Location Section -->
       <div style="font-size:12px; font-weight:800; color:#64748b; margin-bottom:10px;">DELIVERY DETAILS:</div>
       <div style="display:flex; flex-direction:column; gap:12px;">
         
@@ -1014,7 +1015,7 @@
           <input type="tel" id="c-phone" class="zepto-input" placeholder="मोबाइल नंबर दर्ज करें" maxlength="10">
         </div>
 
-        <!-- 3. Full Address (Saaf bina udahran ke) -->
+        <!-- 3. Full Address -->
         <div style="background: #ffffff; padding: 2px 0;">
           <label style="font-size: 12px; font-weight: 900; color: #0f172a; display:block; margin-bottom: 5px;">
             🏠 घर / दुकान / फ्लैट नंबर और लैंडमार्क (पूरा पता) *
@@ -1022,9 +1023,9 @@
           <input type="text" id="c-address" class="zepto-input" style="border: 2px solid #64748b; font-size: 13.5px;" placeholder="अपना पूरा पता यहाँ लिखें">
         </div>
 
-        <!-- 4. Mandatory Live Location Button -->
+        <!-- 4. Mandatory Live Location Button (Tick Mark System Added) -->
         <div style="margin-top: 6px;">
-          <button type="button" class="btn-fetch-gps" onclick="getCurrentLocation()">
+          <button type="button" class="btn-fetch-gps" id="btn-location-action" onclick="getCurrentLocation()">
             📍 क्लिक करके लाइव लोकेशन अपडेट करें (अनिवार्य)
           </button>
         </div>
@@ -1770,15 +1771,19 @@
       document.getElementById('bill-coupon-amount').innerText = `-₹${couponDisc}`;
     }
 
-    // Anivarya live GPS location fetch
+    // अनिवार्य लाइव GPS लोकेशन फ़ेच (सफलता पर हरा रंग और ✅ टिक मार्क)
     function getCurrentLocation() {
       const statusVal = document.getElementById('gps-status-val');
+      const gpsBtn = document.getElementById('btn-location-action');
       const submitBtn = document.getElementById('order-submit-btn');
+      
+      gpsBtn.innerText = '⏳ लाइव लोकेशन जाँची जा रही है...';
       statusVal.innerText = 'लाइव लोकेशन फ़ैच हो रही है... कृपया प्रतीक्षा करें।';
 
       if (!navigator.geolocation) {
         alert('आपके फ़ोन में GPS सपोर्ट नहीं मिला।');
         statusVal.innerText = '🔴 GPS सपोर्ट उपलब्ध नहीं है।';
+        gpsBtn.innerText = '📍 क्लिक करके लाइव लोकेशन अपडेट करें (अनिवार्य)';
         return;
       }
 
@@ -1795,13 +1800,20 @@
           } catch (e) {}
 
           const mapsUrl = `https://maps.google.com/?q=${pos.coords.latitude},${pos.coords.longitude}`;
-          statusVal.innerHTML = `🟢 लाइव लोकेशन सफलतापूर्वक अपडेट हुई! (दूरी: ${calculatedKm.toFixed(2)} KM)<br><a href="${mapsUrl}" target="_blank" style="color:#0284c7; font-weight:800;">Google Maps लिंक देखें ↗</a>`;
+          
+          // लोकेशन मिलते ही बटन का रंग हरा और आगे ✅ टिक मार्क
+          gpsBtn.style.background = '#059669';
+          gpsBtn.innerHTML = '✅ लाइव लोकेशन अपडेट हो गई!';
+
+          statusVal.innerHTML = `✅ <b>लाइव लोकेशन वेरिफ़ाइड!</b> (दूरी: ${calculatedKm.toFixed(2)} KM)<br><a href="${mapsUrl}" target="_blank" style="color:#0284c7; font-weight:800;">Google Maps लिंक देखें ↗</a>`;
 
           renderCartSheet();
         },
         (err) => {
           isLocationUpdated = false;
           customerCoords = null;
+          gpsBtn.style.background = '#0284c7';
+          gpsBtn.innerText = '📍 क्लिक करके लाइव लोकेशन अपडेट करें (अनिवार्य)';
           statusVal.innerHTML = `🔴 लोकेशन फ़ैच फ़ेल हुई: ${err.message}। कृपया मोबाइल में GPS चालू रखें और ब्राउज़र में Location Allow करें!`;
           submitBtn.disabled = true;
           submitBtn.innerText = '⚠️ पहले लाइव लोकेशन अपडेट करें';
