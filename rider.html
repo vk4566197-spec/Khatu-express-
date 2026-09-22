@@ -8,6 +8,28 @@
   <link rel="icon" type="image/png" href="logo.png">
   <meta name="theme-color" content="#1b042d">
 
+  <!-- Force Cache Kill -->
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
+
+  <!-- Unregister any old Service Worker immediately -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.getRegistrations().then(function(registrations) {
+        for (let registration of registrations) {
+          registration.unregister();
+        }
+      });
+    }
+    if ('caches' in window) {
+      caches.keys().then(function(names) {
+        for (let name of names) caches.delete(name);
+      });
+    }
+  </script>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 
@@ -49,7 +71,7 @@
       align-items: center;
       position: sticky;
       top: 0;
-      z-index: 1000;
+      z-index: 10000;
     }
 
     .rider-brand {
@@ -81,35 +103,32 @@
 
     /* DIRECT TOUCH TOGGLE BUTTON */
     .status-toggle-box {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      background: #0f172a;
-      padding: 8px 16px;
-      border-radius: 25px;
-      border: 2px solid #10b981;
-      cursor: pointer;
-      user-select: none;
-      -webkit-user-select: none;
-      touch-action: manipulation;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.4);
-    }
-    .status-toggle-box:active {
-      transform: scale(0.92);
+      display: inline-flex !important;
+      align-items: center !important;
+      gap: 8px !important;
+      background: #0f172a !important;
+      padding: 8px 16px !important;
+      border-radius: 25px !important;
+      border: 2px solid #ef4444 !important;
+      cursor: pointer !important;
+      user-select: none !important;
+      -webkit-user-select: none !important;
+      touch-action: manipulation !important;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.4) !important;
+      pointer-events: auto !important;
     }
 
     .status-dot {
       width: 12px;
       height: 12px;
       border-radius: 50%;
-      background: #10b981;
-      box-shadow: 0 0 10px #10b981;
+      background: #ef4444;
       display: inline-block;
     }
 
-    .status-dot.offline {
-      background: #ef4444 !important;
-      box-shadow: none !important;
+    .status-dot.online {
+      background: #10b981 !important;
+      box-shadow: 0 0 12px #10b981 !important;
     }
 
     .status-text {
@@ -425,10 +444,10 @@
       </div>
     </div>
     
-    <!-- DIRECT ONE-TOUCH BUTTON -->
-    <div class="status-toggle-box" id="duty-btn" onclick="directToggleDuty(); return false;">
+    <!-- DIRECT WORKING BUTTON -->
+    <div class="status-toggle-box" id="duty-btn">
       <span class="status-dot" id="online-indicator"></span>
-      <span class="status-text" id="online-status-text">ONLINE</span>
+      <span class="status-text" id="online-status-text">OFFLINE</span>
     </div>
   </div>
 
@@ -510,59 +529,49 @@
     </div>
   </div>
 
-  <script>
-    // AUTO REMOVE OLD SERVICE WORKER CACHE (Taaki naya code turant chal sake)
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.getRegistrations().then(regs => {
-        for (let reg of regs) reg.unregister();
-      });
-    }
+  <!-- Audio Element -->
+  <audio id="order-sound" src="alert.mp3" preload="none"></audio>
 
+  <script>
     const SUPABASE_URL = 'https://mpeikimhkjuinqkjaumr.supabase.co';
     const SUPABASE_KEY = 'sb_publishable_2_wD-pbi_pNf8niiHxFbYA_saCIhApN';
 
     let currentTab = 'active';
     let allRiderOrders = [];
-    
-    // BY DEFAULT 100% ONLINE
-    let isRiderOnline = true;
+    let isRiderOnline = false;
     let selectedOrderForDelivery = null;
     let selectedOrderForPickup = null;
     let base64PickupPhoto = null;
     let base64DeliveryPhoto = null;
 
-    // DIRECT 1-TAP TOGGLE BUTTON (100% INSTANT RESPONSE)
-    function directToggleDuty() {
+    // DIRECT NATIVE BUTTON EVENT
+    const dutyBtn = document.getElementById('duty-btn');
+    dutyBtn.addEventListener('click', function(e) {
+      e.preventDefault();
+      e.stopPropagation();
       isRiderOnline = !isRiderOnline;
       localStorage.setItem('baba_rider_duty_status', isRiderOnline ? 'ONLINE' : 'OFFLINE');
       renderDutyUI();
-
-      // Background silent ping
-      fetch(`${SUPABASE_URL}/rest/v1/riders?id=eq.1`, {
-        method: 'PATCH',
-        headers: {
-          'apikey': SUPABASE_KEY,
-          'Authorization': `Bearer ${SUPABASE_KEY}`,
-          'Content-Type': 'application/json',
-          'Prefer': 'return=minimal'
-        },
-        body: JSON.stringify({ is_active: isRiderOnline, last_ping: new Date().toISOString() })
-      }).catch(e => {});
-    }
+      
+      // Stop audio immediately if offline
+      if (!isRiderOnline) {
+        stopAudioSound();
+      } else {
+        checkNewOrderSound();
+      }
+    });
 
     function renderDutyUI() {
       const dot = document.getElementById('online-indicator');
       const txt = document.getElementById('online-status-text');
       const box = document.getElementById('duty-btn');
 
-      if (!dot || !txt || !box) return;
-
       if (isRiderOnline) {
-        dot.className = 'status-dot';
+        dot.className = 'status-dot online';
         txt.innerText = 'ONLINE';
         box.style.borderColor = '#10b981';
       } else {
-        dot.className = 'status-dot offline';
+        dot.className = 'status-dot';
         txt.innerText = 'OFFLINE';
         box.style.borderColor = '#ef4444';
       }
@@ -595,8 +604,8 @@
       });
     }
 
-    // DIRECT REST API CALL (BINA KISI LIBRARY FREEZE KE TURANT LOAD HOGA)
-    async function loadRiderOrders() {
+    // DIRECT NATIVE FETCH ORDERS
+    async function fetchOrdersDirectly() {
       try {
         const res = await fetch(`${SUPABASE_URL}/rest/v1/orders?select=*&order=id.desc`, {
           headers: {
@@ -604,14 +613,60 @@
             'Authorization': `Bearer ${SUPABASE_KEY}`
           }
         });
-        
+
         if (res.ok) {
           allRiderOrders = await res.json();
           updateStats();
           renderOrdersList();
+          checkNewOrderSound();
+        } else {
+          document.getElementById('orders-container').innerHTML = `
+            <div class="empty-msg" style="color:#ef4444;">
+              Supabase एरर: ${res.statusText}
+            </div>
+          `;
         }
       } catch (err) {
-        console.warn("Fetch Error:", err);
+        document.getElementById('orders-container').innerHTML = `
+          <div class="empty-msg" style="color:#ef4444;">
+            इंटरनेट या नेटवर्क एरर! पुनः प्रयास करें।
+          </div>
+        `;
+      }
+    }
+
+    // SOUND LOGIC: OFFLINE MEIN BILKUL CHUP
+    function checkNewOrderSound() {
+      if (!isRiderOnline) {
+        stopAudioSound();
+        return;
+      }
+
+      const hasPending = allRiderOrders.some(o => {
+        const s = (o.status || '').toLowerCase();
+        return s.includes('placed') || s.includes('upi');
+      });
+
+      if (hasPending) {
+        playAudioSound();
+      } else {
+        stopAudioSound();
+      }
+    }
+
+    function playAudioSound() {
+      if (!isRiderOnline) return;
+      const sound = document.getElementById('order-sound');
+      if (sound) {
+        sound.play().catch(() => {});
+      }
+    }
+
+    function stopAudioSound() {
+      const sound = document.getElementById('order-sound');
+      if (sound) {
+        sound.pause();
+        sound.currentTime = 0;
       }
     }
 
@@ -742,8 +797,9 @@
       }).join('');
     }
 
-    // PICKUP PHOTO MODAL
+    // PICKUP MODAL LOGIC
     function openPickupModal(orderId) {
+      stopAudioSound();
       selectedOrderForPickup = orderId;
       base64PickupPhoto = null;
       document.getElementById('pickup-photo-preview').innerHTML = '<span style="color:#64748b; font-size:12px; font-weight:700;">सामान की फ़ोटो यहाँ दिखेगी *</span>';
@@ -793,7 +849,7 @@
 
         alert(`✅ Order #ORD-${selectedOrderForPickup} पिकअप हो गया!`);
         closePickupModal();
-        loadRiderOrders();
+        fetchOrdersDirectly();
       } catch(e) {
         alert('पिकअप एरर: ' + e.message);
       } finally {
@@ -802,7 +858,7 @@
       }
     }
 
-    // DELIVERY PHOTO & OTP MODAL
+    // DELIVERY MODAL LOGIC
     function openDeliveryProofModal(orderId, expectedOtp) {
       selectedOrderForDelivery = { id: orderId, expectedOtp: expectedOtp };
       base64DeliveryPhoto = null;
@@ -863,7 +919,7 @@
 
         alert(`🎉 बधाई हो! Order #ORD-${selectedOrderForDelivery.id} सफलतापूर्वक डिलीवर हो गया।`);
         closeDeliveryModal();
-        loadRiderOrders();
+        fetchOrdersDirectly();
       } catch (err) {
         alert('डिलीवरी एरर: ' + err.message);
       } finally {
@@ -895,19 +951,19 @@
         });
 
         alert(`✅ Order #ORD-${orderId} रद्द हो गया।`);
-        loadRiderOrders();
+        fetchOrdersDirectly();
       } catch (err) {
         alert("एरर: " + err.message);
       }
     }
 
-    // DIRECT INITIALIZE (100% Guaranteed Load)
+    // IMMEDIATE INITIALIZE
     (function init() {
       const saved = localStorage.getItem('baba_rider_duty_status');
-      isRiderOnline = (saved !== 'OFFLINE'); // By default hamesha ONLINE
+      isRiderOnline = (saved === 'ONLINE');
       renderDutyUI();
-      loadRiderOrders();
-      setInterval(loadRiderOrders, 3000);
+      fetchOrdersDirectly();
+      setInterval(fetchOrdersDirectly, 3000);
     })();
   </script>
 </body>
