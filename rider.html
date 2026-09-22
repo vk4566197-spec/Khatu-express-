@@ -51,7 +51,7 @@
       align-items: center;
       position: sticky;
       top: 0;
-      z-index: 10000;
+      z-index: 1000;
     }
 
     .rider-brand {
@@ -81,7 +81,7 @@
       font-weight: 700;
     }
 
-    /* DIRECT 100% TOUCH CLICKABLE BUTTON */
+    /* DIRECT INSTANT ONE-TAP BUTTON */
     .status-toggle-box {
       display: inline-flex !important;
       align-items: center !important;
@@ -94,8 +94,7 @@
       user-select: none !important;
       -webkit-user-select: none !important;
       touch-action: manipulation !important;
-      box-shadow: 0 4px 14px rgba(0,0,0,0.5) !important;
-      z-index: 999999 !important;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.4);
     }
     .status-toggle-box:active {
       transform: scale(0.92);
@@ -427,8 +426,8 @@
       </div>
     </div>
     
-    <!-- DIRECT ONE-TOUCH TOGGLE BUTTON -->
-    <div class="status-toggle-box" id="duty-btn" onclick="directToggleDuty(); return false;">
+    <!-- 1-TAP INSTANT TOGGLE -->
+    <div class="status-toggle-box" id="duty-btn" onclick="toggleDutyInstant()">
       <span class="status-dot" id="online-indicator"></span>
       <span class="status-text" id="online-status-text">OFFLINE</span>
     </div>
@@ -512,9 +511,6 @@
     </div>
   </div>
 
-  <!-- AUDIO ALERT -->
-  <audio id="order-sound" src="alert.mp3" preload="auto" loop></audio>
-
   <script>
     const SUPABASE_URL = 'https://mpeikimhkjuinqkjaumr.supabase.co';
     const SUPABASE_KEY = 'sb_publishable_2_wD-pbi_pNf8niiHxFbYA_saCIhApN';
@@ -524,9 +520,7 @@
       if (window.supabase) {
         _supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
       }
-    } catch(e) {
-      console.warn("Supabase client init fallback:", e);
-    }
+    } catch(e) {}
 
     let currentTab = 'active';
     let allRiderOrders = [];
@@ -537,25 +531,22 @@
     let base64PickupPhoto = null;
     let base64DeliveryPhoto = null;
 
-    // DIRECT ONE-CLICK TOGGLE (NO BLOCKING, NO CRASH)
-    function directToggleDuty() {
+    // DIRECT INSTANT TOGGLE (Bina kisi audio freeze ke)
+    function toggleDutyInstant() {
       isRiderOnline = !isRiderOnline;
       localStorage.setItem('baba_rider_duty_status', isRiderOnline ? 'ONLINE' : 'OFFLINE');
-      renderDutyUI();
+      applyUIState();
 
       if (isRiderOnline) {
         startLocationTracking();
       } else {
-        stopAlertSound(); // OFFLINE par aawaz 100% band
         if (locationWatchId && navigator.geolocation) {
           navigator.geolocation.clearWatch(locationWatchId);
           locationWatchId = null;
         }
       }
 
-      handleSoundState();
-
-      // Background silent ping
+      // Background silent ping to Supabase
       if (_supabase) {
         try {
           _supabase.from('riders').update({
@@ -566,7 +557,7 @@
       }
     }
 
-    function renderDutyUI() {
+    function applyUIState() {
       const dot = document.getElementById('online-indicator');
       const txt = document.getElementById('online-status-text');
       const box = document.getElementById('duty-btn');
@@ -636,7 +627,7 @@
       );
     }
 
-    // BULLETPROOF ORDERS LOADER (Direct Fetch Fallback)
+    // DIRECT ORDER LOADER
     async function loadRiderOrders() {
       try {
         let ordersData = null;
@@ -649,7 +640,6 @@
           if (!error && data) ordersData = data;
         }
 
-        // Agar client freeze ho toh REST API se fetch karein
         if (!ordersData) {
           const res = await fetch(`${SUPABASE_URL}/rest/v1/orders?select=*&order=id.desc`, {
             headers: {
@@ -661,45 +651,10 @@
         }
 
         allRiderOrders = ordersData || [];
-        handleSoundState();
         updateStats();
         renderOrdersList();
       } catch (err) {
-        console.warn("Load orders warning:", err);
-      }
-    }
-
-    // STRICT AUDIO: OFFLINE PE 100% BAND, ONLINE PE BAJEGA
-    function handleSoundState() {
-      if (!isRiderOnline) {
-        stopAlertSound();
-        return;
-      }
-
-      const pendingNew = allRiderOrders.filter(o => {
-        const st = (o.status || '').toLowerCase();
-        return st.includes('placed') || st.includes('upi');
-      });
-
-      if (pendingNew.length > 0) {
-        playAlertSound();
-      } else {
-        stopAlertSound();
-      }
-    }
-
-    function playAlertSound() {
-      const sound = document.getElementById('order-sound');
-      if (sound && sound.paused && isRiderOnline) {
-        sound.play().catch(() => {});
-      }
-    }
-
-    function stopAlertSound() {
-      const sound = document.getElementById('order-sound');
-      if (sound && !sound.paused) {
-        sound.pause();
-        sound.currentTime = 0;
+        console.warn("Orders error:", err);
       }
     }
 
@@ -832,7 +787,6 @@
 
     // PICKUP PHOTO MODAL
     function openPickupModal(orderId) {
-      stopAlertSound();
       selectedOrderForPickup = orderId;
       base64PickupPhoto = null;
       document.getElementById('pickup-photo-preview').innerHTML = '<span style="color:#64748b; font-size:12px; font-weight:700;">सामान की फ़ोटो यहाँ दिखेगी *</span>';
@@ -973,7 +927,7 @@
     (function init() {
       const saved = localStorage.getItem('baba_rider_duty_status');
       isRiderOnline = (saved === 'ONLINE');
-      renderDutyUI();
+      applyUIState();
       loadRiderOrders();
       setInterval(loadRiderOrders, 3000);
     })();
