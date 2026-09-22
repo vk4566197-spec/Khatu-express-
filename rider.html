@@ -8,9 +8,8 @@
   <link rel="icon" type="image/png" href="logo.png">
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#1b042d">
-  <meta name="mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 
+  <!-- Supabase CDN -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800;900&display=swap" rel="stylesheet">
@@ -83,20 +82,19 @@
       font-weight: 700;
     }
 
+    /* DIRECT INSTANT TOUCH BUTTON */
     .status-toggle-box {
-      display: flex;
+      display: inline-flex;
       align-items: center;
       gap: 8px;
       background: #0f172a;
-      padding: 8px 14px;
-      border-radius: 20px;
-      border: 2px solid var(--border-color);
+      padding: 10px 16px;
+      border-radius: 24px;
+      border: 2px solid #64748b;
       cursor: pointer;
       user-select: none;
-      transition: all 0.2s;
-    }
-    .status-toggle-box:active {
-      transform: scale(0.92);
+      -webkit-user-select: none;
+      touch-action: manipulation;
     }
 
     .status-dot {
@@ -104,11 +102,11 @@
       height: 12px;
       border-radius: 50%;
       background: #ef4444;
-      transition: all 0.3s;
+      display: inline-block;
     }
 
     .status-dot.online {
-      background: #10b981;
+      background: #10b981 !important;
       box-shadow: 0 0 12px #10b981;
     }
 
@@ -424,9 +422,10 @@
         <div class="brand-sub" id="rider-name-display">Delivery Partner</div>
       </div>
     </div>
-    <!-- SEEDHA ONCLICK BUTTON -->
-    <div class="status-toggle-box" onclick="handleToggleClick()">
-      <div class="status-dot" id="online-indicator"></div>
+    
+    <!-- PURE BULLETPROOF TOGGLE BUTTON -->
+    <div class="status-toggle-box" id="duty-btn" onclick="directToggleDuty()">
+      <span class="status-dot" id="online-indicator"></span>
       <span class="status-text" id="online-status-text">OFFLINE</span>
     </div>
   </div>
@@ -455,7 +454,7 @@
 
   <!-- ORDERS CONTAINER -->
   <div class="container" id="orders-container">
-    <div class="empty-msg">ऑर्डर्स लोड हो रहे हैं... कृपया प्रतीक्षा करें।</div>
+    <div class="empty-msg">लोड हो रहा है...</div>
   </div>
 
   <!-- 1. PICKUP SAMAN PHOTO MODAL -->
@@ -526,6 +525,50 @@
     let base64PickupPhoto = null;
     let base64DeliveryPhoto = null;
 
+    // DIRECT 1-TAP TOGGLE FUNCTION
+    function directToggleDuty() {
+      isRiderOnline = !isRiderOnline;
+      localStorage.setItem('baba_rider_duty_status', isRiderOnline ? 'ONLINE' : 'OFFLINE');
+      renderDutyUI();
+
+      // Background tracking sync
+      if (isRiderOnline) {
+        startLocationTracking();
+      } else {
+        stopAlertSound();
+        if (locationWatchId) {
+          navigator.geolocation.clearWatch(locationWatchId);
+          locationWatchId = null;
+        }
+      }
+
+      handleSoundState();
+
+      // Silent DB ping
+      try {
+        _supabase.from('riders').update({
+          is_active: isRiderOnline,
+          last_ping: new Date().toISOString()
+        }).eq('id', 1).then(() => {});
+      } catch(e) {}
+    }
+
+    function renderDutyUI() {
+      const dot = document.getElementById('online-indicator');
+      const txt = document.getElementById('online-status-text');
+      const box = document.getElementById('duty-btn');
+
+      if (isRiderOnline) {
+        dot.className = 'status-dot online';
+        txt.innerText = 'ONLINE';
+        box.style.borderColor = '#10b981';
+      } else {
+        dot.className = 'status-dot';
+        txt.innerText = 'OFFLINE';
+        box.style.borderColor = '#64748b';
+      }
+    }
+
     function compressImage(file, maxWidth = 650, quality = 0.65) {
       return new Promise((resolve, reject) => {
         const reader = new FileReader();
@@ -553,46 +596,6 @@
       });
     }
 
-    // 1-TAP INSTANT TOGGLE FUNCTION
-    function handleToggleClick() {
-      const targetState = !isRiderOnline;
-      updateOnlineStatus(targetState);
-    }
-
-    function updateOnlineStatus(online) {
-      isRiderOnline = online;
-      localStorage.setItem('baba_rider_duty_status', online ? 'ONLINE' : 'OFFLINE');
-
-      const dot = document.getElementById('online-indicator');
-      const txt = document.getElementById('online-status-text');
-
-      if (dot && txt) {
-        if (online) {
-          dot.className = 'status-dot online';
-          txt.innerText = 'ONLINE';
-          startLocationTracking();
-        } else {
-          dot.className = 'status-dot';
-          txt.innerText = 'OFFLINE';
-          stopAlertSound();
-          if (locationWatchId) {
-            navigator.geolocation.clearWatch(locationWatchId);
-            locationWatchId = null;
-          }
-        }
-      }
-
-      // Supabase sync (bina script atkaye)
-      try {
-        _supabase.from('riders').update({
-          is_active: online,
-          last_ping: new Date().toISOString()
-        }).eq('id', 1).then(() => {});
-      } catch(e) {}
-
-      handleSoundState();
-    }
-
     function startLocationTracking() {
       if (!navigator.geolocation) return;
 
@@ -618,7 +621,7 @@
       );
     }
 
-    // LOAD ORDERS
+    // INSTANT ORDER FETCHING
     async function loadRiderOrders() {
       try {
         const { data, error } = await _supabase
@@ -703,7 +706,7 @@
       if (filtered.length === 0) {
         container.innerHTML = `
           <div class="empty-msg">
-            ${currentTab === 'active' ? '🎉 अभी कोई नया या पेंडिंग ऑर्डर नहीं है।' : 'कोई पिछला ऑर्डर रिकॉर्ड नहीं मिला।'}
+            ${currentTab === 'active' ? '🎉 अभी कोई नया ऑर्डर नहीं है।' : 'कोई पिछला ऑर्डर रिकॉर्ड नहीं मिला।'}
           </div>
         `;
         return;
@@ -943,13 +946,14 @@
       }
     }
 
-    // ON PAGE LOAD
-    window.addEventListener('load', () => {
+    // DIRECT SCRIPT BOOTSTRAP
+    (function init() {
       const saved = localStorage.getItem('baba_rider_duty_status');
-      updateOnlineStatus(saved === 'ONLINE');
+      isRiderOnline = (saved === 'ONLINE');
+      renderDutyUI();
       loadRiderOrders();
       setInterval(loadRiderOrders, 3000);
-    });
+    })();
   </script>
 </body>
 </html>
