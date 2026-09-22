@@ -58,7 +58,6 @@
       overflow-x: hidden;
     }
 
-    /* 1. SIDE DRAWER */
     .drawer-overlay {
       position: fixed; 
       top: 0; 
@@ -132,7 +131,6 @@
     }
     .drawer-item:active { background: #f1f5f9; }
 
-    /* 2. BROADCAST NOTICE TICKER */
     .broadcast-ticker-wrap {
       display: none; 
       background: linear-gradient(90deg, #ea580c, #c2410c); 
@@ -155,7 +153,6 @@
       100% { transform: translate3d(-100%, 0, 0); }
     }
 
-    /* 3. TOP HERO HEADER */
     .top-hero-area {
       background: var(--primary-gradient);
       padding: 16px 16px 20px 16px; 
@@ -219,7 +216,6 @@
       margin-top: 2px;
     }
 
-    /* SEARCH BAR */
     .search-box-wrap { 
       position: relative; 
       margin-bottom: 14px; 
@@ -267,7 +263,6 @@
     }
     @keyframes pulseMic { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.18); } }
 
-    /* CATEGORIES */
     .category-scroll { 
       display: flex; 
       gap: 12px; 
@@ -313,7 +308,6 @@
       font-weight: 900;
     }
 
-    /* PROMO HERO CARD */
     .promo-banner {
       margin: 14px 16px; 
       background: linear-gradient(135deg, #ffffff 0%, #fff1f5 100%);
@@ -338,7 +332,6 @@
       margin-top: 3px; 
     }
 
-    /* PRODUCT CARDS GRID */
     .main-container { padding: 0 16px; }
     .grid { 
       display: grid; 
@@ -475,7 +468,6 @@
       line-height: 1;
     }
 
-    /* SMART GLOWING UPSELL CARD */
     .cart-target-banner {
       background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
       border: 1.5px solid #fcd34d;
@@ -511,7 +503,6 @@
       transition: width 0.4s ease;
     }
 
-    /* FLOATING CART & NAV */
     .floating-cart-bar {
       position: fixed; 
       bottom: 74px; 
@@ -555,7 +546,6 @@
     .nav-item.active { color: var(--accent-pink); }
     .nav-item-icon { font-size: 19px; }
 
-    /* FULL-PAGE VIEW FOR CART & ORDER */
     .modal-overlay {
       position: fixed; 
       top: 0; 
@@ -623,7 +613,6 @@
       color: #0f172a; 
     }
     
-    /* STICKY BOTTOM BAR */
     .cart-sticky-bottom-bar {
       position: fixed;
       bottom: 0;
@@ -739,7 +728,6 @@
       margin: 4px 0; 
     }
 
-    /* RATING SYSTEM */
     .rider-rating-card {
       background: #ffffff; border: 1.5px solid #fde047; border-radius: 16px;
       padding: 18px 16px; margin: 16px 0; text-align: center; box-shadow: 0 4px 16px rgba(234, 179, 8, 0.15);
@@ -754,7 +742,6 @@
     }
     .rating-chip.selected { background: #fef9c3; border-color: #facc15; color: #854d0e; }
 
-    /* IN-APP CHAT DRAWER */
     .chat-drawer { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #f8fafc; z-index: 1100; display: none; flex-direction: column; }
     .chat-drawer.active { display: flex; }
     .chat-top-header { background: var(--primary-purple); color: white; padding: 16px; display: flex; justify-content: space-between; align-items: center; }
@@ -769,7 +756,6 @@
     .chat-input-box { flex: 1; padding: 10px 14px; border-radius: 20px; border: 1.5px solid #cbd5e1; font-size: 13px; outline: none; }
     .chat-send-btn { background: var(--primary-purple); color: white; border: none; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 16px; cursor: pointer; }
 
-    /* DISPUTE FORM */
     .btn-dispute-trigger {
       background: #fee2e2; border: 1px solid #fca5a5; color: #dc2626;
       font-size: 11px; font-weight: 800; padding: 8px 12px; border-radius: 8px; cursor: pointer; margin-top: 8px; width: 100%;
@@ -778,14 +764,12 @@
 </head>
 <body>
 
-  <!-- 1. BROADCAST NOTICE TICKER -->
   <div class="broadcast-ticker-wrap" id="broadcast-ticker-bar">
     <span class="broadcast-ticker-text" id="broadcast-ticker-content">
       📢 Baba Food Delivery me aapka swagat hai!
     </span>
   </div>
 
-  <!-- 2. SIDE DRAWER -->
   <div class="drawer-overlay" id="drawer-overlay" onclick="toggleDrawer(false)"></div>
   <div class="side-drawer" id="side-drawer">
     <div class="drawer-header">
@@ -809,7 +793,6 @@
     </div>
   </div>
 
-  <!-- 3. TOP HERO HEADER -->
   <div class="top-hero-area">
     <div class="location-row">
       <div class="brand-cluster">
@@ -823,14 +806,12 @@
       <button class="menu-trigger-btn" onclick="openSupportModal()" title="Help & Support">🎧</button>
     </div>
 
-    <!-- Search with Voice -->
     <div class="search-box-wrap">
       <span class="search-icon-pos">🔍</span>
       <input type="text" id="search-input" class="search-bar-input" placeholder='Search "milk", "potato", "doodh", "aalu"...' oninput="handleFilter()">
       <button class="voice-mic-btn" id="voice-search-btn" onclick="startVoiceSearch()" title="बोलकर सर्च करें">🎙️</button>
     </div>
 
-    <!-- Category Tabs -->
     <div class="category-scroll" id="category-chips">
       <div class="cat-item active" onclick="setCategory('All', this)">
         <div class="cat-icon-circle">🛍️</div>
@@ -839,7 +820,6 @@
     </div>
   </div>
 
-  <!-- SURGE ALERTS -->
   <div class="rain-surge-alert-bar" id="rain-surge-alert" style="display:none; margin: 10px 16px; border-radius:12px; padding:10px 14px; background:#eff6ff; border:1px solid #bfdbfe; color:#1e40af; font-size:12px; font-weight:800;">
     <span>🌧️</span>
     <span id="rain-surge-msg">खराब मौसम के कारण डिलीवरी शुल्क लागू है।</span>
@@ -849,7 +829,6 @@
     <span id="night-surge-msg">देर रात डिलीवरी सेवा शुल्क लागू है।</span>
   </div>
 
-  <!-- PROMO HERO CARD -->
   <div class="promo-banner">
     <div class="promo-text">
       <h3 id="dyn-banner-title">₹249+ पर <span style="color: var(--accent-green);">Free Delivery</span> 🚚</h3>
@@ -859,7 +838,6 @@
   </div>
 
   <div class="main-container">
-    <!-- Active Order Tracker Strip -->
     <div class="active-order-strip" id="live-order-strip" onclick="openTrackModal()" style="background:#0f172a; color:white; border-radius:16px; padding:14px 16px; margin-bottom:14px; display:none; justify-content:space-between; align-items:center; cursor:pointer;">
       <div style="display: flex; align-items: center; gap: 10px;">
         <span style="font-size: 22px;">🛵</span>
@@ -876,7 +854,6 @@
     </div>
     <div class="grid" id="product-list"></div>
 
-    <!-- Past Orders History -->
     <div id="past-orders-section" style="margin-top: 35px; border-top: 1px solid var(--border-soft); padding-top: 22px;">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
         <div style="font-size: 16px; font-weight: 900; color: #0f172a;">🕒 Past Orders & Invoices</div>
@@ -888,7 +865,6 @@
     </div>
   </div>
 
-  <!-- FLOATING CART -->
   <div class="floating-cart-bar" id="cart-float-bar" onclick="openCartModal()">
     <div>
       <div style="font-size:11.5px; font-weight:700; opacity:0.9;" id="float-qty-text">0 Items Added</div>
@@ -897,7 +873,6 @@
     <div style="font-size: 13px; font-weight: 900; display:flex; align-items:center; gap:6px;">View Full Cart ➔</div>
   </div>
 
-  <!-- BOTTOM NAV BAR -->
   <div class="bottom-nav-bar">
     <div class="nav-item active" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">
       <div class="nav-item-icon">🏠</div>
@@ -917,7 +892,6 @@
     </div>
   </div>
 
-  <!-- FULL PAGE CART VIEW -->
   <div class="modal-overlay" id="cart-modal">
     <div class="fullpage-content">
       <div class="fullpage-head">
@@ -925,7 +899,6 @@
         <button class="fullpage-close" onclick="toggleCartModal(false)">✕</button>
       </div>
 
-      <!-- SMART CART UPSELL PROGRESS BANNER -->
       <div class="cart-target-banner" id="cart-smart-target-box" style="display: none;">
         <div class="target-headline" id="cart-target-text">
           🎉 सामान जोड़ें और इनाम पाएँ!
@@ -937,7 +910,6 @@
 
       <div id="cart-items-box"></div>
 
-      <!-- Coupon Box -->
       <div style="display:flex; gap:8px; margin: 14px 0;">
         <input type="text" id="cart-coupon-input" class="zepto-input" style="text-transform:uppercase; font-weight:800;" placeholder="Enter Coupon (e.g. BABA50)">
         <button onclick="applyCouponCode()" style="background:var(--primary-purple); color:white; border:none; padding:0 18px; border-radius:12px; font-weight:800; font-size:12px; cursor:pointer;">Apply</button>
@@ -954,7 +926,6 @@
           <span id="bill-delivery-charge" style="color:var(--accent-green);">FREE</span>
         </div>
         
-        <!-- DISTANCE CHARGE ROW -->
         <div class="bill-row" id="row-distance-charge" style="display: none; color: #0284c7;">
           <span id="bill-distance-title">📏 Distance Charge (Extra KM)</span>
           <span id="bill-distance-amount">+₹0</span>
@@ -982,7 +953,6 @@
         </div>
       </div>
 
-      <!-- Payment Mode -->
       <div style="font-size:12px; font-weight:800; color:#64748b; margin:14px 0 8px 0;">SELECT PAYMENT METHOD:</div>
       <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px; margin-bottom:14px;">
         <div id="opt-cod" onclick="selectPaymentMode('COD')" style="border:1.5px solid var(--accent-pink); background:#fff0f4; color:var(--accent-pink); padding:12px; border-radius:12px; text-align:center; font-weight:800; font-size:13px; cursor:pointer;">
@@ -999,23 +969,18 @@
         <input type="tel" id="upi-utr" class="zepto-input" placeholder="Enter 12-digit UTR No." maxlength="12" style="text-align:center; font-weight:800; letter-spacing:1px; background:#fff;">
       </div>
 
-      <!-- Customer Address & Location Section -->
       <div style="font-size:12px; font-weight:800; color:#64748b; margin-bottom:10px;">DELIVERY DETAILS:</div>
       <div style="display:flex; flex-direction:column; gap:12px;">
-        
-        <!-- 1. Name -->
         <div>
           <label style="font-size: 11.5px; font-weight: 800; color: #334155; display:block; margin-bottom: 4px;">आपका पूरा नाम (Full Name) *</label>
           <input type="text" id="c-name" class="zepto-input" placeholder="नाम दर्ज करें">
         </div>
 
-        <!-- 2. Phone -->
         <div>
           <label style="font-size: 11.5px; font-weight: 800; color: #334155; display:block; margin-bottom: 4px;">10 अंकों का मोबाइल नंबर *</label>
           <input type="tel" id="c-phone" class="zepto-input" placeholder="मोबाइल नंबर दर्ज करें" maxlength="10">
         </div>
 
-        <!-- 3. Full Address -->
         <div style="background: #ffffff; padding: 2px 0;">
           <label style="font-size: 12px; font-weight: 900; color: #0f172a; display:block; margin-bottom: 5px;">
             🏠 घर / दुकान / फ्लैट नंबर और लैंडमार्क (पूरा पता) *
@@ -1023,23 +988,19 @@
           <input type="text" id="c-address" class="zepto-input" style="border: 2px solid #64748b; font-size: 13.5px;" placeholder="अपना पूरा पता यहाँ लिखें">
         </div>
 
-        <!-- 4. Mandatory Live Location Button (Tick Mark System Added) -->
         <div style="margin-top: 6px;">
           <button type="button" class="btn-fetch-gps" id="btn-location-action" onclick="getCurrentLocation()">
             📍 क्लिक करके लाइव लोकेशन अपडेट करें (अनिवार्य)
           </button>
         </div>
 
-        <!-- 5. GPS Status Pill -->
         <div class="loc-card-box" id="gps-status-box">
           <div class="loc-card-title">GPS स्थिति (MANDATORY):</div>
           <div class="loc-card-val" id="gps-status-val">⚠️ लोकेशन अपडेट नहीं है। ऊपर दिए गए नीले बटन पर क्लिक करें!</div>
         </div>
-
       </div>
     </div>
 
-    <!-- ALWAYS VISIBLE STICKY BOTTOM CHECKOUT BUTTON -->
     <div class="cart-sticky-bottom-bar" id="cart-sticky-bar">
       <button class="btn-checkout-sticky" id="order-submit-btn" onclick="placeOrder()" disabled>
         ⚠️ पहले लाइव लोकेशन अपडेट करें
@@ -1047,7 +1008,6 @@
     </div>
   </div>
 
-  <!-- FULL PAGE LIVE TRACKING MODAL -->
   <div class="modal-overlay" id="track-modal">
     <div class="fullpage-content">
       <div class="fullpage-head">
@@ -1058,18 +1018,15 @@
         <button class="fullpage-close" onclick="toggleTrackModal(false)">✕</button>
       </div>
 
-      <!-- 60-Sec Self Cancel -->
       <div id="self-cancel-container" style="display:none; background:#fef2f2; border:1px solid #fca5a5; padding:12px 14px; border-radius:12px; margin-bottom:14px; justify-content:space-between; align-items:center;">
         <span style="font-size:12px; font-weight:800; color:#991b1b;">⏱️ ऑर्डर रद्द करना है? (<span id="cancel-timer-secs">60</span>s बाकी)</span>
         <button onclick="handleCustomerSelfCancel()" style="background:#dc2626; color:white; border:none; padding:8px 14px; border-radius:8px; font-size:12px; font-weight:800; cursor:pointer;">Cancel ✕</button>
       </div>
 
-      <!-- Live Dynamic ETA Chip -->
       <div id="eta-chip-container" style="display:none; text-align:center; margin-bottom:12px;">
         <span id="eta-chip-text" style="background:#0284c7; color:white; font-size:12px; font-weight:800; padding:6px 14px; border-radius:14px;">⚡ राइडर की लाइव दूरी जाँची जा रही है...</span>
       </div>
 
-      <!-- Live OTP Box -->
       <div class="cust-otp-box" id="cust-otp-container" style="display:none;">
         <div style="font-size:11px; font-weight:800; color:#7e22ce;">🔑 SAFE DELIVERY OTP</div>
         <div class="cust-otp-code" id="cust-live-otp">----</div>
@@ -1082,7 +1039,6 @@
         <div id="st-3" style="font-size:14px; font-weight:800; color:#94a3b8;">📦 Delivered Successfully</div>
       </div>
 
-      <!-- Privacy Masked Call / Action -->
       <div id="rider-contact-row" style="display:none; gap:10px; margin-bottom:14px;">
         <button onclick="callRiderMasked()" style="flex:1; background:#10b981; color:white; border:none; padding:12px; border-radius:12px; font-size:12px; font-weight:800; cursor:pointer;">
           🛡️ Call Rider (Masked)
@@ -1092,7 +1048,6 @@
         </button>
       </div>
 
-      <!-- 5-STAR RIDER RATING CARD -->
       <div class="rider-rating-card" id="rider-rating-box" style="display: none;">
         <div style="font-size: 14px; font-weight: 900; color: #0f172a;">Rate Your Delivery Partner 🛵</div>
         <div style="font-size: 11px; color: #64748b; margin-top: 2px;">डिलीवरी अनुभव कैसा रहा? स्टार रेटिंग दें:</div>
@@ -1117,7 +1072,6 @@
     </div>
   </div>
 
-  <!-- IN-APP LIVE CHAT DRAWER -->
   <div class="chat-drawer" id="chat-drawer">
     <div class="chat-top-header">
       <div style="display:flex; align-items:center; gap:10px;">
@@ -1144,7 +1098,6 @@
     </div>
   </div>
 
-  <!-- FULL RECEIPT & PHOTO DISPUTE CLAIM MODAL -->
   <div class="modal-overlay" id="receipt-modal">
     <div class="fullpage-content">
       <div class="fullpage-head">
@@ -1163,7 +1116,6 @@
         <div style="font-size: 12px; font-weight: 700; color: #1e293b; white-space: pre-line;" id="rcpt-address">--</div>
       </div>
 
-      <!-- Dispute Claim Status View -->
       <div id="rcpt-dispute-status-pill" style="display:none; padding:10px 14px; border-radius:10px; font-size:12px; font-weight:800; margin-bottom:12px;"></div>
 
       <div class="bill-box" style="margin: 0 0 12px 0;">
@@ -1181,19 +1133,17 @@
         ⚠️ ख़राब या टूटा सामान मिला? रिफ़ंड क्लेम करें
       </button>
 
-      <!-- Dispute Form Area -->
-      <div id="dispute-form-box" style="display: none; background: #fff5f5; border: 1.5px dashed #fca5a5; border-radius: 12px; padding: 12px; margin-top: 10px;">
+      <div id="dispute-form-box" style="display: none; background: #fff5f5; border: 1.5px dashed #fca5a5; border-radius: 12px; padding: 14px; margin-top: 10px;">
         <div style="font-size: 12px; font-weight: 900; color: #991b1b; margin-bottom: 6px;">Submit Photo Proof & Claim:</div>
-        <textarea id="dispute-note-input" class="zepto-input" rows="2" placeholder="क्या समस्या है? (उदा. सामान टूटा हुआ था)"></textarea>
-        <input type="file" id="dispute-file-input" accept="image/*" capture="environment" style="margin: 8px 0; font-size: 12px;">
-        <button class="btn-checkout-sticky" style="background: #dc2626; padding: 10px;" onclick="submitRefundDispute()">
+        <textarea id="dispute-note-input" class="zepto-input" rows="2" placeholder="क्या समस्या है? (उदा. सामान खराब या टूटा हुआ है)"></textarea>
+        <input type="file" id="dispute-file-input" accept="image/*" style="margin: 10px 0; font-size: 12px; width: 100%;">
+        <button class="btn-checkout-sticky" id="btn-submit-dispute" style="background: #dc2626; padding: 12px;" onclick="submitRefundDispute()">
           📤 Submit Refund Claim to Admin
         </button>
       </div>
     </div>
   </div>
 
-  <!-- SUPPORT MODAL -->
   <div class="modal-overlay" id="support-modal">
     <div class="fullpage-content">
       <div class="fullpage-head">
@@ -1233,7 +1183,6 @@
     let currentViewingReceiptOrder = null;
     let assignedRiderPhone = null;
 
-    // HINDI-TO-ENGLISH & COMMON SYNONYM DICTIONARY
     const keywordSynonyms = {
       'doodh': 'milk', 'dudh': 'milk', 'dud': 'milk', 'दूध': 'milk', 'milk': 'doodh',
       'aalu': 'potato', 'aloo': 'potato', 'alu': 'potato', 'आलू': 'potato', 'potato': 'aalu',
@@ -1712,7 +1661,6 @@
 
       updateSmartCartTarget(itemsTotal);
 
-      // Location lock aur ₹99 check
       const submitBtn = document.getElementById('order-submit-btn');
       const minReq = Number(appConfig.min_order_value) || 99;
       
@@ -1771,7 +1719,6 @@
       document.getElementById('bill-coupon-amount').innerText = `-₹${couponDisc}`;
     }
 
-    // अनिवार्य लाइव GPS लोकेशन फ़ेच (सफलता पर हरा रंग और ✅ टिक मार्क)
     function getCurrentLocation() {
       const statusVal = document.getElementById('gps-status-val');
       const gpsBtn = document.getElementById('btn-location-action');
@@ -1801,7 +1748,6 @@
 
           const mapsUrl = `https://maps.google.com/?q=${pos.coords.latitude},${pos.coords.longitude}`;
           
-          // लोकेशन मिलते ही बटन का रंग हरा और आगे ✅ टिक मार्क
           gpsBtn.style.background = '#059669';
           gpsBtn.innerHTML = '✅ लाइव लोकेशन अपडेट हो गई!';
 
@@ -2148,35 +2094,70 @@
     function closeReceiptModal() { document.getElementById('receipt-modal').classList.remove('active'); }
     function openDisputeForm() { document.getElementById('dispute-form-box').style.display = 'block'; }
 
+    // Automatic Canvas Image Compressor function taaki Supabase payload crash na ho
+    function compressImage(file, maxWidth = 800, quality = 0.7) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = (event) => {
+          const img = new Image();
+          img.src = event.target.result;
+          img.onload = () => {
+            const canvas = document.createElement('canvas');
+            let width = img.width;
+            let height = img.height;
+
+            if (width > maxWidth) {
+              height = Math.round((height * maxWidth) / width);
+              width = maxWidth;
+            }
+
+            canvas.width = width;
+            canvas.height = height;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, width, height);
+            resolve(canvas.toDataURL('image/jpeg', quality));
+          };
+          img.onerror = (err) => reject(err);
+        };
+        reader.onerror = (err) => reject(err);
+      });
+    }
+
+    // 100% Fixed Refund Claim Function
     async function submitRefundDispute() {
       if (!currentViewingReceiptOrder) return;
       const note = document.getElementById('dispute-note-input').value.trim();
       const fileInput = document.getElementById('dispute-file-input');
+      const submitBtn = document.getElementById('btn-submit-dispute');
 
       if (!note) return alert('कृपया समस्या का विवरण लिखें!');
       if (!fileInput.files || fileInput.files.length === 0) return alert('कृपया खराब सामान की फोटो अपलोड करें!');
 
-      const file = fileInput.files[0];
-      const reader = new FileReader();
+      submitBtn.disabled = true;
+      submitBtn.innerText = '⏳ फोटो कंप्रेस व अपलोड हो रही है...';
 
-      reader.onload = async function(e) {
-        const base64Photo = e.target.result;
-        try {
-          const { error } = await _supabase.from('orders').update({
-            dispute_status: 'PENDING',
-            dispute_note: note,
-            dispute_photo_url: base64Photo
-          }).eq('id', currentViewingReceiptOrder.id);
+      try {
+        const file = fileInput.files[0];
+        const compressedBase64 = await compressImage(file, 700, 0.6);
 
-          if (error) throw error;
-          alert('✅ आपकी शिकायत और फोटो एडमिन को भेज दी गई है।');
-          document.getElementById('dispute-form-box').style.display = 'none';
-          closeReceiptModal();
-        } catch(err) {
-          alert('त्रुटि: ' + err.message);
-        }
-      };
-      reader.readAsDataURL(file);
+        const { error } = await _supabase.from('orders').update({
+          dispute_status: 'PENDING',
+          dispute_note: note,
+          dispute_photo_url: compressedBase64
+        }).eq('id', currentViewingReceiptOrder.id);
+
+        if (error) throw error;
+
+        alert('✅ आपकी शिकायत और फोटो एडमिन को सफलतापूर्वक भेज दी गई है!');
+        document.getElementById('dispute-form-box').style.display = 'none';
+        closeReceiptModal();
+      } catch(err) {
+        alert('सबमिट एरर: ' + err.message);
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.innerText = '📤 Submit Refund Claim to Admin';
+      }
     }
 
     function repeatOrder(items) {
