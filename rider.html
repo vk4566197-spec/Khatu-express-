@@ -318,7 +318,6 @@
       gap: 6px;
     }
 
-    /* MODAL POPUPS */
     .modal-bg {
       position: fixed;
       top: 0;
@@ -579,16 +578,30 @@
         Notification.requestPermission();
       }
 
-      // Check saved duty state
+      // 1. Saved Duty Check (Refresh par status maintain rahega)
       const savedDuty = localStorage.getItem('baba_rider_duty_status');
       if (savedDuty === 'ONLINE') {
         setOnlineState(true);
       } else {
-        setOnlineState(false);
+        await checkCurrentDutyStatus();
       }
 
+      // 2. Load orders immediately
       await loadRiderOrders();
-      setInterval(loadRiderOrders, 3500); // 3.5s fast polling
+      setInterval(loadRiderOrders, 3000); // 3-second fast polling
+    }
+
+    async function checkCurrentDutyStatus() {
+      try {
+        const { data } = await _supabase.from('riders').select('is_active').eq('id', 1).single();
+        if (data && data.is_active) {
+          setOnlineState(true);
+        } else {
+          setOnlineState(false);
+        }
+      } catch(e) { 
+        setOnlineState(false); 
+      }
     }
 
     function setOnlineState(online) {
@@ -605,11 +618,10 @@
       } else {
         dot.className = 'status-dot';
         txt.innerText = 'OFFLINE';
-        stopOrderSoundAlert(); // OFFLINE hote hi sound turant band
+        stopOrderSoundAlert(); // OFFLINE par sound 100% band
         if (locationWatchId) navigator.geolocation.clearWatch(locationWatchId);
       }
 
-      // Refresh sound check based on duty
       checkAndHandleAudioAlert();
     }
 
@@ -690,7 +702,7 @@
       );
     }
 
-    // LOAD ALL ORDERS FROM SUPABASE
+    // LOAD ALL ORDERS DIRECTLY (No Status Miss)
     async function loadRiderOrders() {
       try {
         const { data, error } = await _supabase
@@ -709,22 +721,20 @@
       }
     }
 
-    // STRICT AUDIO ALERT LOGIC: ONLINE PAR BAJEGA, OFFLINE PAR 100% BAND
+    // STRICT AUDIO ALERT RULE
     function checkAndHandleAudioAlert() {
-      // Pending new orders count
-      const pendingNew = allRiderOrders.filter(o => 
-        o.status === 'Order Placed' || 
-        o.status === 'Paid Online (UPI)' ||
-        (o.status && o.status.toLowerCase().includes('placed'))
-      );
-
-      // Rule 1: Agar ID OFFLINE hai toh bilkul band
+      // Offline hone par kisi bhi haalat me audio nahi bajegi
       if (!isRiderOnline) {
         stopOrderSoundAlert();
         return;
       }
 
-      // Rule 2: Agar ID ONLINE hai aur naya pending order hai toh sound baje
+      // Online hone par hi check hoga
+      const pendingNew = allRiderOrders.filter(o => {
+        const st = (o.status || '').toLowerCase();
+        return st.includes('placed') || st.includes('upi') || st === 'order placed';
+      });
+
       if (pendingNew.length > 0) {
         startOrderSoundAlert();
         if (pendingNew.length > lastKnownPendingCount) {
@@ -738,7 +748,7 @@
 
     function startOrderSoundAlert() {
       const sound = document.getElementById('order-sound');
-      if (sound && sound.paused) {
+      if (sound && sound.paused && isRiderOnline) {
         sound.play().catch(() => {});
       }
     }
@@ -778,16 +788,14 @@
       renderOrdersList();
     }
 
-    // 100% CRASH PROOF RENDER FUNCTION
+    // 100% RELIABLE RENDER FUNCTION (Shows New Orders Instantly)
     function renderOrdersList() {
       const container = document.getElementById('orders-container');
       let filtered = [];
 
       if (currentTab === 'active') {
-        // Active orders: Placed, UPI, Out for Delivery
         filtered = allRiderOrders.filter(o => o.status !== 'Delivered' && o.status !== 'Cancelled');
       } else {
-        // Completed/Past: Delivered, Cancelled
         filtered = allRiderOrders.filter(o => o.status === 'Delivered' || o.status === 'Cancelled');
       }
 
@@ -891,7 +899,7 @@
       }).join('');
     }
 
-    // PICKUP SAMAN PHOTO
+    // PICKUP SAMAN PHOTO LOGIC
     function openPickupModal(orderId) {
       stopOrderSoundAlert();
       selectedOrderForPickup = orderId;
@@ -948,7 +956,7 @@
       }
     }
 
-    // DELIVERY PHOTO & OTP
+    // DELIVERY PROOF PHOTO & OTP
     function openDeliveryProofModal(orderId, expectedOtp) {
       selectedOrderForDelivery = { id: orderId, expectedOtp: expectedOtp };
       base64DeliveryPhoto = null;
