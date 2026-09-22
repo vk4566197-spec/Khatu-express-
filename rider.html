@@ -92,13 +92,15 @@
       border-radius: 20px;
       border: 1.5px solid var(--border-color);
       cursor: pointer;
+      user-select: none;
     }
 
     .status-dot {
-      width: 10px;
-      height: 10px;
+      width: 12px;
+      height: 12px;
       border-radius: 50%;
       background: #ef4444;
+      transition: all 0.3s;
     }
 
     .status-dot.online {
@@ -108,7 +110,7 @@
 
     .status-text {
       font-size: 12px;
-      font-weight: 800;
+      font-weight: 900;
       color: #f8fafc;
     }
 
@@ -418,7 +420,8 @@
         <div class="brand-sub" id="rider-name-display">Delivery Partner</div>
       </div>
     </div>
-    <div class="status-toggle-box" onclick="promptSelfieAttendance()">
+    <!-- 100% WORKING ONE-TAP TOGGLE BUTTON -->
+    <div class="status-toggle-box" id="duty-btn" onclick="toggleDutyStatus()">
       <div class="status-dot" id="online-indicator"></div>
       <span class="status-text" id="online-status-text">OFFLINE</span>
     </div>
@@ -451,11 +454,11 @@
     <div class="empty-msg">ऑर्डर्स लोड हो रहे हैं... कृपया प्रतीक्षा करें।</div>
   </div>
 
-  <!-- 1. SELFIE ATTENDANCE MODAL (ON/OFF DUTY) -->
+  <!-- 1. SELFIE MODAL (WHEN GOING ONLINE) -->
   <div class="modal-bg" id="selfie-modal">
     <div class="modal-card">
       <div style="font-size: 17px; font-weight: 900; color: #f8fafc; margin-bottom: 4px;">📸 सेल्फी हाजिरी (Selfie Duty)</div>
-      <div style="font-size: 11.5px; color: #94a3b8;" id="selfie-modal-subtitle">ड्यूटी चालू करने के लिए अपनी साफ़ सेल्फ़ी लें:</div>
+      <div style="font-size: 11.5px; color: #94a3b8;" id="selfie-modal-subtitle">ड्यूटी चालू (ONLINE) करने के लिए अपनी साफ़ सेल्फ़ी लें:</div>
 
       <div class="photo-preview-box" id="selfie-preview-box">
         <span style="color:#64748b; font-size:12px; font-weight:700;">सेल्फी यहाँ दिखेगी</span>
@@ -466,8 +469,8 @@
         📷 कैमरा खोलें और सेल्फी लें
       </button>
 
-      <button class="btn-action-primary" id="btn-submit-selfie" style="margin-top:12px; display:none;" onclick="confirmSelfieDuty()">
-        ✓ सबमिट करें और ड्यूटी बदलें
+      <button class="btn-action-primary" id="btn-submit-selfie" style="margin-top:12px; display:none;" onclick="confirmSelfieOnline()">
+        ✓ सबमिट करें और ONLINE जाएँ
       </button>
 
       <button onclick="closeSelfieModal()" style="background:none; border:none; color:#94a3b8; font-weight:800; font-size:12px; margin-top:10px; cursor:pointer;">
@@ -578,29 +581,30 @@
         Notification.requestPermission();
       }
 
-      // 1. Saved Duty Check (Refresh par status maintain rahega)
+      // Check saved duty state
       const savedDuty = localStorage.getItem('baba_rider_duty_status');
       if (savedDuty === 'ONLINE') {
         setOnlineState(true);
       } else {
-        await checkCurrentDutyStatus();
+        setOnlineState(false);
       }
 
-      // 2. Load orders immediately
       await loadRiderOrders();
-      setInterval(loadRiderOrders, 3000); // 3-second fast polling
+      setInterval(loadRiderOrders, 3000);
     }
 
-    async function checkCurrentDutyStatus() {
-      try {
-        const { data } = await _supabase.from('riders').select('is_active').eq('id', 1).single();
-        if (data && data.is_active) {
-          setOnlineState(true);
-        } else {
+    // TOGGLE BUTTON CLICK HANDLER
+    function toggleDutyStatus() {
+      if (isRiderOnline) {
+        // If already online, turn offline directly
+        if (confirm("क्या आप ड्यूटी बंद (OFFLINE) करना चाहते हैं?")) {
           setOnlineState(false);
+          updateDutyInDB(false, null);
+          alert("✅ आप OFFLINE हो चुके हैं।");
         }
-      } catch(e) { 
-        setOnlineState(false); 
+      } else {
+        // If offline, open selfie modal to go online
+        promptSelfieAttendance();
       }
     }
 
@@ -618,20 +622,32 @@
       } else {
         dot.className = 'status-dot';
         txt.innerText = 'OFFLINE';
-        stopOrderSoundAlert(); // OFFLINE par sound 100% band
+        stopOrderSoundAlert(); // OFFLINE hote hi aawaz band
         if (locationWatchId) navigator.geolocation.clearWatch(locationWatchId);
       }
 
       checkAndHandleAudioAlert();
     }
 
+    async function updateDutyInDB(online, selfie) {
+      try {
+        const updateData = {
+          is_active: online,
+          duty_status: online ? 'ON_DUTY' : 'OFF_DUTY',
+          last_ping: new Date().toISOString()
+        };
+        if (selfie) updateData.selfie_url = selfie;
+
+        await _supabase.from('riders').update(updateData).eq('id', 1);
+      } catch(e) {
+        console.warn("Duty DB update error:", e);
+      }
+    }
+
     function promptSelfieAttendance() {
       base64Selfie = null;
       document.getElementById('selfie-preview-box').innerHTML = '<span style="color:#64748b; font-size:12px; font-weight:700;">सेल्फी यहाँ दिखेगी</span>';
       document.getElementById('btn-submit-selfie').style.display = 'none';
-      document.getElementById('selfie-modal-subtitle').innerText = isRiderOnline 
-        ? 'ड्यूटी बंद (OFFLINE) करने के लिए अपनी सेल्फ़ी लें:' 
-        : 'ड्यूटी चालू (ONLINE) करने के लिए अपनी सेल्फ़ी लें:';
       document.getElementById('selfie-modal').classList.add('active');
     }
 
@@ -650,30 +666,23 @@
       }
     }
 
-    async function confirmSelfieDuty() {
+    async function confirmSelfieOnline() {
       if (!base64Selfie) return alert('कृपया पहले सेल्फी लें!');
-      const newStatus = !isRiderOnline;
       const submitBtn = document.getElementById('btn-submit-selfie');
       submitBtn.disabled = true;
       submitBtn.innerText = '⏳ हाजिरी दर्ज हो रही है...';
 
       try {
-        await _supabase.from('riders').update({
-          is_active: newStatus,
-          selfie_url: base64Selfie,
-          duty_status: newStatus ? 'ON_DUTY' : 'OFF_DUTY',
-          last_ping: new Date().toISOString()
-        }).eq('id', 1);
-
-        setOnlineState(newStatus);
-        alert(newStatus ? '✅ सेल्फी स्वीकार हुई! आप अब ONLINE हैं।' : '✅ आप OFFLINE हो चुके हैं।');
+        await updateDutyInDB(true, base64Selfie);
+        setOnlineState(true);
+        alert('✅ सेल्फी स्वीकार हुई! आप अब ONLINE हैं।');
         closeSelfieModal();
         loadRiderOrders();
       } catch(e) {
         alert('ड्यूटी अपडेट एरर: ' + e.message);
       } finally {
         submitBtn.disabled = false;
-        submitBtn.innerText = '✓ सबमिट करें और ड्यूटी बदलें';
+        submitBtn.innerText = '✓ सबमिट करें और ONLINE जाएँ';
       }
     }
 
@@ -702,7 +711,6 @@
       );
     }
 
-    // LOAD ALL ORDERS DIRECTLY (No Status Miss)
     async function loadRiderOrders() {
       try {
         const { data, error } = await _supabase
@@ -721,15 +729,14 @@
       }
     }
 
-    // STRICT AUDIO ALERT RULE
     function checkAndHandleAudioAlert() {
-      // Offline hone par kisi bhi haalat me audio nahi bajegi
+      // OFFLINE par sound 100% band
       if (!isRiderOnline) {
         stopOrderSoundAlert();
         return;
       }
 
-      // Online hone par hi check hoga
+      // ONLINE hone par check
       const pendingNew = allRiderOrders.filter(o => {
         const st = (o.status || '').toLowerCase();
         return st.includes('placed') || st.includes('upi') || st === 'order placed';
@@ -788,7 +795,6 @@
       renderOrdersList();
     }
 
-    // 100% RELIABLE RENDER FUNCTION (Shows New Orders Instantly)
     function renderOrdersList() {
       const container = document.getElementById('orders-container');
       let filtered = [];
@@ -899,7 +905,6 @@
       }).join('');
     }
 
-    // PICKUP SAMAN PHOTO LOGIC
     function openPickupModal(orderId) {
       stopOrderSoundAlert();
       selectedOrderForPickup = orderId;
@@ -956,7 +961,6 @@
       }
     }
 
-    // DELIVERY PROOF PHOTO & OTP
     function openDeliveryProofModal(orderId, expectedOtp) {
       selectedOrderForDelivery = { id: orderId, expectedOtp: expectedOtp };
       base64DeliveryPhoto = null;
@@ -1022,7 +1026,6 @@
       }
     }
 
-    // RIDER CANCEL ORDER
     async function riderCancelOrder(orderId) {
       const reason = prompt("ऑर्डर कैंसिल करने का कारण लिखें (उदा. ग्राहक फ़ोन नहीं उठा रहा / पता नहीं मिल रहा):");
       if (!reason || reason.trim().length < 3) {
