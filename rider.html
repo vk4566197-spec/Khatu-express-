@@ -176,6 +176,17 @@
       padding: 16px;
       margin-bottom: 14px;
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+      position: relative;
+    }
+
+    .order-card.new-pulse {
+      border-color: #38bdf8;
+      animation: glowCard 1.5s infinite alternate;
+    }
+
+    @keyframes glowCard {
+      0% { box-shadow: 0 0 10px rgba(56, 189, 248, 0.3); }
+      100% { box-shadow: 0 0 20px rgba(56, 189, 248, 0.7); }
     }
 
     .order-top {
@@ -536,7 +547,6 @@
     let base64PickupPhoto = null;
     let base64DeliveryPhoto = null;
 
-    // IMAGE COMPRESSOR FUNCTION
     function compressImage(file, maxWidth = 650, quality = 0.65) {
       return new Promise((resolve, reject) => {
         const reader = new FileReader();
@@ -569,29 +579,16 @@
         Notification.requestPermission();
       }
 
-      // Check LocalStorage first so refresh doesn't make rider offline
+      // Check saved duty state
       const savedDuty = localStorage.getItem('baba_rider_duty_status');
       if (savedDuty === 'ONLINE') {
         setOnlineState(true);
       } else {
-        await checkCurrentDutyStatus();
+        setOnlineState(false);
       }
 
       await loadRiderOrders();
-      setInterval(loadRiderOrders, 4000);
-    }
-
-    async function checkCurrentDutyStatus() {
-      try {
-        const { data } = await _supabase.from('riders').select('is_active').eq('id', 1).single();
-        if (data && data.is_active) {
-          setOnlineState(true);
-        } else {
-          setOnlineState(false);
-        }
-      } catch(e) { 
-        setOnlineState(false); 
-      }
+      setInterval(loadRiderOrders, 3500); // 3.5s fast polling
     }
 
     function setOnlineState(online) {
@@ -608,11 +605,14 @@
       } else {
         dot.className = 'status-dot';
         txt.innerText = 'OFFLINE';
+        stopOrderSoundAlert(); // OFFLINE hote hi sound turant band
         if (locationWatchId) navigator.geolocation.clearWatch(locationWatchId);
       }
+
+      // Refresh sound check based on duty
+      checkAndHandleAudioAlert();
     }
 
-    // 1. SELFIE DUTY
     function promptSelfieAttendance() {
       base64Selfie = null;
       document.getElementById('selfie-preview-box').innerHTML = '<span style="color:#64748b; font-size:12px; font-weight:700;">सेल्फी यहाँ दिखेगी</span>';
@@ -656,6 +656,7 @@
         setOnlineState(newStatus);
         alert(newStatus ? '✅ सेल्फी स्वीकार हुई! आप अब ONLINE हैं।' : '✅ आप OFFLINE हो चुके हैं।');
         closeSelfieModal();
+        loadRiderOrders();
       } catch(e) {
         alert('ड्यूटी अपडेट एरर: ' + e.message);
       } finally {
@@ -664,7 +665,6 @@
       }
     }
 
-    // 2. LIVE GPS BROADCAST
     function startLiveLocationBroadcast() {
       if (!navigator.geolocation) return;
 
@@ -690,7 +690,7 @@
       );
     }
 
-    // 3. LOAD ORDERS & SOUND
+    // LOAD ALL ORDERS FROM SUPABASE
     async function loadRiderOrders() {
       try {
         const { data, error } = await _supabase
@@ -701,23 +701,39 @@
         if (error) throw error;
         allRiderOrders = data || [];
 
-        const pendingNew = allRiderOrders.filter(o => o.status === 'Order Placed' || o.status === 'Paid Online (UPI)');
-
-        if (pendingNew.length > 0 && isRiderOnline) {
-          startOrderSoundAlert();
-          if (pendingNew.length > lastKnownPendingCount) {
-            triggerSystemNotification(pendingNew[0]);
-          }
-        } else {
-          stopOrderSoundAlert();
-        }
-        lastKnownPendingCount = pendingNew.length;
-
+        checkAndHandleAudioAlert();
         updateDashboardStats();
         renderOrdersList();
       } catch (err) {
         console.error("Orders load failed:", err);
       }
+    }
+
+    // STRICT AUDIO ALERT LOGIC: ONLINE PAR BAJEGA, OFFLINE PAR 100% BAND
+    function checkAndHandleAudioAlert() {
+      // Pending new orders count
+      const pendingNew = allRiderOrders.filter(o => 
+        o.status === 'Order Placed' || 
+        o.status === 'Paid Online (UPI)' ||
+        (o.status && o.status.toLowerCase().includes('placed'))
+      );
+
+      // Rule 1: Agar ID OFFLINE hai toh bilkul band
+      if (!isRiderOnline) {
+        stopOrderSoundAlert();
+        return;
+      }
+
+      // Rule 2: Agar ID ONLINE hai aur naya pending order hai toh sound baje
+      if (pendingNew.length > 0) {
+        startOrderSoundAlert();
+        if (pendingNew.length > lastKnownPendingCount) {
+          triggerSystemNotification(pendingNew[0]);
+        }
+      } else {
+        stopOrderSoundAlert();
+      }
+      lastKnownPendingCount = pendingNew.length;
     }
 
     function startOrderSoundAlert() {
@@ -738,7 +754,7 @@
     function triggerSystemNotification(order) {
       if ('Notification' in window && Notification.permission === 'granted') {
         new Notification("🚨 नया डिलीवरी ऑर्डर!", {
-          body: `Order #ORD-${order.id} | ₹${order.total_amount}\nग्राहक: ${order.customer_name}`,
+          body: `Order #ORD-${order.id} | ₹${order.total_amount}\nग्राहक: ${order.customer_name || 'Customer'}`,
           icon: 'logo.png'
         });
       }
@@ -762,13 +778,16 @@
       renderOrdersList();
     }
 
+    // 100% CRASH PROOF RENDER FUNCTION
     function renderOrdersList() {
       const container = document.getElementById('orders-container');
       let filtered = [];
 
       if (currentTab === 'active') {
+        // Active orders: Placed, UPI, Out for Delivery
         filtered = allRiderOrders.filter(o => o.status !== 'Delivered' && o.status !== 'Cancelled');
       } else {
+        // Completed/Past: Delivered, Cancelled
         filtered = allRiderOrders.filter(o => o.status === 'Delivered' || o.status === 'Cancelled');
       }
 
@@ -782,10 +801,19 @@
       }
 
       container.innerHTML = filtered.map(order => {
-        const items = Array.isArray(order.items) ? order.items : [];
+        let items = [];
+        try {
+          if (Array.isArray(order.items)) {
+            items = order.items;
+          } else if (typeof order.items === 'string') {
+            items = JSON.parse(order.items);
+          }
+        } catch(e) { items = []; }
+
         const isDispatched = order.status === 'Out for Delivery';
         const isDelivered = order.status === 'Delivered';
         const isCancelled = order.status === 'Cancelled';
+        const isNew = !isDispatched && !isDelivered && !isCancelled;
 
         let mapsUrl = null;
         if (order.delivery_address && order.delivery_address.includes('http')) {
@@ -794,16 +822,16 @@
         }
 
         return `
-          <div class="order-card">
+          <div class="order-card ${isNew ? 'new-pulse' : ''}">
             <div class="order-top">
               <div>
                 <div class="ord-id">#ORD-${order.id}</div>
                 <span class="ord-tag ${isDelivered ? 'tag-delivered' : isCancelled ? 'tag-cancelled' : isDispatched ? 'tag-transit' : 'tag-placed'}">
-                  ${order.status}
+                  ${order.status || 'Order Placed'}
                 </span>
               </div>
               <div style="text-align:right;">
-                <div class="ord-amount">₹${order.total_amount}</div>
+                <div class="ord-amount">₹${order.total_amount || 0}</div>
                 <div style="font-size:10.5px; color:#94a3b8; font-weight:700;">${order.payment_mode || 'COD'}</div>
               </div>
             </div>
@@ -816,26 +844,26 @@
                 <span>📞</span> <span>${order.customer_phone || 'NA'}</span>
               </div>
               <div class="cust-row">
-                <span>📍</span> <span style="white-space:pre-line;">${order.delivery_address || 'Address not found'}</span>
+                <span>📍</span> <span style="white-space:pre-line;">${order.delivery_address || 'पता उपलब्ध नहीं है'}</span>
               </div>
               ${order.distance_km ? `<div class="cust-row" style="color:#38bdf8;"><span>📏</span> <span>दूरी: <b>${order.distance_km} KM</b></span></div>` : ''}
-              ${order.cancellation_reason ? `<div class="cust-row" style="color:#ef4444;"><span>⚠️</span> <span>कैंसिलेशन कारण: <b>${order.cancellation_reason} (${order.cancelled_by || ''})</b></span></div>` : ''}
+              ${order.cancellation_reason ? `<div class="cust-row" style="color:#ef4444;"><span>⚠️</span> <span>कैंसिलेशन: <b>${order.cancellation_reason} (${order.cancelled_by || ''})</b></span></div>` : ''}
             </div>
 
             <div class="items-summary-box">
               <div style="font-size:11px; font-weight:800; color:#38bdf8; margin-bottom:6px;">📦 ITEMS TO DELIVER:</div>
-              ${items.map(it => `
+              ${items.length > 0 ? items.map(it => `
                 <div class="item-summary-line">
-                  <span>${it.name} (${it.unit || '1u'})</span>
-                  <span><b>× ${it.qty}</b></span>
+                  <span>${it.name \vert{}\vert{} 'Item'} (${it.unit || '1u'})</span>
+                  <span><b>× ${it.qty || 1}</b></span>
                 </div>
-              `).join('')}
+              `).join('') : '<div style="color:#94a3b8; font-size:11px;">सामान विवरण उपलब्ध नहीं</div>'}
               ${order.free_gift_added ? `<div class="item-summary-line" style="color:#34d399;"><span>🎁 ${order.free_gift_added}</span><span>FREE</span></div>` : ''}
             </div>
 
             ${!isDelivered && !isCancelled ? `
               <a href="tel:${order.customer_phone}" class="btn-action-call">
-                📞 Call Customer (${order.customer_name})
+                📞 Call Customer (${order.customer_name || 'Customer'})
               </a>
 
               ${mapsUrl ? `
@@ -846,7 +874,7 @@
 
               ${!isDispatched ? `
                 <button class="btn-action-primary" style="background:#0284c7;" onclick="openPickupModal(${order.id})">
-                  📸 Accept & Photo Pickup (पिकअप करें)
+                  📸 Accept & Pickup (सामान का फोटो लें)
                 </button>
               ` : `
                 <button class="btn-action-primary" onclick="openDeliveryProofModal(${order.id}, '${order.delivery_otp || ''}')">
@@ -855,7 +883,7 @@
               `}
 
               <button class="btn-action-cancel" onclick="riderCancelOrder(${order.id})">
-                ❌ Reject / Cancel Order (राइडर द्वारा रद्द)
+                ❌ Reject / Cancel Order (रद्द करें)
               </button>
             ` : ''}
           </div>
@@ -863,7 +891,7 @@
       }).join('');
     }
 
-    // 4. PICKUP SAMAN PHOTO LOGIC
+    // PICKUP SAMAN PHOTO
     function openPickupModal(orderId) {
       stopOrderSoundAlert();
       selectedOrderForPickup = orderId;
@@ -920,7 +948,7 @@
       }
     }
 
-    // 5. DELIVERY PROOF PHOTO & OTP MODAL LOGIC
+    // DELIVERY PHOTO & OTP
     function openDeliveryProofModal(orderId, expectedOtp) {
       selectedOrderForDelivery = { id: orderId, expectedOtp: expectedOtp };
       base64DeliveryPhoto = null;
