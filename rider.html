@@ -8,28 +8,29 @@
   <link rel="icon" type="image/png" href="logo.png">
   <meta name="theme-color" content="#1b042d">
 
-  <!-- Force Cache Kill -->
+  <!-- FORCE BROWSER TO IGNORE CACHE -->
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
 
-  <!-- Unregister any old Service Worker immediately -->
+  <!-- UNREGISTER OLD SERVICE WORKER PERMANENTLY -->
   <script>
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.getRegistrations().then(function(registrations) {
-        for (let registration of registrations) {
-          registration.unregister();
-        }
-      });
-    }
-    if ('caches' in window) {
-      caches.keys().then(function(names) {
-        for (let name of names) caches.delete(name);
-      });
-    }
+    try {
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.getRegistrations().then(function(registrations) {
+          for (var i = 0; i < registrations.length; i++) {
+            registrations[i].unregister();
+          }
+        });
+      }
+      if (window.caches) {
+        caches.keys().then(function(names) {
+          for (var i = 0; i < names.length; i++) caches.delete(names[i]);
+        });
+      }
+    } catch(e) {}
   </script>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 
@@ -71,7 +72,7 @@
       align-items: center;
       position: sticky;
       top: 0;
-      z-index: 10000;
+      z-index: 1000;
     }
 
     .rider-brand {
@@ -101,34 +102,37 @@
       font-weight: 700;
     }
 
-    /* DIRECT TOUCH TOGGLE BUTTON */
+    /* DIRECT RESPONSIVE TOGGLE */
     .status-toggle-box {
       display: inline-flex !important;
       align-items: center !important;
       gap: 8px !important;
       background: #0f172a !important;
-      padding: 8px 16px !important;
+      padding: 9px 18px !important;
       border-radius: 25px !important;
-      border: 2px solid #ef4444 !important;
+      border: 2px solid #10b981 !important;
       cursor: pointer !important;
       user-select: none !important;
       -webkit-user-select: none !important;
       touch-action: manipulation !important;
       box-shadow: 0 4px 12px rgba(0,0,0,0.4) !important;
-      pointer-events: auto !important;
+    }
+    .status-toggle-box:active {
+      transform: scale(0.92);
     }
 
     .status-dot {
       width: 12px;
       height: 12px;
       border-radius: 50%;
-      background: #ef4444;
+      background: #10b981;
+      box-shadow: 0 0 10px #10b981;
       display: inline-block;
     }
 
-    .status-dot.online {
-      background: #10b981 !important;
-      box-shadow: 0 0 12px #10b981 !important;
+    .status-dot.offline {
+      background: #ef4444 !important;
+      box-shadow: none !important;
     }
 
     .status-text {
@@ -444,10 +448,10 @@
       </div>
     </div>
     
-    <!-- DIRECT WORKING BUTTON -->
-    <div class="status-toggle-box" id="duty-btn">
+    <!-- 100% WORKING DIRECT TOGGLE BUTTON -->
+    <div class="status-toggle-box" id="duty-btn" onclick="toggleDuty();" ontouchend="toggleDuty();">
       <span class="status-dot" id="online-indicator"></span>
-      <span class="status-text" id="online-status-text">OFFLINE</span>
+      <span class="status-text" id="online-status-text">ONLINE</span>
     </div>
   </div>
 
@@ -529,155 +533,127 @@
     </div>
   </div>
 
-  <!-- Audio Element -->
-  <audio id="order-sound" src="alert.mp3" preload="none"></audio>
-
   <script>
-    const SUPABASE_URL = 'https://mpeikimhkjuinqkjaumr.supabase.co';
-    const SUPABASE_KEY = 'sb_publishable_2_wD-pbi_pNf8niiHxFbYA_saCIhApN';
+    var SUPABASE_URL = 'https://mpeikimhkjuinqkjaumr.supabase.co';
+    var SUPABASE_KEY = 'sb_publishable_2_wD-pbi_pNf8niiHxFbYA_saCIhApN';
 
-    let currentTab = 'active';
-    let allRiderOrders = [];
-    let isRiderOnline = false;
-    let selectedOrderForDelivery = null;
-    let selectedOrderForPickup = null;
-    let base64PickupPhoto = null;
-    let base64DeliveryPhoto = null;
+    var currentTab = 'active';
+    var allRiderOrders = [];
+    
+    // BY-DEFAULT 100% ONLINE
+    var isRiderOnline = true;
+    var selectedOrderForDelivery = null;
+    var selectedOrderForPickup = null;
+    var base64PickupPhoto = null;
+    var base64DeliveryPhoto = null;
+    var lastToggleTime = 0;
 
-    // DIRECT NATIVE BUTTON EVENT
-    const dutyBtn = document.getElementById('duty-btn');
-    dutyBtn.addEventListener('click', function(e) {
-      e.preventDefault();
-      e.stopPropagation();
+    // DIRECT 1-TAP INSTANT TOGGLE (Crash-free)
+    function toggleDuty() {
+      var now = Date.now();
+      if (now - lastToggleTime < 250) return; // Debounce double touch
+      lastToggleTime = now;
+
       isRiderOnline = !isRiderOnline;
       localStorage.setItem('baba_rider_duty_status', isRiderOnline ? 'ONLINE' : 'OFFLINE');
       renderDutyUI();
-      
-      // Stop audio immediately if offline
-      if (!isRiderOnline) {
-        stopAudioSound();
-      } else {
-        checkNewOrderSound();
-      }
-    });
+
+      // Silent DB update
+      try {
+        fetch(SUPABASE_URL + '/rest/v1/riders?id=eq.1', {
+          method: 'PATCH',
+          headers: {
+            'apikey': SUPABASE_KEY,
+            'Authorization': 'Bearer ' + SUPABASE_KEY,
+            'Content-Type': 'application/json',
+            'Prefer': 'return=minimal'
+          },
+          body: JSON.stringify({ is_active: isRiderOnline, last_ping: new Date().toISOString() })
+        }).catch(function(){});
+      } catch(e) {}
+    }
 
     function renderDutyUI() {
-      const dot = document.getElementById('online-indicator');
-      const txt = document.getElementById('online-status-text');
-      const box = document.getElementById('duty-btn');
+      var dot = document.getElementById('online-indicator');
+      var txt = document.getElementById('online-status-text');
+      var box = document.getElementById('duty-btn');
+
+      if (!dot || !txt || !box) return;
 
       if (isRiderOnline) {
-        dot.className = 'status-dot online';
+        dot.className = 'status-dot';
         txt.innerText = 'ONLINE';
         box.style.borderColor = '#10b981';
       } else {
-        dot.className = 'status-dot';
+        dot.className = 'status-dot offline';
         txt.innerText = 'OFFLINE';
         box.style.borderColor = '#ef4444';
       }
     }
 
-    function compressImage(file, maxWidth = 650, quality = 0.65) {
-      return new Promise((resolve, reject) => {
-        const reader = new FileReader();
+    function compressImage(file, maxWidth, quality) {
+      maxWidth = maxWidth || 650;
+      quality = quality || 0.65;
+      return new Promise(function(resolve, reject) {
+        var reader = new FileReader();
         reader.readAsDataURL(file);
-        reader.onload = (event) => {
-          const img = new Image();
+        reader.onload = function(event) {
+          var img = new Image();
           img.src = event.target.result;
-          img.onload = () => {
-            const canvas = document.createElement('canvas');
-            let width = img.width;
-            let height = img.height;
+          img.onload = function() {
+            var canvas = document.createElement('canvas');
+            var width = img.width;
+            var height = img.height;
             if (width > maxWidth) {
               height = Math.round((height * maxWidth) / width);
               width = maxWidth;
             }
             canvas.width = width;
             canvas.height = height;
-            const ctx = canvas.getContext('2d');
+            var ctx = canvas.getContext('2d');
             ctx.drawImage(img, 0, 0, width, height);
             resolve(canvas.toDataURL('image/jpeg', quality));
           };
-          img.onerror = (e) => reject(e);
+          img.onerror = function(e) { reject(e); };
         };
-        reader.onerror = (e) => reject(e);
+        reader.onerror = function(e) { reject(e); };
       });
     }
 
-    // DIRECT NATIVE FETCH ORDERS
-    async function fetchOrdersDirectly() {
-      try {
-        const res = await fetch(`${SUPABASE_URL}/rest/v1/orders?select=*&order=id.desc`, {
-          headers: {
-            'apikey': SUPABASE_KEY,
-            'Authorization': `Bearer ${SUPABASE_KEY}`
-          }
-        });
-
-        if (res.ok) {
-          allRiderOrders = await res.json();
-          updateStats();
-          renderOrdersList();
-          checkNewOrderSound();
-        } else {
-          document.getElementById('orders-container').innerHTML = `
-            <div class="empty-msg" style="color:#ef4444;">
-              Supabase एरर: ${res.statusText}
-            </div>
-          `;
+    // DIRECT NATIVE REST API (TURANT LOAD HOGA)
+    function fetchOrders() {
+      fetch(SUPABASE_URL + '/rest/v1/orders?select=*&order=id.desc', {
+        headers: {
+          'apikey': SUPABASE_KEY,
+          'Authorization': 'Bearer ' + SUPABASE_KEY
         }
-      } catch (err) {
-        document.getElementById('orders-container').innerHTML = `
-          <div class="empty-msg" style="color:#ef4444;">
-            इंटरनेट या नेटवर्क एरर! पुनः प्रयास करें।
-          </div>
-        `;
-      }
-    }
-
-    // SOUND LOGIC: OFFLINE MEIN BILKUL CHUP
-    function checkNewOrderSound() {
-      if (!isRiderOnline) {
-        stopAudioSound();
-        return;
-      }
-
-      const hasPending = allRiderOrders.some(o => {
-        const s = (o.status || '').toLowerCase();
-        return s.includes('placed') || s.includes('upi');
+      })
+      .then(function(res) {
+        if (!res.ok) throw new Error("HTTP error " + res.status);
+        return res.json();
+      })
+      .then(function(data) {
+        allRiderOrders = data || [];
+        updateStats();
+        renderOrdersList();
+      })
+      .catch(function(err) {
+        console.warn("Orders fetch err:", err);
       });
-
-      if (hasPending) {
-        playAudioSound();
-      } else {
-        stopAudioSound();
-      }
-    }
-
-    function playAudioSound() {
-      if (!isRiderOnline) return;
-      const sound = document.getElementById('order-sound');
-      if (sound) {
-        sound.play().catch(() => {});
-      }
-    }
-
-    function stopAudioSound() {
-      const sound = document.getElementById('order-sound');
-      if (sound) {
-        sound.pause();
-        sound.currentTime = 0;
-      }
     }
 
     function updateStats() {
-      const active = allRiderOrders.filter(o => o.status !== 'Delivered' && o.status !== 'Cancelled');
-      const delivered = allRiderOrders.filter(o => o.status === 'Delivered');
-      const totalEarn = delivered.length * 30;
+      var active = allRiderOrders.filter(function(o) { return o.status !== 'Delivered' && o.status !== 'Cancelled'; });
+      var delivered = allRiderOrders.filter(function(o) { return o.status === 'Delivered'; });
+      var totalEarn = delivered.length * 30;
 
-      document.getElementById('stat-active-count').innerText = active.length;
-      document.getElementById('stat-delivered-count').innerText = delivered.length;
-      document.getElementById('stat-earnings').innerText = `₹${totalEarn}`;
+      var activeEl = document.getElementById('stat-active-count');
+      var deliveredEl = document.getElementById('stat-delivered-count');
+      var earnEl = document.getElementById('stat-earnings');
+
+      if (activeEl) activeEl.innerText = active.length;
+      if (deliveredEl) deliveredEl.innerText = delivered.length;
+      if (earnEl) earnEl.innerText = '₹' + totalEarn;
     }
 
     function switchTab(tab) {
@@ -688,26 +664,23 @@
     }
 
     function renderOrdersList() {
-      const container = document.getElementById('orders-container');
-      let filtered = [];
+      var container = document.getElementById('orders-container');
+      if (!container) return;
 
+      var filtered = [];
       if (currentTab === 'active') {
-        filtered = allRiderOrders.filter(o => o.status !== 'Delivered' && o.status !== 'Cancelled');
+        filtered = allRiderOrders.filter(function(o) { return o.status !== 'Delivered' && o.status !== 'Cancelled'; });
       } else {
-        filtered = allRiderOrders.filter(o => o.status === 'Delivered' || o.status === 'Cancelled');
+        filtered = allRiderOrders.filter(function(o) { return o.status === 'Delivered' || o.status === 'Cancelled'; });
       }
 
       if (filtered.length === 0) {
-        container.innerHTML = `
-          <div class="empty-msg">
-            ${currentTab === 'active' ? '🎉 अभी कोई नया ऑर्डर नहीं है।' : 'कोई पिछला ऑर्डर रिकॉर्ड नहीं मिला।'}
-          </div>
-        `;
+        container.innerHTML = '<div class="empty-msg">' + (currentTab === 'active' ? '🎉 अभी कोई नया ऑर्डर नहीं है।' : 'कोई पिछला ऑर्डर रिकॉर्ड नहीं मिला।') + '</div>';
         return;
       }
 
-      container.innerHTML = filtered.map(order => {
-        let items = [];
+      container.innerHTML = filtered.map(function(order) {
+        var items = [];
         try {
           if (Array.isArray(order.items)) {
             items = order.items;
@@ -716,90 +689,56 @@
           }
         } catch(e) { items = []; }
 
-        const isDispatched = order.status === 'Out for Delivery';
-        const isDelivered = order.status === 'Delivered';
-        const isCancelled = order.status === 'Cancelled';
-        const isNew = !isDispatched && !isDelivered && !isCancelled;
+        var isDispatched = order.status === 'Out for Delivery';
+        var isDelivered = order.status === 'Delivered';
+        var isCancelled = order.status === 'Cancelled';
+        var isNew = !isDispatched && !isDelivered && !isCancelled;
 
-        let mapsUrl = null;
-        if (order.delivery_address && order.delivery_address.includes('http')) {
-          const match = order.delivery_address.match(/https?:\/\/[^\s]+/);
+        var mapsUrl = null;
+        if (order.delivery_address && order.delivery_address.indexOf('http') !== -1) {
+          var match = order.delivery_address.match(/https?:\/\/[^\s]+/);
           if (match) mapsUrl = match[0];
         }
 
-        return `
-          <div class="order-card ${isNew ? 'new-pulse' : ''}">
-            <div class="order-top">
-              <div>
-                <div class="ord-id">#ORD-${order.id}</div>
-                <span class="ord-tag ${isDelivered ? 'tag-delivered' : isCancelled ? 'tag-cancelled' : isDispatched ? 'tag-transit' : 'tag-placed'}">
-                  ${order.status || 'Order Placed'}
-                </span>
-              </div>
-              <div style="text-align:right;">
-                <div class="ord-amount">₹${order.total_amount || 0}</div>
-                <div style="font-size:10.5px; color:#94a3b8; font-weight:700;">${order.payment_mode || 'COD'}</div>
-              </div>
-            </div>
+        var itemsHtml = items.length > 0 ? items.map(function(it) {
+          return '<div class="item-summary-line"><span>' + (it.name || 'Item') + ' (' + (it.unit || '1u') + ')</span><span><b>× ' + (it.qty || 1) + '</b></span></div>';
+        }).join('') : '<div style="color:#94a3b8; font-size:11px;">सामान विवरण उपलब्ध नहीं</div>';
 
-            <div class="cust-info-box">
-              <div class="cust-row">
-                <span>👤</span> <b>${order.customer_name || 'Customer'}</b>
-              </div>
-              <div class="cust-row">
-                <span>📞</span> <span>${order.customer_phone || 'NA'}</span>
-              </div>
-              <div class="cust-row">
-                <span>📍</span> <span style="white-space:pre-line;">${order.delivery_address || 'पता उपलब्ध नहीं है'}</span>
-              </div>
-              ${order.distance_km ? `<div class="cust-row" style="color:#38bdf8;"><span>📏</span> <span>दूरी: <b>${order.distance_km} KM</b></span></div>` : ''}
-              ${order.cancellation_reason ? `<div class="cust-row" style="color:#ef4444;"><span>⚠️</span> <span>कैंसिलेशन: <b>${order.cancellation_reason} (${order.cancelled_by || ''})</b></span></div>` : ''}
-            </div>
-
-            <div class="items-summary-box">
-              <div style="font-size:11px; font-weight:800; color:#38bdf8; margin-bottom:6px;">📦 ITEMS TO DELIVER:</div>
-              ${items.length > 0 ? items.map(it => `
-                <div class="item-summary-line">
-                  <span>${it.name \vert{}\vert{} 'Item'} (${it.unit || '1u'})</span>
-                  <span><b>× ${it.qty || 1}</b></span>
-                </div>
-              `).join('') : '<div style="color:#94a3b8; font-size:11px;">सामान विवरण उपलब्ध नहीं</div>'}
-              ${order.free_gift_added ? `<div class="item-summary-line" style="color:#34d399;"><span>🎁 ${order.free_gift_added}</span><span>FREE</span></div>` : ''}
-            </div>
-
-            ${!isDelivered && !isCancelled ? `
-              <a href="tel:${order.customer_phone}" class="btn-action-call">
-                📞 Call Customer (${order.customer_name || 'Customer'})
-              </a>
-
-              ${mapsUrl ? `
-                <a href="${mapsUrl}" target="_blank" class="btn-action-call" style="background:#475569; margin-bottom:8px;">
-                  🗺️ Open Live Location in Google Maps ↗
-                </a>
-              ` : ''}
-
-              ${!isDispatched ? `
-                <button class="btn-action-primary" style="background:#0284c7;" onclick="openPickupModal(${order.id})">
-                  📸 Accept & Pickup (सामान का फोटो लें)
-                </button>
-              ` : `
-                <button class="btn-action-primary" onclick="openDeliveryProofModal(${order.id}, '${order.delivery_otp || ''}')">
-                  📸 Deliver (फोटो लें & OTP डालें)
-                </button>
-              `}
-
-              <button class="btn-action-cancel" onclick="riderCancelOrder(${order.id})">
-                ❌ Reject / Cancel Order (रद्द करें)
-              </button>
-            ` : ''}
-          </div>
-        `;
+        return '<div class="order-card ' + (isNew ? 'new-pulse' : '') + '">' +
+          '<div class="order-top">' +
+            '<div>' +
+              '<div class="ord-id">#ORD-' + order.id + '</div>' +
+              '<span class="ord-tag ' + (isDelivered ? 'tag-delivered' : isCancelled ? 'tag-cancelled' : isDispatched ? 'tag-transit' : 'tag-placed') + '">' + (order.status || 'Order Placed') + '</span>' +
+            '</div>' +
+            '<div style="text-align:right;">' +
+              '<div class="ord-amount">₹' + (order.total_amount || 0) + '</div>' +
+              '<div style="font-size:10.5px; color:#94a3b8; font-weight:700;">' + (order.payment_mode || 'COD') + '</div>' +
+            '</div>' +
+          '</div>' +
+          '<div class="cust-info-box">' +
+            '<div class="cust-row"><span>👤</span> <b>' + (order.customer_name || 'Customer') + '</b></div>' +
+            '<div class="cust-row"><span>📞</span> <span>' + (order.customer_phone || 'NA') + '</span></div>' +
+            '<div class="cust-row"><span>📍</span> <span style="white-space:pre-line;">' + (order.delivery_address || 'पता उपलब्ध नहीं है') + '</span></div>' +
+            (order.distance_km ? '<div class="cust-row" style="color:#38bdf8;"><span>📏</span> <span>दूरी: <b>' + order.distance_km + ' KM</b></span></div>' : '') +
+            (order.cancellation_reason ? '<div class="cust-row" style="color:#ef4444;"><span>⚠️</span> <span>कैंसिलेशन: <b>' + order.cancellation_reason + ' (' + (order.cancelled_by || '') + ')</b></span></div>' : '') +
+          '</div>' +
+          '<div class="items-summary-box">' +
+            '<div style="font-size:11px; font-weight:800; color:#38bdf8; margin-bottom:6px;">📦 ITEMS TO DELIVER:</div>' +
+            itemsHtml +
+            (order.free_gift_added ? '<div class="item-summary-line" style="color:#34d399;"><span>🎁 ' + order.free_gift_added + '</span><span>FREE</span></div>' : '') +
+          '</div>' +
+          (!isDelivered && !isCancelled ? (
+            '<a href="tel:' + order.customer_phone + '" class="btn-action-call">📞 Call Customer (' + (order.customer_name || 'Customer') + ')</a>' +
+            (mapsUrl ? '<a href="' + mapsUrl + '" target="_blank" class="btn-action-call" style="background:#475569; margin-bottom:8px;">🗺️ Open Live Location in Google Maps ↗</a>' : '') +
+            (!isDispatched ? '<button class="btn-action-primary" style="background:#0284c7;" onclick="openPickupModal(' + order.id + ')">📸 Accept & Pickup (सामान का फोटो लें)</button>' : '<button class="btn-action-primary" onclick="openDeliveryProofModal(' + order.id + ', \'' + (order.delivery_otp || '') + '\')">📸 Deliver (फोटो लें & OTP डालें)</button>') +
+            '<button class="btn-action-cancel" onclick="riderCancelOrder(' + order.id + ')">❌ Reject / Cancel Order (रद्द करें)</button>'
+          ) : '') +
+        '</div>';
       }).join('');
     }
 
     // PICKUP MODAL LOGIC
     function openPickupModal(orderId) {
-      stopAudioSound();
       selectedOrderForPickup = orderId;
       base64PickupPhoto = null;
       document.getElementById('pickup-photo-preview').innerHTML = '<span style="color:#64748b; font-size:12px; font-weight:700;">सामान की फ़ोटो यहाँ दिखेगी *</span>';
@@ -812,50 +751,51 @@
       selectedOrderForPickup = null;
     }
 
-    async function handlePickupPhotoChosen(input) {
+    function handlePickupPhotoChosen(input) {
       if (!input.files || input.files.length === 0) return;
-      try {
-        base64PickupPhoto = await compressImage(input.files[0], 650, 0.6);
-        document.getElementById('pickup-photo-preview').innerHTML = `<img src="${base64PickupPhoto}" alt="Pickup Proof">`;
+      compressImage(input.files[0], 650, 0.6).then(function(base64) {
+        base64PickupPhoto = base64;
+        document.getElementById('pickup-photo-preview').innerHTML = '<img src="' + base64PickupPhoto + '" alt="Pickup Proof">';
         document.getElementById('btn-confirm-pickup').style.display = 'block';
-      } catch(err) {
+      }).catch(function(err) {
         alert('फ़ोटो लोड एरर: ' + err.message);
-      }
+      });
     }
 
-    async function confirmPickupWithPhoto() {
+    function confirmPickupWithPhoto() {
       if (!selectedOrderForPickup) return;
       if (!base64PickupPhoto) return alert('कृपया पहले सामान का फोटो लें!');
 
-      const btn = document.getElementById('btn-confirm-pickup');
+      var btn = document.getElementById('btn-confirm-pickup');
       btn.disabled = true;
       btn.innerText = '⏳ पिकअप सेव हो रहा है...';
 
-      try {
-        await fetch(`${SUPABASE_URL}/rest/v1/orders?id=eq.${selectedOrderForPickup}`, {
-          method: 'PATCH',
-          headers: {
-            'apikey': SUPABASE_KEY,
-            'Authorization': `Bearer ${SUPABASE_KEY}`,
-            'Content-Type': 'application/json',
-            'Prefer': 'return=minimal'
-          },
-          body: JSON.stringify({
-            status: 'Out for Delivery',
-            assigned_rider_id: 1,
-            pickup_proof_photo: base64PickupPhoto
-          })
-        });
-
-        alert(`✅ Order #ORD-${selectedOrderForPickup} पिकअप हो गया!`);
+      fetch(SUPABASE_URL + '/rest/v1/orders?id=eq.' + selectedOrderForPickup, {
+        method: 'PATCH',
+        headers: {
+          'apikey': SUPABASE_KEY,
+          'Authorization': 'Bearer ' + SUPABASE_KEY,
+          'Content-Type': 'application/json',
+          'Prefer': 'return=minimal'
+        },
+        body: JSON.stringify({
+          status: 'Out for Delivery',
+          assigned_rider_id: 1,
+          pickup_proof_photo: base64PickupPhoto
+        })
+      })
+      .then(function() {
+        alert('✅ Order #ORD-' + selectedOrderForPickup + ' पिकअप हो गया!');
         closePickupModal();
-        fetchOrdersDirectly();
-      } catch(e) {
+        fetchOrders();
+      })
+      .catch(function(e) {
         alert('पिकअप एरर: ' + e.message);
-      } finally {
+      })
+      .finally(function() {
         btn.disabled = false;
         btn.innerText = '🛵 Pickup पूरा करें (Out for Delivery)';
-      }
+      });
     }
 
     // DELIVERY MODAL LOGIC
@@ -872,99 +812,94 @@
       selectedOrderForDelivery = null;
     }
 
-    async function handleDeliveryPhotoChosen(input) {
+    function handleDeliveryPhotoChosen(input) {
       if (!input.files || input.files.length === 0) return;
-      try {
-        base64DeliveryPhoto = await compressImage(input.files[0], 650, 0.6);
-        document.getElementById('delivery-proof-preview').innerHTML = `<img src="${base64DeliveryPhoto}" alt="Delivery Proof">`;
-      } catch(err) {
+      compressImage(input.files[0], 650, 0.6).then(function(base64) {
+        base64DeliveryPhoto = base64;
+        document.getElementById('delivery-proof-preview').innerHTML = '<img src="' + base64DeliveryPhoto + '" alt="Delivery Proof">';
+      }).catch(function(err) {
         alert('फ़ोटो लोड एरर: ' + err.message);
-      }
+      });
     }
 
-    async function confirmDeliveryWithProof() {
+    function confirmDeliveryWithProof() {
       if (!selectedOrderForDelivery) return;
+      if (!base64DeliveryPhoto) return alert('⚠️ ग्राहक को सामान सौंपते हुए फ़ोटो खींचना अनिवार्य है!');
 
-      if (!base64DeliveryPhoto) {
-        return alert('⚠️ ग्राहक को सामान सौंपते हुए फ़ोटो खींचना अनिवार्य है!');
-      }
-
-      const enteredOtp = document.getElementById('input-delivery-otp').value.trim();
-      if (enteredOtp.length !== 4) {
-        return alert('कृपया ग्राहक से 4 अंकों का OTP पूछकर डालें!');
-      }
+      var enteredOtp = document.getElementById('input-delivery-otp').value.trim();
+      if (enteredOtp.length !== 4) return alert('कृपया ग्राहक से 4 अंकों का OTP पूछकर डालें!');
 
       if (selectedOrderForDelivery.expectedOtp && selectedOrderForDelivery.expectedOtp.toString().trim() !== enteredOtp) {
         return alert('❌ गलत OTP! ग्राहक के मोबाइल पर दिख रहा 4 अंकों का सही कोड पूछें।');
       }
 
-      const deliverBtn = document.getElementById('btn-confirm-delivery');
+      var deliverBtn = document.getElementById('btn-confirm-delivery');
       deliverBtn.disabled = true;
       deliverBtn.innerText = '⏳ डिलीवरी सत्यापित हो रही है...';
 
-      try {
-        await fetch(`${SUPABASE_URL}/rest/v1/orders?id=eq.${selectedOrderForDelivery.id}`, {
-          method: 'PATCH',
-          headers: {
-            'apikey': SUPABASE_KEY,
-            'Authorization': `Bearer ${SUPABASE_KEY}`,
-            'Content-Type': 'application/json',
-            'Prefer': 'return=minimal'
-          },
-          body: JSON.stringify({
-            status: 'Delivered',
-            delivery_proof_photo: base64DeliveryPhoto
-          })
-        });
-
-        alert(`🎉 बधाई हो! Order #ORD-${selectedOrderForDelivery.id} सफलतापूर्वक डिलीवर हो गया।`);
+      fetch(SUPABASE_URL + '/rest/v1/orders?id=eq.' + selectedOrderForDelivery.id, {
+        method: 'PATCH',
+        headers: {
+          'apikey': SUPABASE_KEY,
+          'Authorization': 'Bearer ' + SUPABASE_KEY,
+          'Content-Type': 'application/json',
+          'Prefer': 'return=minimal'
+        },
+        body: JSON.stringify({
+          status: 'Delivered',
+          delivery_proof_photo: base64DeliveryPhoto
+        })
+      })
+      .then(function() {
+        alert('🎉 बधाई हो! Order #ORD-' + selectedOrderForDelivery.id + ' सफलतापूर्वक डिलीवर हो गया।');
         closeDeliveryModal();
-        fetchOrdersDirectly();
-      } catch (err) {
+        fetchOrders();
+      })
+      .catch(function(err) {
         alert('डिलीवरी एरर: ' + err.message);
-      } finally {
+      })
+      .finally(function() {
         deliverBtn.disabled = false;
         deliverBtn.innerText = '✓ सत्यापित करें और डिलीवर मार्क करें';
-      }
+      });
     }
 
-    async function riderCancelOrder(orderId) {
-      const reason = prompt("ऑर्डर कैंसिल करने का कारण लिखें:");
+    function riderCancelOrder(orderId) {
+      var reason = prompt("ऑर्डर कैंसिल करने का कारण लिखें:");
       if (!reason || reason.trim().length < 3) return alert("कारण लिखना अनिवार्य है!");
+      if (!confirm("क्या आप वाकई Order #ORD-" + orderId + " को रद्द करना चाहते हैं?")) return;
 
-      if (!confirm(`क्या आप वाकई Order #ORD-${orderId} को रद्द करना चाहते हैं?`)) return;
-
-      try {
-        await fetch(`${SUPABASE_URL}/rest/v1/orders?id=eq.${orderId}`, {
-          method: 'PATCH',
-          headers: {
-            'apikey': SUPABASE_KEY,
-            'Authorization': `Bearer ${SUPABASE_KEY}`,
-            'Content-Type': 'application/json',
-            'Prefer': 'return=minimal'
-          },
-          body: JSON.stringify({
-            status: 'Cancelled',
-            cancelled_by: 'Rider',
-            cancellation_reason: reason.trim()
-          })
-        });
-
-        alert(`✅ Order #ORD-${orderId} रद्द हो गया।`);
-        fetchOrdersDirectly();
-      } catch (err) {
+      fetch(SUPABASE_URL + '/rest/v1/orders?id=eq.' + orderId, {
+        method: 'PATCH',
+        headers: {
+          'apikey': SUPABASE_KEY,
+          'Authorization': 'Bearer ' + SUPABASE_KEY,
+          'Content-Type': 'application/json',
+          'Prefer': 'return=minimal'
+        },
+        body: JSON.stringify({
+          status: 'Cancelled',
+          cancelled_by: 'Rider',
+          cancellation_reason: reason.trim()
+        })
+      })
+      .then(function() {
+        alert('✅ Order #ORD-' + orderId + ' रद्द हो गया।');
+        fetchOrders();
+      })
+      .catch(function(err) {
         alert("एरर: " + err.message);
-      }
+      });
     }
 
-    // IMMEDIATE INITIALIZE
-    (function init() {
-      const saved = localStorage.getItem('baba_rider_duty_status');
-      isRiderOnline = (saved === 'ONLINE');
+    // BOOTSTRAP IMMEDIATELY ON LOAD
+    window.addEventListener('DOMContentLoaded', function() {
+      var saved = localStorage.getItem('baba_rider_duty_status');
+      isRiderOnline = (saved !== 'OFFLINE'); // By-default ONLINE
       renderDutyUI();
-      fetchOrdersDirectly();
-      setInterval(fetchOrdersDirectly, 3000);
-    })();
+      fetchOrders();
+      setInterval(fetchOrders, 3000);
+    });
   </script>
 </body>
 </html>
