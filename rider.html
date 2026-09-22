@@ -83,7 +83,7 @@
       font-weight: 700;
     }
 
-    /* DIRECT 1-TAP WORKING TOGGLE BUTTON */
+    /* DIRECT INSTANT ON/OFF TOGGLE */
     .status-toggle-box {
       display: flex;
       align-items: center;
@@ -91,13 +91,13 @@
       background: #0f172a;
       padding: 8px 14px;
       border-radius: 20px;
-      border: 1.5px solid var(--border-color);
+      border: 2px solid var(--border-color);
       cursor: pointer;
       user-select: none;
       transition: all 0.2s;
     }
     .status-toggle-box:active {
-      transform: scale(0.95);
+      transform: scale(0.92);
     }
 
     .status-dot {
@@ -110,7 +110,7 @@
 
     .status-dot.online {
       background: #10b981;
-      box-shadow: 0 0 10px #10b981;
+      box-shadow: 0 0 12px #10b981;
     }
 
     .status-text {
@@ -425,8 +425,8 @@
         <div class="brand-sub" id="rider-name-display">Delivery Partner</div>
       </div>
     </div>
-    <!-- 1-TAP INSTANT ONLINE/OFFLINE TOGGLE -->
-    <div class="status-toggle-box" id="duty-btn" onclick="toggleDutyInstant()">
+    <!-- 100% INSTANT CLICKABLE TOGGLE BUTTON -->
+    <div class="status-toggle-box" id="duty-toggle-btn">
       <div class="status-dot" id="online-indicator"></div>
       <span class="status-text" id="online-status-text">OFFLINE</span>
     </div>
@@ -555,31 +555,24 @@
       });
     }
 
-    // ON LOAD INITIALIZE
-    window.addEventListener('load', () => {
-      // 1. Saved status restore
+    // DIRECT EVENT LISTENER FOR BUTTON (Bina kisi error ke 100% click hoga)
+    document.addEventListener('DOMContentLoaded', () => {
+      const toggleBtn = document.getElementById('duty-toggle-btn');
+      if (toggleBtn) {
+        toggleBtn.addEventListener('click', () => {
+          const targetState = !isRiderOnline;
+          setOnlineUI(targetState);
+        });
+      }
+
+      // Initial state load
       const saved = localStorage.getItem('baba_rider_duty_status');
       setOnlineUI(saved === 'ONLINE');
 
-      // 2. Direct order load without blocking
+      // Orders load instantly
       loadRiderOrders();
-      setInterval(loadRiderOrders, 3000);
+      setInterval(loadRiderOrders, 3500);
     });
-
-    // INSTANT 1-TAP TOGGLE FUNCTION (NO SELFIE REQUIRED)
-    function toggleDutyInstant() {
-      const newState = !isRiderOnline;
-      setOnlineUI(newState);
-
-      // Background safe update to database
-      try {
-        _supabase.from('riders').update({
-          is_active: newState,
-          duty_status: newState ? 'ON_DUTY' : 'OFF_DUTY',
-          last_ping: new Date().toISOString()
-        }).eq('id', 1).then(() => {});
-      } catch(e) {}
-    }
 
     function setOnlineUI(online) {
       isRiderOnline = online;
@@ -588,16 +581,26 @@
       const dot = document.getElementById('online-indicator');
       const txt = document.getElementById('online-status-text');
 
-      if (online) {
-        dot.className = 'status-dot online';
-        txt.innerText = 'ONLINE';
-        startLiveLocationBroadcast();
-      } else {
-        dot.className = 'status-dot';
-        txt.innerText = 'OFFLINE';
-        stopOrderSoundAlert(); // OFFLINE hote hi aawaz 100% band
-        if (locationWatchId) navigator.geolocation.clearWatch(locationWatchId);
+      if (dot && txt) {
+        if (online) {
+          dot.className = 'status-dot online';
+          txt.innerText = 'ONLINE';
+          startLiveLocationBroadcast();
+        } else {
+          dot.className = 'status-dot';
+          txt.innerText = 'OFFLINE';
+          stopOrderSoundAlert(); // OFFLINE par sound 100% band
+          if (locationWatchId) navigator.geolocation.clearWatch(locationWatchId);
+        }
       }
+
+      // Non-blocking background sync
+      try {
+        _supabase.from('riders').update({
+          is_active: online,
+          last_ping: new Date().toISOString()
+        }).eq('id', 1).then(() => {});
+      } catch(e) {}
 
       checkAndHandleAudioAlert();
     }
@@ -627,7 +630,7 @@
       );
     }
 
-    // LOAD ALL ORDERS
+    // LOAD ALL ORDERS DIRECTLY
     async function loadRiderOrders() {
       try {
         const { data, error } = await _supabase
@@ -636,7 +639,11 @@
           .order('id', { ascending: false });
 
         if (error) {
-          console.error("Fetch Error:", error);
+          document.getElementById('orders-container').innerHTML = `
+            <div class="empty-msg" style="color:#f87171;">
+              ऑर्डर लोड एरर: ${error.message}
+            </div>
+          `;
           return;
         }
 
@@ -645,12 +652,15 @@
         updateDashboardStats();
         renderOrdersList();
       } catch (err) {
-        console.error("Load Error:", err);
+        document.getElementById('orders-container').innerHTML = `
+          <div class="empty-msg" style="color:#f87171;">
+            नेटवर्क समस्या: ${err.message}
+          </div>
+        `;
       }
     }
 
     function checkAndHandleAudioAlert() {
-      // Offline par bilkul band
       if (!isRiderOnline) {
         stopOrderSoundAlert();
         return;
@@ -701,7 +711,7 @@
       renderOrdersList();
     }
 
-    // BULLETPROOF RENDER FUNCTION
+    // RENDER FUNCTION
     function renderOrdersList() {
       const container = document.getElementById('orders-container');
       let filtered = [];
