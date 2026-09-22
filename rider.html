@@ -83,7 +83,6 @@
       font-weight: 700;
     }
 
-    /* DIRECT INSTANT ON/OFF TOGGLE */
     .status-toggle-box {
       display: flex;
       align-items: center;
@@ -425,8 +424,8 @@
         <div class="brand-sub" id="rider-name-display">Delivery Partner</div>
       </div>
     </div>
-    <!-- 100% INSTANT CLICKABLE TOGGLE BUTTON -->
-    <div class="status-toggle-box" id="duty-toggle-btn">
+    <!-- SEEDHA ONCLICK BUTTON -->
+    <div class="status-toggle-box" onclick="handleToggleClick()">
       <div class="status-dot" id="online-indicator"></div>
       <span class="status-text" id="online-status-text">OFFLINE</span>
     </div>
@@ -522,7 +521,6 @@
     let allRiderOrders = [];
     let isRiderOnline = false;
     let locationWatchId = null;
-    let lastKnownPendingCount = 0;
     let selectedOrderForDelivery = null;
     let selectedOrderForPickup = null;
     let base64PickupPhoto = null;
@@ -555,26 +553,13 @@
       });
     }
 
-    // DIRECT EVENT LISTENER FOR BUTTON (Bina kisi error ke 100% click hoga)
-    document.addEventListener('DOMContentLoaded', () => {
-      const toggleBtn = document.getElementById('duty-toggle-btn');
-      if (toggleBtn) {
-        toggleBtn.addEventListener('click', () => {
-          const targetState = !isRiderOnline;
-          setOnlineUI(targetState);
-        });
-      }
+    // 1-TAP INSTANT TOGGLE FUNCTION
+    function handleToggleClick() {
+      const targetState = !isRiderOnline;
+      updateOnlineStatus(targetState);
+    }
 
-      // Initial state load
-      const saved = localStorage.getItem('baba_rider_duty_status');
-      setOnlineUI(saved === 'ONLINE');
-
-      // Orders load instantly
-      loadRiderOrders();
-      setInterval(loadRiderOrders, 3500);
-    });
-
-    function setOnlineUI(online) {
+    function updateOnlineStatus(online) {
       isRiderOnline = online;
       localStorage.setItem('baba_rider_duty_status', online ? 'ONLINE' : 'OFFLINE');
 
@@ -585,16 +570,19 @@
         if (online) {
           dot.className = 'status-dot online';
           txt.innerText = 'ONLINE';
-          startLiveLocationBroadcast();
+          startLocationTracking();
         } else {
           dot.className = 'status-dot';
           txt.innerText = 'OFFLINE';
-          stopOrderSoundAlert(); // OFFLINE par sound 100% band
-          if (locationWatchId) navigator.geolocation.clearWatch(locationWatchId);
+          stopAlertSound();
+          if (locationWatchId) {
+            navigator.geolocation.clearWatch(locationWatchId);
+            locationWatchId = null;
+          }
         }
       }
 
-      // Non-blocking background sync
+      // Supabase sync (bina script atkaye)
       try {
         _supabase.from('riders').update({
           is_active: online,
@@ -602,18 +590,18 @@
         }).eq('id', 1).then(() => {});
       } catch(e) {}
 
-      checkAndHandleAudioAlert();
+      handleSoundState();
     }
 
-    function startLiveLocationBroadcast() {
+    function startLocationTracking() {
       if (!navigator.geolocation) return;
 
       locationWatchId = navigator.geolocation.watchPosition(
-        (position) => {
+        (pos) => {
           if (!isRiderOnline) return;
-          const lat = position.coords.latitude;
-          const lng = position.coords.longitude;
-          const speed = position.coords.speed ? Math.round(position.coords.speed * 3.6) : 0;
+          const lat = pos.coords.latitude;
+          const lng = pos.coords.longitude;
+          const speed = pos.coords.speed ? Math.round(pos.coords.speed * 3.6) : 0;
 
           try {
             _supabase.from('riders').update({
@@ -630,7 +618,7 @@
       );
     }
 
-    // LOAD ALL ORDERS DIRECTLY
+    // LOAD ORDERS
     async function loadRiderOrders() {
       try {
         const { data, error } = await _supabase
@@ -639,30 +627,22 @@
           .order('id', { ascending: false });
 
         if (error) {
-          document.getElementById('orders-container').innerHTML = `
-            <div class="empty-msg" style="color:#f87171;">
-              ऑर्डर लोड एरर: ${error.message}
-            </div>
-          `;
+          console.error("Orders Error:", error);
           return;
         }
 
         allRiderOrders = data || [];
-        checkAndHandleAudioAlert();
-        updateDashboardStats();
+        handleSoundState();
+        updateStats();
         renderOrdersList();
       } catch (err) {
-        document.getElementById('orders-container').innerHTML = `
-          <div class="empty-msg" style="color:#f87171;">
-            नेटवर्क समस्या: ${err.message}
-          </div>
-        `;
+        console.error("Fetch Error:", err);
       }
     }
 
-    function checkAndHandleAudioAlert() {
+    function handleSoundState() {
       if (!isRiderOnline) {
-        stopOrderSoundAlert();
+        stopAlertSound();
         return;
       }
 
@@ -672,21 +652,20 @@
       });
 
       if (pendingNew.length > 0) {
-        startOrderSoundAlert();
+        playAlertSound();
       } else {
-        stopOrderSoundAlert();
+        stopAlertSound();
       }
-      lastKnownPendingCount = pendingNew.length;
     }
 
-    function startOrderSoundAlert() {
+    function playAlertSound() {
       const sound = document.getElementById('order-sound');
       if (sound && sound.paused && isRiderOnline) {
         sound.play().catch(() => {});
       }
     }
 
-    function stopOrderSoundAlert() {
+    function stopAlertSound() {
       const sound = document.getElementById('order-sound');
       if (sound && !sound.paused) {
         sound.pause();
@@ -694,13 +673,13 @@
       }
     }
 
-    function updateDashboardStats() {
+    function updateStats() {
       const active = allRiderOrders.filter(o => o.status !== 'Delivered' && o.status !== 'Cancelled');
-      const deliveredToday = allRiderOrders.filter(o => o.status === 'Delivered');
-      const totalEarn = deliveredToday.length * 30;
+      const delivered = allRiderOrders.filter(o => o.status === 'Delivered');
+      const totalEarn = delivered.length * 30;
 
       document.getElementById('stat-active-count').innerText = active.length;
-      document.getElementById('stat-delivered-count').innerText = deliveredToday.length;
+      document.getElementById('stat-delivered-count').innerText = delivered.length;
       document.getElementById('stat-earnings').innerText = `₹${totalEarn}`;
     }
 
@@ -711,7 +690,6 @@
       renderOrdersList();
     }
 
-    // RENDER FUNCTION
     function renderOrdersList() {
       const container = document.getElementById('orders-container');
       let filtered = [];
@@ -822,9 +800,9 @@
       }).join('');
     }
 
-    // PICKUP MODAL LOGIC
+    // PICKUP PHOTO MODAL
     function openPickupModal(orderId) {
-      stopOrderSoundAlert();
+      stopAlertSound();
       selectedOrderForPickup = orderId;
       base64PickupPhoto = null;
       document.getElementById('pickup-photo-preview').innerHTML = '<span style="color:#64748b; font-size:12px; font-weight:700;">सामान की फ़ोटो यहाँ दिखेगी *</span>';
@@ -868,7 +846,7 @@
 
         if (error) throw error;
 
-        alert(`✅ Order #ORD-${selectedOrderForPickup} पिकअप हो गया और Out for Delivery मार्क हो गया!`);
+        alert(`✅ Order #ORD-${selectedOrderForPickup} पिकअप हो गया!`);
         closePickupModal();
         loadRiderOrders();
       } catch(e) {
@@ -879,7 +857,7 @@
       }
     }
 
-    // DELIVERY MODAL LOGIC
+    // DELIVERY PHOTO & OTP MODAL
     function openDeliveryProofModal(orderId, expectedOtp) {
       selectedOrderForDelivery = { id: orderId, expectedOtp: expectedOtp };
       base64DeliveryPhoto = null;
@@ -964,6 +942,14 @@
         alert("एरर: " + err.message);
       }
     }
+
+    // ON PAGE LOAD
+    window.addEventListener('load', () => {
+      const saved = localStorage.getItem('baba_rider_duty_status');
+      updateOnlineStatus(saved === 'ONLINE');
+      loadRiderOrders();
+      setInterval(loadRiderOrders, 3000);
+    });
   </script>
 </body>
 </html>
