@@ -111,7 +111,6 @@
       color: #f8fafc;
     }
 
-    /* STATS SUMMARY BAR */
     .stats-bar {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
@@ -140,7 +139,6 @@
       margin-top: 2px;
     }
 
-    /* TABS */
     .tabs-row {
       display: flex;
       gap: 10px;
@@ -166,7 +164,6 @@
       color: #ffffff;
     }
 
-    /* ORDERS CONTAINER */
     .container {
       padding: 0 16px;
     }
@@ -259,7 +256,6 @@
       margin-bottom: 0;
     }
 
-    /* ACTION BUTTONS */
     .btn-action-primary {
       background: var(--accent-green);
       color: #ffffff;
@@ -314,7 +310,6 @@
       background: #7f1d1d;
     }
 
-    /* MODAL FOR OTP ENTRY */
     .otp-modal-bg {
       position: fixed;
       top: 0;
@@ -375,7 +370,6 @@
 </head>
 <body>
 
-  <!-- TOP APP BAR -->
   <div class="top-nav">
     <div class="rider-brand">
       <img src="logo.png" alt="Logo" onerror="this.style.display='none'">
@@ -390,7 +384,6 @@
     </div>
   </div>
 
-  <!-- STATS BAR -->
   <div class="stats-bar">
     <div class="stat-card">
       <div class="stat-num" id="stat-active-count">0</div>
@@ -406,18 +399,16 @@
     </div>
   </div>
 
-  <!-- FILTER TABS -->
   <div class="tabs-row">
     <button class="tab-btn active" id="tab-active" onclick="switchTab('active')">⚡ Active Orders</button>
     <button class="tab-btn" id="tab-history" onclick="switchTab('history')">✓ Completed / Past</button>
   </div>
 
-  <!-- MAIN LIST CONTAINER -->
   <div class="container" id="orders-container">
     <div class="empty-msg">ऑर्डर्स लोड हो रहे हैं... कृपया प्रतीक्षा करें।</div>
   </div>
 
-  <!-- DELIVERY OTP VERIFICATION POPUP MODAL -->
+  <!-- DELIVERY OTP POPUP -->
   <div class="otp-modal-bg" id="otp-modal">
     <div class="otp-card">
       <div style="font-size: 18px; font-weight: 900; color: #f8fafc; margin-bottom: 4px;">🔑 Safe Delivery OTP</div>
@@ -425,7 +416,7 @@
       
       <input type="tel" id="input-delivery-otp" class="otp-input-field" maxlength="4" placeholder="----">
 
-      <button class="btn-action-primary" onclick="confirmOtpAndDeliver()">
+      <button class="btn-action-primary" id="btn-confirm-delivery" onclick="confirmOtpAndDeliver()">
         ✓ सत्यापित करें और डिलीवर मार्क करें
       </button>
       <button onclick="closeOtpModal()" style="background:none; border:none; color:#94a3b8; font-weight:800; font-size:12px; margin-top:10px; cursor:pointer;">
@@ -434,7 +425,6 @@
     </div>
   </div>
 
-  <!-- AUDIO ALERT -->
   <audio id="order-sound" src="alert.mp3" preload="auto"></audio>
 
   <script>
@@ -450,14 +440,12 @@
     let locationWatchId = null;
     let lastKnownOrdersCount = 0;
 
-    // RIDER INITIALIZATION
     async function initRiderApp() {
       startLiveLocationBroadcast();
       await loadRiderOrders();
-      setInterval(loadRiderOrders, 4500); // Har 4.5 second me background refresh
+      setInterval(loadRiderOrders, 4500);
     }
 
-    // TOGGLE ONLINE / OFFLINE
     function toggleRiderOnlineStatus() {
       isRiderOnline = !isRiderOnline;
       const dot = document.getElementById('online-indicator');
@@ -474,7 +462,6 @@
       }
     }
 
-    // LIVE GPS LOCATION STREAM TO SUPABASE (Taaki Customer & Admin Live Track Kar Sakein)
     function startLiveLocationBroadcast() {
       if (!navigator.geolocation) return;
 
@@ -485,7 +472,6 @@
           const lng = position.coords.longitude;
           const speed = position.coords.speed ? Math.round(position.coords.speed * 3.6) : 0;
 
-          // Riders table me Rider ID: 1 ki location update
           try {
             await _supabase.from('riders').update({
               current_lat: lat,
@@ -501,7 +487,6 @@
       );
     }
 
-    // LOAD ORDERS
     async function loadRiderOrders() {
       try {
         const { data, error } = await _supabase
@@ -512,7 +497,6 @@
         if (error) throw error;
         allRiderOrders = data || [];
 
-        // Naye order par audio beep play karein
         const pendingNew = allRiderOrders.filter(o => o.status === 'Order Placed' || o.status === 'Paid Online (UPI)');
         if (pendingNew.length > lastKnownOrdersCount && lastKnownOrdersCount !== 0) {
           playAudioAlert();
@@ -534,7 +518,7 @@
     function updateDashboardStats() {
       const active = allRiderOrders.filter(o => o.status !== 'Delivered' && o.status !== 'Cancelled');
       const deliveredToday = allRiderOrders.filter(o => o.status === 'Delivered');
-      const totalEarn = deliveredToday.length * 30; // ₹30 delivery commission per completed order
+      const totalEarn = deliveredToday.length * 30;
 
       document.getElementById('stat-active-count').innerText = active.length;
       document.getElementById('stat-delivered-count').innerText = deliveredToday.length;
@@ -573,7 +557,6 @@
         const isDelivered = order.status === 'Delivered';
         const isCancelled = order.status === 'Cancelled';
 
-        // Google Maps URL nikalna
         let mapsUrl = null;
         if (order.delivery_address && order.delivery_address.includes('http')) {
           const match = order.delivery_address.match(/https?:\/\/[^\s]+/);
@@ -595,7 +578,6 @@
               </div>
             </div>
 
-            <!-- Customer Details -->
             <div class="cust-info-box">
               <div class="cust-row">
                 <span>👤</span> <b>${order.customer_name || 'Customer'}</b>
@@ -610,7 +592,6 @@
               ${order.cancellation_reason ? `<div class="cust-row" style="color:#ef4444;"><span>⚠️</span> <span>कैंसिलेशन कारण: <b>${order.cancellation_reason} (${order.cancelled_by || ''})</b></span></div>` : ''}
             </div>
 
-            <!-- Items Brief -->
             <div class="items-summary-box">
               <div style="font-size:11px; font-weight:800; color:#38bdf8; margin-bottom:6px;">📦 ITEMS TO DELIVER:</div>
               ${items.map(it => `
@@ -622,21 +603,17 @@
               ${order.free_gift_added ? `<div class="item-summary-line" style="color:#34d399;"><span>🎁 ${order.free_gift_added}</span><span>FREE</span></div>` : ''}
             </div>
 
-            <!-- Action Buttons -->
             ${!isDelivered && !isCancelled ? `
-              <!-- Call Button -->
               <a href="tel:${order.customer_phone}" class="btn-action-call">
                 📞 Call Customer (${order.customer_name})
               </a>
 
-              <!-- Google Maps Link -->
               ${mapsUrl ? `
                 <a href="${mapsUrl}" target="_blank" class="btn-action-call" style="background:#475569; margin-bottom:8px;">
                   🗺️ Open Live Location in Google Maps ↗
                 </a>
               ` : ''}
 
-              <!-- Status Action Button -->
               ${!isDispatched ? `
                 <button class="btn-action-primary" style="background:#0284c7;" onclick="markOutForDelivery(${order.id})">
                   🛵 Accept & Start Delivery (Out for Delivery)
@@ -647,7 +624,6 @@
                 </button>
               `}
 
-              <!-- Rider Side Cancel Button -->
               <button class="btn-action-cancel" onclick="riderCancelOrder(${order.id})">
                 ❌ Reject / Cancel Order (राइडर द्वारा रद्द)
               </button>
@@ -657,14 +633,13 @@
       }).join('');
     }
 
-    // 1. MARK OUT FOR DELIVERY
     async function markOutForDelivery(orderId) {
       try {
         const { error } = await _supabase
           .from('orders')
           .update({
             status: 'Out for Delivery',
-            assigned_rider_id: 1 // Default Rider 1
+            assigned_rider_id: 1
           })
           .eq('id', orderId);
 
@@ -676,7 +651,6 @@
       }
     }
 
-    // 2. PROMPT FOR OTP MODAL
     function promptDeliveryOtp(orderId, expectedOtp) {
       selectedDeliveringOrderId = orderId;
       verifyingActualOtp = expectedOtp;
@@ -690,26 +664,27 @@
       verifyingActualOtp = null;
     }
 
-    // 3. CONFIRM OTP AND MARK DELIVERED
+    // SAFE & BULLETPROOF DELIVER FUNCTION
     async function confirmOtpAndDeliver() {
       const enteredOtp = document.getElementById('input-delivery-otp').value.trim();
+      const deliverBtn = document.getElementById('btn-confirm-delivery');
 
       if (enteredOtp.length !== 4) {
         return alert('कृपया 4 अंकों का सही OTP डालें!');
       }
 
-      // Agar order me OTP generate hua ho toh match karein
-      if (verifyingActualOtp && verifyingActualOtp !== enteredOtp) {
+      if (verifyingActualOtp && verifyingActualOtp.toString().trim() !== enteredOtp) {
         return alert('❌ गलत OTP! ग्राहक के मोबाइल पर दिख रहा 4-अंकों का कोड पूछें।');
       }
 
+      deliverBtn.disabled = true;
+      deliverBtn.innerText = '⏳ डिलीवर हो रहा है...';
+
       try {
+        // सिर्फ status: 'Delivered' अपडेट करेंगे ताकि delivered_at कॉलम न होने पर भी एरर न आए
         const { error } = await _supabase
           .from('orders')
-          .update({
-            status: 'Delivered',
-            delivered_at: new Date().toISOString()
-          })
+          .update({ status: 'Delivered' })
           .eq('id', selectedDeliveringOrderId);
 
         if (error) throw error;
@@ -719,19 +694,19 @@
         loadRiderOrders();
       } catch (err) {
         alert('डिलीवरी एरर: ' + err.message);
+      } finally {
+        deliverBtn.disabled = false;
+        deliverBtn.innerText = '✓ सत्यापित करें और डिलीवर मार्क करें';
       }
     }
 
-    // 4. RIDER CANCEL ORDER (RIDER SIDE CANCELLATION)
     async function riderCancelOrder(orderId) {
-      const reason = prompt("ऑर्डर कैंसिल करने का कारण लिखें (उदा. ग्राहक फ़ोन नहीं उठा रहा / पता नहीं मिल रहा / दुकान बंद है):");
-      
+      const reason = prompt("ऑर्डर कैंसिल करने का कारण लिखें (उदा. ग्राहक फ़ोन नहीं उठा रहा / पता नहीं मिल रहा):");
       if (!reason || reason.trim().length < 3) {
-        return alert("कृपया ऑर्डर रद्द करने का कारण साफ़-साफ़ लिखें!");
+        return alert("कृपया रद्द करने का कारण दर्ज करें!");
       }
 
-      const confirmCancel = confirm(`क्या आप वाकई Order #ORD-${orderId} को कैंसिल करना चाहते हैं?`);
-      if (!confirmCancel) return;
+      if (!confirm(`क्या आप वाकई Order #ORD-${orderId} को कैंसिल करना चाहते हैं?`)) return;
 
       try {
         const { error } = await _supabase
@@ -745,14 +720,13 @@
 
         if (error) throw error;
 
-        alert(`✅ Order #ORD-${orderId} राइडर की तरफ से कैंसिल कर दिया गया है।`);
+        alert(`✅ Order #ORD-${orderId} रद्द कर दिया गया है।`);
         loadRiderOrders();
       } catch (err) {
         alert("एरर: " + err.message);
       }
     }
 
-    // START ON LOAD
     window.addEventListener('load', initRiderApp);
   </script>
 </body>
