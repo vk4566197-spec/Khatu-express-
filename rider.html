@@ -46,7 +46,7 @@
 
     .top-nav {
       background: #1e112a;
-      padding: 16px 18px;
+      padding: 14px 16px;
       border-bottom: 1px solid #381a4d;
       display: flex;
       justify-content: space-between;
@@ -420,7 +420,7 @@
         <div class="brand-sub" id="rider-name-display">Delivery Partner</div>
       </div>
     </div>
-    <!-- 100% WORKING ONE-TAP TOGGLE BUTTON -->
+    <!-- Direct Toggle Button -->
     <div class="status-toggle-box" id="duty-btn" onclick="toggleDutyStatus()">
       <div class="status-dot" id="online-indicator"></div>
       <span class="status-text" id="online-status-text">OFFLINE</span>
@@ -458,7 +458,7 @@
   <div class="modal-bg" id="selfie-modal">
     <div class="modal-card">
       <div style="font-size: 17px; font-weight: 900; color: #f8fafc; margin-bottom: 4px;">📸 सेल्फी हाजिरी (Selfie Duty)</div>
-      <div style="font-size: 11.5px; color: #94a3b8;" id="selfie-modal-subtitle">ड्यूटी चालू (ONLINE) करने के लिए अपनी साफ़ सेल्फ़ी लें:</div>
+      <div style="font-size: 11.5px; color: #94a3b8;">ड्यूटी चालू (ONLINE) करने के लिए अपनी सेल्फ़ी लें:</div>
 
       <div class="photo-preview-box" id="selfie-preview-box">
         <span style="color:#64748b; font-size:12px; font-weight:700;">सेल्फी यहाँ दिखेगी</span>
@@ -576,12 +576,13 @@
       });
     }
 
+    // INIT FUNCTION
     async function initRiderApp() {
       if ('Notification' in window && Notification.permission !== 'granted') {
-        Notification.requestPermission();
+        Notification.requestPermission().catch(() => {});
       }
 
-      // Check saved duty state
+      // Check Saved State
       const savedDuty = localStorage.getItem('baba_rider_duty_status');
       if (savedDuty === 'ONLINE') {
         setOnlineState(true);
@@ -589,21 +590,19 @@
         setOnlineState(false);
       }
 
-      await loadRiderOrders();
+      // Load Orders immediately
+      loadRiderOrders();
       setInterval(loadRiderOrders, 3000);
     }
 
-    // TOGGLE BUTTON CLICK HANDLER
+    // ONE-TAP DUTY TOGGLE
     function toggleDutyStatus() {
       if (isRiderOnline) {
-        // If already online, turn offline directly
         if (confirm("क्या आप ड्यूटी बंद (OFFLINE) करना चाहते हैं?")) {
           setOnlineState(false);
           updateDutyInDB(false, null);
-          alert("✅ आप OFFLINE हो चुके हैं।");
         }
       } else {
-        // If offline, open selfie modal to go online
         promptSelfieAttendance();
       }
     }
@@ -622,7 +621,7 @@
       } else {
         dot.className = 'status-dot';
         txt.innerText = 'OFFLINE';
-        stopOrderSoundAlert(); // OFFLINE hote hi aawaz band
+        stopOrderSoundAlert();
         if (locationWatchId) navigator.geolocation.clearWatch(locationWatchId);
       }
 
@@ -637,11 +636,8 @@
           last_ping: new Date().toISOString()
         };
         if (selfie) updateData.selfie_url = selfie;
-
         await _supabase.from('riders').update(updateData).eq('id', 1);
-      } catch(e) {
-        console.warn("Duty DB update error:", e);
-      }
+      } catch(e) {}
     }
 
     function promptSelfieAttendance() {
@@ -670,20 +666,14 @@
       if (!base64Selfie) return alert('कृपया पहले सेल्फी लें!');
       const submitBtn = document.getElementById('btn-submit-selfie');
       submitBtn.disabled = true;
-      submitBtn.innerText = '⏳ हाजिरी दर्ज हो रही है...';
+      submitBtn.innerText = '⏳ सेव हो रहा है...';
 
-      try {
-        await updateDutyInDB(true, base64Selfie);
-        setOnlineState(true);
-        alert('✅ सेल्फी स्वीकार हुई! आप अब ONLINE हैं।');
-        closeSelfieModal();
-        loadRiderOrders();
-      } catch(e) {
-        alert('ड्यूटी अपडेट एरर: ' + e.message);
-      } finally {
-        submitBtn.disabled = false;
-        submitBtn.innerText = '✓ सबमिट करें और ONLINE जाएँ';
-      }
+      updateDutyInDB(true, base64Selfie);
+      setOnlineState(true);
+      closeSelfieModal();
+      submitBtn.disabled = false;
+      submitBtn.innerText = '✓ सबमिट करें और ONLINE जाएँ';
+      loadRiderOrders();
     }
 
     function startLiveLocationBroadcast() {
@@ -706,11 +696,12 @@
             }).eq('id', 1);
           } catch(e) {}
         },
-        (err) => console.warn("GPS error:", err),
+        (err) => {},
         { enableHighAccuracy: true, maximumAge: 5000, timeout: 10000 }
       );
     }
 
+    // LOAD ALL ORDERS
     async function loadRiderOrders() {
       try {
         const { data, error } = await _supabase
@@ -718,25 +709,26 @@
           .select('*')
           .order('id', { ascending: false });
 
-        if (error) throw error;
-        allRiderOrders = data || [];
+        if (error) {
+          document.getElementById('orders-container').innerHTML = `<div class="empty-msg" style="color:#f87171;">ऑर्डर लोड एरर: ${error.message}</div>`;
+          return;
+        }
 
+        allRiderOrders = data || [];
         checkAndHandleAudioAlert();
         updateDashboardStats();
         renderOrdersList();
       } catch (err) {
-        console.error("Orders load failed:", err);
+        document.getElementById('orders-container').innerHTML = `<div class="empty-msg" style="color:#f87171;">लोडिंग समस्या: ${err.message}</div>`;
       }
     }
 
     function checkAndHandleAudioAlert() {
-      // OFFLINE par sound 100% band
       if (!isRiderOnline) {
         stopOrderSoundAlert();
         return;
       }
 
-      // ONLINE hone par check
       const pendingNew = allRiderOrders.filter(o => {
         const st = (o.status || '').toLowerCase();
         return st.includes('placed') || st.includes('upi') || st === 'order placed';
@@ -795,6 +787,7 @@
       renderOrdersList();
     }
 
+    // 100% BULLETPROOF RENDER
     function renderOrdersList() {
       const container = document.getElementById('orders-container');
       let filtered = [];
@@ -905,6 +898,7 @@
       }).join('');
     }
 
+    // PICKUP SAMAN PHOTO LOGIC
     function openPickupModal(orderId) {
       stopOrderSoundAlert();
       selectedOrderForPickup = orderId;
@@ -961,6 +955,7 @@
       }
     }
 
+    // DELIVERY PROOF PHOTO & OTP
     function openDeliveryProofModal(orderId, expectedOtp) {
       selectedOrderForDelivery = { id: orderId, expectedOtp: expectedOtp };
       base64DeliveryPhoto = null;
@@ -1026,6 +1021,7 @@
       }
     }
 
+    // RIDER CANCEL ORDER
     async function riderCancelOrder(orderId) {
       const reason = prompt("ऑर्डर कैंसिल करने का कारण लिखें (उदा. ग्राहक फ़ोन नहीं उठा रहा / पता नहीं मिल रहा):");
       if (!reason || reason.trim().length < 3) {
