@@ -83,7 +83,7 @@
       font-weight: 700;
     }
 
-    /* DIRECT INSTANT WORKING TOGGLE BUTTON */
+    /* DIRECT 1-TAP WORKING TOGGLE BUTTON */
     .status-toggle-box {
       display: flex;
       align-items: center;
@@ -94,7 +94,7 @@
       border: 1.5px solid var(--border-color);
       cursor: pointer;
       user-select: none;
-      transition: 0.2s;
+      transition: all 0.2s;
     }
     .status-toggle-box:active {
       transform: scale(0.95);
@@ -425,7 +425,7 @@
         <div class="brand-sub" id="rider-name-display">Delivery Partner</div>
       </div>
     </div>
-    <!-- 100% GUARANTEED WORKING TOGGLE -->
+    <!-- 1-TAP INSTANT ONLINE/OFFLINE TOGGLE -->
     <div class="status-toggle-box" id="duty-btn" onclick="toggleDutyInstant()">
       <div class="status-dot" id="online-indicator"></div>
       <span class="status-text" id="online-status-text">OFFLINE</span>
@@ -566,15 +566,16 @@
       setInterval(loadRiderOrders, 3000);
     });
 
-    // INSTANT TOGGLE FUNCTION
+    // INSTANT 1-TAP TOGGLE FUNCTION (NO SELFIE REQUIRED)
     function toggleDutyInstant() {
       const newState = !isRiderOnline;
       setOnlineUI(newState);
 
-      // Background safe update
+      // Background safe update to database
       try {
         _supabase.from('riders').update({
           is_active: newState,
+          duty_status: newState ? 'ON_DUTY' : 'OFF_DUTY',
           last_ping: new Date().toISOString()
         }).eq('id', 1).then(() => {});
       } catch(e) {}
