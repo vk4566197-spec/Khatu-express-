@@ -6,10 +6,8 @@
   <title>🛵 BABA RIDER — Partner Dashboard</title>
 
   <link rel="icon" type="image/png" href="logo.png">
-  <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#1b042d">
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 
@@ -81,19 +79,19 @@
       font-weight: 700;
     }
 
-    /* DIRECT INSTANT ONE-TAP BUTTON */
+    /* DIRECT TOUCH TOGGLE BUTTON */
     .status-toggle-box {
-      display: inline-flex !important;
-      align-items: center !important;
-      gap: 8px !important;
-      background: #0f172a !important;
-      padding: 10px 18px !important;
-      border-radius: 25px !important;
-      border: 2px solid #ef4444 !important;
-      cursor: pointer !important;
-      user-select: none !important;
-      -webkit-user-select: none !important;
-      touch-action: manipulation !important;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: #0f172a;
+      padding: 8px 16px;
+      border-radius: 25px;
+      border: 2px solid #10b981;
+      cursor: pointer;
+      user-select: none;
+      -webkit-user-select: none;
+      touch-action: manipulation;
       box-shadow: 0 4px 12px rgba(0,0,0,0.4);
     }
     .status-toggle-box:active {
@@ -104,13 +102,14 @@
       width: 12px;
       height: 12px;
       border-radius: 50%;
-      background: #ef4444;
+      background: #10b981;
+      box-shadow: 0 0 10px #10b981;
       display: inline-block;
     }
 
-    .status-dot.online {
-      background: #10b981 !important;
-      box-shadow: 0 0 12px #10b981 !important;
+    .status-dot.offline {
+      background: #ef4444 !important;
+      box-shadow: none !important;
     }
 
     .status-text {
@@ -426,10 +425,10 @@
       </div>
     </div>
     
-    <!-- 1-TAP INSTANT TOGGLE -->
-    <div class="status-toggle-box" id="duty-btn" onclick="toggleDutyInstant()">
+    <!-- DIRECT ONE-TOUCH BUTTON -->
+    <div class="status-toggle-box" id="duty-btn" onclick="directToggleDuty(); return false;">
       <span class="status-dot" id="online-indicator"></span>
-      <span class="status-text" id="online-status-text">OFFLINE</span>
+      <span class="status-text" id="online-status-text">ONLINE</span>
     </div>
   </div>
 
@@ -512,52 +511,46 @@
   </div>
 
   <script>
+    // AUTO REMOVE OLD SERVICE WORKER CACHE (Taaki naya code turant chal sake)
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.getRegistrations().then(regs => {
+        for (let reg of regs) reg.unregister();
+      });
+    }
+
     const SUPABASE_URL = 'https://mpeikimhkjuinqkjaumr.supabase.co';
     const SUPABASE_KEY = 'sb_publishable_2_wD-pbi_pNf8niiHxFbYA_saCIhApN';
-    
-    let _supabase = null;
-    try {
-      if (window.supabase) {
-        _supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-      }
-    } catch(e) {}
 
     let currentTab = 'active';
     let allRiderOrders = [];
-    let isRiderOnline = false;
-    let locationWatchId = null;
+    
+    // BY DEFAULT 100% ONLINE
+    let isRiderOnline = true;
     let selectedOrderForDelivery = null;
     let selectedOrderForPickup = null;
     let base64PickupPhoto = null;
     let base64DeliveryPhoto = null;
 
-    // DIRECT INSTANT TOGGLE (Bina kisi audio freeze ke)
-    function toggleDutyInstant() {
+    // DIRECT 1-TAP TOGGLE BUTTON (100% INSTANT RESPONSE)
+    function directToggleDuty() {
       isRiderOnline = !isRiderOnline;
       localStorage.setItem('baba_rider_duty_status', isRiderOnline ? 'ONLINE' : 'OFFLINE');
-      applyUIState();
+      renderDutyUI();
 
-      if (isRiderOnline) {
-        startLocationTracking();
-      } else {
-        if (locationWatchId && navigator.geolocation) {
-          navigator.geolocation.clearWatch(locationWatchId);
-          locationWatchId = null;
-        }
-      }
-
-      // Background silent ping to Supabase
-      if (_supabase) {
-        try {
-          _supabase.from('riders').update({
-            is_active: isRiderOnline,
-            last_ping: new Date().toISOString()
-          }).eq('id', 1).then(() => {});
-        } catch(e) {}
-      }
+      // Background silent ping
+      fetch(`${SUPABASE_URL}/rest/v1/riders?id=eq.1`, {
+        method: 'PATCH',
+        headers: {
+          'apikey': SUPABASE_KEY,
+          'Authorization': `Bearer ${SUPABASE_KEY}`,
+          'Content-Type': 'application/json',
+          'Prefer': 'return=minimal'
+        },
+        body: JSON.stringify({ is_active: isRiderOnline, last_ping: new Date().toISOString() })
+      }).catch(e => {});
     }
 
-    function applyUIState() {
+    function renderDutyUI() {
       const dot = document.getElementById('online-indicator');
       const txt = document.getElementById('online-status-text');
       const box = document.getElementById('duty-btn');
@@ -565,11 +558,11 @@
       if (!dot || !txt || !box) return;
 
       if (isRiderOnline) {
-        dot.className = 'status-dot online';
+        dot.className = 'status-dot';
         txt.innerText = 'ONLINE';
         box.style.borderColor = '#10b981';
       } else {
-        dot.className = 'status-dot';
+        dot.className = 'status-dot offline';
         txt.innerText = 'OFFLINE';
         box.style.borderColor = '#ef4444';
       }
@@ -602,59 +595,23 @@
       });
     }
 
-    function startLocationTracking() {
-      if (!navigator.geolocation) return;
-
-      locationWatchId = navigator.geolocation.watchPosition(
-        (pos) => {
-          if (!isRiderOnline || !_supabase) return;
-          const lat = pos.coords.latitude;
-          const lng = pos.coords.longitude;
-          const speed = pos.coords.speed ? Math.round(pos.coords.speed * 3.6) : 0;
-
-          try {
-            _supabase.from('riders').update({
-              current_lat: lat,
-              current_lng: lng,
-              current_speed_kmh: speed,
-              is_active: true,
-              last_ping: new Date().toISOString()
-            }).eq('id', 1).then(() => {});
-          } catch(e) {}
-        },
-        (err) => {},
-        { enableHighAccuracy: true, maximumAge: 5000, timeout: 10000 }
-      );
-    }
-
-    // DIRECT ORDER LOADER
+    // DIRECT REST API CALL (BINA KISI LIBRARY FREEZE KE TURANT LOAD HOGA)
     async function loadRiderOrders() {
       try {
-        let ordersData = null;
-
-        if (_supabase) {
-          const { data, error } = await _supabase
-            .from('orders')
-            .select('*')
-            .order('id', { ascending: false });
-          if (!error && data) ordersData = data;
+        const res = await fetch(`${SUPABASE_URL}/rest/v1/orders?select=*&order=id.desc`, {
+          headers: {
+            'apikey': SUPABASE_KEY,
+            'Authorization': `Bearer ${SUPABASE_KEY}`
+          }
+        });
+        
+        if (res.ok) {
+          allRiderOrders = await res.json();
+          updateStats();
+          renderOrdersList();
         }
-
-        if (!ordersData) {
-          const res = await fetch(`${SUPABASE_URL}/rest/v1/orders?select=*&order=id.desc`, {
-            headers: {
-              'apikey': SUPABASE_KEY,
-              'Authorization': `Bearer ${SUPABASE_KEY}`
-            }
-          });
-          if (res.ok) ordersData = await res.json();
-        }
-
-        allRiderOrders = ordersData || [];
-        updateStats();
-        renderOrdersList();
       } catch (err) {
-        console.warn("Orders error:", err);
+        console.warn("Fetch Error:", err);
       }
     }
 
@@ -819,13 +776,20 @@
       btn.innerText = '⏳ पिकअप सेव हो रहा है...';
 
       try {
-        if (_supabase) {
-          await _supabase.from('orders').update({
+        await fetch(`${SUPABASE_URL}/rest/v1/orders?id=eq.${selectedOrderForPickup}`, {
+          method: 'PATCH',
+          headers: {
+            'apikey': SUPABASE_KEY,
+            'Authorization': `Bearer ${SUPABASE_KEY}`,
+            'Content-Type': 'application/json',
+            'Prefer': 'return=minimal'
+          },
+          body: JSON.stringify({
             status: 'Out for Delivery',
             assigned_rider_id: 1,
             pickup_proof_photo: base64PickupPhoto
-          }).eq('id', selectedOrderForPickup);
-        }
+          })
+        });
 
         alert(`✅ Order #ORD-${selectedOrderForPickup} पिकअप हो गया!`);
         closePickupModal();
@@ -883,12 +847,19 @@
       deliverBtn.innerText = '⏳ डिलीवरी सत्यापित हो रही है...';
 
       try {
-        if (_supabase) {
-          await _supabase.from('orders').update({
+        await fetch(`${SUPABASE_URL}/rest/v1/orders?id=eq.${selectedOrderForDelivery.id}`, {
+          method: 'PATCH',
+          headers: {
+            'apikey': SUPABASE_KEY,
+            'Authorization': `Bearer ${SUPABASE_KEY}`,
+            'Content-Type': 'application/json',
+            'Prefer': 'return=minimal'
+          },
+          body: JSON.stringify({
             status: 'Delivered',
             delivery_proof_photo: base64DeliveryPhoto
-          }).eq('id', selectedOrderForDelivery.id);
-        }
+          })
+        });
 
         alert(`🎉 बधाई हो! Order #ORD-${selectedOrderForDelivery.id} सफलतापूर्वक डिलीवर हो गया।`);
         closeDeliveryModal();
@@ -908,13 +879,20 @@
       if (!confirm(`क्या आप वाकई Order #ORD-${orderId} को रद्द करना चाहते हैं?`)) return;
 
       try {
-        if (_supabase) {
-          await _supabase.from('orders').update({
+        await fetch(`${SUPABASE_URL}/rest/v1/orders?id=eq.${orderId}`, {
+          method: 'PATCH',
+          headers: {
+            'apikey': SUPABASE_KEY,
+            'Authorization': `Bearer ${SUPABASE_KEY}`,
+            'Content-Type': 'application/json',
+            'Prefer': 'return=minimal'
+          },
+          body: JSON.stringify({
             status: 'Cancelled',
             cancelled_by: 'Rider',
             cancellation_reason: reason.trim()
-          }).eq('id', orderId);
-        }
+          })
+        });
 
         alert(`✅ Order #ORD-${orderId} रद्द हो गया।`);
         loadRiderOrders();
@@ -923,11 +901,11 @@
       }
     }
 
-    // INSTANT INITIALIZE
+    // DIRECT INITIALIZE (100% Guaranteed Load)
     (function init() {
       const saved = localStorage.getItem('baba_rider_duty_status');
-      isRiderOnline = (saved === 'ONLINE');
-      applyUIState();
+      isRiderOnline = (saved !== 'OFFLINE'); // By default hamesha ONLINE
+      renderDutyUI();
       loadRiderOrders();
       setInterval(loadRiderOrders, 3000);
     })();
