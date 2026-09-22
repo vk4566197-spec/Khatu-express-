@@ -376,11 +376,11 @@
       background: #475569;
       color: #fff;
       border: 1px solid #94a3b8;
-      padding: 10px;
+      padding: 11px;
       border-radius: 10px;
       width: 100%;
       font-weight: 800;
-      font-size: 12px;
+      font-size: 12.5px;
       cursor: pointer;
       display: flex;
       align-items: center;
@@ -456,7 +456,7 @@
         📷 कैमरा खोलें और सेल्फी लें
       </button>
 
-      <button class="btn-action-primary" id="btn-submit-selfie" style="margin-top:10px; display:none;" onclick="confirmSelfieDuty()">
+      <button class="btn-action-primary" id="btn-submit-selfie" style="margin-top:12px; display:none;" onclick="confirmSelfieDuty()">
         ✓ सबमिट करें और ड्यूटी बदलें
       </button>
 
@@ -466,13 +466,37 @@
     </div>
   </div>
 
-  <!-- 2. DELIVERY PROOF PHOTO & OTP MODAL -->
+  <!-- 2. PICKUP SAMAN PHOTO MODAL -->
+  <div class="modal-bg" id="pickup-modal">
+    <div class="modal-card">
+      <div style="font-size: 17px; font-weight: 900; color: #38bdf8; margin-bottom: 4px;">🛍️ सामान पिकअप फोटो (Pickup Proof)</div>
+      <div style="font-size: 11.5px; color: #94a3b8;">दुकान / हब से पैक सामान का फोटो खींचें:</div>
+
+      <div class="photo-preview-box" id="pickup-photo-preview">
+        <span style="color:#64748b; font-size:12px; font-weight:700;">सामान की फ़ोटो यहाँ दिखेगी *</span>
+      </div>
+
+      <input type="file" id="pickup-photo-input" accept="image/*" capture="environment" style="display:none;" onchange="handlePickupPhotoChosen(this)">
+      <button class="btn-camera" onclick="document.getElementById('pickup-photo-input').click()">
+        📸 पैक सामान का फोटो खींचें
+      </button>
+
+      <button class="btn-action-primary" id="btn-confirm-pickup" style="margin-top:12px; display:none;" onclick="confirmPickupWithPhoto()">
+        🛵 Pickup पूरा करें (Out for Delivery)
+      </button>
+
+      <button onclick="closePickupModal()" style="background:none; border:none; color:#94a3b8; font-weight:800; font-size:12px; margin-top:10px; cursor:pointer;">
+        रद्द करें (Cancel)
+      </button>
+    </div>
+  </div>
+
+  <!-- 3. DELIVERY PROOF PHOTO & OTP MODAL -->
   <div class="modal-bg" id="delivery-modal">
     <div class="modal-card">
-      <div style="font-size: 17px; font-weight: 900; color: #f8fafc; margin-bottom: 4px;">📦 डिलीवरी सत्यापन (Proof & OTP)</div>
-      <div style="font-size: 11.5px; color: #94a3b8;">1. ग्राहक को सामान देते हुए फ़ोटो लें<br>2. ग्राहक का 4 अंकों का OTP डालें</div>
+      <div style="font-size: 17px; font-weight: 900; color: #34d399; margin-bottom: 4px;">📦 डिलीवरी सत्यापन (Proof & OTP)</div>
+      <div style="font-size: 11.5px; color: #94a3b8;">1. ग्राहक को सामान सौंपते हुए फ़ोटो लें<br>2. ग्राहक का 4 अंकों का OTP डालें</div>
 
-      <!-- Customer Photo Proof -->
       <div class="photo-preview-box" id="delivery-proof-preview">
         <span style="color:#64748b; font-size:12px; font-weight:700;">सामान सौंपते हुए फ़ोटो लें *</span>
       </div>
@@ -482,7 +506,6 @@
         📸 सामान सौंपते हुए फ़ोटो खींचें
       </button>
 
-      <!-- OTP Input -->
       <input type="tel" id="input-delivery-otp" class="otp-input-field" maxlength="4" placeholder="----">
 
       <button class="btn-action-primary" id="btn-confirm-delivery" onclick="confirmDeliveryWithProof()">
@@ -508,10 +531,12 @@
     let locationWatchId = null;
     let lastKnownPendingCount = 0;
     let selectedOrderForDelivery = null;
+    let selectedOrderForPickup = null;
     let base64Selfie = null;
+    let base64PickupPhoto = null;
     let base64DeliveryPhoto = null;
 
-    // IMAGE COMPRESSOR TO PREVENT ERRORS
+    // IMAGE COMPRESSOR FUNCTION
     function compressImage(file, maxWidth = 650, quality = 0.65) {
       return new Promise((resolve, reject) => {
         const reader = new FileReader();
@@ -540,17 +565,22 @@
     }
 
     async function initRiderApp() {
-      // Request Notification Permission for Background Sound Alert
       if ('Notification' in window && Notification.permission !== 'granted') {
         Notification.requestPermission();
       }
 
-      await checkCurrentDutyStatus();
+      // Check LocalStorage first so refresh doesn't make rider offline
+      const savedDuty = localStorage.getItem('baba_rider_duty_status');
+      if (savedDuty === 'ONLINE') {
+        setOnlineState(true);
+      } else {
+        await checkCurrentDutyStatus();
+      }
+
       await loadRiderOrders();
       setInterval(loadRiderOrders, 4000);
     }
 
-    // CHECK RIDER STATUS IN DB
     async function checkCurrentDutyStatus() {
       try {
         const { data } = await _supabase.from('riders').select('is_active').eq('id', 1).single();
@@ -559,11 +589,15 @@
         } else {
           setOnlineState(false);
         }
-      } catch(e) { setOnlineState(false); }
+      } catch(e) { 
+        setOnlineState(false); 
+      }
     }
 
     function setOnlineState(online) {
       isRiderOnline = online;
+      localStorage.setItem('baba_rider_duty_status', online ? 'ONLINE' : 'OFFLINE');
+
       const dot = document.getElementById('online-indicator');
       const txt = document.getElementById('online-status-text');
 
@@ -578,7 +612,7 @@
       }
     }
 
-    // 1. SELFIE DUTY POPUP
+    // 1. SELFIE DUTY
     function promptSelfieAttendance() {
       base64Selfie = null;
       document.getElementById('selfie-preview-box').innerHTML = '<span style="color:#64748b; font-size:12px; font-weight:700;">सेल्फी यहाँ दिखेगी</span>';
@@ -656,7 +690,7 @@
       );
     }
 
-    // 3. LOAD ORDERS & CONTINUOUS BACKGROUND SOUND ALERT
+    // 3. LOAD ORDERS & SOUND
     async function loadRiderOrders() {
       try {
         const { data, error } = await _supabase
@@ -669,7 +703,6 @@
 
         const pendingNew = allRiderOrders.filter(o => o.status === 'Order Placed' || o.status === 'Paid Online (UPI)');
 
-        // New order sound alert
         if (pendingNew.length > 0 && isRiderOnline) {
           startOrderSoundAlert();
           if (pendingNew.length > lastKnownPendingCount) {
@@ -812,8 +845,8 @@
               ` : ''}
 
               ${!isDispatched ? `
-                <button class="btn-action-primary" style="background:#0284c7;" onclick="markOutForDelivery(${order.id})">
-                  🛵 Accept & Out for Delivery (स्वीकारें)
+                <button class="btn-action-primary" style="background:#0284c7;" onclick="openPickupModal(${order.id})">
+                  📸 Accept & Photo Pickup (पिकअप करें)
                 </button>
               ` : `
                 <button class="btn-action-primary" onclick="openDeliveryProofModal(${order.id}, '${order.delivery_otp || ''}')">
@@ -830,27 +863,64 @@
       }).join('');
     }
 
-    // ACCEPT ORDER
-    async function markOutForDelivery(orderId) {
+    // 4. PICKUP SAMAN PHOTO LOGIC
+    function openPickupModal(orderId) {
       stopOrderSoundAlert();
+      selectedOrderForPickup = orderId;
+      base64PickupPhoto = null;
+      document.getElementById('pickup-photo-preview').innerHTML = '<span style="color:#64748b; font-size:12px; font-weight:700;">सामान की फ़ोटो यहाँ दिखेगी *</span>';
+      document.getElementById('btn-confirm-pickup').style.display = 'none';
+      document.getElementById('pickup-modal').classList.add('active');
+    }
+
+    function closePickupModal() {
+      document.getElementById('pickup-modal').classList.remove('active');
+      selectedOrderForPickup = null;
+    }
+
+    async function handlePickupPhotoChosen(input) {
+      if (!input.files || input.files.length === 0) return;
+      try {
+        base64PickupPhoto = await compressImage(input.files[0], 650, 0.6);
+        document.getElementById('pickup-photo-preview').innerHTML = `<img src="${base64PickupPhoto}" alt="Pickup Proof">`;
+        document.getElementById('btn-confirm-pickup').style.display = 'block';
+      } catch(err) {
+        alert('फ़ोटो लोड एरर: ' + err.message);
+      }
+    }
+
+    async function confirmPickupWithPhoto() {
+      if (!selectedOrderForPickup) return;
+      if (!base64PickupPhoto) return alert('कृपया पहले सामान का फोटो लें!');
+
+      const btn = document.getElementById('btn-confirm-pickup');
+      btn.disabled = true;
+      btn.innerText = '⏳ पिकअप अपलोड हो रहा है...';
+
       try {
         const { error } = await _supabase
           .from('orders')
           .update({
             status: 'Out for Delivery',
-            assigned_rider_id: 1
+            assigned_rider_id: 1,
+            pickup_proof_photo: base64PickupPhoto
           })
-          .eq('id', orderId);
+          .eq('id', selectedOrderForPickup);
 
         if (error) throw error;
-        alert(`✅ Order #ORD-${orderId} स्वीकार कर लिया गया है!`);
+
+        alert(`✅ Order #ORD-${selectedOrderForPickup} पिकअप हो गया और Out for Delivery मार्क हो गया!`);
+        closePickupModal();
         loadRiderOrders();
-      } catch (err) {
-        alert('अपडेट एरर: ' + err.message);
+      } catch(e) {
+        alert('पिकअप एरर: ' + e.message);
+      } finally {
+        btn.disabled = false;
+        btn.innerText = '🛵 Pickup पूरा करें (Out for Delivery)';
       }
     }
 
-    // 4. DELIVERY PROOF PHOTO & OTP MODAL LOGIC
+    // 5. DELIVERY PROOF PHOTO & OTP MODAL LOGIC
     function openDeliveryProofModal(orderId, expectedOtp) {
       selectedOrderForDelivery = { id: orderId, expectedOtp: expectedOtp };
       base64DeliveryPhoto = null;
@@ -874,7 +944,6 @@
       }
     }
 
-    // CONFIRM DELIVERY WITH PHOTO PROOF AND OTP
     async function confirmDeliveryWithProof() {
       if (!selectedOrderForDelivery) return;
 
