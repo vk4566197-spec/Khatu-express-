@@ -96,8 +96,6 @@
     .drawer-logo-img {
       width: 64px !important; 
       height: 64px !important; 
-      max-width: 64px !important;
-      max-height: 64px !important;
       border-radius: 50% !important;
       object-fit: cover !important; 
       background: #fff; 
@@ -245,10 +243,10 @@
       color: #64748b; 
     }
 
-    /* CATEGORIES */
+    /* CATEGORIES DYNAMIC */
     .category-scroll { 
       display: flex; 
-      gap: 12px; 
+      gap: 10px; 
       overflow-x: auto; 
       scrollbar-width: none; 
       padding-top: 4px;
@@ -259,36 +257,29 @@
       flex-direction: column; 
       align-items: center; 
       cursor: pointer; 
-      min-width: 56px; 
+      min-width: 60px; 
     }
     .cat-icon-circle {
-      width: 48px; 
-      height: 48px; 
-      border-radius: 16px; 
-      background: rgba(255,255,255,0.12); 
-      border: 1px solid rgba(255,255,255,0.16);
+      padding: 10px 14px;
+      border-radius: 14px; 
+      background: rgba(255,255,255,0.14); 
+      border: 1px solid rgba(255,255,255,0.2);
       display: flex; 
       align-items: center; 
       justify-content: center; 
-      font-size: 22px; 
-      margin-bottom: 6px;
+      font-size: 12px; 
+      font-weight: 800;
+      color: #fff;
       backdrop-filter: blur(8px);
       transition: all 0.2s ease;
+      white-space: nowrap;
     }
     .cat-item.active .cat-icon-circle { 
       background: #ffffff; 
+      color: var(--primary-purple);
       border-color: #ffffff;
-      transform: translateY(-2px);
       box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-    }
-    .cat-name { 
-      font-size: 11px; 
-      font-weight: 700; 
-      color: rgba(255,255,255,0.85); 
-    }
-    .cat-item.active .cat-name {
-      color: #ffffff;
-      font-weight: 900;
+      transform: translateY(-2px);
     }
 
     /* PROMO HERO CARD */
@@ -693,6 +684,26 @@
       transition: background 0.3s ease;
     }
 
+    /* DYNAMIC UPI QR BOX */
+    .upi-qr-card {
+      background: #fdf4ff;
+      border: 2px dashed #d8b4fe;
+      border-radius: 16px;
+      padding: 16px;
+      text-align: center;
+      margin: 12px 0;
+      display: none;
+    }
+    .upi-qr-img {
+      width: 180px;
+      height: 180px;
+      margin: 10px auto;
+      border-radius: 12px;
+      border: 2px solid #a855f7;
+      background: #fff;
+      padding: 6px;
+    }
+
     .past-order-box { 
       background: #fff; 
       border-radius: 16px; 
@@ -793,8 +804,8 @@
     <div class="drawer-menu-list">
       <div class="drawer-item" onclick="toggleDrawer(false); openCartModal();">🛒 Mera Cart</div>
       <div class="drawer-item" onclick="toggleDrawer(false); openPastOrdersModal();">📦 Purane Orders</div>
-      <div class="drawer-item" onclick="toggleDrawer(false); alert('Customer Support Call: 9876543210');">📞 Help & Support</div>
-      <div class="drawer-item" onclick="toggleDrawer(false); alert('Baba Food Delivery v2.0 Pro Express');">ℹ️ App Info</div>
+      <div class="drawer-item" onclick="toggleDrawer(false); alert('Customer Support Call: 7037647464');">📞 Help & Support</div>
+      <div class="drawer-item" onclick="toggleDrawer(false); alert('Baba Food Delivery Express v2.0');">ℹ️ App Info</div>
     </div>
   </div>
 
@@ -820,27 +831,10 @@
       <input type="text" id="cust-search-input" class="search-bar-input" placeholder="Search biryani, snacks, cold drink..." oninput="handleSearch()">
     </div>
 
-    <!-- Category Filter -->
+    <!-- DYNAMIC CATEGORY FILTER (AUTO GENERATED FROM ITEMS) -->
     <div class="category-scroll" id="cat-scroll-container">
       <div class="cat-item active" onclick="filterCategory('ALL', this)">
-        <div class="cat-icon-circle">🍽️</div>
-        <span class="cat-name">All</span>
-      </div>
-      <div class="cat-item" onclick="filterCategory('Snacks', this)">
-        <div class="cat-icon-circle">🍟</div>
-        <span class="cat-name">Snacks</span>
-      </div>
-      <div class="cat-item" onclick="filterCategory('Meals', this)">
-        <div class="cat-icon-circle">🍛</div>
-        <span class="cat-name">Meals</span>
-      </div>
-      <div class="cat-item" onclick="filterCategory('Drinks', this)">
-        <div class="cat-icon-circle">🥤</div>
-        <span class="cat-name">Drinks</span>
-      </div>
-      <div class="cat-item" onclick="filterCategory('Sweets', this)">
-        <div class="cat-icon-circle">🍰</div>
-        <span class="cat-name">Sweets</span>
+        <div class="cat-icon-circle">🍽️ All</div>
       </div>
     </div>
   </div>
@@ -922,18 +916,28 @@
         <input type="tel" id="cust-phone" class="zepto-input" placeholder="Mobile Number (10 Digit) *" maxlength="10">
         <textarea id="cust-address" class="zepto-input" rows="2" placeholder="Ghar Ka Pata / Landmark *"></textarea>
         
-        <button type="button" class="btn-fetch-gps" onclick="fetchLiveGps()">
-          📍 Auto Fetch My Live GPS Location
+        <!-- MANDATORY GPS LOCATION -->
+        <button type="button" class="btn-fetch-gps" id="btn-gps-action" onclick="fetchLiveGps()">
+          📍 Auto Fetch My Live GPS Location (अनिवार्य *)
         </button>
         <div class="loc-card-box" id="loc-box" style="display:none;">
-          <div class="loc-card-title">Live Delivery Coordinates</div>
+          <div class="loc-card-title">✅ Live Delivery Coordinates Verified:</div>
           <div class="loc-card-val" id="loc-val"></div>
         </div>
 
-        <select id="payment-mode-select" class="zepto-input" style="font-weight:700;">
+        <select id="payment-mode-select" class="zepto-input" style="font-weight:700;" onchange="handlePaymentModeChange()">
           <option value="COD">💵 Cash on Delivery (COD)</option>
-          <option value="UPI">📱 Online UPI / Scanner</option>
+          <option value="UPI">📱 Online UPI / Instant Scanner</option>
         </select>
+
+        <!-- DYNAMIC UPI QR SCANNER BOX -->
+        <div class="upi-qr-card" id="upi-qr-card">
+          <div style="font-size:13px; font-weight:900; color:#6b21a8;">QR Code Scan Karke Payment Karein</div>
+          <div style="font-size:11px; color:#64748b; margin-top:2px;">(Exact amount auto-filled aayega)</div>
+          <img id="dynamic-qr-image" class="upi-qr-img" src="" alt="UPI QR Code">
+          <div style="font-size:13px; font-weight:800; color:#0f172a;">UPI ID: <b>7037647464-3@axl</b></div>
+          <input type="text" id="upi-utr-input" class="zepto-input" placeholder="Payment ke baad 12-digit UTR No. daalein *" style="margin-top:10px; text-align:center;">
+        </div>
       </div>
 
       <!-- Bill Breakdown -->
@@ -996,6 +1000,8 @@
     const SUPABASE_KEY = 'sb_publishable_2_wD-pbi_pNf8niiHxFbYA_saCIhApN';
     const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
+    const STORE_UPI_ID = '7037647464-3@axl';
+
     let allProducts = [];
     let cart = {}; 
     let appSettings = {};
@@ -1004,6 +1010,7 @@
     let appliedCoupon = null;
     let activeTrackOrderId = null;
     let trackingInterval = null;
+    let currentCalculatedTotal = 0;
 
     // INITIALIZATION
     document.addEventListener('DOMContentLoaded', () => {
@@ -1011,7 +1018,6 @@
       fetchCustomerProducts();
       setupCustomerRealtime();
 
-      // Pre-fill phone if saved
       const savedPhone = localStorage.getItem('baba_cust_phone');
       if (savedPhone) {
         const pInput = document.getElementById('cust-phone');
@@ -1025,7 +1031,6 @@
         if (data) {
           appSettings = data;
           
-          // Store Status
           const storeBtn = document.getElementById('store-badge-top');
           if (data.store_status === 'CLOSED') {
             storeBtn.style.background = '#dc2626';
@@ -1035,7 +1040,6 @@
             storeBtn.innerText = '🟢 OPEN';
           }
 
-          // Broadcast Notice
           if (data.is_broadcast_active && data.broadcast_notice) {
             const ticker = document.getElementById('broadcast-ticker');
             document.getElementById('broadcast-ticker-text').innerText = data.broadcast_notice;
@@ -1044,7 +1048,6 @@
             document.getElementById('broadcast-ticker').style.display = 'none';
           }
 
-          // Banners
           if (data.banner_title) document.getElementById('promo-banner-title').innerText = data.banner_title;
           if (data.banner_subtitle) document.getElementById('promo-banner-sub').innerText = data.banner_subtitle;
         }
@@ -1058,11 +1061,40 @@
         const { data, error } = await _supabase.from('products').select('*').order('id', { ascending: true });
         if (error) throw error;
         allProducts = data || [];
+        buildDynamicCategories();
         renderProducts();
       } catch (error) {
         document.getElementById('product-grid-wrap').innerHTML = 
           `<div style="grid-column:1/-1; text-align:center; color:#dc2626; padding:30px;">Menu load nahi ho paya: ${error.message}</div>`;
       }
+    }
+
+    // 1. DYNAMIC CATEGORIES BUILDER
+    function buildDynamicCategories() {
+      const container = document.getElementById('cat-scroll-container');
+      const uniqueCategories = new Set();
+
+      allProducts.forEach(p => {
+        if (p.category && p.category.trim()) {
+          uniqueCategories.add(p.category.trim());
+        }
+      });
+
+      let catHtml = `
+        <div class="cat-item ${activeCategory === 'ALL' ? 'active' : ''}" onclick="filterCategory('ALL', this)">
+          <div class="cat-icon-circle">🍽️ All</div>
+        </div>
+      `;
+
+      uniqueCategories.forEach(cat => {
+        catHtml += `
+          <div class="cat-item ${activeCategory === cat ? 'active' : ''}" onclick="filterCategory('${cat}', this)">
+            <div class="cat-icon-circle">${cat}</div>
+          </div>
+        `;
+      });
+
+      container.innerHTML = catHtml;
     }
 
     function renderProducts() {
@@ -1123,12 +1155,11 @@
       }).join('');
     }
 
-    // CART OPERATIONS (PROBLEM 5 FIXED: FALLBACK HUB_ID)
+    // CART OPERATIONS
     function updateItemQty(prodId, delta) {
       const prod = allProducts.find(p => p.id === prodId);
       if (!prod) return;
 
-      // Single Hub Cart Lock Check with Hub 1 Fallback
       if (appSettings.enable_hub_lock && delta > 0) {
         const targetHubId = prod.hub_id || 1;
         const currentCartHubs = Object.values(cart).map(i => i.hub_id || 1);
@@ -1161,7 +1192,6 @@
         subtotal += (Number(it.price) * it.qty);
       });
 
-      // Floating Cart Bar
       const floatBar = document.getElementById('floating-cart-bar');
       if (totalQty > 0) {
         floatBar.style.display = 'flex';
@@ -1171,14 +1201,12 @@
         floatBar.style.display = 'none';
       }
 
-      // Calculations for Modal
       const freeDelMin = appSettings.min_free_delivery ?? 249;
       const baseDelCharge = appSettings.delivery_charge ?? 25;
       const deliveryFee = (subtotal >= freeDelMin || subtotal === 0) ? 0 : baseDelCharge;
 
       let rainFee = (appSettings.rain_surge_mode && appSettings.rain_surge_mode !== 'OFF') ? Number(appSettings.rain_surge_fee || 0) : 0;
       
-      // Auto Night Surge Calculation
       let nightFee = 0;
       if (appSettings.is_night_surge_active) {
         const curHr = new Date().getHours();
@@ -1196,9 +1224,8 @@
         couponDisc = Number(appliedCoupon.discount_value || 0);
       }
 
-      let grandTotal = Math.max(0, (subtotal + deliveryFee + rainFee + nightFee) - couponDisc);
+      currentCalculatedTotal = Math.max(0, (subtotal + deliveryFee + rainFee + nightFee) - couponDisc);
 
-      // DOM Updates
       document.getElementById('bill-subtotal').innerText = `₹${subtotal}`;
       document.getElementById('bill-delivery').innerText = deliveryFee === 0 ? 'FREE' : `₹${deliveryFee}`;
       
@@ -1220,16 +1247,18 @@
         document.getElementById('bill-coupon-disc').innerText = `-₹${couponDisc}`;
       } else coupRow.style.display = 'none';
 
-      // Auto Free Gift Rule
       const giftRow = document.getElementById('row-free-gift');
       if (appSettings.is_free_gift_active && subtotal >= (appSettings.free_gift_min_order ?? 499)) {
         giftRow.style.display = 'flex';
         document.getElementById('bill-free-gift-text').innerText = appSettings.free_gift_item_name || '1x Cold Drink';
       } else giftRow.style.display = 'none';
 
-      document.getElementById('bill-grand-total').innerText = `₹${grandTotal}`;
+      document.getElementById('bill-grand-total').innerText = `₹${currentCalculatedTotal}`;
 
-      // Target Progress Fill
+      // Update Dynamic UPI QR if UPI is active
+      handlePaymentModeChange();
+
+      // Progress Fill
       const targetFill = document.getElementById('target-progress-fill');
       const targetText = document.getElementById('target-headline-text');
       if (subtotal >= freeDelMin) {
@@ -1242,7 +1271,7 @@
         targetText.innerHTML = `🚚 <b>₹${left}</b> का और सामान जोड़ें और पाएं <b>FREE Delivery</b>!`;
       }
 
-      // Render Modal Cart Items
+      // Render Modal Items
       const cartItemsBox = document.getElementById('cart-items-container');
       const itemsArr = Object.values(cart);
       if (itemsArr.length === 0) {
@@ -1264,7 +1293,43 @@
       }
     }
 
-    // ORDER SUBMISSION
+    // 2. DYNAMIC UPI QR LOGIC
+    function handlePaymentModeChange() {
+      const mode = document.getElementById('payment-mode-select').value;
+      const qrCard = document.getElementById('upi-qr-card');
+      const qrImg = document.getElementById('dynamic-qr-image');
+
+      if (mode === 'UPI' && currentCalculatedTotal > 0) {
+        // Build dynamic UPI Payment Link with exact amount
+        const upiString = `upi://pay?pa=${STORE_UPI_ID}&pn=BABA%20FOOD%20DELIVERY&am=${currentCalculatedTotal}&cu=INR&tn=BabaFoodExpress`;
+        const qrApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(upiString)}`;
+        qrImg.src = qrApiUrl;
+        qrCard.style.display = 'block';
+      } else {
+        qrCard.style.display = 'none';
+      }
+    }
+
+    // 3. MANDATORY LIVE GPS FETCH
+    function fetchLiveGps() {
+      if (!navigator.geolocation) return alert('Aapke phone me GPS support nahi hai!');
+
+      const btn = document.getElementById('btn-gps-action');
+      btn.innerText = '📡 Live GPS Connect Ho Raha Hai...';
+
+      navigator.geolocation.getCurrentPosition(pos => {
+        userCoords = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+        document.getElementById('loc-box').style.display = 'block';
+        document.getElementById('loc-val').innerText = `${userCoords.lat.toFixed(5)}, ${userCoords.lng.toFixed(5)}`;
+        btn.style.background = '#10b981';
+        btn.innerText = '✅ Live Location Locked';
+      }, err => {
+        btn.innerText = '📍 Auto Fetch My Live GPS Location (अनिवार्य *)';
+        alert('GPS Access Dena Zaroori Hai! Error: ' + err.message);
+      }, { enableHighAccuracy: true, timeout: 10000 });
+    }
+
+    // ORDER SUBMISSION WITH VALIDATIONS
     async function submitCustomerOrder() {
       if (appSettings.store_status === 'CLOSED') {
         alert('Dukaan abhi band hai. Kripya thodi der baad koshish karein!');
@@ -1285,9 +1350,23 @@
       const phone = document.getElementById('cust-phone').value.trim();
       const addr = document.getElementById('cust-address').value.trim();
       const payMode = document.getElementById('payment-mode-select').value;
+      const utrNo = document.getElementById('upi-utr-input').value.trim();
 
       if (!name || !/^[6-9]\d{9}$/.test(phone) || !addr) {
         alert('Kripya apna poora naam, sahi 10-digit mobile number aur address bharein!');
+        return;
+      }
+
+      // GPS Mandatory Check
+      if (!userCoords || !userCoords.lat || !userCoords.lng) {
+        alert('⚠️ Delivery ke liye Live GPS location lena zaroori hai! Kripya neele button par click karein.');
+        fetchLiveGps();
+        return;
+      }
+
+      // UPI UTR Check
+      if (payMode === 'UPI' && !utrNo) {
+        alert('Kripya QR scan karke payment karein aur 12-digit UTR/Transaction ID box me bharein!');
         return;
       }
 
@@ -1311,7 +1390,6 @@
       }
 
       const couponDisc = appliedCoupon ? Number(appliedCoupon.discount_value || 0) : 0;
-      const grandTotal = Math.max(0, (subtotal + deliveryFee + rainFee + nightFee) - couponDisc);
       const otp = Math.floor(1000 + Math.random() * 9000).toString();
       const freeGift = (appSettings.is_free_gift_active && subtotal >= (appSettings.free_gift_min_order ?? 499)) ? appSettings.free_gift_item_name : null;
       const hubId = itemsArr[0]?.hub_id || 1;
@@ -1319,10 +1397,11 @@
       const orderPayload = {
         customer_name: name,
         customer_phone: phone,
-        delivery_address: addr,
+        delivery_address: `${addr} [GPS: ${userCoords.lat.toFixed(5)}, ${userCoords.lng.toFixed(5)}]`,
         items: itemsArr.map(i => ({ id: i.id, name: i.name, qty: i.qty, price: i.price, subtotal: i.price * i.qty })),
-        total_amount: grandTotal,
+        total_amount: currentCalculatedTotal,
         payment_mode: payMode,
+        transaction_id: payMode === 'UPI' ? utrNo : null,
         status: payMode === 'UPI' ? 'Paid Online / Placed' : 'Placed',
         delivery_otp: otp,
         hub_id: hubId,
@@ -1337,10 +1416,10 @@
         const { data, error } = await _supabase.from('orders').insert([orderPayload]).select().single();
         if (error) throw error;
 
-        // Save Phone locally
         localStorage.setItem('baba_cust_phone', phone);
         cart = {};
         appliedCoupon = null;
+        userCoords = null;
         updateCartUI();
         closeCartModal();
         btn.disabled = false;
@@ -1420,16 +1499,6 @@
       }).eq('id', orderId);
       alert('Order Cancel Ho Gaya!');
       fetchTrackingData();
-    }
-
-    // LIVE GPS FETCH
-    function fetchLiveGps() {
-      if (!navigator.geolocation) return alert('Aapke browser me GPS uplabdh nahi hai!');
-      navigator.geolocation.getCurrentPosition(pos => {
-        userCoords = { lat: pos.coords.latitude, lng: pos.coords.longitude };
-        document.getElementById('loc-box').style.display = 'block';
-        document.getElementById('loc-val').innerText = `${userCoords.lat.toFixed(5)}, ${userCoords.lng.toFixed(5)}`;
-      }, err => alert('GPS Error: ' + err.message));
     }
 
     // COUPONS
