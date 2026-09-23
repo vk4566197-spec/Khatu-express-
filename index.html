@@ -540,11 +540,12 @@
     }
     .modal-overlay.active { display: flex; }
     
+    /* EXTRA PADDING BOTTOM SO PAYMENT SUMMARY NEVER CUTS OFF */
     .fullpage-content {
       background: white; 
       width: 100%;
       min-height: 100%;
-      padding: 18px 18px 220px 18px;
+      padding: 18px 18px 300px 18px;
       display: flex;
       flex-direction: column;
     }
@@ -568,27 +569,29 @@
       cursor: pointer;
     }
 
+    /* CLEAR, BOLD PAYMENT SUMMARY */
     .bill-box { 
       background: #f8fafc; 
-      padding: 14px; 
+      padding: 16px; 
       border-radius: 16px; 
-      margin: 14px 0; 
-      font-size: 13px; 
-      border: 1px solid var(--border-soft);
+      margin: 18px 0 24px 0; 
+      font-size: 13.5px; 
+      border: 1.5px solid #e2e8f0;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.03);
     }
     .bill-row { 
       display: flex; 
       justify-content: space-between; 
-      margin-bottom: 8px; 
-      font-weight: 600;
+      margin-bottom: 10px; 
+      font-weight: 700;
       color: #475569;
     }
     .bill-row.total { 
       font-weight: 900; 
-      font-size: 16px; 
-      margin-top: 10px; 
-      padding-top: 10px; 
-      border-top: 1px dashed #cbd5e1; 
+      font-size: 17px; 
+      margin-top: 12px; 
+      padding-top: 12px; 
+      border-top: 2px dashed #cbd5e1; 
       color: #0f172a; 
     }
     
@@ -599,7 +602,7 @@
       left: 0;
       width: 100%;
       background: #ffffff;
-      padding: 12px 18px 18px 18px;
+      padding: 14px 18px 20px 18px;
       box-shadow: 0 -8px 25px rgba(0, 0, 0, 0.15);
       z-index: 1050;
       border-top: 1.5px solid #f1f5f9;
@@ -712,6 +715,37 @@
       margin-bottom: 12px; 
       box-shadow: var(--shadow-sm);
     }
+    
+    /* LIVE COUNTDOWN & DISPATCH BOX */
+    .eta-countdown-card {
+      background: linear-gradient(135deg, #0c4a6e, #075985);
+      color: #ffffff;
+      border-radius: 18px;
+      padding: 18px;
+      text-align: center;
+      margin-bottom: 16px;
+      box-shadow: 0 6px 20px rgba(7, 89, 133, 0.3);
+    }
+    .eta-big-timer {
+      font-size: 38px;
+      font-weight: 900;
+      letter-spacing: 2px;
+      color: #38bdf8;
+      margin: 6px 0;
+      font-variant-numeric: tabular-nums;
+    }
+    .rider-live-status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(255,255,255,0.18);
+      padding: 5px 12px;
+      border-radius: 20px;
+      font-size: 11.5px;
+      font-weight: 800;
+      margin-top: 6px;
+    }
+
     .cust-otp-box {
       background: linear-gradient(135deg, #fdf4ff, #fae8ff);
       border: 2px dashed #c084fc; 
@@ -831,7 +865,7 @@
       <input type="text" id="cust-search-input" class="search-bar-input" placeholder="Search biryani, snacks, cold drink..." oninput="handleSearch()">
     </div>
 
-    <!-- DYNAMIC CATEGORY FILTER (AUTO GENERATED FROM ITEMS) -->
+    <!-- DYNAMIC CATEGORY FILTER -->
     <div class="category-scroll" id="cat-scroll-container">
       <div class="cat-item active" onclick="filterCategory('ALL', this)">
         <div class="cat-icon-circle">🍽️ All</div>
@@ -940,15 +974,18 @@
         </div>
       </div>
 
-      <!-- Bill Breakdown -->
-      <div class="bill-box">
+      <!-- FULL PAYMENT SUMMARY (ALWAYS VISIBLE WITH ZERO OVERLAP) -->
+      <div class="bill-box" id="cart-bill-summary-box">
+        <div style="font-size:14px; font-weight:900; color:#0f172a; margin-bottom:12px; border-bottom:1px solid #e2e8f0; padding-bottom:6px;">
+          🧾 Payment Summary
+        </div>
         <div class="bill-row"><span>Item Subtotal:</span><span id="bill-subtotal">₹0</span></div>
         <div class="bill-row"><span>Standard Delivery:</span><span id="bill-delivery">₹0</span></div>
         <div class="bill-row" id="row-rain-surge" style="display:none; color:#0284c7;"><span>🌧️ Rain Surge:</span><span id="bill-rain-surge">₹0</span></div>
         <div class="bill-row" id="row-night-surge" style="display:none; color:#7c3aed;"><span>🌙 Night Surge:</span><span id="bill-night-surge">₹0</span></div>
         <div class="bill-row" id="row-coupon-disc" style="display:none; color:#059669;"><span>🎟️ Coupon Discount:</span><span id="bill-coupon-disc">-₹0</span></div>
         <div class="bill-row" id="row-free-gift" style="display:none; color:#db2777;"><span>🎁 Free Gift:</span><span id="bill-free-gift-text"></span></div>
-        <div class="bill-row total"><span>Total Amount:</span><span id="bill-grand-total">₹0</span></div>
+        <div class="bill-row total"><span>Kul Rashi (Grand Total):</span><span id="bill-grand-total">₹0</span></div>
       </div>
     </div>
 
@@ -971,7 +1008,7 @@
     </div>
   </div>
 
-  <!-- LIVE TRACKING MODAL -->
+  <!-- LIVE TRACKING MODAL WITH COUNTDOWN & MAP -->
   <div class="modal-overlay" id="track-modal">
     <div class="fullpage-content">
       <div class="fullpage-head">
@@ -1011,8 +1048,8 @@
     let activeTrackOrderId = null;
     let trackingInterval = null;
     let currentCalculatedTotal = 0;
+    let countdownTimerInterval = null;
 
-    // INITIALIZATION
     document.addEventListener('DOMContentLoaded', () => {
       loadSettings();
       fetchCustomerProducts();
@@ -1069,7 +1106,6 @@
       }
     }
 
-    // 1. DYNAMIC CATEGORIES BUILDER
     function buildDynamicCategories() {
       const container = document.getElementById('cat-scroll-container');
       const uniqueCategories = new Set();
@@ -1155,7 +1191,6 @@
       }).join('');
     }
 
-    // CART OPERATIONS
     function updateItemQty(prodId, delta) {
       const prod = allProducts.find(p => p.id === prodId);
       if (!prod) return;
@@ -1165,7 +1200,7 @@
         const currentCartHubs = Object.values(cart).map(i => i.hub_id || 1);
 
         if (currentCartHubs.length > 0 && !currentCartHubs.includes(targetHubId)) {
-          alert('⚠️ Ek cart mein sirf ek hi dukaan/hub ke items add ho sakte hain! Doosri dukaan ke saman ke liye alag order karein.');
+          alert('⚠️ Ek cart mein sirf ek hi dukaan/hub ke items add ho sakte hain!');
           return;
         }
       }
@@ -1226,6 +1261,7 @@
 
       currentCalculatedTotal = Math.max(0, (subtotal + deliveryFee + rainFee + nightFee) - couponDisc);
 
+      // DOM Updates
       document.getElementById('bill-subtotal').innerText = `₹${subtotal}`;
       document.getElementById('bill-delivery').innerText = deliveryFee === 0 ? 'FREE' : `₹${deliveryFee}`;
       
@@ -1255,10 +1291,9 @@
 
       document.getElementById('bill-grand-total').innerText = `₹${currentCalculatedTotal}`;
 
-      // Update Dynamic UPI QR if UPI is active
       handlePaymentModeChange();
 
-      // Progress Fill
+      // Target Progress Fill
       const targetFill = document.getElementById('target-progress-fill');
       const targetText = document.getElementById('target-headline-text');
       if (subtotal >= freeDelMin) {
@@ -1293,15 +1328,13 @@
       }
     }
 
-    // 2. DYNAMIC UPI QR LOGIC
     function handlePaymentModeChange() {
       const mode = document.getElementById('payment-mode-select').value;
       const qrCard = document.getElementById('upi-qr-card');
       const qrImg = document.getElementById('dynamic-qr-image');
 
       if (mode === 'UPI' && currentCalculatedTotal > 0) {
-        // Build dynamic UPI Payment Link with exact amount
-        const upiString = `upi://pay?pa=${STORE_UPI_ID}&pn=BABA%20FOOD%20DELIVERY&am=${currentCalculatedTotal}&cu=INR&tn=BabaFoodExpress`;
+        const upiString = `upi://pay?pa=${STORE_UPI_ID}&pn=BABA%20FOOD%20DELIVERY&am=${currentCalculatedTotal}&cu=INR&tn=OrderPayment`;
         const qrApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(upiString)}`;
         qrImg.src = qrApiUrl;
         qrCard.style.display = 'block';
@@ -1310,12 +1343,11 @@
       }
     }
 
-    // 3. MANDATORY LIVE GPS FETCH
     function fetchLiveGps() {
-      if (!navigator.geolocation) return alert('Aapke phone me GPS support nahi hai!');
+      if (!navigator.geolocation) return alert('GPS uplabdh nahi hai!');
 
       const btn = document.getElementById('btn-gps-action');
-      btn.innerText = '📡 Live GPS Connect Ho Raha Hai...';
+      btn.innerText = '📡 Live GPS Lock Ho Raha Hai...';
 
       navigator.geolocation.getCurrentPosition(pos => {
         userCoords = { lat: pos.coords.latitude, lng: pos.coords.longitude };
@@ -1323,13 +1355,14 @@
         document.getElementById('loc-val').innerText = `${userCoords.lat.toFixed(5)}, ${userCoords.lng.toFixed(5)}`;
         btn.style.background = '#10b981';
         btn.innerText = '✅ Live Location Locked';
+        // Auto refresh UI so bill summary stays visible
+        updateCartUI();
       }, err => {
         btn.innerText = '📍 Auto Fetch My Live GPS Location (अनिवार्य *)';
         alert('GPS Access Dena Zaroori Hai! Error: ' + err.message);
       }, { enableHighAccuracy: true, timeout: 10000 });
     }
 
-    // ORDER SUBMISSION WITH VALIDATIONS
     async function submitCustomerOrder() {
       if (appSettings.store_status === 'CLOSED') {
         alert('Dukaan abhi band hai. Kripya thodi der baad koshish karein!');
@@ -1357,16 +1390,14 @@
         return;
       }
 
-      // GPS Mandatory Check
       if (!userCoords || !userCoords.lat || !userCoords.lng) {
-        alert('⚠️ Delivery ke liye Live GPS location lena zaroori hai! Kripya neele button par click karein.');
+        alert('⚠️ Delivery ke liye Live GPS location anivarya hai! Kripya neele button par click karein.');
         fetchLiveGps();
         return;
       }
 
-      // UPI UTR Check
       if (payMode === 'UPI' && !utrNo) {
-        alert('Kripya QR scan karke payment karein aur 12-digit UTR/Transaction ID box me bharein!');
+        alert('Kripya QR scan karke payment karein aur 12-digit UTR No. darj karein!');
         return;
       }
 
@@ -1434,19 +1465,20 @@
       }
     }
 
-    // LIVE TRACKING
+    // LIVE TRACKING & DISPATCH COUNTDOWN
     async function openTrackModal(orderId) {
       activeTrackOrderId = orderId;
       document.getElementById('track-order-num').innerText = `Order #ORD-${orderId}`;
       document.getElementById('track-modal').classList.add('active');
       fetchTrackingData();
       if (trackingInterval) clearInterval(trackingInterval);
-      trackingInterval = setInterval(fetchTrackingData, 5000);
+      trackingInterval = setInterval(fetchTrackingData, 4000);
     }
 
     function closeTrackModal() {
       document.getElementById('track-modal').classList.remove('active');
       if (trackingInterval) clearInterval(trackingInterval);
+      if (countdownTimerInterval) clearInterval(countdownTimerInterval);
     }
 
     async function fetchTrackingData() {
@@ -1461,12 +1493,54 @@
       const secondsPassed = Math.floor((now - orderTime) / 1000);
       const canSelfCancel = (secondsPassed < cancelWindowSec) && !data.status.toLowerCase().includes('cancelled') && !data.status.toLowerCase().includes('delivered');
 
+      const isDispatched = data.status.toLowerCase().includes('out') || data.status.toLowerCase().includes('running');
+      const isDelivered = data.status.toLowerCase().includes('delivered');
+
+      // Rider details if assigned
+      let riderInfoHtml = '';
+      if (data.assigned_rider_id) {
+        const { data: rider } = await _supabase.from('riders').select('name, phone, current_lat, current_lng').eq('id', data.assigned_rider_id).single();
+        if (rider) {
+          riderInfoHtml = `
+            <div style="background:#f1f5f9; border-radius:12px; padding:12px; margin:12px 0; font-size:12.5px;">
+              <div>🛵 Delivery Partner: <b>${rider.name}</b> (📞 <a href="tel:${rider.phone}">${rider.phone}</a>)</div>
+              ${rider.current_lat && rider.current_lng ? `
+                <div style="margin-top:6px;">
+                  <a href="https://maps.google.com/?q=${rider.current_lat},${rider.current_lng}" target="_blank" style="color:#0284c7; font-weight:800; text-decoration:none;">
+                    📍 Rider Ki Live Location Map Par Dekhein ↗
+                  </a>
+                </div>
+              ` : ''}
+            </div>
+          `;
+        }
+      }
+
       body.innerHTML = `
-        <div style="background:#fff; border-radius:14px; border:1px solid var(--border-soft); padding:16px;">
+        <div style="background:#fff; border-radius:16px; border:1px solid var(--border-soft); padding:16px;">
+          
+          ${isDispatched ? `
+            <div class="eta-countdown-card">
+              <div style="font-size:12px; font-weight:800; opacity:0.9;">🛵 RIDER NE ORDER PICK KAR LIYA HAI!</div>
+              <div class="eta-big-timer" id="eta-countdown-clock">14:59</div>
+              <div class="rider-live-status-pill">⚡ Express Delivery in Progress</div>
+            </div>
+          ` : isDelivered ? `
+            <div style="background:#ecfdf5; border:1.5px solid #86efac; border-radius:14px; padding:16px; text-align:center; color:#065f46; font-weight:900; margin-bottom:14px;">
+              🎉 ORDER SAFALTAPOORVAK DELIVER HO GAYA!
+            </div>
+          ` : `
+            <div style="background:#eff6ff; border:1.5px solid #bfdbfe; border-radius:14px; padding:14px; text-align:center; color:#1e40af; font-weight:800; margin-bottom:14px;">
+              ⏳ Dukaan par order taiyar ho raha hai... Rider turant pick karega!
+            </div>
+          `}
+
           <div style="display:flex; justify-content:space-between; align-items:center;">
-            <div style="font-size:16px; font-weight:900;">Status: <span style="color:var(--accent-pink);">${data.status}</span></div>
-            <div style="font-size:12px; font-weight:800; color:var(--text-muted);">₹${data.total_amount} (${data.payment_mode})</div>
+            <div style="font-size:15px; font-weight:900;">Status: <span style="color:var(--accent-pink);">${data.status}</span></div>
+            <div style="font-size:13px; font-weight:800; color:var(--text-muted);">₹${data.total_amount} (${data.payment_mode})</div>
           </div>
+
+          ${riderInfoHtml}
 
           <div class="cust-otp-box">
             <div style="font-size:12px; font-weight:800; color:#6b21a8;">DELIVERY SECRET OTP (Rider ko batayein):</div>
@@ -1488,6 +1562,36 @@
           </div>
         </div>
       `;
+
+      if (isDispatched && !countdownTimerInterval) {
+        startLiveCountdown(15 * 60); // 15 Minute reverse countdown
+      }
+    }
+
+    function startLiveCountdown(durationSeconds) {
+      let timer = durationSeconds;
+      if (countdownTimerInterval) clearInterval(countdownTimerInterval);
+
+      countdownTimerInterval = setInterval(() => {
+        const el = document.getElementById('eta-countdown-clock');
+        if (!el) {
+          clearInterval(countdownTimerInterval);
+          return;
+        }
+
+        const minutes = parseInt(timer / 60, 10);
+        const seconds = parseInt(timer % 60, 10);
+
+        const mStr = minutes < 10 ? "0" + minutes : minutes;
+        const sStr = seconds < 10 ? "0" + seconds : seconds;
+
+        el.textContent = mStr + ":" + sStr;
+
+        if (--timer < 0) {
+          clearInterval(countdownTimerInterval);
+          el.textContent = "00:00 (Rider pahunch gaya hai)";
+        }
+      }, 1000);
     }
 
     async function selfCancelOrder(orderId) {
@@ -1501,7 +1605,6 @@
       fetchTrackingData();
     }
 
-    // COUPONS
     async function applyCouponCode() {
       const code = document.getElementById('coupon-input').value.trim().toUpperCase();
       if (!code) return alert('Coupon code daalein!');
@@ -1514,14 +1617,13 @@
       updateCartUI();
     }
 
-    // PAST ORDERS
     async function openPastOrdersModal() {
       const phone = localStorage.getItem('baba_cust_phone');
       document.getElementById('orders-modal').classList.add('active');
       const box = document.getElementById('past-orders-list');
 
       if (!phone) {
-        box.innerHTML = '<div style="text-align:center; padding:30px; color:var(--text-muted); font-weight:700;">Pehle ek order place karein taaki history save ho sake!</div>';
+        box.innerHTML = '<div style="text-align:center; padding:30px; color:var(--text-muted); font-weight:700;">Pehle ek order place karein!</div>';
         return;
       }
 
@@ -1560,7 +1662,6 @@
     }
     function handleSearch() { renderProducts(); }
 
-    // CUSTOMER LIVE CHAT
     function openCustomerChat(orderId) {
       document.getElementById('cust-chat-drawer').classList.add('active');
       const box = document.getElementById('chat-msgs-box');
@@ -1589,7 +1690,6 @@
       }, 1000);
     }
 
-    // REALTIME UPDATES
     function setupCustomerRealtime() {
       _supabase
         .channel('public_customer_updates')
