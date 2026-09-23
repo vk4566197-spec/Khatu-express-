@@ -6,6 +6,7 @@
   <title>🛵 BABA RIDER — Partner Dashboard</title>
 
   <link rel="icon" type="image/png" href="logo.png">
+  <link rel="manifest" href="manifest-rider.json">
   <meta name="theme-color" content="#1b042d">
 
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
@@ -81,7 +82,6 @@
 
     .btn-action-primary { background: var(--accent-green); color: #ffffff; border: none; padding: 12px; border-radius: 12px; font-size: 13px; font-weight: 800; cursor: pointer; width: 100%; margin-bottom: 8px; display: flex; align-items: center; justify-content: center; gap: 6px; }
     .btn-action-call { background: #0284c7; color: #ffffff; border: none; padding: 11px; border-radius: 12px; font-size: 12.5px; font-weight: 800; cursor: pointer; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 6px; margin-bottom: 8px; }
-    .btn-action-cancel { background: #450a0a; border: 1.5px solid #ef4444; color: #fca5a5; padding: 11px; border-radius: 12px; font-size: 12.5px; font-weight: 800; cursor: pointer; width: 100%; display: flex; align-items: center; justify-content: center; gap: 6px; }
 
     .modal-bg { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.85); backdrop-filter: blur(5px); z-index: 999999; display: none; align-items: center; justify-content: center; padding: 20px; }
     .modal-bg.active { display: flex; }
@@ -101,7 +101,7 @@
       <img src="logo.png" alt="Logo" onerror="this.style.display='none'">
       <div>
         <div class="brand-title">BABA RIDER 🛵</div>
-        <div class="brand-sub">Delivery Partner</div>
+        <div class="brand-sub">Express Delivery Partner</div>
       </div>
     </div>
     <div class="status-toggle-box" id="duty-btn" onclick="toggleDuty();">
@@ -122,7 +122,7 @@
     </div>
     <div class="stat-card">
       <div class="stat-num" id="stat-earnings">₹0</div>
-      <div class="stat-label">Total Earning</div>
+      <div class="stat-label">Earnings (₹35/ord)</div>
     </div>
   </div>
 
@@ -166,8 +166,8 @@
     </div>
   </div>
 
-  <!-- AUDIO ELEMENT (Online Alert Tone via Web Audio Synthesizer fallback) -->
-  <audio id="order-sound" src="https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3" preload="auto" loop></audio>
+  <!-- AUDIO ALERT -->
+  <audio id="order-sound" src="alert.mp3" preload="auto" loop></audio>
 
   <script>
     var SUPABASE_URL = 'https://mpeikimhkjuinqkjaumr.supabase.co';
@@ -175,15 +175,19 @@
 
     var currentTab = 'active';
     var allRiderOrders = [];
-    var isRiderOnline = true;
+    var isRiderOnline = localStorage.getItem('baba_rider_duty_status') !== 'OFFLINE';
     var audioUnlocked = false;
     var selectedOrderForDelivery = null;
     var selectedOrderForPickup = null;
     var base64PickupPhoto = null;
     var base64DeliveryPhoto = null;
-    var knownOrderIds = new Set();
+    var lastKnownAlertId = null;
 
-    // UNLOCK AUDIO ON FIRST TOUCH
+    // Service Worker Registration for Lock Screen Alerts
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('sw.js').catch(function(){});
+    }
+
     function unlockAudio() {
       if (audioUnlocked) return;
       var sound = document.getElementById('order-sound');
@@ -196,12 +200,11 @@
       }
     }
 
-    function playSound() {
+    function playSound(amount) {
       if (!isRiderOnline) return;
       var sound = document.getElementById('order-sound');
       if (sound) {
         sound.play().catch(function() {
-          // Fallback tone if audio file fails
           try {
             var ctx = new (window.AudioContext || window.webkitAudioContext)();
             var osc = ctx.createOscillator();
@@ -211,6 +214,13 @@
             osc.start();
             osc.stop(ctx.currentTime + 1);
           } catch(e){}
+        });
+      }
+      // Service worker background notification trigger
+      if (navigator.serviceWorker && navigator.serviceWorker.controller) {
+        navigator.serviceWorker.controller.postMessage({
+          type: 'NEW_ORDER_ALERT',
+          amount: amount || ''
         });
       }
     }
@@ -227,7 +237,12 @@
       isRiderOnline = !isRiderOnline;
       localStorage.setItem('baba_rider_duty_status', isRiderOnline ? 'ONLINE' : 'OFFLINE');
       renderDutyUI();
-      if (!isRiderOnline) stopSound();
+      if (!isRiderOnline) {
+        stopSound();
+        lastKnownAlertId = null;
+      } else {
+        fetchOrders();
+      }
     }
 
     function renderDutyUI() {
@@ -247,8 +262,9 @@
       }
     }
 
+    // High Compression Image Function (Payload 400 Bad Request Fix)
     function compressImage(file, maxWidth, quality) {
-      maxWidth = maxWidth || 650; quality = quality || 0.65;
+      maxWidth = maxWidth || 480; quality = quality || 0.45;
       return new Promise(function(resolve, reject) {
         var reader = new FileReader();
         reader.readAsDataURL(file);
@@ -268,6 +284,7 @@
       });
     }
 
+    // Fetch orders with Normalized Status & Loop Prevention Fix
     function fetchOrders() {
       fetch(SUPABASE_URL + '/rest/v1/orders?select=*&order=id.desc', {
         headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY }
@@ -276,18 +293,27 @@
       .then(function(data) {
         var newOrders = data || [];
         
-        // CHECK IF NEW UNASSIGNED ORDER ARRIVED TO PLAY TUNE
         if (isRiderOnline) {
+          // Status Normalize: COD (Placed) & Online (Paid Online / Placed) dono trigger honge
           var pending = newOrders.filter(function(o) {
-            return o.status === 'Order Placed' || o.status === 'Placed';
+            var s = (o.status || '').toLowerCase();
+            return (s.includes('placed') || s.includes('paid') || s.includes('pending')) && !s.includes('cancelled') && !s.includes('out') && !s.includes('delivered');
           });
+
+          // Sound Loop Fix: Sirf naye order par ghanti baje gi
           if (pending.length > 0) {
-            playSound();
+            var topOrder = pending[0];
+            if (lastKnownAlertId !== topOrder.id) {
+              playSound(topOrder.total_amount);
+              lastKnownAlertId = topOrder.id;
+            }
           } else {
             stopSound();
+            lastKnownAlertId = null;
           }
         } else {
           stopSound();
+          lastKnownAlertId = null;
         }
 
         allRiderOrders = newOrders;
@@ -298,11 +324,16 @@
     }
 
     function updateStats() {
-      var active = allRiderOrders.filter(function(o) { return o.status !== 'Delivered' && o.status !== 'Cancelled'; });
-      var delivered = allRiderOrders.filter(function(o) { return o.status === 'Delivered'; });
+      var active = allRiderOrders.filter(function(o) { 
+        var st = (o.status || '').toLowerCase();
+        return !st.includes('delivered') && !st.includes('cancelled'); 
+      });
+      var delivered = allRiderOrders.filter(function(o) { 
+        return (o.status || '').toLowerCase().includes('delivered'); 
+      });
       document.getElementById('stat-active-count').innerText = active.length;
       document.getElementById('stat-delivered-count').innerText = delivered.length;
-      document.getElementById('stat-earnings').innerText = '₹' + (delivered.length * 30);
+      document.getElementById('stat-earnings').innerText = '₹' + (delivered.length * 35);
     }
 
     function switchTab(tab) {
@@ -315,51 +346,75 @@
     function renderOrdersList() {
       var container = document.getElementById('orders-container');
       if (!container) return;
+      
       var filtered = currentTab === 'active' 
-        ? allRiderOrders.filter(function(o) { return o.status !== 'Delivered' && o.status !== 'Cancelled'; })
-        : allRiderOrders.filter(function(o) { return o.status === 'Delivered' || o.status === 'Cancelled'; });
+        ? allRiderOrders.filter(function(o) { 
+            var st = (o.status || '').toLowerCase();
+            return !st.includes('delivered') && !st.includes('cancelled'); 
+          })
+        : allRiderOrders.filter(function(o) { 
+            var st = (o.status || '').toLowerCase();
+            return st.includes('delivered') || st.includes('cancelled'); 
+          });
 
       if (filtered.length === 0) {
-        container.innerHTML = '<div class="empty-msg">' + (currentTab === 'active' ? '🎉 अभी कोई नया ऑर्डर नहीं है।' : 'कोई रिकॉर्ड नहीं मिला।') + '</div>';
+        container.innerHTML = '<div class="empty-msg">' + (currentTab === 'active' ? '🎉 अभी कोई नया ऑर्डर नहीं है।' : 'कोई पुराना रिकॉर्ड नहीं मिला।') + '</div>';
         return;
       }
 
       container.innerHTML = filtered.map(function(order) {
         var items = [];
-        try { items = typeof order.items === 'string' ? JSON.parse(order.items) : order.items; } catch(e){}
-        var isDispatched = order.status === 'Out for Delivery';
-        var isDelivered = order.status === 'Delivered';
-        var isCancelled = order.status === 'Cancelled';
+        try { items = Array.isArray(order.items) ? order.items : JSON.parse(order.items || '[]'); } catch(e){}
+        var st = (order.status || '').toLowerCase();
+        var isDispatched = st.includes('out') || st.includes('running');
+        var isDelivered = st.includes('delivered');
+        var isCancelled = st.includes('cancelled');
 
-        return '<div class="order-card">' +
+        var itemsListHtml = items.map(function(it) {
+          return '<div class="item-summary-line"><span>' + (it.name || 'Item') + ' × ' + (it.qty || 1) + '</span></div>';
+        }).join('');
+
+        return '<div class="order-card ' + (!isDispatched && !isDelivered && !isCancelled ? 'new-pulse' : '') + '">' +
           '<div class="order-top">' +
-            '<div><div class="ord-id">#ORD-' + order.id + '</div><span class="ord-tag">' + (order.status || 'Placed') + '</span></div>' +
-            '<div style="text-align:right;"><div class="ord-amount">₹' + (order.total_amount || 0) + '</div></div>' +
+            '<div><div class="ord-id">#ORD-' + order.id + '</div><span class="ord-tag ' + (isDelivered ? 'tag-delivered' : isDispatched ? 'tag-transit' : 'tag-placed') + '">' + (order.status || 'Placed') + '</span></div>' +
+            '<div style="text-align:right;"><div class="ord-amount">₹' + (order.total_amount || 0) + '</div><div style="font-size:11px; color:#94a3b8; font-weight:700;">' + (order.payment_mode || 'COD') + '</div></div>' +
           '</div>' +
           '<div class="cust-info-box">' +
             '<div class="cust-row"><span>👤</span> <b>' + (order.customer_name || 'Customer') + '</b></div>' +
             '<div class="cust-row"><span>📞</span> <span>' + (order.customer_phone || 'NA') + '</span></div>' +
-            '<div class="cust-row"><span>📍</span> <span>' + (order.delivery_address || 'पता नहीं है') + '</span></div>' +
+            '<div class="cust-row"><span>📍</span> <span>' + (order.delivery_address || 'Address not specified') + '</span></div>' +
           '</div>' +
+          (itemsListHtml ? '<div class="items-summary-box">' + itemsListHtml + '</div>' : '') +
           (!isDelivered && !isCancelled ? (
             '<a href="tel:' + order.customer_phone + '" class="btn-action-call">📞 Call Customer</a>' +
             (!isDispatched 
               ? '<button class="btn-action-primary" style="background:#0284c7;" onclick="openPickupModal(' + order.id + ')">📸 Accept & Pickup</button>'
-              : '<button class="btn-action-primary" onclick="openDeliveryProofModal(' + order.id + ', \'' + (order.delivery_otp || '') + '\')">📸 Deliver (OTP डालें)</button>')
+              : '<button class="btn-action-primary" onclick="openDeliveryProofModal(' + order.id + ', \'' + (order.delivery_otp || '') + '\')">🔐 Deliver (Enter OTP)</button>')
           ) : '') +
         '</div>';
       }).join('');
     }
 
-    function openPickupModal(id) { stopSound(); selectedOrderForPickup = id; document.getElementById('pickup-modal').classList.add('active'); }
-    function closePickupModal() { document.getElementById('pickup-modal').classList.remove('active'); }
-    function handlePickupPhotoChosen(i) { compressImage(i.files[0], 650).then(function(b){ base64PickupPhoto = b; document.getElementById('btn-confirm-pickup').style.display='block'; }); }
+    function openPickupModal(id) { 
+      stopSound(); 
+      selectedOrderForPickup = id; 
+      document.getElementById('pickup-modal').classList.add('active'); 
+    }
+    
+    function closePickupModal() { 
+      document.getElementById('pickup-modal').classList.remove('active'); 
+    }
+    
+    function handlePickupPhotoChosen(i) { 
+      if (!i.files || !i.files[0]) return;
+      compressImage(i.files[0], 480, 0.45).then(function(b){ 
+        base64PickupPhoto = b; 
+        document.getElementById('pickup-photo-preview').innerHTML = '<img src="' + b + '">';
+        document.getElementById('btn-confirm-pickup').style.display='block'; 
+      }); 
+    }
 
-    // PICKUP CONFIRMATION (CALCULATES AND SAVES ETA TIME IN DB)
     function confirmPickupWithPhoto() {
-      var etaMinutes = 20; // 20 mins delivery ETA
-      var estimatedTimeStr = etaMinutes + " mins";
-
       fetch(SUPABASE_URL + '/rest/v1/orders?id=eq.' + selectedOrderForPickup, {
         method: 'PATCH',
         headers: {
@@ -368,24 +423,38 @@
         },
         body: JSON.stringify({
           status: 'Out for Delivery',
-          assigned_rider_id: 1,
           pickup_proof_photo: base64PickupPhoto,
-          estimated_delivery_time: estimatedTimeStr
+          estimated_delivery_time: '15-20 mins'
         })
       }).then(function() {
-        alert('✅ Order Pickup Ho Gaya!');
+        alert('✅ Order Pickup ho gaya! Out for Delivery.');
         closePickupModal();
         fetchOrders();
       });
     }
 
-    function openDeliveryProofModal(id, otp) { selectedOrderForDelivery = {id: id, otp: otp}; document.getElementById('delivery-modal').classList.add('active'); }
-    function closeDeliveryModal() { document.getElementById('delivery-modal').classList.remove('active'); }
-    function handleDeliveryPhotoChosen(i) { compressImage(i.files[0], 650).then(function(b){ base64DeliveryPhoto = b; }); }
+    function openDeliveryProofModal(id, otp) { 
+      selectedOrderForDelivery = {id: id, otp: otp}; 
+      document.getElementById('delivery-modal').classList.add('active'); 
+    }
+    
+    function closeDeliveryModal() { 
+      document.getElementById('delivery-modal').classList.remove('active'); 
+    }
+    
+    function handleDeliveryPhotoChosen(i) { 
+      if (!i.files || !i.files[0]) return;
+      compressImage(i.files[0], 480, 0.45).then(function(b){ 
+        base64DeliveryPhoto = b; 
+        document.getElementById('delivery-proof-preview').innerHTML = '<img src="' + b + '">';
+      }); 
+    }
 
     function confirmDeliveryWithProof() {
       var entered = document.getElementById('input-delivery-otp').value.trim();
-      if (entered !== selectedOrderForDelivery.otp) return alert('❌ गलत OTP!');
+      if (selectedOrderForDelivery.otp && entered !== selectedOrderForDelivery.otp) {
+        return alert('❌ Galat OTP! Grahak se sahi 4-digit code lein.');
+      }
 
       fetch(SUPABASE_URL + '/rest/v1/orders?id=eq.' + selectedOrderForDelivery.id, {
         method: 'PATCH',
@@ -393,9 +462,12 @@
           'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY,
           'Content-Type': 'application/json', 'Prefer': 'return=minimal'
         },
-        body: JSON.stringify({ status: 'Delivered', delivery_proof_photo: base64DeliveryPhoto })
+        body: JSON.stringify({ 
+          status: 'Delivered', 
+          delivery_proof_photo: base64DeliveryPhoto 
+        })
       }).then(function() {
-        alert('🎉 Delivered!');
+        alert('🎉 Order Delivered Safaltapoorvak!');
         closeDeliveryModal();
         fetchOrders();
       });
@@ -404,7 +476,7 @@
     window.addEventListener('DOMContentLoaded', function() {
       renderDutyUI();
       fetchOrders();
-      setInterval(fetchOrders, 3000);
+      setInterval(fetchOrders, 8000);
     });
   </script>
 </body>
