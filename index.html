@@ -20,7 +20,7 @@
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   
   <style>
     :root {
@@ -42,7 +42,7 @@
       box-sizing: border-box; 
       margin: 0; 
       padding: 0; 
-      font-family: 'Plus Jakarta Sans', 'Inter', sans-serif; 
+      font-family: 'Plus Jakarta Sans', sans-serif; 
       -webkit-tap-highlight-color: transparent;
     }
 
@@ -260,7 +260,7 @@
       min-width: 60px; 
     }
     .cat-icon-circle {
-      padding: 10px 14px;
+      padding: 9px 14px;
       border-radius: 14px; 
       background: rgba(255,255,255,0.14); 
       border: 1px solid rgba(255,255,255,0.2);
@@ -524,28 +524,31 @@
     .nav-item.active { color: var(--accent-pink); }
     .nav-item-icon { font-size: 19px; }
 
-    /* FULL-PAGE VIEW FOR CART & ORDER */
+    /* ========================================================
+       PERFECT SCROLL & PAYMENT SUMMARY FIX
+       ======================================================== */
     .modal-overlay {
       position: fixed; 
       top: 0; 
       left: 0; 
       width: 100vw; 
-      height: 100vh;
+      height: 100%;
+      height: 100dvh; /* Mobile browser bottom bar responsive fix */
       background: #ffffff; 
       display: none; 
       flex-direction: column; 
       z-index: 1000;
-      overflow-y: scroll;
-      -webkit-overflow-scrolling: touch;
+      overflow: hidden;
     }
     .modal-overlay.active { display: flex; }
     
-    /* EXTRA PADDING BOTTOM SO PAYMENT SUMMARY NEVER CUTS OFF */
     .fullpage-content {
-      background: white; 
+      background: #ffffff; 
       width: 100%;
-      min-height: 100%;
-      padding: 18px 18px 300px 18px;
+      flex: 1;
+      overflow-y: auto !important;
+      -webkit-overflow-scrolling: touch;
+      padding: 18px 18px 140px 18px !important; /* Space so bill is 100% visible */
       display: flex;
       flex-direction: column;
     }
@@ -574,7 +577,7 @@
       background: #f8fafc; 
       padding: 16px; 
       border-radius: 16px; 
-      margin: 18px 0 24px 0; 
+      margin: 16px 0 20px 0; 
       font-size: 13.5px; 
       border: 1.5px solid #e2e8f0;
       box-shadow: 0 2px 10px rgba(0,0,0,0.03);
@@ -582,35 +585,30 @@
     .bill-row { 
       display: flex; 
       justify-content: space-between; 
-      margin-bottom: 10px; 
+      margin-bottom: 9px; 
       font-weight: 700;
       color: #475569;
     }
     .bill-row.total { 
       font-weight: 900; 
       font-size: 17px; 
-      margin-top: 12px; 
-      padding-top: 12px; 
+      margin-top: 10px; 
+      padding-top: 10px; 
       border-top: 2px dashed #cbd5e1; 
       color: #0f172a; 
     }
     
     /* STICKY BOTTOM BAR */
     .cart-sticky-bottom-bar {
-      position: fixed;
+      position: absolute;
       bottom: 0;
       left: 0;
       width: 100%;
       background: #ffffff;
-      padding: 14px 18px 20px 18px;
-      box-shadow: 0 -8px 25px rgba(0, 0, 0, 0.15);
+      padding: 12px 18px 16px 18px;
+      box-shadow: 0 -8px 25px rgba(0, 0, 0, 0.12);
       z-index: 1050;
       border-top: 1.5px solid #f1f5f9;
-      display: none;
-    }
-    .modal-overlay.active ~ .cart-sticky-bottom-bar,
-    .modal-overlay.active .cart-sticky-bottom-bar {
-      display: block;
     }
 
     .btn-checkout-sticky { 
@@ -918,9 +916,9 @@
     </div>
   </div>
 
-  <!-- CART & CHECKOUT MODAL -->
+  <!-- CART & CHECKOUT MODAL (FIXED INTERNAL SCROLL) -->
   <div class="modal-overlay" id="cart-modal">
-    <div class="fullpage-content">
+    <div class="fullpage-content" id="cart-content-scrollable">
       <div class="fullpage-head">
         <div class="fullpage-title">Aapka Cart 🛒</div>
         <button class="fullpage-close" onclick="closeCartModal()">✕</button>
@@ -974,7 +972,7 @@
         </div>
       </div>
 
-      <!-- FULL PAYMENT SUMMARY (ALWAYS VISIBLE WITH ZERO OVERLAP) -->
+      <!-- FULL PAYMENT SUMMARY (ALWAYS VISIBLE & SCROLLABLE) -->
       <div class="bill-box" id="cart-bill-summary-box">
         <div style="font-size:14px; font-weight:900; color:#0f172a; margin-bottom:12px; border-bottom:1px solid #e2e8f0; padding-bottom:6px;">
           🧾 Payment Summary
@@ -987,9 +985,12 @@
         <div class="bill-row" id="row-free-gift" style="display:none; color:#db2777;"><span>🎁 Free Gift:</span><span id="bill-free-gift-text"></span></div>
         <div class="bill-row total"><span>Kul Rashi (Grand Total):</span><span id="bill-grand-total">₹0</span></div>
       </div>
+
+      <!-- Extra Safety Bottom Space -->
+      <div style="height: 30px; width: 100%;"></div>
     </div>
 
-    <!-- Sticky Bottom Place Order Button -->
+    <!-- Sticky Bottom Place Order Button (Inside Modal) -->
     <div class="cart-sticky-bottom-bar">
       <button class="btn-checkout-sticky" id="btn-place-order" onclick="submitCustomerOrder()">
         Place Express Order 🚀
@@ -1291,8 +1292,6 @@
 
       document.getElementById('bill-grand-total').innerText = `₹${currentCalculatedTotal}`;
 
-      handlePaymentModeChange();
-
       // Target Progress Fill
       const targetFill = document.getElementById('target-progress-fill');
       const targetText = document.getElementById('target-headline-text');
@@ -1338,6 +1337,12 @@
         const qrApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(upiString)}`;
         qrImg.src = qrApiUrl;
         qrCard.style.display = 'block';
+
+        // Auto scroll down smoothly to make QR and Summary visible
+        setTimeout(() => {
+          const scrollBox = document.getElementById('cart-content-scrollable');
+          if (scrollBox) scrollBox.scrollTo({ top: scrollBox.scrollHeight, behavior: 'smooth' });
+        }, 120);
       } else {
         qrCard.style.display = 'none';
       }
@@ -1355,8 +1360,12 @@
         document.getElementById('loc-val').innerText = `${userCoords.lat.toFixed(5)}, ${userCoords.lng.toFixed(5)}`;
         btn.style.background = '#10b981';
         btn.innerText = '✅ Live Location Locked';
-        // Auto refresh UI so bill summary stays visible
-        updateCartUI();
+        
+        // Auto scroll slightly down to show details clearly
+        setTimeout(() => {
+          const scrollBox = document.getElementById('cart-content-scrollable');
+          if (scrollBox) scrollBox.scrollBy({ top: 120, behavior: 'smooth' });
+        }, 100);
       }, err => {
         btn.innerText = '📍 Auto Fetch My Live GPS Location (अनिवार्य *)';
         alert('GPS Access Dena Zaroori Hai! Error: ' + err.message);
@@ -1496,7 +1505,6 @@
       const isDispatched = data.status.toLowerCase().includes('out') || data.status.toLowerCase().includes('running');
       const isDelivered = data.status.toLowerCase().includes('delivered');
 
-      // Rider details if assigned
       let riderInfoHtml = '';
       if (data.assigned_rider_id) {
         const { data: rider } = await _supabase.from('riders').select('name, phone, current_lat, current_lng').eq('id', data.assigned_rider_id).single();
@@ -1564,7 +1572,7 @@
       `;
 
       if (isDispatched && !countdownTimerInterval) {
-        startLiveCountdown(15 * 60); // 15 Minute reverse countdown
+        startLiveCountdown(15 * 60);
       }
     }
 
