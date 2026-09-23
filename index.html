@@ -46,7 +46,7 @@
       -webkit-tap-highlight-color: transparent;
     }
 
-    input, textarea {
+    input, textarea, select {
       -webkit-user-select: auto !important;
       user-select: auto !important;
     }
@@ -244,28 +244,6 @@
       font-size: 15px; 
       color: #64748b; 
     }
-    .voice-mic-btn {
-      position: absolute; 
-      right: 8px; 
-      width: 32px; 
-      height: 32px; 
-      border-radius: 50%;
-      background: #f1f5f9; 
-      border: 1px solid #cbd5e1; 
-      color: var(--primary-purple);
-      display: flex; 
-      align-items: center; 
-      justify-content: center; 
-      font-size: 14px; 
-      cursor: pointer;
-    }
-    .voice-mic-btn.recording {
-      background: #fee2e2; 
-      border-color: #f87171; 
-      color: #dc2626;
-      animation: pulseMic 1s infinite;
-    }
-    @keyframes pulseMic { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.18); } }
 
     /* CATEGORIES */
     .category-scroll { 
@@ -739,70 +717,84 @@
       margin: 4px 0; 
     }
 
-    .rider-rating-card {
-      background: #ffffff; border: 1.5px solid #fde047; border-radius: 16px;
-      padding: 18px 16px; margin: 16px 0; text-align: center; box-shadow: 0 4px 16px rgba(234, 179, 8, 0.15);
+    /* CHAT DRAWER */
+    .chat-drawer { 
+      position: fixed; 
+      top: 0; 
+      left: 0; 
+      width: 100vw; 
+      height: 100vh; 
+      background: #f8fafc; 
+      z-index: 1100; 
+      display: none; 
+      flex-direction: column; 
     }
-    .stars-row { display: flex; justify-content: center; gap: 8px; font-size: 32px; margin: 10px 0; cursor: pointer; }
-    .star-icon { color: #cbd5e1; transition: 0.2s; }
-    .star-icon.filled { color: #eab308; }
-    .rating-chips-row { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; margin: 10px 0; }
-    .rating-chip {
-      background: #f8fafc; border: 1px solid #e2e8f0; color: #475569;
-      font-size: 11px; font-weight: 700; padding: 5px 10px; border-radius: 16px; cursor: pointer;
-    }
-    .rating-chip.selected { background: #fef9c3; border-color: #facc15; color: #854d0e; }
-
-    .chat-drawer { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #f8fafc; z-index: 1100; display: none; flex-direction: column; }
     .chat-drawer.active { display: flex; }
-    .chat-top-header { background: var(--primary-purple); color: white; padding: 16px; display: flex; justify-content: space-between; align-items: center; }
-    .chat-messages-area { flex: 1; padding: 16px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
-    .msg-bubble { max-width: 80%; padding: 10px 14px; border-radius: 14px; font-size: 13px; line-height: 1.4; word-wrap: break-word; font-weight: 600; }
-    .msg-customer { align-self: flex-end; background: var(--accent-pink); color: white; border-bottom-right-radius: 2px; }
-    .msg-rider { align-self: flex-start; background: #ffffff; color: #0f172a; border: 1px solid #e2e8f0; border-bottom-left-radius: 2px; }
-    .quick-chips-row { display: flex; gap: 8px; padding: 8px 14px; overflow-x: auto; scrollbar-width: none; background: #ffffff; border-top: 1px solid #eee; }
-    .quick-chips-row::-webkit-scrollbar { display: none; }
-    .quick-chip { background: #f1f5f9; color: #334155; padding: 6px 12px; border-radius: 16px; font-size: 11px; font-weight: 800; white-space: nowrap; cursor: pointer; border: 1px solid #cbd5e1; }
-    .chat-input-bar { padding: 10px 14px; background: white; border-top: 1px solid #e2e8f0; display: flex; gap: 8px; align-items: center; }
-    .chat-input-box { flex: 1; padding: 10px 14px; border-radius: 20px; border: 1.5px solid #cbd5e1; font-size: 13px; outline: none; }
-    .chat-send-btn { background: var(--primary-purple); color: white; border: none; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 16px; cursor: pointer; }
-
-    .btn-dispute-trigger {
-      background: #fee2e2; border: 1px solid #fca5a5; color: #dc2626;
-      font-size: 11px; font-weight: 800; padding: 8px 12px; border-radius: 8px; cursor: pointer; margin-top: 8px; width: 100%;
+    .chat-top-header { 
+      background: var(--primary-purple); 
+      color: white; 
+      padding: 16px; 
+      display: flex; 
+      justify-content: space-between; 
+      align-items: center; 
+    }
+    .chat-messages-area { 
+      flex: 1; 
+      padding: 16px; 
+      overflow-y: auto; 
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .chat-bubble {
+      max-width: 80%;
+      padding: 10px 14px;
+      border-radius: 14px;
+      font-size: 13px;
+      line-height: 1.4;
+      font-weight: 600;
+    }
+    .chat-bubble.customer {
+      background: var(--primary-purple);
+      color: #ffffff;
+      align-self: flex-end;
+      border-bottom-right-radius: 2px;
+    }
+    .chat-bubble.rider {
+      background: #e2e8f0;
+      color: #0f172a;
+      align-self: flex-start;
+      border-bottom-left-radius: 2px;
+    }
+    .chat-input-bar {
+      display: flex;
+      gap: 8px;
+      padding: 12px 16px;
+      background: #ffffff;
+      border-top: 1px solid var(--border-soft);
     }
   </style>
 </head>
 <body>
 
   <!-- 1. BROADCAST NOTICE TICKER -->
-  <div class="broadcast-ticker-wrap" id="broadcast-ticker-bar">
-    <span class="broadcast-ticker-text" id="broadcast-ticker-content">
-      📢 Baba Food Delivery me aapka swagat hai!
-    </span>
+  <div id="broadcast-ticker" class="broadcast-ticker-wrap">
+    <div id="broadcast-ticker-text" class="broadcast-ticker-text"></div>
   </div>
 
   <!-- 2. SIDE DRAWER -->
   <div class="drawer-overlay" id="drawer-overlay" onclick="toggleDrawer(false)"></div>
   <div class="side-drawer" id="side-drawer">
     <div class="drawer-header">
-      <img class="drawer-logo-img" src="logo.png" alt="Logo" onerror="this.style.display='none'">
-      <div class="drawer-brand">👑 BABA FOOD EXPRESS🏹</div>
-      <div style="font-size: 11px; color: #fdf4ff; margin-top: 2px;">Fast Express Delivery</div>
+      <img src="logo.png" class="drawer-logo-img" alt="Logo" onerror="this.style.display='none'">
+      <div class="drawer-brand">👑 BABA FOOD EXPRESS</div>
+      <div style="font-size: 11px; color: #fdf4ff; margin-top: 2px;">Fresh & Fast Delivery in 10-20 Mins</div>
     </div>
     <div class="drawer-menu-list">
-      <div class="drawer-item" onclick="toggleDrawer(false); scrollToHistory();">
-        <span>🕒</span> Past Orders & Receipts
-      </div>
-      <div class="drawer-item" onclick="openSupportModal()">
-        <span>💬</span> 24x7 Help & Support
-      </div>
-      <a class="drawer-item" href="tel:9711107063">
-        <span>📞</span> Helpline: 9711107063
-      </a>
-      <a class="drawer-item" target="_blank" href="https://wa.me/919711107063?text=Hello%20Baba%20Food%20Delivery%20Support">
-        <span>🟢</span> WhatsApp: 9711107063
-      </a>
+      <div class="drawer-item" onclick="toggleDrawer(false); openCartModal();">🛒 Mera Cart</div>
+      <div class="drawer-item" onclick="toggleDrawer(false); openPastOrdersModal();">📦 Purane Orders</div>
+      <div class="drawer-item" onclick="toggleDrawer(false); alert('Customer Support Call: 9876543210');">📞 Help & Support</div>
+      <div class="drawer-item" onclick="toggleDrawer(false); alert('Baba Food Delivery v2.0 Pro Express');">ℹ️ App Info</div>
     </div>
   </div>
 
@@ -811,400 +803,191 @@
     <div class="location-row">
       <div class="brand-cluster">
         <button class="menu-trigger-btn" onclick="toggleDrawer(true)">☰</button>
-        <img class="header-app-logo" src="logo.png" alt="App Logo" onerror="this.style.display='none'">
+        <img src="logo.png" class="header-app-logo" alt="Logo" onerror="this.style.display='none'">
         <div class="brand-meta">
-          <h1>BABA FOOD EXPRESS</h1>
-          <span class="eta-pill">⚡ 10 MINS DELIVERY</span>
+          <h1>BABA FOOD <span>🏹</span></h1>
+          <div class="eta-pill">⚡ 10-20 Min Delivery</div>
         </div>
       </div>
-      <button class="menu-trigger-btn" onclick="openSupportModal()" title="Help & Support">🎧</button>
+      <button id="store-badge-top" style="background:#10b981; border:none; color:white; font-size:10px; font-weight:800; padding:6px 12px; border-radius:20px;">
+        🟢 OPEN
+      </button>
     </div>
 
-    <!-- Search with Voice -->
+    <!-- Search Box -->
     <div class="search-box-wrap">
       <span class="search-icon-pos">🔍</span>
-      <input type="text" id="search-input" class="search-bar-input" placeholder='Search "milk", "potato", "doodh", "aalu"...' oninput="handleFilter()">
-      <button class="voice-mic-btn" id="voice-search-btn" onclick="startVoiceSearch()" title="बोलकर सर्च करें">🎙️</button>
+      <input type="text" id="cust-search-input" class="search-bar-input" placeholder="Search biryani, snacks, cold drink..." oninput="handleSearch()">
     </div>
 
-    <!-- Category Tabs -->
-    <div class="category-scroll" id="category-chips">
-      <div class="cat-item active" onclick="setCategory('All', this)">
-        <div class="cat-icon-circle">🛍️</div>
-        <div class="cat-name">All</div>
+    <!-- Category Filter -->
+    <div class="category-scroll" id="cat-scroll-container">
+      <div class="cat-item active" onclick="filterCategory('ALL', this)">
+        <div class="cat-icon-circle">🍽️</div>
+        <span class="cat-name">All</span>
+      </div>
+      <div class="cat-item" onclick="filterCategory('Snacks', this)">
+        <div class="cat-icon-circle">🍟</div>
+        <span class="cat-name">Snacks</span>
+      </div>
+      <div class="cat-item" onclick="filterCategory('Meals', this)">
+        <div class="cat-icon-circle">🍛</div>
+        <span class="cat-name">Meals</span>
+      </div>
+      <div class="cat-item" onclick="filterCategory('Drinks', this)">
+        <div class="cat-icon-circle">🥤</div>
+        <span class="cat-name">Drinks</span>
+      </div>
+      <div class="cat-item" onclick="filterCategory('Sweets', this)">
+        <div class="cat-icon-circle">🍰</div>
+        <span class="cat-name">Sweets</span>
       </div>
     </div>
   </div>
 
-  <!-- SURGE ALERTS -->
-  <div class="rain-surge-alert-bar" id="rain-surge-alert" style="display:none; margin: 10px 16px; border-radius:12px; padding:10px 14px; background:#eff6ff; border:1px solid #bfdbfe; color:#1e40af; font-size:12px; font-weight:800;">
-    <span>🌧️</span>
-    <span id="rain-surge-msg">खराब मौसम के कारण डिलीवरी शुल्क लागू है।</span>
-  </div>
-  <div class="night-surge-alert-bar" id="night-surge-alert" style="display:none; margin: 6px 16px; border-radius:12px; padding:10px 14px; background:#fdf4ff; border:1px solid #f0abfc; color:#86198f; font-size:12px; font-weight:800;">
-    <span>🌙</span>
-    <span id="night-surge-msg">देर रात डिलीवरी सेवा शुल्क लागू है।</span>
-  </div>
-
-  <!-- PROMO HERO CARD -->
-  <div class="promo-banner">
+  <!-- PROMO BANNER -->
+  <div class="promo-banner" id="promo-banner-card">
     <div class="promo-text">
-      <h3 id="dyn-banner-title">₹249+ पर <span style="color: var(--accent-green);">Free Delivery</span> 🚚</h3>
-      <div class="promo-sub" id="dyn-banner-sub">₹399+ के ऑर्डर पर ₹49 का भारी Discount!</div>
+      <h3 id="promo-banner-title">Express Grocery & Food</h3>
+      <div class="promo-sub" id="promo-banner-sub">Free Delivery On Selected Orders</div>
     </div>
-    <div style="font-size: 38px;" id="dyn-banner-icon">🎁</div>
+    <div style="font-size: 28px;">🚀</div>
   </div>
 
+  <!-- MAIN PRODUCT GRID -->
   <div class="main-container">
-    <!-- Active Order Tracker Strip -->
-    <div class="active-order-strip" id="live-order-strip" onclick="openTrackModal()" style="background:#0f172a; color:white; border-radius:16px; padding:14px 16px; margin-bottom:14px; display:none; justify-content:space-between; align-items:center; cursor:pointer;">
-      <div style="display: flex; align-items: center; gap: 10px;">
-        <span style="font-size: 22px;">🛵</span>
-        <div>
-          <div style="font-size: 13px; font-weight: 800;" id="strip-title">Live Order In Progress</div>
-          <div style="font-size: 11px; color: #38bdf8;" id="strip-sub">टैप करके लाइव ट्रैकिंग और OTP देखें</div>
-        </div>
-      </div>
-      <span style="font-size: 16px; color: #94a3b8;">➔</span>
-    </div>
-
-    <div id="loader" style="text-align: center; padding: 40px; font-size: 13px; color: var(--text-muted);">
-      ताज़ा आइटम्स लोड हो रहे हैं...
-    </div>
-    <div class="grid" id="product-list"></div>
-
-    <!-- Past Orders History -->
-    <div id="past-orders-section" style="margin-top: 35px; border-top: 1px solid var(--border-soft); padding-top: 22px;">
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
-        <div style="font-size: 16px; font-weight: 900; color: #0f172a;">🕒 Past Orders & Invoices</div>
-        <span style="font-size: 11px; color: #64748b; font-weight: 700;">विवरण देखने के लिए टैप करें</span>
-      </div>
-      <div id="history-container">
-        <div style="font-size: 12px; color: #94a3b8; padding: 10px 0;">कोई पिछला ऑर्डर नहीं मिला।</div>
+    <div id="product-grid-wrap" class="grid">
+      <div style="grid-column: 1/-1; text-align:center; padding: 40px; color: var(--text-muted);">
+        Items load ho rahe hain...
       </div>
     </div>
   </div>
 
-  <!-- FLOATING CART -->
-  <div class="floating-cart-bar" id="cart-float-bar" onclick="openCartModal()">
+  <!-- FLOATING CART BAR -->
+  <div class="floating-cart-bar" id="floating-cart-bar" onclick="openCartModal()">
     <div>
-      <div style="font-size:11.5px; font-weight:700; opacity:0.9;" id="float-qty-text">0 Items Added</div>
-      <div style="font-size:16px; font-weight:900;" id="float-total-text">₹0</div>
+      <div id="floating-cart-qty" style="font-size: 11px; font-weight: 700; opacity: 0.9;">0 ITEMS</div>
+      <div id="floating-cart-price" style="font-size: 16px; font-weight: 900;">₹0</div>
     </div>
-    <div style="font-size: 13px; font-weight: 900; display:flex; align-items:center; gap:6px;">View Full Cart ➔</div>
+    <div style="display:flex; align-items:center; gap:6px; font-weight:900; font-size:14px;">
+      View Cart 🛒 ➔
+    </div>
   </div>
 
   <!-- BOTTOM NAV BAR -->
   <div class="bottom-nav-bar">
-    <div class="nav-item active" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">
+    <div class="nav-item active" onclick="window.scrollTo({top:0, behavior:'smooth'})">
       <div class="nav-item-icon">🏠</div>
       <span>Home</span>
     </div>
-    <div class="nav-item" onclick="openTrackModal()">
-      <div class="nav-item-icon">🛵</div>
-      <span>Track</span>
-    </div>
-    <div class="nav-item" onclick="scrollToHistory()">
-      <div class="nav-item-icon">🕒</div>
+    <div class="nav-item" onclick="openPastOrdersModal()">
+      <div class="nav-item-icon">📦</div>
       <span>Orders</span>
     </div>
-    <div class="nav-item" onclick="openSupportModal()">
-      <div class="nav-item-icon">🎧</div>
-      <span>Support</span>
+    <div class="nav-item" onclick="openCartModal()">
+      <div class="nav-item-icon">🛒</div>
+      <span>Cart</span>
     </div>
   </div>
 
-  <!-- FULL PAGE CART VIEW -->
+  <!-- CART & CHECKOUT MODAL -->
   <div class="modal-overlay" id="cart-modal">
     <div class="fullpage-content">
       <div class="fullpage-head">
-        <div class="fullpage-title">🛍️ Order Summary & Checkout</div>
-        <button class="fullpage-close" onclick="toggleCartModal(false)">✕</button>
+        <div class="fullpage-title">Aapka Cart 🛒</div>
+        <button class="fullpage-close" onclick="closeCartModal()">✕</button>
       </div>
 
-      <!-- SMART CART UPSELL PROGRESS BANNER -->
-      <div class="cart-target-banner" id="cart-smart-target-box" style="display: none;">
-        <div class="target-headline" id="cart-target-text">
-          🎉 सामान जोड़ें और इनाम पाएँ!
-        </div>
+      <!-- Target Progress Banner -->
+      <div class="cart-target-banner" id="target-progress-box">
+        <div class="target-headline" id="target-headline-text">Free delivery target</div>
         <div class="target-progress-bg">
-          <div class="target-progress-fill" id="cart-target-progress-bar"></div>
+          <div class="target-progress-fill" id="target-progress-fill"></div>
         </div>
       </div>
 
-      <div id="cart-items-box"></div>
+      <!-- Items List -->
+      <div id="cart-items-container"></div>
 
-      <!-- Coupon Box -->
-      <div style="display:flex; gap:8px; margin: 14px 0;">
-        <input type="text" id="cart-coupon-input" class="zepto-input" style="text-transform:uppercase; font-weight:800;" placeholder="Enter Coupon (e.g. BABA50)">
-        <button onclick="applyCouponCode()" style="background:var(--primary-purple); color:white; border:none; padding:0 18px; border-radius:12px; font-weight:800; font-size:12px; cursor:pointer;">Apply</button>
+      <!-- Coupon Apply -->
+      <div style="display:flex; gap:8px; margin: 12px 0;">
+        <input type="text" id="coupon-input" class="zepto-input" placeholder="Coupon Code (e.g. BABA50)" style="text-transform:uppercase;">
+        <button class="btn-add-zepto" onclick="applyCouponCode()" style="background:var(--primary-purple); color:white; border:none; padding:0 20px;">Apply</button>
       </div>
-      <div id="coupon-success-pill" style="display:none; background:#ecfdf5; border:1px solid #a7f3d0; color:#065f46; font-size:11px; font-weight:800; padding:6px 10px; border-radius:8px; margin-bottom:8px;"></div>
+      <div id="coupon-applied-msg" style="font-size:12px; font-weight:800; color:#059669; margin-bottom:8px;"></div>
 
+      <!-- Customer Details Form -->
+      <div style="display:flex; flex-direction:column; gap:10px; margin-top:8px;">
+        <input type="text" id="cust-name" class="zepto-input" placeholder="Aapka Poora Naam *">
+        <input type="tel" id="cust-phone" class="zepto-input" placeholder="Mobile Number (10 Digit) *" maxlength="10">
+        <textarea id="cust-address" class="zepto-input" rows="2" placeholder="Ghar Ka Pata / Landmark *"></textarea>
+        
+        <button type="button" class="btn-fetch-gps" onclick="fetchLiveGps()">
+          📍 Auto Fetch My Live GPS Location
+        </button>
+        <div class="loc-card-box" id="loc-box" style="display:none;">
+          <div class="loc-card-title">Live Delivery Coordinates</div>
+          <div class="loc-card-val" id="loc-val"></div>
+        </div>
+
+        <select id="payment-mode-select" class="zepto-input" style="font-weight:700;">
+          <option value="COD">💵 Cash on Delivery (COD)</option>
+          <option value="UPI">📱 Online UPI / Scanner</option>
+        </select>
+      </div>
+
+      <!-- Bill Breakdown -->
       <div class="bill-box">
-        <div class="bill-row">
-          <span>Items Total</span>
-          <span id="bill-subtotal">₹0</span>
-        </div>
-        <div class="bill-row">
-          <span>Delivery Charge</span>
-          <span id="bill-delivery-charge" style="color:var(--accent-green);">FREE</span>
-        </div>
-        
-        <!-- DISTANCE CHARGE ROW -->
-        <div class="bill-row" id="row-distance-charge" style="display: none; color: #0284c7;">
-          <span id="bill-distance-title">📏 Distance Charge (Extra KM)</span>
-          <span id="bill-distance-amount">+₹0</span>
-        </div>
-
-        <div class="bill-row" id="row-rain-surge" style="display: none; color: #1e40af;">
-          <span>🌧️ Rain Surge</span>
-          <span id="bill-rain-surge-amount">+₹0</span>
-        </div>
-        <div class="bill-row" id="row-night-surge" style="display: none; color: #86198f;">
-          <span>🌙 Night Surge</span>
-          <span id="bill-night-surge-amount">+₹0</span>
-        </div>
-        <div class="bill-row" id="row-discount" style="display: none; color: var(--accent-green);">
-          <span>Offer Discount</span>
-          <span id="bill-disc-amount">-₹0</span>
-        </div>
-        <div class="bill-row" id="row-coupon" style="display: none; color: var(--accent-green);">
-          <span id="bill-coupon-title">Coupon Discount</span>
-          <span id="bill-coupon-amount">-₹0</span>
-        </div>
-        <div class="bill-row total">
-          <span>Total To Pay</span>
-          <span id="bill-grand-total">₹0</span>
-        </div>
-      </div>
-
-      <!-- Payment Mode -->
-      <div style="font-size:12px; font-weight:800; color:#64748b; margin:14px 0 8px 0;">SELECT PAYMENT METHOD:</div>
-      <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px; margin-bottom:14px;">
-        <div id="opt-cod" onclick="selectPaymentMode('COD')" style="border:1.5px solid var(--accent-pink); background:#fff0f4; color:var(--accent-pink); padding:12px; border-radius:12px; text-align:center; font-weight:800; font-size:13px; cursor:pointer;">
-          💵 Cash on Delivery
-        </div>
-        <div id="opt-upi" onclick="selectPaymentMode('UPI')" style="border:1.5px solid #cbd5e1; padding:12px; border-radius:12px; text-align:center; font-weight:800; font-size:13px; cursor:pointer; color:#475569;">
-          📱 Online UPI
-        </div>
-      </div>
-
-      <div class="upi-gate-card" id="upi-box" style="display:none; background:#faf5ff; border:1px dashed var(--primary-purple); border-radius:14px; padding:14px; text-align:center; margin-bottom:14px;">
-        <div style="font-size:13px; font-weight:800; color:var(--primary-purple);">Scan & Pay ₹<span id="upi-box-amount">0</span></div>
-        <div style="width:160px; height:160px; margin:8px auto; background:#fff; padding:6px; border-radius:10px;"><img id="upi-qr-img" src="" style="width:100%; height:100%;"></div>
-        <input type="tel" id="upi-utr" class="zepto-input" placeholder="Enter 12-digit UTR No." maxlength="12" style="text-align:center; font-weight:800; letter-spacing:1px; background:#fff;">
-      </div>
-
-      <!-- Customer Address & Location Section -->
-      <div style="font-size:12px; font-weight:800; color:#64748b; margin-bottom:10px;">DELIVERY DETAILS:</div>
-      <div style="display:flex; flex-direction:column; gap:12px;">
-        
-        <!-- 1. Name -->
-        <div>
-          <label style="font-size: 11.5px; font-weight: 800; color: #334155; display:block; margin-bottom: 4px;">आपका पूरा नाम (Full Name) *</label>
-          <input type="text" id="c-name" class="zepto-input" placeholder="नाम दर्ज करें">
-        </div>
-
-        <!-- 2. Phone -->
-        <div>
-          <label style="font-size: 11.5px; font-weight: 800; color: #334155; display:block; margin-bottom: 4px;">10 अंकों का मोबाइल नंबर *</label>
-          <input type="tel" id="c-phone" class="zepto-input" placeholder="मोबाइल नंबर दर्ज करें" maxlength="10">
-        </div>
-
-        <!-- 3. Full Address -->
-        <div style="background: #ffffff; padding: 2px 0;">
-          <label style="font-size: 12px; font-weight: 900; color: #0f172a; display:block; margin-bottom: 5px;">
-            🏠 घर / दुकान / फ्लैट नंबर और लैंडमार्क (पूरा पता) *
-          </label>
-          <input type="text" id="c-address" class="zepto-input" style="border: 2px solid #64748b; font-size: 13.5px;" placeholder="अपना पूरा पता यहाँ लिखें">
-        </div>
-
-        <!-- 4. Mandatory Live Location Button (Tick Mark System) -->
-        <div style="margin-top: 6px;">
-          <button type="button" class="btn-fetch-gps" id="btn-location-action" onclick="getCurrentLocation()">
-            📍 क्लिक करके लाइव लोकेशन अपडेट करें (अनिवार्य)
-          </button>
-        </div>
-
-        <!-- 5. GPS Status Pill -->
-        <div class="loc-card-box" id="gps-status-box">
-          <div class="loc-card-title">GPS स्थिति (MANDATORY):</div>
-          <div class="loc-card-val" id="gps-status-val">⚠️ लोकेशन अपडेट नहीं है। ऊपर दिए गए नीले बटन पर क्लिक करें!</div>
-        </div>
-
+        <div class="bill-row"><span>Item Subtotal:</span><span id="bill-subtotal">₹0</span></div>
+        <div class="bill-row"><span>Standard Delivery:</span><span id="bill-delivery">₹0</span></div>
+        <div class="bill-row" id="row-rain-surge" style="display:none; color:#0284c7;"><span>🌧️ Rain Surge:</span><span id="bill-rain-surge">₹0</span></div>
+        <div class="bill-row" id="row-night-surge" style="display:none; color:#7c3aed;"><span>🌙 Night Surge:</span><span id="bill-night-surge">₹0</span></div>
+        <div class="bill-row" id="row-coupon-disc" style="display:none; color:#059669;"><span>🎟️ Coupon Discount:</span><span id="bill-coupon-disc">-₹0</span></div>
+        <div class="bill-row" id="row-free-gift" style="display:none; color:#db2777;"><span>🎁 Free Gift:</span><span id="bill-free-gift-text"></span></div>
+        <div class="bill-row total"><span>Total Amount:</span><span id="bill-grand-total">₹0</span></div>
       </div>
     </div>
 
-    <!-- ALWAYS VISIBLE STICKY BOTTOM CHECKOUT BUTTON -->
-    <div class="cart-sticky-bottom-bar" id="cart-sticky-bar">
-      <button class="btn-checkout-sticky" id="order-submit-btn" onclick="placeOrder()" disabled>
-        ⚠️ पहले लाइव लोकेशन अपडेट करें
+    <!-- Sticky Bottom Place Order Button -->
+    <div class="cart-sticky-bottom-bar">
+      <button class="btn-checkout-sticky" id="btn-place-order" onclick="submitCustomerOrder()">
+        Place Express Order 🚀
       </button>
     </div>
   </div>
 
-  <!-- FULL PAGE LIVE TRACKING MODAL -->
+  <!-- PAST ORDERS MODAL -->
+  <div class="modal-overlay" id="orders-modal">
+    <div class="fullpage-content">
+      <div class="fullpage-head">
+        <div class="fullpage-title">Mera Order History 📦</div>
+        <button class="fullpage-close" onclick="closePastOrdersModal()">✕</button>
+      </div>
+      <div id="past-orders-list"></div>
+    </div>
+  </div>
+
+  <!-- LIVE TRACKING MODAL -->
   <div class="modal-overlay" id="track-modal">
     <div class="fullpage-content">
       <div class="fullpage-head">
-        <div>
-          <div class="fullpage-title" id="t-order-id">Live Tracking</div>
-          <div style="font-size: 11px; color: var(--text-muted);" id="live-eta-subtitle">10-Min Fast Dispatch</div>
-        </div>
-        <button class="fullpage-close" onclick="toggleTrackModal(false)">✕</button>
+        <div class="fullpage-title" id="track-order-num">Track Order</div>
+        <button class="fullpage-close" onclick="closeTrackModal()">✕</button>
       </div>
-
-      <!-- 60-Sec Self Cancel (Fully Accurate Timer) -->
-      <div id="self-cancel-container" style="display:none; background:#fef2f2; border:1px solid #fca5a5; padding:12px 14px; border-radius:12px; margin-bottom:14px; justify-content:space-between; align-items:center;">
-        <span style="font-size:12px; font-weight:800; color:#991b1b;">⏱️ ऑर्डर रद्द करना है? (<span id="cancel-timer-secs">60</span>s बाकी)</span>
-        <button onclick="handleCustomerSelfCancel()" style="background:#dc2626; color:white; border:none; padding:8px 14px; border-radius:8px; font-size:12px; font-weight:800; cursor:pointer;">Cancel ✕</button>
-      </div>
-
-      <!-- Live Dynamic ETA Chip -->
-      <div id="eta-chip-container" style="display:none; text-align:center; margin-bottom:12px;">
-        <span id="eta-chip-text" style="background:#0284c7; color:white; font-size:12px; font-weight:800; padding:6px 14px; border-radius:14px;">⚡ राइडर की लाइव दूरी जाँची जा रही है...</span>
-      </div>
-
-      <!-- Live OTP Box -->
-      <div class="cust-otp-box" id="cust-otp-container" style="display:none;">
-        <div style="font-size:11px; font-weight:800; color:#7e22ce;">🔑 SAFE DELIVERY OTP</div>
-        <div class="cust-otp-code" id="cust-live-otp">----</div>
-        <div style="font-size:11px; color:#6b21a8; font-weight:600;">सामान मिलने पर यह कोड राइडर को बताएँ</div>
-      </div>
-
-      <div style="padding: 14px 0 20px 10px;">
-        <div id="st-1" style="font-size:14px; font-weight:800; color:var(--accent-green); margin-bottom:10px;">✓ Order Placed & Packing</div>
-        <div id="st-2" style="font-size:14px; font-weight:800; color:#94a3b8; margin-bottom:10px;">🛵 Out for Delivery</div>
-        <div id="st-3" style="font-size:14px; font-weight:800; color:#94a3b8;">📦 Delivered Successfully</div>
-      </div>
-
-      <!-- Privacy Masked Call / Action -->
-      <div id="rider-contact-row" style="display:none; gap:10px; margin-bottom:14px;">
-        <button onclick="callRiderMasked()" style="flex:1; background:#10b981; color:white; border:none; padding:12px; border-radius:12px; font-size:12px; font-weight:800; cursor:pointer;">
-          🛡️ Call Rider (Masked)
-        </button>
-        <button onclick="openLiveChatModal()" style="flex:1; background:#0284c7; color:white; border:none; padding:12px; border-radius:12px; font-size:12px; font-weight:800; cursor:pointer;">
-          💬 Chat with Rider
-        </button>
-      </div>
-
-      <!-- 5-STAR RIDER RATING CARD -->
-      <div class="rider-rating-card" id="rider-rating-box" style="display: none;">
-        <div style="font-size: 14px; font-weight: 900; color: #0f172a;">Rate Your Delivery Partner 🛵</div>
-        <div style="font-size: 11px; color: #64748b; margin-top: 2px;">डिलीवरी अनुभव कैसा रहा? स्टार रेटिंग दें:</div>
-        <div class="stars-row" id="stars-container">
-          <span class="star-icon" onclick="setRiderStars(1)">★</span>
-          <span class="star-icon" onclick="setRiderStars(2)">★</span>
-          <span class="star-icon" onclick="setRiderStars(3)">★</span>
-          <span class="star-icon" onclick="setRiderStars(4)">★</span>
-          <span class="star-icon" onclick="setRiderStars(5)">★</span>
-        </div>
-        <div class="rating-chips-row">
-          <span class="rating-chip" onclick="toggleRatingChip(this, '⚡ Fast Delivery')">⚡ Fast Delivery</span>
-          <span class="rating-chip" onclick="toggleRatingChip(this, '😊 Polite Rider')">😊 Polite Rider</span>
-          <span class="rating-chip" onclick="toggleRatingChip(this, '📦 Safe Packing')">📦 Safe Packing</span>
-        </div>
-        <button class="btn-checkout-sticky" style="background:#0f172a; padding:12px; margin-top:10px;" onclick="submitRiderRating()">
-          Submit Star Rating ⭐
-        </button>
-      </div>
-
-      <button class="btn-checkout-sticky" style="background:#0f172a; margin-top:14px;" onclick="toggleTrackModal(false)">बंद करें (Close Tracking)</button>
+      <div id="track-content-body"></div>
     </div>
   </div>
 
-  <!-- IN-APP LIVE CHAT DRAWER -->
-  <div class="chat-drawer" id="chat-drawer">
+  <!-- CUSTOMER LIVE CHAT DRAWER -->
+  <div class="chat-drawer" id="cust-chat-drawer">
     <div class="chat-top-header">
-      <div style="display:flex; align-items:center; gap:10px;">
-        <button onclick="closeLiveChatModal()" style="background:none; border:none; color:white; font-size:20px; font-weight:900; cursor:pointer;">←</button>
-        <div>
-          <div style="font-size:15px; font-weight:900;" id="chat-header-title">Chat with Rider</div>
-          <div style="font-size:11px; color:#d8b4fe;">Online Delivery Partner</div>
-        </div>
-      </div>
-      <a href="tel:9711107063" style="color:white; text-decoration:none; font-size:18px;">📞</a>
+      <div style="font-weight:900;">💬 Support & Rider Chat</div>
+      <button style="background:none; border:none; color:white; font-size:18px; cursor:pointer;" onclick="closeCustomerChat()">✕</button>
     </div>
-
-    <div class="chat-messages-area" id="chat-messages"></div>
-
-    <div class="quick-chips-row">
-      <div class="quick-chip" onclick="sendQuickMessage('भैया जल्दी आना प्लीज')">⚡ जल्दी आना प्लीज</div>
-      <div class="quick-chip" onclick="sendQuickMessage('पहुँचकर कॉल करना')">📞 पहुँचकर कॉल करना</div>
-      <div class="quick-chip" onclick="sendQuickMessage('गेट पर छोड़ दो')">🚪 गेट पर छोड़ दो</div>
-    </div>
-
+    <div class="chat-messages-area" id="chat-msgs-box"></div>
     <div class="chat-input-bar">
-      <input type="text" id="chat-user-text" class="chat-input-box" placeholder="Type a message to rider...">
-      <button class="chat-send-btn" onclick="sendCustomMessage()">➔</button>
-    </div>
-  </div>
-
-  <!-- FULL RECEIPT & PHOTO DISPUTE CLAIM MODAL -->
-  <div class="modal-overlay" id="receipt-modal">
-    <div class="fullpage-content">
-      <div class="fullpage-head">
-        <div>
-          <div class="fullpage-title" id="rcpt-title">Order Receipt #ORD-00</div>
-          <div style="font-size: 11px; color: #64748b;" id="rcpt-date-mode">Placed on -- | COD</div>
-        </div>
-        <button class="fullpage-close" onclick="closeReceiptModal()">✕</button>
-      </div>
-
-      <div style="font-size: 12px; font-weight: 800; color: #334155; margin-bottom: 6px;">ITEMS ORDERED</div>
-      <div id="rcpt-items-list" style="max-height: 200px; overflow-y: auto;"></div>
-
-      <div style="background: #f8fafc; border-radius: 12px; padding: 12px; margin: 12px 0; border: 1px solid #e2e8f0;">
-        <div style="font-size: 11px; font-weight: 800; color: #64748b; margin-bottom: 4px;">DELIVERY ADDRESS</div>
-        <div style="font-size: 12px; font-weight: 700; color: #1e293b; white-space: pre-line;" id="rcpt-address">--</div>
-      </div>
-
-      <!-- Dispute Claim Status View -->
-      <div id="rcpt-dispute-status-pill" style="display:none; padding:10px 14px; border-radius:10px; font-size:12px; font-weight:800; margin-bottom:12px;"></div>
-
-      <div class="bill-box" style="margin: 0 0 12px 0;">
-        <div class="bill-row total">
-          <span>Total Paid</span>
-          <span style="color: var(--accent-green); font-size: 17px;" id="rcpt-total-amount">₹0</span>
-        </div>
-      </div>
-
-      <button class="btn-checkout-sticky" id="rcpt-repeat-btn" style="background: var(--primary-purple); margin-bottom: 8px;">
-        🔁 Repeat This Entire Order
-      </button>
-
-      <button class="btn-dispute-trigger" id="rcpt-dispute-btn" onclick="openDisputeForm()">
-        ⚠️ ख़राब या टूटा सामान मिला? रिफ़ंड क्लेम करें
-      </button>
-
-      <!-- Dispute Form Area -->
-      <div id="dispute-form-box" style="display: none; background: #fff5f5; border: 1.5px dashed #fca5a5; border-radius: 12px; padding: 14px; margin-top: 10px;">
-        <div style="font-size: 12px; font-weight: 900; color: #991b1b; margin-bottom: 6px;">Submit Photo Proof & Claim:</div>
-        <textarea id="dispute-note-input" class="zepto-input" rows="2" placeholder="क्या समस्या है? (उदा. सामान खराब या टूटा हुआ है)"></textarea>
-        <input type="file" id="dispute-file-input" accept="image/*" style="margin: 10px 0; font-size: 12px; width: 100%;">
-        <button class="btn-checkout-sticky" id="btn-submit-dispute" style="background: #dc2626; padding: 12px;" onclick="submitRefundDispute()">
-          📤 Submit Refund Claim to Admin
-        </button>
-      </div>
-    </div>
-  </div>
-
-  <!-- SUPPORT MODAL -->
-  <div class="modal-overlay" id="support-modal">
-    <div class="fullpage-content">
-      <div class="fullpage-head">
-        <div class="fullpage-title">Help & Support 🎧</div>
-        <button class="fullpage-close" onclick="toggleSupportModal(false)">✕</button>
-      </div>
-      <div style="display:flex; flex-direction:column; gap:12px; margin-top:14px;">
-        <a class="btn-checkout-sticky" style="background:#25D366; text-decoration:none; text-align:center;" target="_blank" href="https://wa.me/919711107063?text=Support%20Needed">
-          💬 WhatsApp पर संपर्क करें (9711107063)
-        </a>
-        <a class="btn-checkout-sticky" style="background:var(--primary-purple); text-decoration:none; text-align:center;" href="tel:9711107063">
-          📞 हेल्पलाइन पर कॉल करें (9711107063)
-        </a>
-      </div>
+      <input type="text" id="chat-text-input" class="zepto-input" placeholder="Message likhein...">
+      <button class="btn-add-zepto" onclick="sendCustomerChatMessage()" style="background:var(--primary-purple); color:white; border:none;">Bhejo</button>
     </div>
   </div>
 
@@ -1215,1052 +998,539 @@
 
     let allProducts = [];
     let cart = {}; 
-    let selectedCat = 'All';
-    let currentOrderId = localStorage.getItem('zepto_active_order') || null;
-    let selectedPaymentMode = 'COD';
-    const STORE_UPI_ID = '7037647464-3@axl';
-    let customerCoords = null;
-    let calculatedKm = 0;
-    let isLocationUpdated = false; 
+    let appSettings = {};
+    let activeCategory = 'ALL';
+    let userCoords = null;
     let appliedCoupon = null;
-    let cancelTimerInterval = null;
-    let chatInterval = null;
-    let selectedStarCount = 5;
-    let selectedChips = new Set();
-    let currentViewingReceiptOrder = null;
-    let assignedRiderPhone = null;
+    let activeTrackOrderId = null;
+    let trackingInterval = null;
 
-    const keywordSynonyms = {
-      'doodh': 'milk', 'dudh': 'milk', 'dud': 'milk', 'दूध': 'milk', 'milk': 'doodh',
-      'aalu': 'potato', 'aloo': 'potato', 'alu': 'potato', 'आलू': 'potato', 'potato': 'aalu',
-      'tamatar': 'tomato', 'tamater': 'tomato', 'टमाटर': 'tomato', 'tomato': 'tamatar',
-      'pyaz': 'onion', 'pyaaj': 'onion', 'pyaj': 'onion', 'प्याज': 'onion', 'onion': 'pyaz',
-      'tel': 'oil', 'tail': 'oil', 'तेल': 'oil', 'oil': 'tel',
-      'chawal': 'rice', 'chaawal': 'rice', 'चावल': 'rice', 'rice': 'chawal',
-      'atta': 'flour', 'aata': 'flour', 'आटा': 'flour', 'flour': 'atta',
-      'cheeni': 'sugar', 'chini': 'sugar', 'चीनी': 'sugar', 'sugar': 'cheeni',
-      'namak': 'salt', 'नमक': 'salt', 'salt': 'namak',
-      'chai': 'tea', 'chaye': 'tea', 'चाय': 'tea', 'tea': 'chai',
-      'dahi': 'curd', 'दही': 'curd', 'curd': 'dahi', 'yogurt': 'dahi',
-      'paneer': 'cheese', 'panir': 'cheese', 'पनीर': 'paneer', 'cheese': 'paneer',
-      'biscuit': 'cookie', 'cookies': 'biscuit', 'बिस्कुट': 'biscuit',
-      'pani': 'water', 'paani': 'water', 'पानी': 'water', 'water': 'pani',
-      'roti': 'bread', 'रोटी': 'bread', 'bread': 'roti',
-      'mirch': 'chilli', 'mirchi': 'chilli', 'मिर्च': 'chilli', 'chilli': 'mirch',
-      'nimbu': 'lemon', 'नींबू': 'lemon', 'lemon': 'nimbu',
-      'ghee': 'butter', 'ghi': 'ghee', 'घी': 'ghee', 'butter': 'ghee',
-      'coldrink': 'drink', 'cold drink': 'drink', 'pepsi': 'drink', 'coke': 'drink', 'कोल्ड्रिंक': 'drink',
-      'samosa': 'snack', 'समौसा': 'samosa', 'समोसा': 'samosa'
-    };
+    // INITIALIZATION
+    document.addEventListener('DOMContentLoaded', () => {
+      loadSettings();
+      fetchCustomerProducts();
+      setupCustomerRealtime();
 
-    function getLevenshteinDistance(a, b) {
-      if (!a.length) return b.length;
-      if (!b.length) return a.length;
-      const matrix = [];
-      for (let i = 0; i <= b.length; i++) matrix[i] = [i];
-      for (let j = 0; j <= a.length; j++) matrix[0][j] = j;
-      for (let i = 1; i <= b.length; i++) {
-        for (let j = 1; j <= a.length; j++) {
-          if (b.charAt(i - 1) === a.charAt(j - 1)) {
-            matrix[i][j] = matrix[i - 1][j - 1];
-          } else {
-            matrix[i][j] = Math.min(
-              matrix[i - 1][j - 1] + 1,
-              Math.min(matrix[i][j - 1] + 1, matrix[i - 1][j] + 1)
-            );
-          }
-        }
+      // Pre-fill phone if saved
+      const savedPhone = localStorage.getItem('baba_cust_phone');
+      if (savedPhone) {
+        const pInput = document.getElementById('cust-phone');
+        if (pInput) pInput.value = savedPhone;
       }
-      return matrix[b.length][a.length];
-    }
+    });
 
-    function isFuzzyMatch(str1, str2) {
-      if (!str1 || !str2) return false;
-      str1 = str1.toLowerCase().trim();
-      str2 = str2.toLowerCase().trim();
-      if (str1.includes(str2) || str2.includes(str1)) return true;
-      const maxDistance = str2.length <= 4 ? 1 : 2;
-      return getLevenshteinDistance(str1, str2) <= maxDistance;
-    }
-
-    let appConfig = {
-      theme_color: '#ff3269',
-      header_bg: '#f4ecfb',
-      primary_purple: '#3c006b',
-      banner_title: '₹249+ पर <span style="color: #059669;">Free Delivery</span> 🚚',
-      banner_subtitle: '₹399+ के ऑर्डर पर ₹49 का भारी Discount!',
-      banner_icon: '🎁',
-      min_free_delivery: 249,
-      delivery_charge: 25,
-      discount_min_order: 399,
-      discount_amount: 49,
-      store_status: 'OPEN',
-      max_delivery_radius_km: 7.0,
-      base_delivery_km: 2.0,
-      per_km_charge: 2.5,
-      broadcast_notice: '',
-      is_broadcast_active: false,
-      rain_surge_mode: 'OFF',
-      rain_surge_fee: 0,
-      min_order_value: 99,
-      enable_hub_lock: true,
-      cancel_window_seconds: 60,
-      free_gift_min_order: 499,
-      free_gift_item_name: '1x Cold Drink (Free Gift)',
-      is_free_gift_active: true,
-      night_surge_start_hour: 22,
-      night_surge_end_hour: 6,
-      night_surge_fee: 20,
-      is_night_surge_active: false,
-      low_stock_threshold: 5
-    };
-
-    const catEmojiMap = {
-      'All': '🛍️', 'Grocery': '🥦', 'Dairy': '🥛', 'Snacks': '🍿', 'Bakery': '🍞', 'Drinks': '🥤'
-    };
-
-    function toggleDrawer(open) {
-      const drawer = document.getElementById('side-drawer');
-      const overlay = document.getElementById('drawer-overlay');
-      if (open) {
-        drawer.classList.add('active');
-        overlay.classList.add('active');
-      } else {
-        drawer.classList.remove('active');
-        overlay.classList.remove('active');
-      }
-    }
-
-    function startVoiceSearch() {
-      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-      if (!SpeechRecognition) return alert('आपके ब्राउज़र में वॉइस सर्च सपोर्ट नहीं है।');
-
-      const recognition = new SpeechRecognition();
-      recognition.lang = 'hi-IN';
-      recognition.interimResults = false;
-      recognition.maxAlternatives = 1;
-
-      const micBtn = document.getElementById('voice-search-btn');
-      micBtn.classList.add('recording');
-
-      recognition.start();
-
-      recognition.onresult = (event) => {
-        let transcript = event.results[0][0].transcript.toLowerCase().trim();
-        document.getElementById('search-input').value = transcript;
-        handleFilter();
-        micBtn.classList.remove('recording');
-      };
-      recognition.onerror = () => micBtn.classList.remove('recording');
-      recognition.onspeechend = () => { recognition.stop(); micBtn.classList.remove('recording'); };
-    }
-
-    function calculateHaversineKm(lat1, lon1, lat2, lon2) {
-      const R = 6371;
-      const dLat = (lat2 - lat1) * Math.PI / 180;
-      const dLon = (lon2 - lon1) * Math.PI / 180;
-      const a = Math.sin(dLat/2) * Math.sin(dLat/2) + Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.sin(dLon/2) * Math.sin(dLon/2);
-      return R * (2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)));
-    }
-
-    function updateSmartCartTarget(itemsTotal) {
-      const targetBox = document.getElementById('cart-smart-target-box');
-      const targetText = document.getElementById('cart-target-text');
-      const progressBar = document.getElementById('cart-target-progress-bar');
-
-      if (!targetBox || itemsTotal <= 0) {
-        if (targetBox) targetBox.style.display = 'none';
-        return;
-      }
-
-      targetBox.style.display = 'flex';
-
-      const freeDelMin = Number(appConfig.min_free_delivery) || 249;
-      const freeGiftMin = Number(appConfig.free_gift_min_order) || 499;
-      const discountMin = Number(appConfig.discount_min_order) || 399;
-
-      if (itemsTotal < freeDelMin) {
-        const diff = freeDelMin - itemsTotal;
-        const pct = Math.min(100, Math.round((itemsTotal / freeDelMin) * 100));
-        targetText.innerHTML = `🚚 सिर्फ <b>₹${diff}</b> की और खरीदारी पर <b>FREE Delivery</b>!`;
-        progressBar.style.width = `${pct}%`;
-      } else if (itemsTotal < discountMin) {
-        const diff = discountMin - itemsTotal;
-        const pct = Math.min(100, Math.round((itemsTotal / discountMin) * 100));
-        targetText.innerHTML = `💸 सिर्फ <b>₹${diff}</b> की और खरीदारी पर <b>₹${appConfig.discount_amount || 49} का Discount</b>!`;
-        progressBar.style.width = `${pct}%`;
-      } else if (itemsTotal < freeGiftMin && appConfig.is_free_gift_active) {
-        const diff = freeGiftMin - itemsTotal;
-        const pct = Math.min(100, Math.round((itemsTotal / freeGiftMin) * 100));
-        targetText.innerHTML = `🎁 सिर्फ <b>₹${diff}</b> की और खरीदारी पर <b>${appConfig.free_gift_item_name || '1 Cold Drink Free'}</b>!`;
-        progressBar.style.width = `${pct}%`;
-      } else {
-        targetText.innerHTML = `🎉 बधाई हो! आपने सभी ऑफ़र अनलॉक कर लिए हैं!`;
-        progressBar.style.width = `100%`;
-      }
-    }
-
-    function isCurrentlyNightTime() {
-      if (!appConfig.is_night_surge_active) return false;
-      const hr = new Date().getHours();
-      const start = appConfig.night_surge_start_hour ?? 22;
-      const end = appConfig.night_surge_end_hour ?? 6;
-      return start > end ? (hr >= start || hr < end) : (hr >= start && hr < end);
-    }
-
-    async function loadLiveAppSettings() {
+    async function loadSettings() {
       try {
         const { data } = await _supabase.from('app_settings').select('*').eq('id', 1).single();
         if (data) {
-          appConfig = { ...appConfig, ...data };
-          applyThemeAndOffers();
+          appSettings = data;
+          
+          // Store Status
+          const storeBtn = document.getElementById('store-badge-top');
+          if (data.store_status === 'CLOSED') {
+            storeBtn.style.background = '#dc2626';
+            storeBtn.innerText = '🔴 CLOSED';
+          } else {
+            storeBtn.style.background = '#10b981';
+            storeBtn.innerText = '🟢 OPEN';
+          }
+
+          // Broadcast Notice
+          if (data.is_broadcast_active && data.broadcast_notice) {
+            const ticker = document.getElementById('broadcast-ticker');
+            document.getElementById('broadcast-ticker-text').innerText = data.broadcast_notice;
+            ticker.style.display = 'block';
+          } else {
+            document.getElementById('broadcast-ticker').style.display = 'none';
+          }
+
+          // Banners
+          if (data.banner_title) document.getElementById('promo-banner-title').innerText = data.banner_title;
+          if (data.banner_subtitle) document.getElementById('promo-banner-sub').innerText = data.banner_subtitle;
         }
-      } catch (err) { console.warn(err); }
+      } catch (err) {
+        console.warn('Settings load error:', err);
+      }
     }
 
-    function applyThemeAndOffers() {
-      const tickerBar = document.getElementById('broadcast-ticker-bar');
-      if (appConfig.is_broadcast_active && appConfig.broadcast_notice) {
-        tickerBar.style.display = 'block';
-        document.getElementById('broadcast-ticker-content').innerText = `📢 ${appConfig.broadcast_notice}`;
-      } else {
-        tickerBar.style.display = 'none';
-      }
-
-      const rainStrip = document.getElementById('rain-surge-alert');
-      if (appConfig.rain_surge_mode !== 'OFF' && Number(appConfig.rain_surge_fee) > 0) {
-        rainStrip.style.display = 'flex';
-        document.getElementById('rain-surge-msg').innerText = `🌧️ खराब मौसम के कारण ₹${appConfig.rain_surge_fee} डिलीवरी सर्ज लागू है।`;
-      } else {
-        rainStrip.style.display = 'none';
-      }
-
-      const nightStrip = document.getElementById('night-surge-alert');
-      if (isCurrentlyNightTime()) {
-        nightStrip.style.display = 'flex';
-        document.getElementById('night-surge-msg').innerText = `🌙 देर रात सेवा: ₹${appConfig.night_surge_fee} नाइट सर्ज शुल्क लागू है।`;
-      } else {
-        nightStrip.style.display = 'none';
-      }
-
-      renderCartSheet();
-      renderProducts(allProducts);
-    }
-
-    async function initApp() {
-      renderPastOrdersUI();
-      await loadLiveAppSettings();
+    async function fetchCustomerProducts() {
       try {
         const { data, error } = await _supabase.from('products').select('*').order('id', { ascending: true });
+        if (error) throw error;
         allProducts = data || [];
-        document.getElementById('loader').style.display = 'none';
-        renderCategories();
-        renderProducts(allProducts);
-
-        if (currentOrderId) startTracking(currentOrderId);
-      } catch (err) {
-        document.getElementById('loader').innerText = 'Error: ' + err.message;
+        renderProducts();
+      } catch (error) {
+        document.getElementById('product-grid-wrap').innerHTML = 
+          `<div style="grid-column:1/-1; text-align:center; color:#dc2626; padding:30px;">Menu load nahi ho paya: ${error.message}</div>`;
       }
     }
 
-    function selectPaymentMode(mode) {
-      selectedPaymentMode = mode;
-      document.getElementById('opt-cod').style.borderColor = mode === 'COD' ? 'var(--accent-pink)' : '#cbd5e1';
-      document.getElementById('opt-cod').style.background = mode === 'COD' ? '#fff0f4' : '#fff';
-      document.getElementById('opt-upi').style.borderColor = mode === 'UPI' ? 'var(--accent-pink)' : '#cbd5e1';
-      document.getElementById('opt-upi').style.background = mode === 'UPI' ? '#fff0f4' : '#fff';
-
-      document.getElementById('upi-box').style.display = mode === 'UPI' ? 'block' : 'none';
-      if (mode === 'UPI') refreshUpiQr();
-    }
-
-    function refreshUpiQr() {
-      const { finalToPay } = calculateTotals();
-      document.getElementById('upi-box-amount').innerText = finalToPay;
-      const upiUrl = `upi://pay?pa=${STORE_UPI_ID}&pn=BabaFood&am=${finalToPay}&cu=INR`;
-      document.getElementById('upi-qr-img').src = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(upiUrl)}`;
-    }
-
-    function renderCategories() {
-      const bar = document.getElementById('category-chips');
-      const cats = ['All', ...new Set(allProducts.map(p => p.category).filter(Boolean))];
-      bar.innerHTML = cats.map(c => `
-        <div class="cat-item ${c === selectedCat ? 'active' : ''}" onclick="setCategory('${c}', this)">
-          <div class="cat-icon-circle">${catEmojiMap[c] || '📦'}</div>
-          <div class="cat-name">${c}</div>
-        </div>
-      `).join('');
-    }
-
-    function setCategory(cat, el) {
-      selectedCat = cat;
-      document.querySelectorAll('.cat-item').forEach(c => c.classList.remove('active'));
-      if (el) el.classList.add('active');
-      handleFilter();
-    }
-
-    function handleFilter() {
-      const rawInput = document.getElementById('search-input').value.toLowerCase().trim();
-      if (!rawInput) {
-        renderProducts(allProducts.filter(p => selectedCat === 'All' || p.category === selectedCat));
-        return;
-      }
-
-      const searchTerms = new Set([rawInput]);
-      if (keywordSynonyms[rawInput]) searchTerms.add(keywordSynonyms[rawInput]);
-
-      rawInput.split(/\s+/).forEach(word => {
-        searchTerms.add(word);
-        if (keywordSynonyms[word]) searchTerms.add(keywordSynonyms[word]);
-      });
-
-      Object.keys(keywordSynonyms).forEach(dictWord => {
-        if (isFuzzyMatch(rawInput, dictWord)) {
-          searchTerms.add(dictWord);
-          searchTerms.add(keywordSynonyms[dictWord]);
-        }
-      });
-
-      const searchTermsArray = Array.from(searchTerms);
+    function renderProducts() {
+      const wrap = document.getElementById('product-grid-wrap');
+      const query = (document.getElementById('cust-search-input').value || '').toLowerCase().trim();
 
       const filtered = allProducts.filter(p => {
-        const matchC = selectedCat === 'All' || p.category === selectedCat;
-        const pName = (p.name || '').toLowerCase();
-        const pCat = (p.category || '').toLowerCase();
-
-        const matchQ = searchTermsArray.some(term => {
-          if (pName.includes(term) || pCat.includes(term)) return true;
-          const pWords = pName.split(/\s+/);
-          return pWords.some(w => isFuzzyMatch(w, term));
-        });
-
-        return matchC && matchQ;
+        const matchCat = activeCategory === 'ALL' || (p.category || '').toLowerCase() === activeCategory.toLowerCase();
+        const matchQ = (p.name || '').toLowerCase().includes(query) || (p.category || '').toLowerCase().includes(query);
+        return matchCat && matchQ;
       });
 
-      renderProducts(filtered);
-    }
-
-    function renderProducts(items) {
-      const container = document.getElementById('product-list');
-      container.innerHTML = '';
-      if (items.length === 0) {
-        container.innerHTML = '<div style="grid-column: span 2; text-align: center; color: #94a3b8; padding: 30px;">कोई सामान नहीं मिला।</div>';
+      if (filtered.length === 0) {
+        wrap.innerHTML = '<div style="grid-column:1/-1; text-align:center; padding:40px; color:var(--text-muted); font-weight:700;">Koi item nahi mila!</div>';
         return;
       }
 
-      items.forEach(p => {
-        const card = document.createElement('div');
-        card.className = 'product-card';
-        const qty = cart[p.id]?.qty || 0;
-        const stockQty = p.stock_quantity ?? 50;
-        const isOutOfStock = Boolean(p.is_out_of_stock) || stockQty <= 0;
-        const isLowStock = !isOutOfStock && stockQty <= (appConfig.low_stock_threshold || 5);
+      wrap.innerHTML = filtered.map(p => {
+        const qtyInCart = cart[p.id]?.qty || 0;
+        const isOutOfStock = p.is_out_of_stock || (p.stock_quantity !== null && p.stock_quantity <= 0);
+        const isLow = !isOutOfStock && p.stock_quantity && p.stock_quantity <= (appSettings.low_stock_threshold || 5);
         const discPct = Number(p.discount_percent) || 0;
-
-        let originalMrpHtml = '';
-        if (discPct > 0) {
-          const originalMrp = Math.round(p.price / (1 - discPct / 100));
-          originalMrpHtml = `<span class="mrp-cut">₹${originalMrp}</span>`;
-        }
-
-        card.innerHTML = `
-          <div>
-            <div class="img-box" style="${isOutOfStock ? 'opacity: 0.6;' : ''}">
-              <img src="${p.image_url || 'https://via.placeholder.com/150'}" alt="${p.name}">
-              ${isOutOfStock ? '<div class="out-of-stock-tag">OUT OF STOCK</div>' : isLowStock ? `<div class="low-stock-tag">⚠️ Only ${stockQty} Left</div>` : ''}
-              ${discPct > 0 && !isOutOfStock ? `<div class="discount-badge-pill">${discPct}% OFF</div>` : ''}
-            </div>
-            <div class="prod-title">${p.name}</div>
-            <div class="prod-unit">${p.unit || '1 unit'}</div>
-          </div>
-          <div class="price-action-row">
-            <div class="price-tag">₹${p.price} ${originalMrpHtml}</div>
-            <div id="btn-box-${p.id}">${renderButton(p.id, qty, isOutOfStock)}</div>
-          </div>
-        `;
-        container.appendChild(card);
-      });
-    }
-
-    function renderButton(id, qty, isOutOfStock) {
-      if (isOutOfStock) return `<button style="background:#f1f5f9; border:none; color:#94a3b8; padding:6px 12px; border-radius:8px; font-weight:800; font-size:11px;" disabled>Sold</button>`;
-      if (qty > 0) {
-        return `
-          <div class="qty-counter">
-            <button class="qty-btn" onclick="updateQty(${id}, -1)">-</button>
-            <span>${qty}</span>
-            <button class="qty-btn" onclick="updateQty(${id}, 1)">+</button>
-          </div>
-        `;
-      }
-      return `<button class="btn-add-zepto" onclick="updateQty(${id}, 1)">ADD</button>`;
-    }
-
-    function updateQty(id, delta) {
-      const prod = allProducts.find(p => p.id === id);
-      if (!prod || prod.is_out_of_stock) return;
-
-      if (appConfig.enable_hub_lock && delta > 0 && !cart[id]) {
-        const cartItems = Object.values(cart);
-        if (cartItems.length > 0) {
-          const firstHub = cartItems[0].item.hub_id || 1;
-          const currentHub = prod.hub_id || 1;
-          if (firstHub !== currentHub) {
-            alert('🔒 Hub Lock Alert!\n\nआपकी कार्ट में पहले से दूसरे हब का सामान मौजूद है। एक समय में सिर्फ एक ही हब से ऑर्डर कर सकते हैं।');
-            return;
-          }
-        }
-      }
-
-      if (!cart[id]) cart[id] = { item: prod, qty: 0 };
-      cart[id].qty += delta;
-      if (cart[id].qty <= 0) delete cart[id];
-
-      const box = document.getElementById(`btn-box-${id}`);
-      if (box) box.innerHTML = renderButton(id, cart[id]?.qty || 0, false);
-
-      updateCartBar();
-      renderCartSheet();
-      if (selectedPaymentMode === 'UPI') refreshUpiQr();
-    }
-
-    async function applyCouponCode() {
-      const code = document.getElementById('cart-coupon-input').value.trim().toUpperCase();
-      if (!code) return alert('कूपन कोड दर्ज करें!');
-
-      const { data, error } = await _supabase.from('coupons').select('*').eq('code', code).eq('is_active', true).single();
-      if (error || !data) return alert('❌ अमान्य या समाप्त कूपन!');
-
-      const { itemsTotal } = calculateTotals();
-      if (itemsTotal < (Number(data.min_order_amount) || 0)) {
-        return alert(`⚠️ यह कूपन न्यूनतम ₹${data.min_order_amount} के ऑर्डर पर ही मान्य है!`);
-      }
-
-      appliedCoupon = { code: data.code, discount: Number(data.discount_value) || 0 };
-      const pill = document.getElementById('coupon-success-pill');
-      pill.style.display = 'block';
-      pill.innerText = `✓ कूपन '${data.code}' लागू हुआ! ₹${appliedCoupon.discount} की छूट मिली।`;
-      renderCartSheet();
-      if (selectedPaymentMode === 'UPI') refreshUpiQr();
-    }
-
-    function calculateTotals() {
-      const entries = Object.values(cart);
-      const itemsTotal = entries.reduce((s, e) => s + (e.qty * Number(e.item.price)), 0);
-      const totalQty = entries.reduce((s, e) => s + e.qty, 0);
-
-      const minFree = Number(appConfig.min_free_delivery) || 249;
-      const baseCharge = Number(appConfig.delivery_charge) || 25;
-      const minDisc = Number(appConfig.discount_min_order) || 399;
-      const discAmt = Number(appConfig.discount_amount) || 49;
-
-      let deliveryCharge = (itemsTotal >= minFree || itemsTotal === 0) ? 0 : baseCharge;
-
-      const baseKm = Number(appConfig.base_delivery_km) || 2.0;
-      const perKm = Number(appConfig.per_km_charge) || 2.5;
-
-      let distanceCharge = 0;
-      let extraKm = 0;
-
-      if (calculatedKm > baseKm && itemsTotal > 0) {
-        extraKm = parseFloat((calculatedKm - baseKm).toFixed(2));
-        distanceCharge = parseFloat((extraKm * perKm).toFixed(2));
-      }
-
-      let rainSurge = (itemsTotal > 0 && appConfig.rain_surge_mode !== 'OFF') ? (Number(appConfig.rain_surge_fee) || 0) : 0;
-      let nightSurge = (itemsTotal > 0 && isCurrentlyNightTime()) ? (Number(appConfig.night_surge_fee) || 0) : 0;
-
-      let discount = (itemsTotal >= minDisc) ? discAmt : 0;
-      let couponDisc = appliedCoupon ? appliedCoupon.discount : 0;
-
-      let finalToPay = Math.max(0, Math.round(itemsTotal + deliveryCharge + distanceCharge + rainSurge + nightSurge - discount - couponDisc));
-
-      return { itemsTotal, totalQty, deliveryCharge, distanceCharge, extraKm, rainSurge, nightSurge, discount, couponDisc, finalToPay };
-    }
-
-    function updateCartBar() {
-      const { totalQty, finalToPay } = calculateTotals();
-      const bar = document.getElementById('cart-float-bar');
-      if (totalQty > 0) {
-        bar.style.display = 'flex';
-        document.getElementById('float-qty-text').innerText = `${totalQty} Item${totalQty > 1 ? 's' : ''} in Bag`;
-        document.getElementById('float-total-text').innerText = `₹${finalToPay}`;
-      } else {
-        bar.style.display = 'none';
-      }
-    }
-
-    function renderCartSheet() {
-      const box = document.getElementById('cart-items-box');
-      if (!box) return;
-      const entries = Object.values(cart);
-
-      if (entries.length === 0) {
-        box.innerHTML = '<div style="text-align:center; padding: 24px; color: #94a3b8; font-weight:600;">थैला खाली है (Cart is empty).</div>';
-        document.getElementById('bill-subtotal').innerText = '₹0';
-        document.getElementById('bill-grand-total').innerText = '₹0';
-        document.getElementById('cart-smart-target-box').style.display = 'none';
-        document.getElementById('row-distance-charge').style.display = 'none';
-        return;
-      }
-
-      const { itemsTotal, deliveryCharge, distanceCharge, extraKm, rainSurge, nightSurge, discount, couponDisc, finalToPay } = calculateTotals();
-
-      updateSmartCartTarget(itemsTotal);
-
-      const submitBtn = document.getElementById('order-submit-btn');
-      const minReq = Number(appConfig.min_order_value) || 99;
-      
-      if (itemsTotal < minReq) {
-        submitBtn.disabled = true;
-        submitBtn.innerText = `कम से कम ₹${minReq} का ऑर्डर आवश्यक है (₹${minReq - itemsTotal} और जोड़ें)`;
-      } else if (!isLocationUpdated || !customerCoords) {
-        submitBtn.disabled = true;
-        submitBtn.innerText = '⚠️ पहले लाइव लोकेशन अपडेट करें';
-      } else {
-        submitBtn.disabled = false;
-        submitBtn.innerText = selectedPaymentMode === 'UPI' ? 'Verify UTR & Place Order' : '🚀 Place Delivery Order';
-      }
-
-      box.innerHTML = entries.map(({ item, qty }) => `
-        <div style="display:flex; justify-content:space-between; align-items:center; padding:10px 0; border-bottom:1px solid #f8fafc;">
-          <div>
-            <div style="font-size: 13px; font-weight: 800;">${item.name}</div>
-            <div style="font-size: 11px; color: #64748b; font-weight:600;">₹${item.price} × ${qty}</div>
-          </div>
-          <div style="display: flex; align-items: center; gap: 10px;">
-            <span style="font-size: 14px; font-weight: 900;">₹${item.price * qty}</span>
-            <div class="qty-counter" style="padding: 2px 6px;">
-              <button class="qty-btn" onclick="updateQty(${item.id}, -1)">-</button>
-              <span>${qty}</span>
-              <button class="qty-btn" onclick="updateQty(${item.id}, 1)">+</button>
-            </div>
-          </div>
-        </div>
-      `).join('');
-
-      document.getElementById('bill-subtotal').innerText = `₹${itemsTotal}`;
-      document.getElementById('bill-delivery-charge').innerText = deliveryCharge === 0 ? 'FREE' : `₹${deliveryCharge}`;
-      
-      const distRow = document.getElementById('row-distance-charge');
-      if (distanceCharge > 0) {
-        distRow.style.display = 'flex';
-        document.getElementById('bill-distance-title').innerText = `📏 Distance Charge (${extraKm} KM extra × ₹${appConfig.per_km_charge || 2.5})`;
-        document.getElementById('bill-distance-amount').innerText = `+₹${distanceCharge.toFixed(2)}`;
-      } else {
-        distRow.style.display = 'none';
-      }
-
-      document.getElementById('bill-grand-total').innerText = `₹${finalToPay}`;
-
-      document.getElementById('row-rain-surge').style.display = rainSurge > 0 ? 'flex' : 'none';
-      document.getElementById('bill-rain-surge-amount').innerText = `+₹${rainSurge}`;
-
-      document.getElementById('row-night-surge').style.display = nightSurge > 0 ? 'flex' : 'none';
-      document.getElementById('bill-night-surge-amount').innerText = `+₹${nightSurge}`;
-
-      document.getElementById('row-discount').style.display = discount > 0 ? 'flex' : 'none';
-      document.getElementById('bill-disc-amount').innerText = `-₹${discount}`;
-
-      document.getElementById('row-coupon').style.display = couponDisc > 0 ? 'flex' : 'none';
-      document.getElementById('bill-coupon-amount').innerText = `-₹${couponDisc}`;
-    }
-
-    // MANDATORY LIVE GPS LOCATION
-    function getCurrentLocation() {
-      const statusVal = document.getElementById('gps-status-val');
-      const gpsBtn = document.getElementById('btn-location-action');
-      const submitBtn = document.getElementById('order-submit-btn');
-      
-      gpsBtn.innerText = '⏳ लाइव लोकेशन जाँची जा रही है...';
-      statusVal.innerText = 'लाइव लोकेशन फ़ैच हो रही है... कृपया प्रतीक्षा करें।';
-
-      if (!navigator.geolocation) {
-        alert('आपके फ़ोन में GPS सपोर्ट नहीं मिला।');
-        statusVal.innerText = '🔴 GPS सपोर्ट उपलब्ध नहीं है।';
-        gpsBtn.innerText = '📍 क्लिक करके लाइव लोकेशन अपडेट करें (अनिवार्य)';
-        return;
-      }
-
-      navigator.geolocation.getCurrentPosition(
-        async (pos) => {
-          customerCoords = { lat: pos.coords.latitude, lng: pos.coords.longitude };
-          isLocationUpdated = true;
-
-          try {
-            const { data: hubInfo } = await _supabase.from('hubs').select('*').limit(1).single();
-            if (hubInfo && hubInfo.lat && hubInfo.lng) {
-              calculatedKm = calculateHaversineKm(customerCoords.lat, customerCoords.lng, hubInfo.lat, hubInfo.lng);
-            }
-          } catch (e) {}
-
-          const mapsUrl = `https://maps.google.com/?q=${pos.coords.latitude},${pos.coords.longitude}`;
-          
-          gpsBtn.style.background = '#059669';
-          gpsBtn.innerHTML = '✅ लाइव लोकेशन अपडेट हो गई!';
-
-          statusVal.innerHTML = `✅ <b>लाइव लोकेशन वेरिफ़ाइड!</b> (दूरी: ${calculatedKm.toFixed(2)} KM)<br><a href="${mapsUrl}" target="_blank" style="color:#0284c7; font-weight:800;">Google Maps लिंक देखें ↗</a>`;
-
-          renderCartSheet();
-        },
-        (err) => {
-          isLocationUpdated = false;
-          customerCoords = null;
-          gpsBtn.style.background = '#0284c7';
-          gpsBtn.innerText = '📍 क्लिक करके लाइव लोकेशन अपडेट करें (अनिवार्य)';
-          statusVal.innerHTML = `🔴 लोकेशन फ़ैच फ़ेल हुई: ${err.message}। कृपया मोबाइल में GPS चालू रखें और ब्राउज़र में Location Allow करें!`;
-          submitBtn.disabled = true;
-          submitBtn.innerText = '⚠️ पहले लाइव लोकेशन अपडेट करें';
-        },
-        { enableHighAccuracy: true, timeout: 10000 }
-      );
-    }
-
-    // PLACE ORDER FUNCTION (With self-cancel timer trigger)
-    async function placeOrder() {
-      if (!isLocationUpdated || !customerCoords) {
-        return alert('⚠️ लाइव लोकेशन अपडेट करना अनिवार्य है! कृपया नीले बटन पर क्लिक करके लोकेशन अपडेट करें।');
-      }
-
-      const { itemsTotal, finalToPay, distanceCharge, couponDisc, rainSurge, nightSurge } = calculateTotals();
-      const minReq = Number(appConfig.min_order_value) || 99;
-      if (itemsTotal < minReq) {
-        return alert(`⚠️ न्यूनतम ऑर्डर वैल्यू ₹${minReq} है!`);
-      }
-
-      const name = document.getElementById('c-name').value.trim();
-      const phone = document.getElementById('c-phone').value.trim();
-      const manualAddress = document.getElementById('c-address').value.trim();
-      const utr = document.getElementById('upi-utr').value.trim();
-
-      if (name.length < 2) return alert('कृपया अपना पूरा नाम दर्ज करें!');
-      if (!/^[6-9]\d{9}$/.test(phone)) return alert('कृपया 10 अंकों का सही मोबाइल नंबर दर्ज करें!');
-      if (manualAddress.length < 4) return alert('कृपया घर/दुकान का पूरा पता और लैंडमार्क लिखें!');
-
-      if (selectedPaymentMode === 'UPI' && !/^\d{12}$/.test(utr)) {
-        return alert('कृपया 12 अंकों का सही UTR नंबर डालें!');
-      }
-
-      const combinedAddress = `📍 GPS: https://maps.google.com/?q=${customerCoords.lat},${customerCoords.lng}\n🏠 House/Street: ${manualAddress}`;
-
-      const entries = Object.values(cart);
-      if (entries.length === 0) return alert('थैला खाली है!');
-
-      const orderItems = entries.map(({ item, qty }) => ({
-        id: item.id, 
-        name: item.name, 
-        price: item.price, 
-        unit: item.unit, 
-        qty, 
-        subtotal: item.price * qty, 
-        image_url: item.image_url || '',
-        hub_id: item.hub_id || 1
-      }));
-
-      const generatedOtp = Math.floor(1000 + Math.random() * 9000).toString();
-      const hasFreeGift = appConfig.is_free_gift_active && itemsTotal >= (Number(appConfig.free_gift_min_order) || 499);
-
-      try {
-        const { data, error } = await _supabase.from('orders').insert([{
-          customer_name: name,
-          customer_phone: phone,
-          delivery_address: combinedAddress,
-          items: orderItems,
-          total_amount: finalToPay,
-          status: selectedPaymentMode === 'UPI' ? 'Paid Online (UPI)' : 'Order Placed',
-          payment_mode: selectedPaymentMode,
-          transaction_id: selectedPaymentMode === 'UPI' ? utr : null,
-          delivery_otp: generatedOtp,
-          coupon_discount: couponDisc,
-          rain_surge_fee: rainSurge,
-          night_surge_fee: nightSurge,
-          distance_km: Number(calculatedKm.toFixed(2)),
-          distance_charge: distanceCharge,
-          hub_id: orderItems[0]?.hub_id || 1,
-          free_gift_added: hasFreeGift ? appConfig.free_gift_item_name : null
-        }]).select();
-
-        if (error) throw error;
-
-        currentOrderId = data[0].id;
-        localStorage.setItem('zepto_active_order', currentOrderId);
         
-        // Exact order placement timestamp store karein
-        localStorage.setItem('baba_order_placed_time', Date.now().toString());
+        let mrpHtml = '';
+        if (discPct > 0) {
+          const mrp = Math.round(p.price / (1 - discPct / 100));
+          mrpHtml = `<span class="mrp-cut">₹${mrp}</span>`;
+        }
 
-        saveOrderToHistory({
-          id: currentOrderId,
-          total_amount: finalToPay,
-          items: orderItems,
-          date: new Date().toLocaleDateString('hi-IN', { day: 'numeric', month: 'short' }),
-          delivery_address: combinedAddress
-        });
-
-        cart = {};
-        updateCartBar();
-        renderProducts(allProducts);
-        toggleCartModal(false);
-
-        startTracking(currentOrderId);
-        openTrackModal();
-      } catch (e) {
-        alert('Order error: ' + e.message);
-      }
+        return `
+          <div class="product-card">
+            <div class="img-box">
+              <img src="${p.image_url || 'https://via.placeholder.com/150'}" alt="${p.name}" onerror="this.src='https://via.placeholder.com/150'">
+              ${isOutOfStock ? `<span class="out-of-stock-tag">Out of Stock</span>` : ''}
+              ${isLow ? `<span class="low-stock-tag">Few Left</span>` : ''}
+              ${discPct > 0 ? `<span class="discount-badge-pill">${discPct}% OFF</span>` : ''}
+            </div>
+            <div>
+              <div class="prod-title">${p.name}</div>
+              <div class="prod-unit">${p.unit || '1 unit'}</div>
+            </div>
+            <div class="price-action-row">
+              <div class="price-tag">₹${p.price} ${mrpHtml}</div>
+              ${isOutOfStock ? `
+                <button class="btn-add-zepto" style="border-color:#cbd5e1; color:#94a3b8;" disabled>Sold</button>
+              ` : qtyInCart > 0 ? `
+                <div class="qty-counter">
+                  <button class="qty-btn" onclick="updateItemQty(${p.id}, -1)">−</button>
+                  <span>${qtyInCart}</span>
+                  <button class="qty-btn" onclick="updateItemQty(${p.id}, 1)">+</button>
+                </div>
+              ` : `
+                <button class="btn-add-zepto" onclick="updateItemQty(${p.id}, 1)">ADD</button>
+              `}
+            </div>
+          </div>
+        `;
+      }).join('');
     }
 
-    // TRACKING FUNCTION WITH PROPER TIMER
-    function startTracking(orderId) {
-      document.getElementById('live-order-strip').style.display = 'flex';
-      document.getElementById('t-order-id').innerText = `Order #ORD-${orderId}`;
-      
-      // Countdown trigger
-      startSelfCancelCountdown();
+    // CART OPERATIONS (PROBLEM 5 FIXED: FALLBACK HUB_ID)
+    function updateItemQty(prodId, delta) {
+      const prod = allProducts.find(p => p.id === prodId);
+      if (!prod) return;
 
-      const check = async () => {
-        const { data } = await _supabase.from('orders').select('*').eq('id', orderId).single();
-        if (!data) return;
+      // Single Hub Cart Lock Check with Hub 1 Fallback
+      if (appSettings.enable_hub_lock && delta > 0) {
+        const targetHubId = prod.hub_id || 1;
+        const currentCartHubs = Object.values(cart).map(i => i.hub_id || 1);
 
-        if (data.status === 'Cancelled') {
-          document.getElementById('strip-title').innerText = 'Order Cancelled';
-          document.getElementById('strip-sub').innerText = 'यह ऑर्डर रद्द कर दिया गया है';
-          document.getElementById('self-cancel-container').style.display = 'none';
-          document.getElementById('eta-chip-container').style.display = 'none';
+        if (currentCartHubs.length > 0 && !currentCartHubs.includes(targetHubId)) {
+          alert('⚠️ Ek cart mein sirf ek hi dukaan/hub ke items add ho sakte hain! Doosri dukaan ke saman ke liye alag order karein.');
           return;
         }
+      }
 
-        if (data.delivery_otp && data.status !== 'Delivered') {
-          document.getElementById('cust-otp-container').style.display = 'block';
-          document.getElementById('cust-live-otp').innerText = data.delivery_otp;
-        }
+      if (!cart[prodId]) {
+        cart[prodId] = { ...prod, qty: 0 };
+      }
 
-        if (data.status === 'Out for Delivery') {
-          document.getElementById('st-2').style.color = 'var(--accent-green)';
-          document.getElementById('self-cancel-container').style.display = 'none';
-          document.getElementById('rider-contact-row').style.display = 'flex';
+      cart[prodId].qty += delta;
+      if (cart[prodId].qty <= 0) {
+        delete cart[prodId];
+      }
 
-          if (data.assigned_rider_id) {
-            const { data: rInfo } = await _supabase.from('riders').select('phone, current_lat, current_lng, current_speed_kmh, is_overspeeding').eq('id', data.assigned_rider_id).single();
-            if (rInfo) {
-              assignedRiderPhone = rInfo.phone;
-              if (rInfo.current_lat && customerCoords) {
-                const km = calculateHaversineKm(customerCoords.lat, customerCoords.lng, rInfo.current_lat, rInfo.current_lng);
-                const mins = Math.max(2, Math.round(km * 3));
-                document.getElementById('live-eta-subtitle').innerText = `राइडर आपसे ${km.toFixed(1)} KM दूर है • ${mins} मिनट में पहुँच रहा है`;
-                document.getElementById('eta-chip-container').style.display = 'block';
-                document.getElementById('eta-chip-text').innerText = `⚡ राइडर आपसे ${km.toFixed(1)} KM दूर है • ETA: ${mins} Mins`;
-              }
-            }
-          }
-        } else if (data.status === 'Delivered') {
-          document.getElementById('st-3').style.color = 'var(--accent-green)';
-          document.getElementById('self-cancel-container').style.display = 'none';
-          document.getElementById('eta-chip-container').style.display = 'none';
-          document.getElementById('rider-contact-row').style.display = 'none';
-          document.getElementById('rider-rating-box').style.display = 'block';
-          localStorage.removeItem('zepto_active_order');
-        }
-      };
-      check();
-      setInterval(check, 4000);
+      renderProducts();
+      updateCartUI();
     }
 
-    function callRiderMasked() {
-      if (assignedRiderPhone) {
-        window.location.href = `tel:${assignedRiderPhone}`;
+    function updateCartUI() {
+      let totalQty = 0;
+      let subtotal = 0;
+
+      Object.values(cart).forEach(it => {
+        totalQty += it.qty;
+        subtotal += (Number(it.price) * it.qty);
+      });
+
+      // Floating Cart Bar
+      const floatBar = document.getElementById('floating-cart-bar');
+      if (totalQty > 0) {
+        floatBar.style.display = 'flex';
+        document.getElementById('floating-cart-qty').innerText = `${totalQty} ITEM${totalQty > 1 ? 'S' : ''}`;
+        document.getElementById('floating-cart-price').innerText = `₹${subtotal}`;
       } else {
-        alert('राइडर अभी असाइन हो रहा है...');
+        floatBar.style.display = 'none';
+      }
+
+      // Calculations for Modal
+      const freeDelMin = appSettings.min_free_delivery ?? 249;
+      const baseDelCharge = appSettings.delivery_charge ?? 25;
+      const deliveryFee = (subtotal >= freeDelMin || subtotal === 0) ? 0 : baseDelCharge;
+
+      let rainFee = (appSettings.rain_surge_mode && appSettings.rain_surge_mode !== 'OFF') ? Number(appSettings.rain_surge_fee || 0) : 0;
+      
+      // Auto Night Surge Calculation
+      let nightFee = 0;
+      if (appSettings.is_night_surge_active) {
+        const curHr = new Date().getHours();
+        const start = appSettings.night_surge_start_hour ?? 22;
+        const end = appSettings.night_surge_end_hour ?? 6;
+        if (start > end) {
+          if (curHr >= start || curHr < end) nightFee = Number(appSettings.night_surge_fee || 20);
+        } else {
+          if (curHr >= start && curHr < end) nightFee = Number(appSettings.night_surge_fee || 20);
+        }
+      }
+
+      let couponDisc = 0;
+      if (appliedCoupon && subtotal >= (appliedCoupon.min_order_amount || 0)) {
+        couponDisc = Number(appliedCoupon.discount_value || 0);
+      }
+
+      let grandTotal = Math.max(0, (subtotal + deliveryFee + rainFee + nightFee) - couponDisc);
+
+      // DOM Updates
+      document.getElementById('bill-subtotal').innerText = `₹${subtotal}`;
+      document.getElementById('bill-delivery').innerText = deliveryFee === 0 ? 'FREE' : `₹${deliveryFee}`;
+      
+      const rainRow = document.getElementById('row-rain-surge');
+      if (rainFee > 0) {
+        rainRow.style.display = 'flex';
+        document.getElementById('bill-rain-surge').innerText = `₹${rainFee}`;
+      } else rainRow.style.display = 'none';
+
+      const nightRow = document.getElementById('row-night-surge');
+      if (nightFee > 0) {
+        nightRow.style.display = 'flex';
+        document.getElementById('bill-night-surge').innerText = `₹${nightFee}`;
+      } else nightRow.style.display = 'none';
+
+      const coupRow = document.getElementById('row-coupon-disc');
+      if (couponDisc > 0) {
+        coupRow.style.display = 'flex';
+        document.getElementById('bill-coupon-disc').innerText = `-₹${couponDisc}`;
+      } else coupRow.style.display = 'none';
+
+      // Auto Free Gift Rule
+      const giftRow = document.getElementById('row-free-gift');
+      if (appSettings.is_free_gift_active && subtotal >= (appSettings.free_gift_min_order ?? 499)) {
+        giftRow.style.display = 'flex';
+        document.getElementById('bill-free-gift-text').innerText = appSettings.free_gift_item_name || '1x Cold Drink';
+      } else giftRow.style.display = 'none';
+
+      document.getElementById('bill-grand-total').innerText = `₹${grandTotal}`;
+
+      // Target Progress Fill
+      const targetFill = document.getElementById('target-progress-fill');
+      const targetText = document.getElementById('target-headline-text');
+      if (subtotal >= freeDelMin) {
+        targetFill.style.width = '100%';
+        targetText.innerHTML = '🎉 बधाई! आपको <b>FREE Delivery</b> मिल गई है!';
+      } else {
+        const left = freeDelMin - subtotal;
+        const pct = Math.min(100, Math.round((subtotal / freeDelMin) * 100));
+        targetFill.style.width = `${pct}%`;
+        targetText.innerHTML = `🚚 <b>₹${left}</b> का और सामान जोड़ें और पाएं <b>FREE Delivery</b>!`;
+      }
+
+      // Render Modal Cart Items
+      const cartItemsBox = document.getElementById('cart-items-container');
+      const itemsArr = Object.values(cart);
+      if (itemsArr.length === 0) {
+        cartItemsBox.innerHTML = '<div style="text-align:center; padding:20px; color:var(--text-muted); font-weight:700;">Cart khaali hai.</div>';
+      } else {
+        cartItemsBox.innerHTML = itemsArr.map(it => `
+          <div style="display:flex; justify-content:space-between; align-items:center; padding:10px 0; border-bottom:1px solid #f1f5f9;">
+            <div>
+              <div style="font-size:13px; font-weight:800;">${it.name}</div>
+              <div style="font-size:11px; color:var(--text-muted);">₹${it.price} × ${it.qty}</div>
+            </div>
+            <div class="qty-counter">
+              <button class="qty-btn" onclick="updateItemQty(${it.id}, -1)">−</button>
+              <span>${it.qty}</span>
+              <button class="qty-btn" onclick="updateItemQty(${it.id}, 1)">+</button>
+            </div>
+          </div>
+        `).join('');
       }
     }
 
-    // 100% RELIABLE 60-SECOND SELF CANCEL COUNTDOWN
-    function startSelfCancelCountdown() {
-      const cancelBox = document.getElementById('self-cancel-container');
-      const timerSecs = document.getElementById('cancel-timer-secs');
-      let maxSecs = Number(appConfig.cancel_window_seconds) || 60;
-      
-      let placedTime = parseInt(localStorage.getItem('baba_order_placed_time') || Date.now().toString());
-      let elapsed = Math.floor((Date.now() - placedTime) / 1000);
-      let remaining = maxSecs - elapsed;
-
-      if (remaining <= 0) {
-        if (cancelBox) cancelBox.style.display = 'none';
+    // ORDER SUBMISSION
+    async function submitCustomerOrder() {
+      if (appSettings.store_status === 'CLOSED') {
+        alert('Dukaan abhi band hai. Kripya thodi der baad koshish karein!');
         return;
       }
 
-      if (cancelBox) cancelBox.style.display = 'flex';
-      if (timerSecs) timerSecs.innerText = remaining;
+      const itemsArr = Object.values(cart);
+      if (itemsArr.length === 0) return alert('Aapka cart khaali hai!');
 
-      if (cancelTimerInterval) clearInterval(cancelTimerInterval);
+      let subtotal = itemsArr.reduce((acc, it) => acc + (it.price * it.qty), 0);
+      const minOrderVal = appSettings.min_order_value ?? 99;
+      if (subtotal < minOrderVal) {
+        alert(`Kam se kam ₹${minOrderVal} ka order zaroori hai!`);
+        return;
+      }
 
-      cancelTimerInterval = setInterval(() => {
-        remaining--;
-        if (timerSecs) timerSecs.innerText = remaining;
-        if (remaining <= 0) {
-          clearInterval(cancelTimerInterval);
-          if (cancelBox) cancelBox.style.display = 'none';
+      const name = document.getElementById('cust-name').value.trim();
+      const phone = document.getElementById('cust-phone').value.trim();
+      const addr = document.getElementById('cust-address').value.trim();
+      const payMode = document.getElementById('payment-mode-select').value;
+
+      if (!name || !/^[6-9]\d{9}$/.test(phone) || !addr) {
+        alert('Kripya apna poora naam, sahi 10-digit mobile number aur address bharein!');
+        return;
+      }
+
+      const btn = document.getElementById('btn-place-order');
+      btn.disabled = true;
+      btn.innerText = 'Order Lag Raha Hai... ⏳';
+
+      const freeDelMin = appSettings.min_free_delivery ?? 249;
+      const baseDelCharge = appSettings.delivery_charge ?? 25;
+      const deliveryFee = subtotal >= freeDelMin ? 0 : baseDelCharge;
+      const rainFee = (appSettings.rain_surge_mode && appSettings.rain_surge_mode !== 'OFF') ? Number(appSettings.rain_surge_fee || 0) : 0;
+      
+      let nightFee = 0;
+      if (appSettings.is_night_surge_active) {
+        const curHr = new Date().getHours();
+        const start = appSettings.night_surge_start_hour ?? 22;
+        const end = appSettings.night_surge_end_hour ?? 6;
+        if (start > end ? (curHr >= start || curHr < end) : (curHr >= start && curHr < end)) {
+          nightFee = Number(appSettings.night_surge_fee || 20);
         }
+      }
+
+      const couponDisc = appliedCoupon ? Number(appliedCoupon.discount_value || 0) : 0;
+      const grandTotal = Math.max(0, (subtotal + deliveryFee + rainFee + nightFee) - couponDisc);
+      const otp = Math.floor(1000 + Math.random() * 9000).toString();
+      const freeGift = (appSettings.is_free_gift_active && subtotal >= (appSettings.free_gift_min_order ?? 499)) ? appSettings.free_gift_item_name : null;
+      const hubId = itemsArr[0]?.hub_id || 1;
+
+      const orderPayload = {
+        customer_name: name,
+        customer_phone: phone,
+        delivery_address: addr,
+        items: itemsArr.map(i => ({ id: i.id, name: i.name, qty: i.qty, price: i.price, subtotal: i.price * i.qty })),
+        total_amount: grandTotal,
+        payment_mode: payMode,
+        status: payMode === 'UPI' ? 'Paid Online / Placed' : 'Placed',
+        delivery_otp: otp,
+        hub_id: hubId,
+        rain_surge_fee: rainFee,
+        night_surge_fee: nightFee,
+        coupon_code: appliedCoupon ? appliedCoupon.code : null,
+        coupon_discount: couponDisc,
+        free_gift_added: freeGift
+      };
+
+      try {
+        const { data, error } = await _supabase.from('orders').insert([orderPayload]).select().single();
+        if (error) throw error;
+
+        // Save Phone locally
+        localStorage.setItem('baba_cust_phone', phone);
+        cart = {};
+        appliedCoupon = null;
+        updateCartUI();
+        closeCartModal();
+        btn.disabled = false;
+        btn.innerText = 'Place Express Order 🚀';
+
+        alert(`🎉 Order #${data.id} Safaltapoorvak Lag Gaya!`);
+        openTrackModal(data.id);
+      } catch (err) {
+        alert('Order Error: ' + err.message);
+        btn.disabled = false;
+        btn.innerText = 'Place Express Order 🚀';
+      }
+    }
+
+    // LIVE TRACKING
+    async function openTrackModal(orderId) {
+      activeTrackOrderId = orderId;
+      document.getElementById('track-order-num').innerText = `Order #ORD-${orderId}`;
+      document.getElementById('track-modal').classList.add('active');
+      fetchTrackingData();
+      if (trackingInterval) clearInterval(trackingInterval);
+      trackingInterval = setInterval(fetchTrackingData, 5000);
+    }
+
+    function closeTrackModal() {
+      document.getElementById('track-modal').classList.remove('active');
+      if (trackingInterval) clearInterval(trackingInterval);
+    }
+
+    async function fetchTrackingData() {
+      if (!activeTrackOrderId) return;
+      const { data } = await _supabase.from('orders').select('*').eq('id', activeTrackOrderId).single();
+      if (!data) return;
+
+      const body = document.getElementById('track-content-body');
+      const orderTime = new Date(data.created_at).getTime();
+      const now = new Date().getTime();
+      const cancelWindowSec = appSettings.cancel_window_seconds ?? 60;
+      const secondsPassed = Math.floor((now - orderTime) / 1000);
+      const canSelfCancel = (secondsPassed < cancelWindowSec) && !data.status.toLowerCase().includes('cancelled') && !data.status.toLowerCase().includes('delivered');
+
+      body.innerHTML = `
+        <div style="background:#fff; border-radius:14px; border:1px solid var(--border-soft); padding:16px;">
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <div style="font-size:16px; font-weight:900;">Status: <span style="color:var(--accent-pink);">${data.status}</span></div>
+            <div style="font-size:12px; font-weight:800; color:var(--text-muted);">₹${data.total_amount} (${data.payment_mode})</div>
+          </div>
+
+          <div class="cust-otp-box">
+            <div style="font-size:12px; font-weight:800; color:#6b21a8;">DELIVERY SECRET OTP (Rider ko batayein):</div>
+            <div class="cust-otp-code">${data.delivery_otp || '----'}</div>
+          </div>
+
+          ${canSelfCancel ? `
+            <div style="margin:12px 0; text-align:center;">
+              <button onclick="selfCancelOrder(${data.id})" style="background:#fee2e2; border:1.5px solid #f87171; color:#dc2626; padding:10px 16px; border-radius:10px; font-weight:900; font-size:12px; cursor:pointer;">
+                ✕ Cancel Order (${cancelWindowSec - secondsPassed}s left)
+              </button>
+            </div>
+          ` : ''}
+
+          <div style="margin-top:14px; display:flex; gap:10px;">
+            <button class="btn-add-zepto" style="flex:1; background:var(--primary-purple); color:white; border:none; padding:12px;" onclick="openCustomerChat(${data.id})">
+              💬 Chat with Support / Rider
+            </button>
+          </div>
+        </div>
+      `;
+    }
+
+    async function selfCancelOrder(orderId) {
+      if (!confirm('Kya aap sach me ye order cancel karna chahte hain?')) return;
+      await _supabase.from('orders').update({
+        status: 'Cancelled',
+        cancelled_by: 'Customer',
+        cancellation_reason: 'Self cancelled within window'
+      }).eq('id', orderId);
+      alert('Order Cancel Ho Gaya!');
+      fetchTrackingData();
+    }
+
+    // LIVE GPS FETCH
+    function fetchLiveGps() {
+      if (!navigator.geolocation) return alert('Aapke browser me GPS uplabdh nahi hai!');
+      navigator.geolocation.getCurrentPosition(pos => {
+        userCoords = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+        document.getElementById('loc-box').style.display = 'block';
+        document.getElementById('loc-val').innerText = `${userCoords.lat.toFixed(5)}, ${userCoords.lng.toFixed(5)}`;
+      }, err => alert('GPS Error: ' + err.message));
+    }
+
+    // COUPONS
+    async function applyCouponCode() {
+      const code = document.getElementById('coupon-input').value.trim().toUpperCase();
+      if (!code) return alert('Coupon code daalein!');
+
+      const { data } = await _supabase.from('coupons').select('*').eq('code', code).eq('is_active', true).single();
+      if (!data) return alert('Invalid ya expired coupon code!');
+
+      appliedCoupon = data;
+      document.getElementById('coupon-applied-msg').innerText = `✅ Coupon ${data.code} Applied (₹${data.discount_value} OFF)!`;
+      updateCartUI();
+    }
+
+    // PAST ORDERS
+    async function openPastOrdersModal() {
+      const phone = localStorage.getItem('baba_cust_phone');
+      document.getElementById('orders-modal').classList.add('active');
+      const box = document.getElementById('past-orders-list');
+
+      if (!phone) {
+        box.innerHTML = '<div style="text-align:center; padding:30px; color:var(--text-muted); font-weight:700;">Pehle ek order place karein taaki history save ho sake!</div>';
+        return;
+      }
+
+      const { data } = await _supabase.from('orders').select('*').eq('customer_phone', phone).order('id', { ascending: false });
+      const orders = data || [];
+
+      if (orders.length === 0) {
+        box.innerHTML = '<div style="text-align:center; padding:30px; color:var(--text-muted); font-weight:700;">Koi purana order nahi mila.</div>';
+        return;
+      }
+
+      box.innerHTML = orders.map(o => `
+        <div class="past-order-box">
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <div style="font-weight:900;">#ORD-${o.id}</div>
+            <span style="font-size:12px; font-weight:800; color:var(--accent-pink);">${o.status}</span>
+          </div>
+          <div style="font-size:12px; color:var(--text-muted); margin:4px 0;">Total: <b>₹${o.total_amount}</b> | ${new Date(o.created_at).toLocaleDateString()}</div>
+          <button class="btn-add-zepto" style="margin-top:8px;" onclick="closePastOrdersModal(); openTrackModal(${o.id});">Track / View Details ➔</button>
+        </div>
+      `).join('');
+    }
+
+    function closePastOrdersModal() { document.getElementById('orders-modal').classList.remove('active'); }
+    function openCartModal() { document.getElementById('cart-modal').classList.add('active'); updateCartUI(); }
+    function closeCartModal() { document.getElementById('cart-modal').classList.remove('active'); }
+    function toggleDrawer(open) {
+      document.getElementById('side-drawer').classList.toggle('active', open);
+      document.getElementById('drawer-overlay').classList.toggle('active', open);
+    }
+    function filterCategory(cat, el) {
+      activeCategory = cat;
+      document.querySelectorAll('.cat-item').forEach(c => c.classList.remove('active'));
+      if (el) el.classList.add('active');
+      renderProducts();
+    }
+    function handleSearch() { renderProducts(); }
+
+    // CUSTOMER LIVE CHAT
+    function openCustomerChat(orderId) {
+      document.getElementById('cust-chat-drawer').classList.add('active');
+      const box = document.getElementById('chat-msgs-box');
+      box.innerHTML = `
+        <div class="chat-bubble rider">Order #${orderId} ke liye swagat hai! Hamari team aapki sahayata ke liye taiyar hai.</div>
+      `;
+    }
+
+    function closeCustomerChat() {
+      document.getElementById('cust-chat-drawer').classList.remove('active');
+    }
+
+    function sendCustomerChatMessage() {
+      const input = document.getElementById('chat-text-input');
+      const text = input.value.trim();
+      if (!text) return;
+
+      const box = document.getElementById('chat-msgs-box');
+      box.innerHTML += `<div class="chat-bubble customer">${text}</div>`;
+      input.value = '';
+      box.scrollTop = box.scrollHeight;
+
+      setTimeout(() => {
+        box.innerHTML += `<div class="chat-bubble rider">Aapka sandesh prapt ho gaya hai. Rider turant reply karega.</div>`;
+        box.scrollTop = box.scrollHeight;
       }, 1000);
     }
 
-    // CUSTOMER CANCEL ORDER ACTION
-    async function handleCustomerSelfCancel() {
-      if (!confirm('क्या आप वाकई अपना ऑर्डर रद्द करना चाहते हैं?')) return;
-      if (!currentOrderId) return;
-
-      try {
-        const { error } = await _supabase.from('orders').update({
-          status: 'Cancelled',
-          cancelled_by: 'Customer (Self-Cancel)',
-          cancellation_reason: 'कस्टमर ने 60s के अंदर रद्द किया'
-        }).eq('id', currentOrderId);
-
-        if (error) throw error;
-
-        alert('✅ आपका ऑर्डर सफलतापूर्वक कैंसिल हो गया!');
-        localStorage.removeItem('zepto_active_order');
-        currentOrderId = null;
-        toggleTrackModal(false);
-        document.getElementById('live-order-strip').style.display = 'none';
-      } catch (err) {
-        alert('कैंसिलेशन एरर: ' + err.message);
-      }
+    // REALTIME UPDATES
+    function setupCustomerRealtime() {
+      _supabase
+        .channel('public_customer_updates')
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'app_settings' }, () => loadSettings())
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'products' }, () => fetchCustomerProducts())
+        .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'orders' }, payload => {
+          if (activeTrackOrderId === payload.new.id) fetchTrackingData();
+        })
+        .subscribe();
     }
-
-    function setRiderStars(count) {
-      selectedStarCount = count;
-      document.querySelectorAll('#stars-container .star-icon').forEach((star, idx) => {
-        if (idx < count) star.classList.add('filled');
-        else star.classList.remove('filled');
-      });
-    }
-
-    function toggleRatingChip(el, text) {
-      if (selectedChips.has(text)) { selectedChips.delete(text); el.classList.remove('selected'); }
-      else { selectedChips.add(text); el.classList.add('selected'); }
-    }
-
-    async function submitRiderRating() {
-      if (!currentOrderId) return;
-      await _supabase.from('orders').update({
-        rating: selectedStarCount, feedback: [...selectedChips].join(', ') || 'Good'
-      }).eq('id', currentOrderId);
-      document.getElementById('rider-rating-box').innerHTML = '<div style="color:var(--accent-green); font-weight:800;">धन्यवाद! आपकी रेटिंग दर्ज हो गई है। ⭐</div>';
-    }
-
-    function openLiveChatModal() {
-      if (!currentOrderId) return alert('कोई सक्रिय ऑर्डर नहीं है!');
-      document.getElementById('chat-drawer').classList.add('active');
-      loadOrderMessages();
-      if (!chatInterval) chatInterval = setInterval(loadOrderMessages, 2500);
-    }
-
-    function closeLiveChatModal() {
-      document.getElementById('chat-drawer').classList.remove('active');
-      if (chatInterval) { clearInterval(chatInterval); chatInterval = null; }
-    }
-
-    async function loadOrderMessages() {
-      if (!currentOrderId) return;
-      const { data } = await _supabase.from('order_chats').select('*').eq('order_id', currentOrderId).order('id', { ascending: true });
-      const container = document.getElementById('chat-messages');
-      if (!data || data.length === 0) {
-        container.innerHTML = '<div style="text-align:center; font-size:11px; color:#94a3b8; margin:10px 0;">राइडर को मैसेज भेजने के लिए नीचे टाइप करें।</div>';
-        return;
-      }
-      container.innerHTML = data.map(m => `
-        <div class="msg-bubble ${m.sender === 'customer' ? 'msg-customer' : 'msg-rider'}">
-          <div style="font-size:10px; opacity:0.8; margin-bottom:2px;">${m.sender === 'customer' ? 'You' : '🛵 Rider'}</div>
-          ${m.message}
-        </div>
-      `).join('');
-      container.scrollTop = container.scrollHeight;
-    }
-
-    async function sendMessage(text) {
-      if (!text || !currentOrderId) return;
-      await _supabase.from('order_chats').insert([{ order_id: currentOrderId, sender: 'customer', message: text }]);
-      loadOrderMessages();
-    }
-    function sendQuickMessage(txt) { sendMessage(txt); }
-    function sendCustomMessage() {
-      const inp = document.getElementById('chat-user-text');
-      const val = inp.value.trim();
-      if (val) { sendMessage(val); inp.value = ''; }
-    }
-
-    function saveOrderToHistory(order) {
-      let history = JSON.parse(localStorage.getItem('zepto_order_history') || '[]');
-      history.unshift(order);
-      localStorage.setItem('zepto_order_history', JSON.stringify(history.slice(0, 8)));
-      renderPastOrdersUI();
-    }
-
-    function renderPastOrdersUI() {
-      const container = document.getElementById('history-container');
-      const history = JSON.parse(localStorage.getItem('zepto_order_history') || '[]');
-      if (history.length === 0) return;
-
-      container.innerHTML = history.map(o => `
-        <div class="past-order-box">
-          <div style="display:flex; justify-content:space-between; font-weight:800; font-size:13px; margin-bottom:4px;">
-            <span>ORD #${o.id}</span>
-            <span style="color:var(--accent-green);">₹${o.total_amount}</span>
-          </div>
-          <div style="font-size:11px; color:#64748b; margin-bottom:8px;">📅 ${o.date}</div>
-          <button onclick='openReceiptModal(${JSON.stringify(o)})' style="background:#f8fafc; border:1px solid #cbd5e1; padding:6px 12px; border-radius:8px; font-size:12px; font-weight:800; cursor:pointer;">
-            📄 View Receipt & Claim
-          </button>
-        </div>
-      `).join('');
-    }
-
-    async function openReceiptModal(order) {
-      currentViewingReceiptOrder = order;
-      document.getElementById('rcpt-title').innerText = `Order Receipt #ORD-${order.id}`;
-      document.getElementById('rcpt-date-mode').innerText = `Date: ${order.date || ''} | Status: Success`;
-      document.getElementById('rcpt-address').innerText = order.delivery_address || 'Home Address';
-      document.getElementById('rcpt-total-amount').innerText = `₹${order.total_amount}`;
-
-      const { data: fullOrder } = await _supabase.from('orders').select('dispute_status, dispute_note').eq('id', order.id).single();
-      const statusPill = document.getElementById('rcpt-dispute-status-pill');
-      if (fullOrder && fullOrder.dispute_status) {
-        statusPill.style.display = 'block';
-        if (fullOrder.dispute_status === 'PENDING') {
-          statusPill.style.background = '#fef3c7'; statusPill.style.color = '#b45309';
-          statusPill.innerText = `⚠️ रिफ़ंड क्लेम की समीक्षा चल रही है (PENDING)`;
-        } else if (fullOrder.dispute_status === 'APPROVED') {
-          statusPill.style.background = '#dcfce7'; statusPill.style.color = '#15803d';
-          statusPill.innerText = `✓ रिफ़ंड स्वीकार कर लिया गया है (APPROVED)`;
-        } else {
-          statusPill.style.background = '#fee2e2'; statusPill.style.color = '#b91c1c';
-          statusPill.innerText = `✕ क्लेम अस्वीकार किया गया (REJECTED)`;
-        }
-      } else {
-        statusPill.style.display = 'none';
-      }
-
-      const itemsListContainer = document.getElementById('rcpt-items-list');
-      const items = Array.isArray(order.items) ? order.items : [];
-
-      itemsListContainer.innerHTML = items.map(item => `
-        <div style="display:flex; align-items:center; justify-content:space-between; padding:8px 0; border-bottom:1px solid #f1f5f9;">
-          <div>
-            <div style="font-size:12px; font-weight:800;">${item.name}</div>
-            <div style="font-size:10px; color:#64748b;">₹${item.price} × ${item.qty}</div>
-          </div>
-          <div style="font-size:13px; font-weight:900;">₹${item.subtotal || (item.price * item.qty)}</div>
-        </div>
-      `).join('');
-
-      document.getElementById('rcpt-repeat-btn').onclick = () => {
-        closeReceiptModal();
-        repeatOrder(order.items);
-      };
-
-      document.getElementById('dispute-form-box').style.display = 'none';
-      document.getElementById('receipt-modal').classList.add('active');
-    }
-
-    function closeReceiptModal() { document.getElementById('receipt-modal').classList.remove('active'); }
-    function openDisputeForm() { document.getElementById('dispute-form-box').style.display = 'block'; }
-
-    // Automatic Canvas Image Compressor function
-    function compressImage(file, maxWidth = 800, quality = 0.7) {
-      return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.readAsDataURL(file);
-        reader.onload = (event) => {
-          const img = new Image();
-          img.src = event.target.result;
-          img.onload = () => {
-            const canvas = document.createElement('canvas');
-            let width = img.width;
-            let height = img.height;
-
-            if (width > maxWidth) {
-              height = Math.round((height * maxWidth) / width);
-              width = maxWidth;
-            }
-
-            canvas.width = width;
-            canvas.height = height;
-            const ctx = canvas.getContext('2d');
-            ctx.drawImage(img, 0, 0, width, height);
-            resolve(canvas.toDataURL('image/jpeg', quality));
-          };
-          img.onerror = (err) => reject(err);
-        };
-        reader.onerror = (err) => reject(err);
-      });
-    }
-
-    // 100% FIXED REFUND CLAIM SUBMISSION
-    async function submitRefundDispute() {
-      if (!currentViewingReceiptOrder) return;
-      const note = document.getElementById('dispute-note-input').value.trim();
-      const fileInput = document.getElementById('dispute-file-input');
-      const submitBtn = document.getElementById('btn-submit-dispute');
-
-      if (!note) return alert('कृपया समस्या का विवरण लिखें!');
-      if (!fileInput.files || fileInput.files.length === 0) return alert('कृपया खराब सामान की फोटो अपलोड करें!');
-
-      submitBtn.disabled = true;
-      submitBtn.innerText = '⏳ फोटो कंप्रेस व अपलोड हो रही है...';
-
-      try {
-        const file = fileInput.files[0];
-        const compressedBase64 = await compressImage(file, 700, 0.6);
-
-        const { error } = await _supabase.from('orders').update({
-          dispute_status: 'PENDING',
-          dispute_note: note,
-          dispute_photo_url: compressedBase64
-        }).eq('id', currentViewingReceiptOrder.id);
-
-        if (error) throw error;
-
-        alert('✅ आपकी शिकायत और फोटो एडमिन को सफलतापूर्वक भेज दी गई है!');
-        document.getElementById('dispute-form-box').style.display = 'none';
-        closeReceiptModal();
-      } catch(err) {
-        alert('सबमिट एरर: ' + err.message);
-      } finally {
-        submitBtn.disabled = false;
-        submitBtn.innerText = '📤 Submit Refund Claim to Admin';
-      }
-    }
-
-    function repeatOrder(items) {
-      cart = {};
-      items.forEach(oldItem => {
-        const product = allProducts.find(p => p.id === oldItem.id) || {
-          id: oldItem.id, name: oldItem.name, price: oldItem.price, unit: oldItem.unit, image_url: oldItem.image_url || '', hub_id: oldItem.hub_id || 1
-        };
-        if (!product.is_out_of_stock) cart[product.id] = { item: product, qty: oldItem.qty };
-      });
-      renderProducts(allProducts);
-      updateCartBar();
-      openCartModal();
-    }
-
-    function toggleCartModal(s) { 
-      document.getElementById('cart-modal').className = s ? 'modal-overlay active' : 'modal-overlay';
-      document.getElementById('cart-sticky-bar').style.display = s ? 'block' : 'none';
-    }
-    function openCartModal() { renderCartSheet(); toggleCartModal(true); }
-    function closeCartModal() { toggleCartModal(false); }
-
-    function toggleTrackModal(s) { document.getElementById('track-modal').className = s ? 'modal-overlay active' : 'modal-overlay'; }
-    function openTrackModal() { toggleTrackModal(true); }
-    function closeTrackModal() { toggleTrackModal(false); }
-
-    function toggleSupportModal(s) { document.getElementById('support-modal').className = s ? 'modal-overlay active' : 'modal-overlay'; }
-    function openSupportModal() { toggleSupportModal(true); }
-    function closeSupportModal(e) { toggleSupportModal(false); }
-
-    function scrollToHistory() { document.getElementById('past-orders-section').scrollIntoView({ behavior: 'smooth' }); }
-
-    initApp();
   </script>
 </body>
 </html>
