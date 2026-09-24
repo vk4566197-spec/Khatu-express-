@@ -20,6 +20,7 @@
       --accent-green: #059669;
       --accent-red: #dc2626;
       --accent-yellow: #f59e0b;
+      --accent-blue: #0284c7;
       --bg-slate: #0f172a;
       --card-bg: #1e293b;
       --border-color: #334155;
@@ -28,9 +29,23 @@
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; -webkit-tap-highlight-color: transparent; }
-    body { background-color: var(--bg-slate); color: var(--text-main); padding-bottom: 90px; min-height: 100vh; }
+    body { background-color: var(--bg-slate); color: var(--text-main); padding-bottom: 110px; min-height: 100vh; }
 
-    /* HEADER */
+    /* AUDIO UNLOCK OVERLAY */
+    .audio-gate {
+      position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+      background: rgba(15, 23, 42, 0.95); z-index: 999999; display: flex;
+      flex-direction: column; align-items: center; justify-content: center;
+      padding: 24px; text-align: center;
+    }
+    .gate-btn {
+      background: linear-gradient(135deg, #ff2a6d, #e0115f); color: white;
+      border: none; padding: 16px 32px; border-radius: 16px; font-size: 16px;
+      font-weight: 900; cursor: pointer; box-shadow: 0 8px 24px rgba(255, 42, 109, 0.4);
+      margin-top: 18px;
+    }
+
+    /* TOP HEADER */
     .top-nav {
       background: #1e112a; padding: 14px 18px; border-bottom: 1px solid #381a4d;
       display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 1000;
@@ -44,6 +59,7 @@
     .store-toggle-btn {
       background: #10b981; border: none; color: #fff; padding: 8px 14px;
       border-radius: 20px; font-size: 11px; font-weight: 900; cursor: pointer;
+      display: flex; align-items: center; gap: 6px;
     }
     .store-toggle-btn.closed { background: #dc2626; }
 
@@ -72,6 +88,7 @@
     .order-item-card {
       background: #172033; border: 1.5px solid var(--border-color); border-radius: 14px;
       padding: 14px; margin-bottom: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+      position: relative;
     }
     .order-item-card.return-card-style { border-color: #ef4444; background: #23121d; }
     .order-head { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px; }
@@ -79,7 +96,8 @@
     .badge-placed { background: #0284c7; color: white; }
     .badge-out { background: #f59e0b; color: black; }
     .badge-delivered { background: #059669; color: white; }
-    .badge-return { background: #dc2626; color: white; }
+    .badge-cancelled { background: #dc2626; color: white; }
+    .badge-return { background: #ef4444; color: white; }
 
     .ord-details-box { background: #0f172a; border-radius: 10px; padding: 10px; font-size: 12px; color: #cbd5e1; margin: 8px 0; }
     .ord-row { display: flex; align-items: flex-start; gap: 6px; margin-bottom: 4px; word-break: break-word; }
@@ -97,14 +115,46 @@
     .btn-success { background: #059669; border: none; }
     .btn-danger { background: #dc2626; border: none; }
     .btn-warning { background: #d97706; border: none; }
+    .btn-secondary { background: #475569; border: none; }
 
     .return-proof-img {
       width: 120px; height: 120px; border-radius: 10px; object-fit: cover;
       border: 1.5px solid #ef4444; margin-top: 6px; cursor: pointer;
     }
+
+    /* RIDER RADAR CARD STYLES */
+    .radar-card {
+      background: #151f32; border: 1.5px solid #38bdf8; border-radius: 14px;
+      padding: 14px; margin-bottom: 12px; box-shadow: 0 4px 15px rgba(56, 189, 248, 0.15);
+    }
+    .live-dot {
+      width: 10px; height: 10px; border-radius: 50%; background: #10b981;
+      display: inline-block; box-shadow: 0 0 10px #10b981; margin-right: 4px;
+    }
+    .live-dot.offline { background: #ef4444; box-shadow: none; }
+
+    /* MODAL PREVIEWS */
+    .modal-box {
+      position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+      background: rgba(0,0,0,0.85); backdrop-filter: blur(4px); z-index: 10000;
+      display: none; align-items: center; justify-content: center; padding: 16px;
+    }
+    .modal-box.active { display: flex; }
+    .modal-inner {
+      background: #1e293b; border: 2px solid #a855f7; border-radius: 16px;
+      padding: 20px; width: 100%; max-width: 440px; max-height: 90vh; overflow-y: auto;
+    }
   </style>
 </head>
-<body onclick="unlockAdminAudio();" ontouchstart="unlockAdminAudio();">
+<body>
+
+  <!-- AUDIO GATE OVERLAY -->
+  <div class="audio-gate" id="audio-gate">
+    <div style="font-size: 34px;">🔔</div>
+    <h2 style="margin-top: 10px; font-weight: 900; font-size: 20px;">BABA Master Dashboard</h2>
+    <p style="font-size: 13px; color: #94a3b8; margin-top: 8px;">Naye order aur alert sound enable karne ke liye touch karke open karein:</p>
+    <button class="gate-btn" onclick="startMasterAudioGate()">🎧 Start Dashboard & Alert Sound</button>
+  </div>
 
   <!-- TOP APP BAR -->
   <div class="top-nav">
@@ -116,6 +166,7 @@
       </div>
     </div>
     <div class="header-actions">
+      <button id="alert-mute-btn" class="btn-admin btn-warning" style="padding: 6px 10px; font-size: 10px;" onclick="stopAlertTune()">🔕 Stop Bell</button>
       <button id="store-toggle-btn" class="store-toggle-btn" onclick="toggleStoreStatus()">🟢 OPEN</button>
     </div>
   </div>
@@ -144,6 +195,8 @@
   <div class="admin-tabs">
     <button class="tab-btn active" id="tab-btn-orders" onclick="switchAdminTab('orders')">📦 Orders (<span id="count-orders">0</span>)</button>
     <button class="tab-btn" id="tab-btn-returns" onclick="switchAdminTab('returns')" style="color:#f87171;">🚨 Returns (<span id="count-returns">0</span>)</button>
+    <button class="tab-btn" id="tab-btn-radar" onclick="switchAdminTab('radar')" style="color:#38bdf8;">🛰️ Live Rider Radar</button>
+    <button class="tab-btn" id="tab-btn-history" onclick="switchAdminTab('history')">📜 History</button>
     <button class="tab-btn" id="tab-btn-products" onclick="switchAdminTab('products')">🍔 Menu / Stock</button>
     <button class="tab-btn" id="tab-btn-riders" onclick="switchAdminTab('riders')">🛵 Riders</button>
     <button class="tab-btn" id="tab-btn-coupons" onclick="switchAdminTab('coupons')">🎟️ Coupons</button>
@@ -154,7 +207,7 @@
 
   <div class="content-area">
 
-    <!-- 1. LIVE ORDERS SECTION -->
+    <!-- 1. LIVE ACTIVE ORDERS -->
     <div id="section-orders">
       <div class="sec-title">
         <span>⚡ Live Incoming Orders</span>
@@ -171,7 +224,25 @@
       <div id="returns-list-box"><div style="text-align:center; padding:30px; color:#94a3b8;">Koi return request pending nahi hai.</div></div>
     </div>
 
-    <!-- 3. MENU & STOCK MANAGEMENT -->
+    <!-- 3. LIVE RIDER RADAR & GPS TRACKING -->
+    <div id="section-radar" style="display:none;">
+      <div class="sec-title" style="color:#38bdf8;">
+        <span>🛰️ Live Riders GPS Radar & Tracking</span>
+        <button class="btn-admin" style="font-size:11px; padding:6px 10px;" onclick="fetchRiders()">📡 Ping GPS</button>
+      </div>
+      <div id="radar-list-box"><div style="text-align:center; padding:30px; color:#94a3b8;">Riders ki live location load ho rahi hai...</div></div>
+    </div>
+
+    <!-- 4. PAST ORDERS HISTORY -->
+    <div id="section-history" style="display:none;">
+      <div class="sec-title">
+        <span>📜 All Past / Completed Orders History</span>
+        <input type="text" id="history-search" class="admin-input" style="max-width:200px; margin-bottom:0;" placeholder="Search Order/Phone..." oninput="renderHistory()">
+      </div>
+      <div id="history-list-box"></div>
+    </div>
+
+    <!-- 5. MENU & STOCK MANAGEMENT -->
     <div id="section-products" style="display:none;">
       <div class="section-card">
         <div class="sec-title">➕ Naya Item Jodein</div>
@@ -182,6 +253,9 @@
           <input type="number" id="p-discount" class="admin-input" placeholder="Discount %">
           <input type="number" id="p-stock" class="admin-input" placeholder="Stock Qty">
           <input type="text" id="p-unit" class="admin-input" placeholder="Unit (1 plate)">
+          <select id="p-hub-id" class="admin-input">
+            <option value="1">Assign Hub: Hub 1 (Main)</option>
+          </select>
         </div>
         <input type="text" id="p-img" class="admin-input" placeholder="Image URL">
         <button class="btn-admin btn-success" style="width:100%;" onclick="addNewProduct()">+ Menu Me Jodein</button>
@@ -190,7 +264,7 @@
       <div id="inventory-list-box"></div>
     </div>
 
-    <!-- 4. RIDERS MANAGEMENT (WITH BIKE NO. & ADDRESS) -->
+    <!-- 6. RIDERS MANAGEMENT (WITH BIKE NO. & ADDRESS) -->
     <div id="section-riders" style="display:none;">
       <div class="section-card">
         <div class="sec-title">➕ Naya Delivery Rider Jodein</div>
@@ -206,7 +280,7 @@
       <div id="riders-list-box"></div>
     </div>
 
-    <!-- 5. COUPONS MANAGEMENT -->
+    <!-- 7. COUPONS MANAGEMENT -->
     <div id="section-coupons" style="display:none;">
       <div class="section-card">
         <div class="sec-title">➕ Naya Promo Coupon Banayein</div>
@@ -221,7 +295,7 @@
       <div id="coupons-list-box"></div>
     </div>
 
-    <!-- 6. HUBS / MULTI-VENDOR MANAGEMENT (WITH FULL ADD FUNCTION) -->
+    <!-- 8. HUBS / MULTI-VENDOR MANAGEMENT -->
     <div id="section-hubs" style="display:none;">
       <div class="section-card">
         <div class="sec-title">➕ Naya Hub / Dukaan Jodein</div>
@@ -246,13 +320,13 @@
       </div>
     </div>
 
-    <!-- 7. DISPUTES & COMPLAINTS -->
+    <!-- 9. DISPUTES & COMPLAINTS -->
     <div id="section-disputes" style="display:none;">
       <div class="sec-title" style="color:#f59e0b;">⚖️ Grahak Complaints & Disputes</div>
       <div id="disputes-list-box"><div style="text-align:center; padding:30px; color:#94a3b8;">Koi open dispute nahi mila.</div></div>
     </div>
 
-    <!-- 8. RULES & SURGE PRICING SETTINGS -->
+    <!-- 10. RULES & PRICING SETTINGS -->
     <div id="section-settings" style="display:none;">
       <div class="section-card">
         <div class="sec-title">🌧️ Surge & Dynamic Pricing Rules</div>
@@ -276,8 +350,30 @@
             </div>
           </div>
           <div>
+            <label style="font-size:12px; font-weight:800;">Night Surge Hours (24 Hr Format):</label>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:4px;">
+              <input type="number" id="set-night-start" class="admin-input" placeholder="Start (e.g. 22 for 10PM)">
+              <input type="number" id="set-night-end" class="admin-input" placeholder="End (e.g. 6 for 6AM)">
+            </div>
+          </div>
+          <div>
             <label style="font-size:12px; font-weight:800;">Min Order for Free Delivery (₹):</label>
             <input type="number" id="set-min-free" class="admin-input" placeholder="e.g. 249">
+          </div>
+          <div>
+            <label style="font-size:12px; font-weight:800;">Base Delivery Charge (₹):</label>
+            <input type="number" id="set-del-fee" class="admin-input" placeholder="e.g. 25">
+          </div>
+          <div>
+            <label style="font-size:12px; font-weight:800;">Free Gift Offer Settings:</label>
+            <div style="display:grid; grid-template-columns:1fr 1fr 2fr; gap:8px; margin-top:4px;">
+              <select id="set-gift-active" class="admin-input">
+                <option value="true">Gift Active</option>
+                <option value="false">Gift Off</option>
+              </select>
+              <input type="number" id="set-gift-min" class="admin-input" placeholder="Min Order (₹499)">
+              <input type="text" id="set-gift-name" class="admin-input" placeholder="Gift Name (1x Cold Drink)">
+            </div>
           </div>
           <div>
             <label style="font-size:12px; font-weight:800;">Broadcast Notice Ticker (Top Red Banner):</label>
@@ -308,21 +404,25 @@
     let lastAlertOrderId = null;
     let audioUnlocked = false;
 
-    function unlockAdminAudio() {
-      if (audioUnlocked) return;
+    function startMasterAudioGate() {
       const sound = document.getElementById('admin-alert-sound');
       if (sound) {
         sound.play().then(() => {
           sound.pause();
           sound.currentTime = 0;
           audioUnlocked = true;
-        }).catch(() => {});
+          document.getElementById('audio-gate').style.display = 'none';
+        }).catch(() => {
+          document.getElementById('audio-gate').style.display = 'none';
+        });
+      } else {
+        document.getElementById('audio-gate').style.display = 'none';
       }
     }
 
     function playAlertTune() {
       const sound = document.getElementById('admin-alert-sound');
-      if (sound) sound.play().catch(() => {});
+      if (sound && audioUnlocked) sound.play().catch(() => {});
     }
 
     function stopAlertTune() {
@@ -365,7 +465,13 @@
         document.getElementById('set-rain-mode').value = data.rain_surge_mode || 'OFF';
         document.getElementById('set-night-active').value = data.is_night_surge_active ? 'true' : 'false';
         document.getElementById('set-night-fee').value = data.night_surge_fee || 20;
+        document.getElementById('set-night-start').value = data.night_surge_start_hour ?? 22;
+        document.getElementById('set-night-end').value = data.night_surge_end_hour ?? 6;
         document.getElementById('set-min-free').value = data.min_free_delivery || 249;
+        document.getElementById('set-del-fee').value = data.delivery_charge || 25;
+        document.getElementById('set-gift-active').value = data.is_free_gift_active ? 'true' : 'false';
+        document.getElementById('set-gift-min').value = data.free_gift_min_order || 499;
+        document.getElementById('set-gift-name').value = data.free_gift_item_name || '1x Cold Drink';
         document.getElementById('set-broadcast-text').value = data.broadcast_notice || '';
         
         const hBtn = document.getElementById('hub-lock-toggle-btn');
@@ -394,7 +500,13 @@
       const rMode = document.getElementById('set-rain-mode').value;
       const nAct = document.getElementById('set-night-active').value === 'true';
       const nFee = Number(document.getElementById('set-night-fee').value);
+      const nStart = Number(document.getElementById('set-night-start').value);
+      const nEnd = Number(document.getElementById('set-night-end').value);
       const mFree = Number(document.getElementById('set-min-free').value);
+      const dFee = Number(document.getElementById('set-del-fee').value);
+      const gAct = document.getElementById('set-gift-active').value === 'true';
+      const gMin = Number(document.getElementById('set-gift-min').value);
+      const gName = document.getElementById('set-gift-name').value.trim();
       const bText = document.getElementById('set-broadcast-text').value.trim();
 
       await _supabase.from('app_settings').update({
@@ -402,7 +514,13 @@
         rain_surge_fee: rMode === 'HEAVY' ? 30 : rMode === 'LIGHT' ? 15 : 0,
         is_night_surge_active: nAct,
         night_surge_fee: nFee,
+        night_surge_start_hour: nStart,
+        night_surge_end_hour: nEnd,
         min_free_delivery: mFree,
+        delivery_charge: dFee,
+        is_free_gift_active: gAct,
+        free_gift_min_order: gMin,
+        free_gift_item_name: gName,
         broadcast_notice: bText,
         is_broadcast_active: bText.length > 0
       }).eq('id', 1);
@@ -432,6 +550,7 @@
 
       renderOrders();
       renderReturns();
+      renderHistory();
       renderDisputes();
     }
 
@@ -446,6 +565,7 @@
       allRiders = data || [];
       document.getElementById('stat-riders-online').innerText = allRiders.length;
       renderRiders();
+      renderRadar();
     }
 
     async function fetchCoupons() {
@@ -458,6 +578,15 @@
       const { data } = await _supabase.from('hubs').select('*').order('id', { ascending: true });
       allHubs = data || [];
       renderHubs();
+
+      const sel = document.getElementById('p-hub-id');
+      if (sel) {
+        if (allHubs.length === 0) {
+          sel.innerHTML = '<option value="1">Hub 1 (Main Default)</option>';
+        } else {
+          sel.innerHTML = allHubs.map(h => `<option value="${h.id}">${h.name} (#${h.id})</option>`).join('');
+        }
+      }
     }
 
     function updateDashboardStats() {
@@ -505,7 +634,10 @@
                 <b style="font-size:15px; color:#38bdf8;">#ORD-${o.id}</b>
                 <span class="ord-badge ${isDispatched ? 'badge-out' : 'badge-placed'}" style="margin-left:6px;">${o.status}</span>
               </div>
-              <div style="font-size:16px; font-weight:900; color:#34d399;">₹${o.total_amount} <span style="font-size:11px; color:#94a3b8;">(${o.payment_mode})</span></div>
+              <div style="text-align:right;">
+                <div style="font-size:16px; font-weight:900; color:#34d399;">₹${o.total_amount}</div>
+                <span style="font-size:11px; color:#94a3b8; font-weight:700;">${o.payment_mode}</span>
+              </div>
             </div>
 
             <div class="ord-details-box">
@@ -551,7 +683,7 @@
       fetchOrders();
     }
 
-    // 2. RETURN MANAGEMENT TOWER (500M APPROVAL)
+    // 2. RETURN MANAGEMENT TOWER
     function renderReturns() {
       const box = document.getElementById('returns-list-box');
       const returns = allOrders.filter(o => o.return_status === 'Requested');
@@ -629,7 +761,86 @@
       fetchOrders();
     }
 
-    // 3. INVENTORY & STOCK
+    // 3. LIVE RIDER RADAR & GPS TRACKING
+    function renderRadar() {
+      const box = document.getElementById('radar-list-box');
+      if (allRiders.length === 0) {
+        box.innerHTML = '<div style="text-align:center; padding:30px; color:#94a3b8;">Koi rider registered nahi mila.</div>';
+        return;
+      }
+
+      box.innerHTML = allRiders.map(r => {
+        const hasGps = r.current_lat && r.current_lng;
+        const mapsUrl = hasGps ? `https://www.google.com/maps?q=${r.current_lat},${r.current_lng}` : '#';
+
+        return `
+          <div class="radar-card">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <div>
+                <span class="live-dot ${r.is_active ? '' : 'offline'}"></span>
+                <b style="font-size:15px; color:#ffffff;">${r.name}</b>
+                <span style="font-size:11px; color:#38bdf8; margin-left:4px;">(${r.vehicle_no || 'Bike NA'})</span>
+              </div>
+              <span class="ord-badge ${r.is_active ? 'badge-delivered' : 'badge-cancelled'}">
+                ${r.is_active ? 'ON DUTY' : 'OFFLINE'}
+              </span>
+            </div>
+
+            <div style="margin:8px 0; font-size:12px; color:#cbd5e1;">
+              <div>📞 Mobile: <a href="tel:${r.phone}" style="color:#38bdf8;">${r.phone}</a></div>
+              <div style="margin-top:2px;">🏠 Base Address: ${r.address || 'Not specified'}</div>
+              <div style="margin-top:4px; font-weight:800; color:${hasGps ? '#34d399' : '#f87171'};">
+                ${hasGps ? `📍 Live GPS: ${Number(r.current_lat).toFixed(5)},${Number(r.current_lng).toFixed(5)}` : '❌ GPS Coordinate Not Synced Yet'}
+              </div>
+            </div>
+
+            <div style="display:flex; gap:8px; margin-top:10px;">
+              ${hasGps ? `
+                <a href="${mapsUrl}" target="_blank" class="btn-admin" style="flex:1; background:#0284c7; text-align:center; text-decoration:none; display:flex; align-items:center; justify-content:center; gap:6px;">
+                  🗺️ Open Live Map (Google Maps) ↗
+                </a>
+              ` : `
+                <button class="btn-admin btn-secondary" style="flex:1;" disabled>Waiting for GPS Signal...</button>
+              `}
+              <a href="tel:${r.phone}" class="btn-admin btn-success" style="text-decoration:none; padding:10px 16px;">📞 Call</a>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // 4. PAST ORDERS HISTORY
+    function renderHistory() {
+      const box = document.getElementById('history-list-box');
+      const query = (document.getElementById('history-search')?.value || '').toLowerCase().trim();
+
+      const past = allOrders.filter(o => {
+        const isPast = o.status.toLowerCase().includes('delivered') || o.status.toLowerCase().includes('cancelled') || o.return_status === 'Returned';
+        const matchQ = (o.id + '').includes(query) || (o.customer_name || '').toLowerCase().includes(query) || (o.customer_phone || '').includes(query);
+        return isPast && matchQ;
+      });
+
+      if (past.length === 0) {
+        box.innerHTML = '<div style="text-align:center; padding:30px; color:#94a3b8;">Koi purana order record nahi mila.</div>';
+        return;
+      }
+
+      box.innerHTML = past.map(o => `
+        <div class="order-item-card" style="opacity:0.9;">
+          <div class="order-head">
+            <div>
+              <b>#ORD-${o.id}</b>
+              <span class="ord-badge ${o.status.toLowerCase().includes('delivered') ? 'badge-delivered' : 'badge-cancelled'}" style="margin-left:6px;">${o.status}</span>
+            </div>
+            <div>₹${o.total_amount} | ${new Date(o.created_at).toLocaleDateString()}</div>
+          </div>
+          <div style="font-size:12px; color:#94a3b8;">Customer: <b>${o.customer_name}</b> (${o.customer_phone})</div>
+          ${o.cancelled_by ? `<div style="font-size:11px; color:#f87171; margin-top:2px;">Cancelled By: ${o.cancelled_by} (Reason:${o.cancellation_reason || 'None'})</div>` : ''}
+        </div>
+      `).join('');
+    }
+
+    // 5. INVENTORY & STOCK
     function renderInventory() {
       const box = document.getElementById('inventory-list-box');
       box.innerHTML = allProducts.map(p => `
@@ -639,6 +850,7 @@
             <div>
               <div style="font-size:13.5px; font-weight:800;">${p.name}</div>
               <div style="font-size:11.5px; color:#94a3b8;">₹${p.price} | Stock: <b style="color:${p.stock_quantity < 5 ? '#ef4444' : '#10b981'};">${p.stock_quantity ?? 0}</b></div>
+              <div style="font-size:10.5px; color:#38bdf8;">Hub #${p.hub_id || 1} • ${p.category}</div>
             </div>
           </div>
           <div style="display:flex; gap:6px;">
@@ -656,6 +868,7 @@
       const disc = Number(document.getElementById('p-discount').value) || 0;
       const stock = Number(document.getElementById('p-stock').value) || 20;
       const unit = document.getElementById('p-unit').value.trim() || '1 unit';
+      const hubId = Number(document.getElementById('p-hub-id').value) || 1;
       const img = document.getElementById('p-img').value.trim();
 
       if (!name || !price) return alert('Naam aur selling price anivarya hai!');
@@ -663,7 +876,7 @@
       await _supabase.from('products').insert([{
         name: name, category: cat || 'General', price: price,
         discount_percent: disc, stock_quantity: stock, unit: unit,
-        image_url: img || 'https://via.placeholder.com/150'
+        hub_id: hubId, image_url: img || 'https://via.placeholder.com/150'
       }]);
 
       alert('Item Add Ho Gaya!');
@@ -685,7 +898,7 @@
       fetchProducts();
     }
 
-    // 4. RIDERS MANAGEMENT (FULL DETAILS)
+    // 6. RIDERS MANAGEMENT
     function renderRiders() {
       const box = document.getElementById('riders-list-box');
       if (allRiders.length === 0) {
@@ -698,11 +911,21 @@
             <div style="font-weight:900;">🛵 ${r.name} <span style="font-size:11px; color:#38bdf8;">(${r.vehicle_no || 'No Bike No'})</span></div>
             <div style="font-size:12px; color:#94a3b8;">📞 ${r.phone}</div>
             <div style="font-size:11px; color:#cbd5e1; margin-top:2px;">🏠 ${r.address || 'Address nahi diya'}</div>
-            ${r.current_lat ? `<div style="font-size:10px; color:#10b981; margin-top:2px;">📍 GPS: ${r.current_lat.toFixed(4)},${r.current_lng.toFixed(4)}</div>` : ''}
+            ${r.current_lat ? `<div style="font-size:10px; color:#10b981; margin-top:2px;">📍 Live GPS Synced</div>` : ''}
           </div>
-          <button class="btn-admin btn-danger" style="padding:6px 10px;" onclick="deleteRider(${r.id})">Hatao</button>
+          <div style="display:flex; gap:6px;">
+            <button class="btn-admin ${r.is_active ? 'btn-success' : 'btn-secondary'}" style="padding:6px 10px; font-size:10px;" onclick="toggleRiderActive(${r.id}, ${!r.is_active})">
+              ${r.is_active ? 'Active' : 'Disabled'}
+            </button>
+            <button class="btn-admin btn-danger" style="padding:6px 10px;" onclick="deleteRider(${r.id})">Hatao</button>
+          </div>
         </div>
       `).join('');
+    }
+
+    async function toggleRiderActive(id, newStatus) {
+      await _supabase.from('riders').update({ is_active: newStatus }).eq('id', id);
+      fetchRiders();
     }
 
     async function addNewRider() {
@@ -714,14 +937,10 @@
       if (!name || !phone || !bike) return alert('Rider Name, Phone aur Bike No. anivarya hain!');
 
       const { error } = await _supabase.from('riders').insert([{
-        name: name,
-        phone: phone,
-        vehicle_no: bike,
-        address: address,
-        is_active: true
+        name: name, phone: phone, vehicle_no: bike, address: address, is_active: true
       }]);
 
-      if (error) alert('Rider add karne me error: ' + error.message);
+      if (error) alert('Rider add error: ' + error.message);
       else {
         alert('✅ Rider safaltapoorvak register ho gaya!');
         document.getElementById('r-name').value = '';
@@ -738,7 +957,7 @@
       fetchRiders();
     }
 
-    // 5. COUPONS MANAGEMENT
+    // 7. COUPONS MANAGEMENT
     function renderCoupons() {
       const box = document.getElementById('coupons-list-box');
       if (allCoupons.length === 0) {
@@ -775,7 +994,7 @@
       fetchCoupons();
     }
 
-    // 6. HUBS MANAGEMENT (FULL IMPLEMENTATION)
+    // 8. HUBS MANAGEMENT
     function renderHubs() {
       const box = document.getElementById('hubs-list-box');
       if (allHubs.length === 0) {
@@ -802,10 +1021,7 @@
       if (!name || !address) return alert('Hub ka naam aur address anivarya hai!');
 
       const { error } = await _supabase.from('hubs').insert([{
-        name: name,
-        phone: phone,
-        address: address,
-        is_active: true
+        name: name, phone: phone, address: address, is_active: true
       }]);
 
       if (error) alert('Hub create error: ' + error.message);
@@ -824,7 +1040,7 @@
       fetchHubs();
     }
 
-    // 7. DISPUTES MANAGEMENT
+    // 9. DISPUTES MANAGEMENT
     function renderDisputes() {
       const box = document.getElementById('disputes-list-box');
       const disputes = allOrders.filter(o => o.dispute_status && o.dispute_status !== 'Resolved');
@@ -860,9 +1076,10 @@
     function switchAdminTab(tab) {
       currentAdminTab = tab;
       document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-      document.getElementById(`tab-btn-${tab}`).classList.add('active');
+      const activeBtn = document.getElementById(`tab-btn-${tab}`);
+      if (activeBtn) activeBtn.classList.add('active');
 
-      const tabs = ['orders', 'returns', 'products', 'riders', 'coupons', 'hubs', 'disputes', 'settings'];
+      const tabs = ['orders', 'returns', 'radar', 'history', 'products', 'riders', 'coupons', 'hubs', 'disputes', 'settings'];
       tabs.forEach(t => {
         const el = document.getElementById(`section-${t}`);
         if (el) el.style.display = t === tab ? 'block' : 'none';
