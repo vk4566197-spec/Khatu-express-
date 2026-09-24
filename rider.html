@@ -245,7 +245,7 @@
       align-items: center;
       justify-content: center;
       gap: 6px;
-      margin-bottom: 8px;
+      margin-bottom: 8px; 
     }
     .btn-action-chat {
       background: #475569;
@@ -651,17 +651,10 @@
             lng: pos.coords.longitude
           };
 
-          fetch(SUPABASE_URL + '/rest/v1/riders?id=eq.1', {
-            method: 'PATCH',
-            headers: {
-              'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY,
-              'Content-Type': 'application/json', 'Prefer': 'return=minimal'
-            },
-            body: JSON.stringify({
-              current_lat: riderCurrentCoords.lat,
-              current_lng: riderCurrentCoords.lng
-            })
-          }).catch(function(){});
+          _supabase.from('riders').update({
+            current_lat: riderCurrentCoords.lat,
+            current_lng: riderCurrentCoords.lng
+          }).eq('id', 1).then(function(){});
         }, function(err){}, { enableHighAccuracy: true });
       }
     }
@@ -687,12 +680,10 @@
       });
     }
 
-    function fetchOrders() {
-      fetch(SUPABASE_URL + '/rest/v1/orders?select=*&order=id.desc', {
-        headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY }
-      })
-      .then(function(res) { return res.json(); })
-      .then(function(data) {
+    async function fetchOrders() {
+      try {
+        var { data, error } = await _supabase.from('orders').select('*').order('id', { ascending: false });
+        if (error) return;
         var newOrders = data || [];
         
         if (isRiderOnline) {
@@ -727,8 +718,7 @@
         allRiderOrders = newOrders;
         updateStats();
         renderOrdersList();
-      })
-      .catch(function(err){});
+      } catch(err){}
     }
 
     function updateStats() {
@@ -869,8 +859,8 @@
       }).join('');
     }
 
-    // REAL-TIME 2-WAY CHAT FUNCTIONS FOR RIDER
-    function openRiderChat(orderId, custName) {
+    // REAL-TIME 2-WAY CHAT FUNCTIONS FOR RIDER (FIXED WITH AUTO RE-SUBSCRIBE)
+    async function openRiderChat(orderId, custName) {
       activeChatOrderId = orderId;
       document.getElementById('chat-customer-title').innerText = '💬 Chat with ' + custName;
       document.getElementById('chat-order-subtitle').innerText = 'Order #ORD-' + orderId;
@@ -880,11 +870,15 @@
       box.innerHTML = '<div style="text-align:center; color:#94a3b8; font-size:12px; padding:20px;">Messages load ho rahe hain...</div>';
 
       // 1. Fetch previous chats from Supabase
-      fetch(SUPABASE_URL + '/rest/v1/order_chats?order_id=eq.' + orderId + '&order=id.asc', {
-        headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY }
-      })
-      .then(function(res) { return res.json(); })
-      .then(function(messages) {
+      var { data: messages, error } = await _supabase
+        .from('order_chats')
+        .select('*')
+        .eq('order_id', orderId)
+        .order('id', { ascending: true });
+
+      if (error) {
+        box.innerHTML = '<div style="text-align:center; color:#ef4444; font-size:12px; padding:20px;">Chat Load Error: ' + error.message + '</div>';
+      } else {
         box.innerHTML = '';
         if (messages && messages.length > 0) {
           messages.forEach(function(m) { renderRiderChatBubble(m); });
@@ -892,15 +886,20 @@
           box.innerHTML = '<div style="text-align:center; color:#94a3b8; font-size:12px; padding:20px;">Grahak se baat karein ya landmark puchein!</div>';
         }
         box.scrollTop = box.scrollHeight;
-      });
+      }
 
       // 2. Real-time Subscription: Jab Customer message kare toh live show ho
       if (riderChatChannel) {
         _supabase.removeChannel(riderChatChannel);
       }
       riderChatChannel = _supabase
-        .channel('rider_chat_' + orderId)
-        .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'order_chats', filter: 'order_id=eq.' + orderId }, function(payload) {
+        .channel('chat_rider_room_' + orderId)
+        .on('postgres_changes', { 
+          event: 'INSERT', 
+          schema: 'public', 
+          table: 'order_chats', 
+          filter: 'order_id=eq.' + orderId 
+        }, function(payload) {
           if (payload.new.sender_type === 'customer') {
             renderRiderChatBubble(payload.new);
           }
@@ -910,6 +909,9 @@
 
     function renderRiderChatBubble(msg) {
       var box = document.getElementById('chat-box-content');
+      if (box.children.length === 1 && box.children[0].innerText.includes('Grahak se baat karein')) {
+        box.innerHTML = '';
+      }
       var bubble = document.createElement('div');
       bubble.className = 'chat-msg-row ' + msg.sender_type;
       bubble.innerText = msg.message;
@@ -919,14 +921,14 @@
 
     function closeRiderChat() {
       document.getElementById('rider-chat-drawer').classList.remove('active');
-      activeChatOrderId = null;
       if (riderChatChannel) {
         _supabase.removeChannel(riderChatChannel);
         riderChatChannel = null;
       }
+      activeChatOrderId = null;
     }
 
-    function sendRiderMsg() {
+    async function sendRiderMsg() {
       var input = document.getElementById('chat-input-field');
       var text = input.value.trim();
       if (!text || !activeChatOrderId) return;
@@ -935,41 +937,32 @@
 
       renderRiderChatBubble({ sender_type: 'rider', message: text });
 
-      fetch(SUPABASE_URL + '/rest/v1/order_chats', {
-        method: 'POST',
-        headers: {
-          'apikey': SUPABASE_KEY,
-          'Authorization': 'Bearer ' + SUPABASE_KEY,
-          'Content-Type': 'application/json',
-          'Prefer': 'return=minimal'
-        },
-        body: JSON.stringify({
-          order_id: activeChatOrderId,
-          sender_type: 'rider',
-          sender_name: 'Rider',
-          message: text
-        })
-      });
+      var { error } = await _supabase.from('order_chats').insert([{
+        order_id: activeChatOrderId,
+        sender_type: 'rider',
+        sender_name: 'Rider',
+        message: text
+      }]);
+
+      if (error) {
+        alert('Message bhejne me dikkat aayi: ' + error.message);
+      }
     }
 
-    function acceptAndPickupReturn(orderId) {
+    async function acceptAndPickupReturn(orderId) {
       if (!confirm('क्या आपने ग्राहक के सामान का फोटो से मिलान कर लिया है? रिटर्न पिकअप पूरा करें?')) return;
       stopSound();
 
-      fetch(SUPABASE_URL + '/rest/v1/orders?id=eq.' + orderId, {
-        method: 'PATCH',
-        headers: {
-          'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY,
-          'Content-Type': 'application/json', 'Prefer': 'return=minimal'
-        },
-        body: JSON.stringify({
-          return_status: 'Returned',
-          status: 'Returned'
-        })
-      }).then(function() {
+      var { error } = await _supabase.from('orders').update({
+        return_status: 'Returned',
+        status: 'Returned'
+      }).eq('id', orderId);
+
+      if (error) alert('Error: ' + error.message);
+      else {
         alert('✅ रिटर्न सफलता पूर्वक पिकअप हो गया!');
         fetchOrders();
-      });
+      }
     }
 
     function openPickupModal(id) { 
@@ -991,23 +984,19 @@
       }); 
     }
 
-    function confirmPickupWithPhoto() {
-      fetch(SUPABASE_URL + '/rest/v1/orders?id=eq.' + selectedOrderForPickup, {
-        method: 'PATCH',
-        headers: {
-          'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY,
-          'Content-Type': 'application/json', 'Prefer': 'return=minimal'
-        },
-        body: JSON.stringify({
-          status: 'Out for Delivery',
-          pickup_proof_photo: base64PickupPhoto,
-          estimated_delivery_time: '15-20 mins'
-        })
-      }).then(function() {
+    async function confirmPickupWithPhoto() {
+      var { error } = await _supabase.from('orders').update({
+        status: 'Out for Delivery',
+        pickup_proof_photo: base64PickupPhoto,
+        estimated_delivery_time: '15-20 mins'
+      }).eq('id', selectedOrderForPickup);
+
+      if (error) alert('Error: ' + error.message);
+      else {
         alert('✅ Order Pickup ho gaya! Out for Delivery.');
         closePickupModal();
         fetchOrders();
-      });
+      }
     }
 
     function openDeliveryProofModal(id, otp) { 
@@ -1027,27 +1016,23 @@
       }); 
     }
 
-    function confirmDeliveryWithProof() {
+    async function confirmDeliveryWithProof() {
       var entered = document.getElementById('input-delivery-otp').value.trim();
       if (selectedOrderForDelivery.otp && entered !== selectedOrderForDelivery.otp) {
         return alert('❌ Galat OTP! Grahak se sahi 4-digit code lein.');
       }
 
-      fetch(SUPABASE_URL + '/rest/v1/orders?id=eq.' + selectedOrderForDelivery.id, {
-        method: 'PATCH',
-        headers: {
-          'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY,
-          'Content-Type': 'application/json', 'Prefer': 'return=minimal'
-        },
-        body: JSON.stringify({ 
-          status: 'Delivered', 
-          delivery_proof_photo: base64DeliveryPhoto 
-        })
-      }).then(function() {
+      var { error } = await _supabase.from('orders').update({ 
+        status: 'Delivered', 
+        delivery_proof_photo: base64DeliveryPhoto 
+      }).eq('id', selectedOrderForDelivery.id);
+
+      if (error) alert('Error: ' + error.message);
+      else {
         alert('🎉 Order Delivered Safaltapoorvak!');
         closeDeliveryModal();
         fetchOrders();
-      });
+      }
     }
 
     window.addEventListener('DOMContentLoaded', function() {
