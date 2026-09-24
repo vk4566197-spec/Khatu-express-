@@ -758,7 +758,7 @@
       margin: 4px 0; 
     }
 
-    /* CHAT DRAWER */
+    /* REALTIME 2-WAY CHAT DRAWER */
     .chat-drawer { 
       position: fixed; 
       top: 0; 
@@ -794,6 +794,7 @@
       font-size: 13px;
       line-height: 1.4;
       font-weight: 600;
+      word-break: break-word;
     }
     .chat-bubble.customer {
       background: var(--primary-purple);
@@ -1084,16 +1085,19 @@
     </div>
   </div>
 
-  <!-- CUSTOMER LIVE CHAT DRAWER -->
+  <!-- CUSTOMER REAL-TIME 2-WAY CHAT DRAWER -->
   <div class="chat-drawer" id="cust-chat-drawer">
     <div class="chat-top-header">
-      <div style="font-weight:900;">💬 Support & Rider Chat</div>
-      <button style="background:none; border:none; color:white; font-size:18px; cursor:pointer;" onclick="closeCustomerChat()">✕</button>
+      <div>
+        <div style="font-weight:900; font-size:15px;">💬 Support & Rider Chat</div>
+        <div style="font-size:11px; color:#fbcfe8;" id="chat-order-indicator">Order #---</div>
+      </div>
+      <button style="background:none; border:none; color:white; font-size:20px; cursor:pointer;" onclick="closeCustomerChat()">✕</button>
     </div>
     <div class="chat-messages-area" id="chat-msgs-box"></div>
     <div class="chat-input-bar">
-      <input type="text" id="chat-text-input" class="zepto-input" placeholder="Message likhein...">
-      <button class="btn-add-zepto" onclick="sendCustomerChatMessage()" style="background:var(--primary-purple); color:white; border:none;">Bhejo</button>
+      <input type="text" id="chat-text-input" class="zepto-input" placeholder="Message likhein..." onkeypress="if(event.key==='Enter') sendCustomerChatMessage()">
+      <button class="btn-add-zepto" onclick="sendCustomerChatMessage()" style="background:var(--primary-purple); color:white; border:none; padding: 0 20px;">Bhejo</button>
     </div>
   </div>
 
@@ -1117,6 +1121,9 @@
 
     let selectedReturnOrderId = null;
     let base64ReturnPhoto = null;
+
+    let activeCustomerChatOrderId = null;
+    let customerChatChannel = null;
 
     document.addEventListener('DOMContentLoaded', () => {
       loadSettings();
@@ -1627,7 +1634,7 @@
 
           <div style="margin-top:14px; display:flex; gap:10px;">
             <button class="btn-add-zepto" style="flex:1; background:var(--primary-purple); color:white; border:none; padding:12px;" onclick="openCustomerChat(${data.id})">
-              💬 Chat with Support / Rider
+              💬 Chat with Rider & Support
             </button>
           </div>
         </div>
@@ -1843,33 +1850,76 @@
       }, { enableHighAccuracy: true });
     }
 
-    // CHAT SYSTEM
-    function openCustomerChat(orderId) {
+    // REAL-TIME 2-WAY CHAT FUNCTIONS
+    async function openCustomerChat(orderId) {
+      activeCustomerChatOrderId = orderId;
+      document.getElementById('chat-order-indicator').innerText = `Order #ORD-${orderId}`;
       document.getElementById('cust-chat-drawer').classList.add('active');
       const box = document.getElementById('chat-msgs-box');
-      box.innerHTML = `
-        <div class="chat-bubble rider">Order #${orderId} ke liye swagat hai! Hamari team aapki sahayata ke liye taiyar hai.</div>
-      `;
+      box.innerHTML = '<div style="text-align:center; color:#94a3b8; font-size:12px; padding:20px;">Messages load ho rahe hain...</div>';
+
+      // 1. Purani chat fetch karein
+      const { data: messages } = await _supabase
+        .from('order_chats')
+        .select('*')
+        .eq('order_id', orderId)
+        .order('id', { ascending: true });
+
+      box.innerHTML = '';
+      if (messages && messages.length > 0) {
+        messages.forEach(m => renderCustomerChatBubble(m));
+      } else {
+        box.innerHTML = '<div style="text-align:center; color:#94a3b8; font-size:12px; padding:20px;">Abhi koi message nahi hai. Rider se baat shuru karein!</div>';
+      }
+      box.scrollTop = box.scrollHeight;
+
+      // 2. Realtime listener: Rider ka message aate hi add ho
+      if (customerChatChannel) {
+        _supabase.removeChannel(customerChatChannel);
+      }
+      customerChatChannel = _supabase
+        .channel(`cust_chat_${orderId}`)
+        .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'order_chats', filter: `order_id=eq.${orderId}` }, payload => {
+          if (payload.new.sender_type === 'rider') {
+            renderCustomerChatBubble(payload.new);
+          }
+        })
+        .subscribe();
+    }
+
+    function renderCustomerChatBubble(msg) {
+      const box = document.getElementById('chat-msgs-box');
+      const bubble = document.createElement('div');
+      bubble.className = `chat-bubble ${msg.sender_type}`;
+      bubble.innerText = msg.message;
+      box.appendChild(bubble);
+      box.scrollTop = box.scrollHeight;
     }
 
     function closeCustomerChat() {
       document.getElementById('cust-chat-drawer').classList.remove('active');
+      if (customerChatChannel) {
+        _supabase.removeChannel(customerChatChannel);
+        customerChatChannel = null;
+      }
+      activeCustomerChatOrderId = null;
     }
 
-    function sendCustomerChatMessage() {
+    async function sendCustomerChatMessage() {
       const input = document.getElementById('chat-text-input');
       const text = input.value.trim();
-      if (!text) return;
+      if (!text || !activeCustomerChatOrderId) return;
 
-      const box = document.getElementById('chat-msgs-box');
-      box.innerHTML += `<div class="chat-bubble customer">${text}</div>`;
       input.value = '';
-      box.scrollTop = box.scrollHeight;
 
-      setTimeout(() => {
-        box.innerHTML += `<div class="chat-bubble rider">Aapka sandesh prapt ho gaya hai. Rider turant reply karega.</div>`;
-        box.scrollTop = box.scrollHeight;
-      }, 1000);
+      renderCustomerChatBubble({ sender_type: 'customer', message: text });
+
+      await _supabase.from('order_chats').insert([{
+        order_id: activeCustomerChatOrderId,
+        sender_type: 'customer',
+        sender_name: 'Customer',
+        message: text
+      }]);
     }
 
     // REALTIME UPDATES
