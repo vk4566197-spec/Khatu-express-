@@ -132,18 +132,6 @@
       display: inline-block; box-shadow: 0 0 10px #10b981; margin-right: 4px;
     }
     .live-dot.offline { background: #ef4444; box-shadow: none; }
-
-    /* MODAL PREVIEWS */
-    .modal-box {
-      position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-      background: rgba(0,0,0,0.85); backdrop-filter: blur(4px); z-index: 10000;
-      display: none; align-items: center; justify-content: center; padding: 16px;
-    }
-    .modal-box.active { display: flex; }
-    .modal-inner {
-      background: #1e293b; border: 2px solid #a855f7; border-radius: 16px;
-      padding: 20px; width: 100%; max-width: 440px; max-height: 90vh; overflow-y: auto;
-    }
   </style>
 </head>
 <body>
@@ -152,7 +140,7 @@
   <div class="audio-gate" id="audio-gate">
     <div style="font-size: 34px;">🔔</div>
     <h2 style="margin-top: 10px; font-weight: 900; font-size: 20px;">BABA Master Dashboard</h2>
-    <p style="font-size: 13px; color: #94a3b8; margin-top: 8px;">Naye order aur alert sound enable karne ke liye touch karke open karein:</p>
+    <p style="font-size: 13px; color: #94a3b8; margin-top: 8px;">Naye order aane par sound alert bajne ke liye touch karke dashboard open karein:</p>
     <button class="gate-btn" onclick="startMasterAudioGate()">🎧 Start Dashboard & Alert Sound</button>
   </div>
 
@@ -166,7 +154,6 @@
       </div>
     </div>
     <div class="header-actions">
-      <button id="alert-mute-btn" class="btn-admin btn-warning" style="padding: 6px 10px; font-size: 10px;" onclick="stopAlertTune()">🔕 Stop Bell</button>
       <button id="store-toggle-btn" class="store-toggle-btn" onclick="toggleStoreStatus()">🟢 OPEN</button>
     </div>
   </div>
@@ -233,11 +220,11 @@
       <div id="radar-list-box"><div style="text-align:center; padding:30px; color:#94a3b8;">Riders ki live location load ho rahi hai...</div></div>
     </div>
 
-    <!-- 4. PAST ORDERS HISTORY -->
+    <!-- 4. PAST ORDERS HISTORY (COMPLETE DETAILS BREAKDOWN) -->
     <div id="section-history" style="display:none;">
       <div class="sec-title">
         <span>📜 All Past / Completed Orders History</span>
-        <input type="text" id="history-search" class="admin-input" style="max-width:200px; margin-bottom:0;" placeholder="Search Order/Phone..." oninput="renderHistory()">
+        <input type="text" id="history-search" class="admin-input" style="max-width:200px; margin-bottom:0;" placeholder="Search Order/Phone/Customer..." oninput="renderHistory()">
       </div>
       <div id="history-list-box"></div>
     </div>
@@ -809,7 +796,7 @@
       }).join('');
     }
 
-    // 4. PAST ORDERS HISTORY
+    // 4. PAST ORDERS HISTORY (COMPLETE DETAILED VIEW)
     function renderHistory() {
       const box = document.getElementById('history-list-box');
       const query = (document.getElementById('history-search')?.value || '').toLowerCase().trim();
@@ -825,19 +812,55 @@
         return;
       }
 
-      box.innerHTML = past.map(o => `
-        <div class="order-item-card" style="opacity:0.9;">
-          <div class="order-head">
-            <div>
-              <b>#ORD-${o.id}</b>
-              <span class="ord-badge ${o.status.toLowerCase().includes('delivered') ? 'badge-delivered' : 'badge-cancelled'}" style="margin-left:6px;">${o.status}</span>
+      box.innerHTML = past.map(o => {
+        let items = [];
+        try { items = Array.isArray(o.items) ? o.items : JSON.parse(o.items || '[]'); } catch(e){}
+        const itemsList = items.map(i => `• ${i.name} × ${i.qty} (₹${i.price * i.qty})`).join('<br>');
+
+        const assignedRider = allRiders.find(r => r.id === o.assigned_rider_id);
+        const riderText = assignedRider 
+          ? `🛵 <b>${assignedRider.name}</b> (${assignedRider.vehicle_no || 'Bike NA'} • 📞 <a href="tel:${assignedRider.phone}" style="color:#38bdf8;">${assignedRider.phone}</a>)`
+          : '🛵 Not Assigned / Store Handover';
+
+        return `
+          <div class="order-item-card" style="border-color:#334155;">
+            <div class="order-head">
+              <div>
+                <b style="font-size:15px; color:#38bdf8;">#ORD-${o.id}</b>
+                <span class="ord-badge ${o.status.toLowerCase().includes('delivered') ? 'badge-delivered' : 'badge-cancelled'}" style="margin-left:6px;">${o.status}</span>
+              </div>
+              <div style="text-align:right;">
+                <div style="font-size:16px; font-weight:900; color:#34d399;">₹${o.total_amount}</div>
+                <div style="font-size:11px; color:#94a3b8;">${new Date(o.created_at).toLocaleString()}</div>
+              </div>
             </div>
-            <div>₹${o.total_amount} | ${new Date(o.created_at).toLocaleDateString()}</div>
+
+            <div class="ord-details-box">
+              <div class="ord-row"><span>👤</span> <b>Customer:</b> <span>${o.customer_name} (📞 <a href="tel:${o.customer_phone}" style="color:#38bdf8;">${o.customer_phone}</a>)</span></div>
+              <div class="ord-row"><span>📍</span> <b>Address:</b> <span>${o.delivery_address}</span></div>
+              <div class="ord-row"><span>🛵</span> <b>Delivered By:</b> <span>${riderText}</span></div>
+              <div class="ord-row"><span>💳</span> <b>Payment:</b> <span>${o.payment_mode} ${o.transaction_id ? '(UTR: ' + o.transaction_id + ')' : ''}</span></div>
+              
+              <div style="margin-top:8px; padding-top:6px; border-top:1px dashed #334155;">
+                <b style="color:#38bdf8;">Order Items:</b><br>${itemsList || 'No Items Recorded'}
+              </div>
+
+              ${o.delivery_proof_photo ? `
+                <div style="margin-top:8px; padding-top:6px; border-top:1px dashed #334155;">
+                  <b style="color:#10b981;">📸 Delivery Proof Photo:</b><br>
+                  <img src="${o.delivery_proof_photo}" style="width:70px; height:70px; border-radius:8px; object-fit:cover; margin-top:4px; border:1px solid #10b981; cursor:pointer;" onclick="window.open(this.src)">
+                </div>
+              ` : ''}
+
+              ${o.cancelled_by ? `
+                <div style="margin-top:6px; color:#f87171; font-weight:800;">
+                  ❌ Cancelled By: ${o.cancelled_by} (Reason:${o.cancellation_reason || 'Not Specified'})
+                </div>
+              ` : ''}
+            </div>
           </div>
-          <div style="font-size:12px; color:#94a3b8;">Customer: <b>${o.customer_name}</b> (${o.customer_phone})</div>
-          ${o.cancelled_by ? `<div style="font-size:11px; color:#f87171; margin-top:2px;">Cancelled By: ${o.cancelled_by} (Reason:${o.cancellation_reason || 'None'})</div>` : ''}
-        </div>
-      `).join('');
+        `;
+      }).join('');
     }
 
     // 5. INVENTORY & STOCK
