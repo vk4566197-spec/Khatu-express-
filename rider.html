@@ -130,9 +130,15 @@
       position: relative; 
     }
     .order-card.new-pulse { border-color: #38bdf8; animation: glowCard 1.5s infinite alternate; }
+    .order-card.return-pulse { border-color: #ef4444; background: #23121d; animation: glowReturn 1.5s infinite alternate; }
+    
     @keyframes glowCard { 
       0% { box-shadow: 0 0 10px rgba(56, 189, 248, 0.3); } 
       100% { box-shadow: 0 0 20px rgba(56, 189, 248, 0.7); } 
+    }
+    @keyframes glowReturn { 
+      0% { box-shadow: 0 0 10px rgba(239, 68, 68, 0.4); } 
+      100% { box-shadow: 0 0 25px rgba(239, 68, 68, 0.8); } 
     }
 
     .order-top { 
@@ -158,6 +164,7 @@
     .tag-transit { background: #f59e0b; color: #000; }
     .tag-delivered { background: #059669; color: #fff; }
     .tag-cancelled { background: #dc2626; color: #fff; }
+    .tag-return { background: #ef4444; color: #fff; }
 
     .cust-info-box { 
       background: #0f172a; 
@@ -298,6 +305,16 @@
       font-size: 13.5px; 
       font-weight: 700; 
     }
+
+    /* RETURN INSPECTION PHOTO BOX */
+    .return-inspect-img {
+      width: 100%; 
+      max-height: 170px; 
+      object-fit: cover; 
+      border-radius: 10px; 
+      border: 1.5px solid #ef4444; 
+      margin-top: 6px;
+    }
   </style>
 </head>
 <body onclick="unlockAudio();" ontouchstart="unlockAudio();">
@@ -342,7 +359,7 @@
     <div class="empty-msg">ऑर्डर्स लोड हो रहे हैं...</div>
   </div>
 
-  <!-- PICKUP MODAL -->
+  <!-- PICKUP PROOF MODAL -->
   <div class="modal-bg" id="pickup-modal">
     <div class="modal-card">
       <div style="font-size: 17px; font-weight: 900; color: #38bdf8; margin-bottom: 4px;">🛍️ सामान पिकअप फोटो (Pickup Proof)</div>
@@ -357,7 +374,7 @@
     </div>
   </div>
 
-  <!-- DELIVERY MODAL -->
+  <!-- DELIVERY OTP MODAL -->
   <div class="modal-bg" id="delivery-modal">
     <div class="modal-card">
       <div style="font-size: 17px; font-weight: 900; color: #34d399; margin-bottom: 4px;">📦 डिलीवरी सत्यापन (Proof & OTP)</div>
@@ -390,6 +407,7 @@
     var base64DeliveryPhoto = null;
     var lastKnownAlertId = null;
     var wakeLock = null;
+    var riderCurrentCoords = null;
 
     // Service Worker Register
     if ('serviceWorker' in navigator) {
@@ -426,7 +444,7 @@
       }
     }
 
-    function playSound(amount) {
+    function playSound(amount, isReturn) {
       if (!isRiderOnline) return;
       var sound = document.getElementById('order-sound');
       if (sound) {
@@ -442,11 +460,12 @@
           } catch(e){}
         });
       }
-      // Trigger background service worker notification
+
       if (navigator.serviceWorker && navigator.serviceWorker.controller) {
         navigator.serviceWorker.controller.postMessage({
           type: 'NEW_ORDER_ALERT',
-          amount: amount || ''
+          amount: amount || '',
+          isReturn: isReturn || false
         });
       }
     }
@@ -470,6 +489,7 @@
       } else {
         initNotificationPermission();
         requestWakeLock();
+        updateRiderLiveGPS();
         fetchOrders();
       }
     }
@@ -488,6 +508,44 @@
         dot.className = 'status-dot offline';
         txt.innerText = 'OFFLINE';
         box.style.borderColor = '#ef4444';
+      }
+    }
+
+    // HAVERSINE FORMULA (DISTANCE IN METERS)
+    function calculateDistanceInMeters(lat1, lon1, lat2, lon2) {
+      if (!lat1 || !lon1 || !lat2 || !lon2) return 999999;
+      var R = 6371e3; // Earth radius in meters
+      var dLat = (lat2 - lat1) * Math.PI / 180;
+      var dLon = (lon2 - lon1) * Math.PI / 180;
+      var a = 
+        Math.sin(dLat/2) * Math.sin(dLat/2) +
+        Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * 
+        Math.sin(dLon/2) * Math.sin(dLon/2);
+      var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+      return Math.round(R * c);
+    }
+
+    // UPDATE RIDER LIVE LOCATION TO SUPABASE
+    function updateRiderLiveGPS() {
+      if (navigator.geolocation && isRiderOnline) {
+        navigator.geolocation.getCurrentPosition(function(pos) {
+          riderCurrentCoords = {
+            lat: pos.coords.latitude,
+            lng: pos.coords.longitude
+          };
+
+          fetch(SUPABASE_URL + '/rest/v1/riders?id=eq.1', {
+            method: 'PATCH',
+            headers: {
+              'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY,
+              'Content-Type': 'application/json', 'Prefer': 'return=minimal'
+            },
+            body: JSON.stringify({
+              current_lat: riderCurrentCoords.lat,
+              current_lng: riderCurrentCoords.lng
+            })
+          }).catch(function(){});
+        }, function(err){}, { enableHighAccuracy: true });
       }
     }
 
@@ -512,6 +570,7 @@
       });
     }
 
+    // FETCH ORDERS & CHECK 500M RETURN CRITERIA
     function fetchOrders() {
       fetch(SUPABASE_URL + '/rest/v1/orders?select=*&order=id.desc', {
         headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY }
@@ -521,17 +580,26 @@
         var newOrders = data || [];
         
         if (isRiderOnline) {
-          // Status Normalize: COD (Placed) & UPI (Paid Online / Placed) pakad me aayenge
-          var pending = newOrders.filter(function(o) {
+          // 1. Regular Incoming Orders (COD / UPI)
+          var pendingDeliveries = newOrders.filter(function(o) {
             var s = (o.status || '').toLowerCase();
-            return (s.includes('placed') || s.includes('paid') || s.includes('pending')) && !s.includes('cancelled') && !s.includes('out') && !s.includes('delivered');
+            return (s.includes('placed') || s.includes('paid')) && !s.includes('cancelled') && !s.includes('out') && !s.includes('delivered');
           });
 
-          // Sound Loop Fix: Sirf naye order par alert baje gi
-          if (pending.length > 0) {
-            var topOrder = pending[0];
+          // 2. Approved Return Orders (Within 500m only)
+          var eligibleReturns = newOrders.filter(function(o) {
+            if (o.return_status === 'Approved' && o.return_lat && o.return_lng && riderCurrentCoords) {
+              var dist = calculateDistanceInMeters(riderCurrentCoords.lat, riderCurrentCoords.lng, o.return_lat, o.return_lng);
+              return dist <= 500; // 500 meter dayra check
+            }
+            return false;
+          });
+
+          // Sound Alert Trigger
+          if (pendingDeliveries.length > 0 || eligibleReturns.length > 0) {
+            var topOrder = eligibleReturns[0] || pendingDeliveries[0];
             if (lastKnownAlertId !== topOrder.id) {
-              playSound(topOrder.total_amount);
+              playSound(topOrder.total_amount, !!eligibleReturns[0]);
               lastKnownAlertId = topOrder.id;
             }
           } else {
@@ -577,15 +645,24 @@
       var filtered = currentTab === 'active' 
         ? allRiderOrders.filter(function(o) { 
             var st = (o.status || '').toLowerCase();
+            var isPendingReturn = o.return_status === 'Approved';
+            // Agar return approved hai toh sirf 500m ke andar wale ko active me dikhao
+            if (isPendingReturn) {
+              if (riderCurrentCoords && o.return_lat && o.return_lng) {
+                var dist = calculateDistanceInMeters(riderCurrentCoords.lat, riderCurrentCoords.lng, o.return_lat, o.return_lng);
+                return dist <= 500;
+              }
+              return false;
+            }
             return !st.includes('delivered') && !st.includes('cancelled'); 
           })
         : allRiderOrders.filter(function(o) { 
             var st = (o.status || '').toLowerCase();
-            return st.includes('delivered') || st.includes('cancelled'); 
+            return st.includes('delivered') || st.includes('cancelled') || o.return_status === 'Returned'; 
           });
 
       if (filtered.length === 0) {
-        container.innerHTML = '<div class="empty-msg">' + (currentTab === 'active' ? '🎉 अभी कोई नया ऑर्डर नहीं है।' : 'कोई पुराना रिकॉर्ड नहीं मिला।') + '</div>';
+        container.innerHTML = '<div class="empty-msg">' + (currentTab === 'active' ? '🎉 अभी कोई एक्टिव ऑर्डर या 500m रिटर्न नहीं है।' : 'कोई पुराना रिकॉर्ड नहीं मिला।') + '</div>';
         return;
       }
 
@@ -596,23 +673,60 @@
         var isDispatched = st.includes('out') || st.includes('running');
         var isDelivered = st.includes('delivered');
         var isCancelled = st.includes('cancelled');
+        var isReturnOrder = order.return_status === 'Approved';
+
+        // Calculation of distance if return
+        var distText = '';
+        if (isReturnOrder && riderCurrentCoords && order.return_lat && order.return_lng) {
+          var meters = calculateDistanceInMeters(riderCurrentCoords.lat, riderCurrentCoords.lng, order.return_lat, order.return_lng);
+          distText = ' • ' + meters + 'm door';
+        }
 
         var itemsListHtml = items.map(function(it) {
           return '<div class="item-summary-line"><span>' + (it.name || 'Item') + ' × ' + (it.qty || 1) + '</span></div>';
         }).join('');
 
-        return '<div class="order-card ' + (!isDispatched && !isDelivered && !isCancelled ? 'new-pulse' : '') + '">' +
+        return '<div class="order-card ' + (isReturnOrder ? 'return-pulse' : (!isDispatched && !isDelivered && !isCancelled ? 'new-pulse' : '')) + '">' +
           '<div class="order-top">' +
-            '<div><div class="ord-id">#ORD-' + order.id + '</div><span class="ord-tag ' + (isDelivered ? 'tag-delivered' : isDispatched ? 'tag-transit' : 'tag-placed') + '">' + (order.status || 'Placed') + '</span></div>' +
-            '<div style="text-align:right;"><div class="ord-amount">₹' + (order.total_amount || 0) + '</div><div style="font-size:11px; color:#94a3b8; font-weight:700;">' + (order.payment_mode || 'COD') + '</div></div>' +
+            '<div>' +
+              '<div class="ord-id">#ORD-' + order.id + '</div>' +
+              '<span class="ord-tag ' + (isReturnOrder ? 'tag-return' : isDelivered ? 'tag-delivered' : isDispatched ? 'tag-transit' : 'tag-placed') + '">' + 
+                (isReturnOrder ? '🚨 RETURN PICKUP' + distText : (order.status || 'Placed')) + 
+              '</span>' +
+            '</div>' +
+            '<div style="text-align:right;">' +
+              '<div class="ord-amount">₹' + (order.total_amount || 0) + '</div>' +
+              '<div style="font-size:11px; color:#94a3b8; font-weight:700;">' + (order.payment_mode || 'COD') + '</div>' +
+            '</div>' +
           '</div>' +
+
           '<div class="cust-info-box">' +
             '<div class="cust-row"><span>👤</span> <b>' + (order.customer_name || 'Customer') + '</b></div>' +
             '<div class="cust-row"><span>📞</span> <span>' + (order.customer_phone || 'NA') + '</span></div>' +
             '<div class="cust-row"><span>📍</span> <span>' + (order.delivery_address || 'Address not specified') + '</span></div>' +
+            (isReturnOrder ? `
+              <div class="cust-row" style="color:#fca5a5;"><span>⚠️</span> <span><b>Return Karan:</b> ${order.return_reason || 'Nahi bataya'}</span></div>
+              <div class="cust-row" style="color:#fde047;"><span>📱</span> <span><b>Refund UPI:</b> ${order.return_customer_upi || 'Nahi di'}</span></div>
+            ` : '') +
           '</div>' +
-          (itemsListHtml ? '<div class="items-summary-box">' + itemsListHtml + '</div>' : '') +
-          (!isDelivered && !isCancelled ? (
+
+          // CUSTOMER PROOF PHOTO FOR INSPECTION IF RETURN ORDER
+          (isReturnOrder && order.return_photo_url ? `
+            <div style="background:#0f172a; padding:10px; border-radius:10px; margin-bottom:12px;">
+              <div style="font-size:11.5px; font-weight:800; color:#38bdf8; margin-bottom:4px;">🔍 ग्राहक द्वारा भेजा गया फ़ोटो (सत्यापन करें):</div>
+              <img src="${order.return_photo_url}" class="return-inspect-img" onclick="window.open(this.src)" title="फ़ोटो बड़ा करने के लिए क्लिक करें">
+            </div>
+          ` : '') +
+
+          (!isReturnOrder && itemsListHtml ? '<div class="items-summary-box">' + itemsListHtml + '</div>' : '') +
+
+          // ACTION BUTTONS
+          (isReturnOrder ? `
+            <a href="tel:${order.customer_phone}" class="btn-action-call">📞 Call Customer for Return</a>
+            <button class="btn-action-primary" style="background:#ef4444;" onclick="acceptAndPickupReturn(${order.id})">
+              📦 सामान जांच कर रिटर्न पिकअप करें
+            </button>
+          ` : !isDelivered && !isCancelled ? (
             '<a href="tel:' + order.customer_phone + '" class="btn-action-call">📞 Call Customer</a>' +
             (!isDispatched 
               ? '<button class="btn-action-primary" style="background:#0284c7;" onclick="openPickupModal(' + order.id + ')">📸 Accept & Pickup</button>'
@@ -620,6 +734,27 @@
           ) : '') +
         '</div>';
       }).join('');
+    }
+
+    // RETURN PICKUP CONFIRMATION
+    function acceptAndPickupReturn(orderId) {
+      if (!confirm('क्या आपने ग्राहक के सामान का फोटो से मिलान कर लिया है? रिटर्न पिकअप पूरा करें?')) return;
+      stopSound();
+
+      fetch(SUPABASE_URL + '/rest/v1/orders?id=eq.' + orderId, {
+        method: 'PATCH',
+        headers: {
+          'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY,
+          'Content-Type': 'application/json', 'Prefer': 'return=minimal'
+        },
+        body: JSON.stringify({
+          return_status: 'Returned',
+          status: 'Returned'
+        })
+      }).then(function() {
+        alert('✅ रिटर्न सफलता पूर्वक पिकअप हो गया!');
+        fetchOrders();
+      });
     }
 
     function openPickupModal(id) { 
@@ -703,9 +838,13 @@
     window.addEventListener('DOMContentLoaded', function() {
       renderDutyUI();
       initNotificationPermission();
-      if (isRiderOnline) requestWakeLock();
+      if (isRiderOnline) {
+        requestWakeLock();
+        updateRiderLiveGPS();
+      }
       fetchOrders();
-      setInterval(fetchOrders, 8000);
+      setInterval(updateRiderLiveGPS, 10000); // 10 Sec me GPS sync
+      setInterval(fetchOrders, 7000);         // 7 Sec me orders & 500m return check
     });
   </script>
 </body>
