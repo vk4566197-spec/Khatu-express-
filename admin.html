@@ -3,10 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>👑 BABA FOOD — Master Admin Tower</title>
+  <title>👑 BABA FOOD — Master Command Tower</title>
 
   <link rel="icon" type="image/png" href="logo.png">
-  <meta name="theme-color" content="#1b042d">
+  <meta name="theme-color" content="#120224">
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -30,43 +30,43 @@
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; -webkit-tap-highlight-color: transparent; }
     body { background-color: var(--bg-slate); color: var(--text-main); padding-bottom: 90px; min-height: 100vh; }
 
-    /* TOP HEADER */
+    /* HEADER */
     .top-nav {
       background: #1e112a; padding: 14px 18px; border-bottom: 1px solid #381a4d;
       display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 1000;
     }
     .admin-brand { display: flex; align-items: center; gap: 10px; }
-    .admin-brand img { width: 40px; height: 40px; border-radius: 50%; border: 1.5px solid #ff758c; background: #fff; }
-    .brand-title { font-size: 16px; font-weight: 900; color: #ffffff; }
+    .admin-brand img { width: 38px; height: 38px; border-radius: 50%; border: 1.5px solid #ff758c; background: #fff; }
+    .brand-title { font-size: 15px; font-weight: 900; color: #ffffff; }
     .brand-sub { font-size: 11px; color: #ff94b4; font-weight: 700; }
 
-    .header-actions { display: flex; align-items: center; gap: 10px; }
+    .header-actions { display: flex; align-items: center; gap: 8px; }
     .store-toggle-btn {
       background: #10b981; border: none; color: #fff; padding: 8px 14px;
-      border-radius: 20px; font-size: 11.5px; font-weight: 800; cursor: pointer;
+      border-radius: 20px; font-size: 11px; font-weight: 900; cursor: pointer;
     }
     .store-toggle-btn.closed { background: #dc2626; }
 
-    /* STATS SUMMARY ROW */
-    .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; padding: 16px; }
-    .stat-box { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 14px; padding: 12px; text-align: center; }
-    .stat-val { font-size: 19px; font-weight: 900; color: #38bdf8; }
-    .stat-title { font-size: 10.5px; color: var(--text-muted); font-weight: 700; margin-top: 3px; }
+    /* STATS SUMMARY BAR */
+    .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; padding: 14px 16px; }
+    .stat-box { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 14px; padding: 12px 8px; text-align: center; }
+    .stat-val { font-size: 18px; font-weight: 900; color: #38bdf8; }
+    .stat-title { font-size: 10px; color: var(--text-muted); font-weight: 700; margin-top: 2px; }
 
-    /* TABS */
+    /* SCROLLABLE TABS */
     .admin-tabs { display: flex; gap: 8px; padding: 0 16px 14px 16px; overflow-x: auto; scrollbar-width: none; }
     .admin-tabs::-webkit-scrollbar { display: none; }
     .tab-btn {
-      flex: 1; min-width: 100px; background: #1e293b; border: 1.5px solid var(--border-color);
-      color: var(--text-muted); padding: 10px 14px; border-radius: 12px; font-size: 12px;
+      flex: 1; min-width: 95px; background: #1e293b; border: 1.5px solid var(--border-color);
+      color: var(--text-muted); padding: 9px 12px; border-radius: 12px; font-size: 11.5px;
       font-weight: 800; cursor: pointer; text-align: center; white-space: nowrap;
     }
     .tab-btn.active { background: var(--primary-purple); border-color: #a855f7; color: #ffffff; }
 
-    /* CONTAINER */
+    /* CONTENT SECTIONS */
     .content-area { padding: 0 16px; }
     .section-card { background: var(--card-bg); border: 1.5px solid var(--border-color); border-radius: 16px; padding: 16px; margin-bottom: 14px; }
-    .sec-title { font-size: 15px; font-weight: 900; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; }
+    .sec-title { font-size: 14px; font-weight: 900; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; }
 
     /* ORDER CARDS */
     .order-item-card {
@@ -84,7 +84,7 @@
     .ord-details-box { background: #0f172a; border-radius: 10px; padding: 10px; font-size: 12px; color: #cbd5e1; margin: 8px 0; }
     .ord-row { display: flex; align-items: flex-start; gap: 6px; margin-bottom: 4px; word-break: break-word; }
 
-    /* FORM ELEMENTS */
+    /* FORM INPUTS & BUTTONS */
     .admin-input {
       width: 100%; background: #0f172a; border: 1.5px solid #334155; border-radius: 10px;
       padding: 10px 12px; font-size: 12.5px; color: #ffffff; outline: none; margin-bottom: 8px;
@@ -92,27 +92,27 @@
     .admin-input:focus { border-color: #a855f7; }
     .btn-admin {
       background: var(--primary-purple); color: #fff; border: 1px solid #a855f7;
-      padding: 10px 14px; border-radius: 10px; font-size: 12.5px; font-weight: 800; cursor: pointer;
+      padding: 10px 14px; border-radius: 10px; font-size: 12px; font-weight: 800; cursor: pointer;
     }
     .btn-success { background: #059669; border: none; }
     .btn-danger { background: #dc2626; border: none; }
+    .btn-warning { background: #d97706; border: none; }
 
-    /* PHOTO PREVIEW */
     .return-proof-img {
-      width: 130px; height: 130px; border-radius: 10px; object-fit: cover;
+      width: 120px; height: 120px; border-radius: 10px; object-fit: cover;
       border: 1.5px solid #ef4444; margin-top: 6px; cursor: pointer;
     }
   </style>
 </head>
 <body onclick="unlockAdminAudio();" ontouchstart="unlockAdminAudio();">
 
-  <!-- TOP NAV BAR -->
+  <!-- TOP APP BAR -->
   <div class="top-nav">
     <div class="admin-brand">
       <img src="logo.png" alt="Logo" onerror="this.style.display='none'">
       <div>
         <div class="brand-title">BABA COMMAND TOWER 👑</div>
-        <div class="brand-sub">Master Store & Dispatch Control</div>
+        <div class="brand-sub">Master Store Control</div>
       </div>
     </div>
     <div class="header-actions">
@@ -124,7 +124,7 @@
   <div class="stats-grid">
     <div class="stat-box">
       <div class="stat-val" id="stat-active-orders">0</div>
-      <div class="stat-title">Live Orders</div>
+      <div class="stat-title">Active Orders</div>
     </div>
     <div class="stat-box">
       <div class="stat-val" id="stat-return-reqs" style="color:#ef4444;">0</div>
@@ -136,22 +136,25 @@
     </div>
     <div class="stat-box">
       <div class="stat-val" id="stat-revenue">₹0</div>
-      <div class="stat-title">Sales</div>
+      <div class="stat-title">Revenue</div>
     </div>
   </div>
 
-  <!-- NAVIGATION TABS -->
+  <!-- ALL MASTER TABS -->
   <div class="admin-tabs">
     <button class="tab-btn active" id="tab-btn-orders" onclick="switchAdminTab('orders')">📦 Orders (<span id="count-orders">0</span>)</button>
     <button class="tab-btn" id="tab-btn-returns" onclick="switchAdminTab('returns')" style="color:#f87171;">🚨 Returns (<span id="count-returns">0</span>)</button>
-    <button class="tab-btn" id="tab-btn-products" onclick="switchAdminTab('products')">🍔 Menu & Stock</button>
+    <button class="tab-btn" id="tab-btn-products" onclick="switchAdminTab('products')">🍔 Menu / Stock</button>
+    <button class="tab-btn" id="tab-btn-riders" onclick="switchAdminTab('riders')">🛵 Riders</button>
+    <button class="tab-btn" id="tab-btn-coupons" onclick="switchAdminTab('coupons')">🎟️ Coupons</button>
+    <button class="tab-btn" id="tab-btn-hubs" onclick="switchAdminTab('hubs')">🏬 Hubs</button>
+    <button class="tab-btn" id="tab-btn-disputes" onclick="switchAdminTab('disputes')">⚖️ Disputes</button>
     <button class="tab-btn" id="tab-btn-settings" onclick="switchAdminTab('settings')">⚙️ Pricing Rules</button>
   </div>
 
-  <!-- MAIN TAB CONTENT CONTAINER -->
   <div class="content-area">
 
-    <!-- 1. LIVE ORDERS SECTION -->
+    <!-- 1. LIVE ORDERS SECTION (WITH ASSIGN RIDER DROPDOWN & PHOTO PROOFS) -->
     <div id="section-orders">
       <div class="sec-title">
         <span>⚡ Live Incoming Orders</span>
@@ -163,9 +166,9 @@
     <!-- 2. RETURN MANAGEMENT TOWER (500M APPROVAL) -->
     <div id="section-returns" style="display:none;">
       <div class="sec-title" style="color:#ef4444;">
-        <span>🚨 Customer Return / Replacement Requests</span>
+        <span>🚨 Customer Return Requests</span>
       </div>
-      <div id="returns-list-box"><div style="text-align:center; padding:30px; color:#94a3b8;">Koi return request nahi hai.</div></div>
+      <div id="returns-list-box"><div style="text-align:center; padding:30px; color:#94a3b8;">Koi return request pending nahi hai.</div></div>
     </div>
 
     <!-- 3. MENU & STOCK MANAGEMENT -->
@@ -173,22 +176,71 @@
       <div class="section-card">
         <div class="sec-title">➕ Naya Item Jodein</div>
         <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
-          <input type="text" id="p-name" class="admin-input" placeholder="Item Name (e.g. Chicken Biryani)">
+          <input type="text" id="p-name" class="admin-input" placeholder="Item Name (e.g. Biryani)">
           <input type="text" id="p-category" class="admin-input" placeholder="Category (e.g. Meals)">
-          <input type="number" id="p-price" class="admin-input" placeholder="Selling Price (₹)">
-          <input type="number" id="p-discount" class="admin-input" placeholder="Discount % (Optional)">
-          <input type="number" id="p-stock" class="admin-input" placeholder="Stock Qty (e.g. 50)">
-          <input type="text" id="p-unit" class="admin-input" placeholder="Unit (e.g. 1 plate, 500ml)">
+          <input type="number" id="p-price" class="admin-input" placeholder="Price (₹)">
+          <input type="number" id="p-discount" class="admin-input" placeholder="Discount %">
+          <input type="number" id="p-stock" class="admin-input" placeholder="Stock Qty">
+          <input type="text" id="p-unit" class="admin-input" placeholder="Unit (1 plate)">
         </div>
-        <input type="text" id="p-img" class="admin-input" placeholder="Image URL (Direct link)">
-        <button class="btn-admin btn-success" style="width:100%; margin-top:4px;" onclick="addNewProduct()">+ Menu Me Jodein</button>
+        <input type="text" id="p-img" class="admin-input" placeholder="Image URL">
+        <button class="btn-admin btn-success" style="width:100%;" onclick="addNewProduct()">+ Menu Me Jodein</button>
       </div>
-
       <div class="sec-title">📋 Stock Inventory</div>
       <div id="inventory-list-box"></div>
     </div>
 
-    <!-- 4. RULES & PRICING SETTINGS -->
+    <!-- 4. RIDERS MANAGEMENT -->
+    <div id="section-riders" style="display:none;">
+      <div class="section-card">
+        <div class="sec-title">➕ Naya Delivery Rider Jodein</div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
+          <input type="text" id="r-name" class="admin-input" placeholder="Rider Name">
+          <input type="tel" id="r-phone" class="admin-input" placeholder="Phone Number (10 Digit)">
+        </div>
+        <button class="btn-admin btn-success" style="width:100%;" onclick="addNewRider()">+ Rider Register Karein</button>
+      </div>
+      <div class="sec-title">🛵 Active Riders List</div>
+      <div id="riders-list-box"></div>
+    </div>
+
+    <!-- 5. COUPONS MANAGEMENT -->
+    <div id="section-coupons" style="display:none;">
+      <div class="section-card">
+        <div class="sec-title">➕ Naya Promo Coupon Banayein</div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
+          <input type="text" id="c-code" class="admin-input" placeholder="Code (e.g. BABA50)" style="text-transform:uppercase;">
+          <input type="number" id="c-disc" class="admin-input" placeholder="Flat Discount (₹)">
+          <input type="number" id="c-min" class="admin-input" placeholder="Min Order Value (₹)">
+        </div>
+        <button class="btn-admin btn-success" style="width:100%;" onclick="addNewCoupon()">+ Coupon Active Karein</button>
+      </div>
+      <div class="sec-title">🎟️ Active Coupons</div>
+      <div id="coupons-list-box"></div>
+    </div>
+
+    <!-- 6. HUBS / MULTI-VENDOR MANAGEMENT -->
+    <div id="section-hubs" style="display:none;">
+      <div class="section-card">
+        <div class="sec-title">🏬 Store Hubs & Cart Lock</div>
+        <div style="display:flex; justify-content:space-between; align-items:center; background:#0f172a; padding:12px; border-radius:10px; margin-bottom:12px;">
+          <div>
+            <div style="font-size:13px; font-weight:800;">Single Hub Cart Lock</div>
+            <div style="font-size:11px; color:#94a3b8;">Customer ek baar me ek hi dukaan se order karega</div>
+          </div>
+          <button id="hub-lock-toggle-btn" class="btn-admin" onclick="toggleHubLock()"></button>
+        </div>
+        <div id="hubs-list-box"></div>
+      </div>
+    </div>
+
+    <!-- 7. DISPUTES & COMPLAINTS -->
+    <div id="section-disputes" style="display:none;">
+      <div class="sec-title" style="color:#f59e0b;">⚖️ Grahak Complaints & Disputes</div>
+      <div id="disputes-list-box"><div style="text-align:center; padding:30px; color:#94a3b8;">Koi open dispute nahi mila.</div></div>
+    </div>
+
+    <!-- 8. RULES & SURGE PRICING SETTINGS -->
     <div id="section-settings" style="display:none;">
       <div class="section-card">
         <div class="sec-title">🌧️ Surge & Dynamic Pricing Rules</div>
@@ -202,8 +254,14 @@
             </select>
           </div>
           <div>
-            <label style="font-size:12px; font-weight:800;">Night Surge Fee (₹):</label>
-            <input type="number" id="set-night-fee" class="admin-input" placeholder="Night fee (e.g. 20)">
+            <label style="font-size:12px; font-weight:800;">Night Surge Active & Fee (₹):</label>
+            <div style="display:grid; grid-template-columns:1fr 2fr; gap:8px; margin-top:4px;">
+              <select id="set-night-active" class="admin-input">
+                <option value="true">Active (ON)</option>
+                <option value="false">Inactive (OFF)</option>
+              </select>
+              <input type="number" id="set-night-fee" class="admin-input" placeholder="Night fee (₹20)">
+            </div>
           </div>
           <div>
             <label style="font-size:12px; font-weight:800;">Min Order for Free Delivery (₹):</label>
@@ -211,7 +269,7 @@
           </div>
           <div>
             <label style="font-size:12px; font-weight:800;">Broadcast Notice Ticker (Top Red Banner):</label>
-            <input type="text" id="set-broadcast-text" class="admin-input" placeholder="e.g. Barish ke karan delivery me 10 min ki deri ho sakti hai!">
+            <input type="text" id="set-broadcast-text" class="admin-input" placeholder="e.g. Dukaan par rush hai...">
           </div>
           <button class="btn-admin btn-success" onclick="saveSettings()">Save & Update App Live 🚀</button>
         </div>
@@ -232,6 +290,8 @@
     let allOrders = [];
     let allProducts = [];
     let allRiders = [];
+    let allCoupons = [];
+    let allHubs = [];
     let appSettings = {};
     let lastAlertOrderId = null;
     let audioUnlocked = false;
@@ -267,7 +327,14 @@
     });
 
     async function fetchAdminData() {
-      await Promise.all([loadSettings(), fetchOrders(), fetchProducts(), fetchRiders()]);
+      await Promise.all([
+        loadSettings(),
+        fetchOrders(),
+        fetchProducts(),
+        fetchRiders(),
+        fetchCoupons(),
+        fetchHubs()
+      ]);
       updateDashboardStats();
     }
 
@@ -284,9 +351,16 @@
           btn.innerText = '🟢 OPEN';
         }
         document.getElementById('set-rain-mode').value = data.rain_surge_mode || 'OFF';
+        document.getElementById('set-night-active').value = data.is_night_surge_active ? 'true' : 'false';
         document.getElementById('set-night-fee').value = data.night_surge_fee || 20;
         document.getElementById('set-min-free').value = data.min_free_delivery || 249;
         document.getElementById('set-broadcast-text').value = data.broadcast_notice || '';
+        
+        const hBtn = document.getElementById('hub-lock-toggle-btn');
+        if (hBtn) {
+          hBtn.innerText = data.enable_hub_lock ? 'LOCK ON' : 'LOCK OFF';
+          hBtn.className = data.enable_hub_lock ? 'btn-admin btn-success' : 'btn-admin btn-danger';
+        }
       }
     }
 
@@ -294,11 +368,19 @@
       const newStatus = appSettings.store_status === 'CLOSED' ? 'OPEN' : 'CLOSED';
       await _supabase.from('app_settings').update({ store_status: newStatus }).eq('id', 1);
       loadSettings();
-      alert(`Dukaan ka status ab: ${newStatus}`);
+      alert(`Dukaan Status: ${newStatus}`);
+    }
+
+    async function toggleHubLock() {
+      const newLock = !appSettings.enable_hub_lock;
+      await _supabase.from('app_settings').update({ enable_hub_lock: newLock }).eq('id', 1);
+      loadSettings();
+      alert(`Hub Lock ab: ${newLock ? 'ON' : 'OFF'}`);
     }
 
     async function saveSettings() {
       const rMode = document.getElementById('set-rain-mode').value;
+      const nAct = document.getElementById('set-night-active').value === 'true';
       const nFee = Number(document.getElementById('set-night-fee').value);
       const mFree = Number(document.getElementById('set-min-free').value);
       const bText = document.getElementById('set-broadcast-text').value.trim();
@@ -306,6 +388,7 @@
       await _supabase.from('app_settings').update({
         rain_surge_mode: rMode,
         rain_surge_fee: rMode === 'HEAVY' ? 30 : rMode === 'LIGHT' ? 15 : 0,
+        is_night_surge_active: nAct,
         night_surge_fee: nFee,
         min_free_delivery: mFree,
         broadcast_notice: bText,
@@ -320,7 +403,6 @@
       const { data } = await _supabase.from('orders').select('*').order('id', { ascending: false });
       allOrders = data || [];
 
-      // Check incoming pending orders for alert tone
       const pending = allOrders.filter(o => {
         const s = (o.status || '').toLowerCase();
         return (s.includes('placed') || s.includes('paid')) && !s.includes('out') && !s.includes('delivered');
@@ -338,6 +420,7 @@
 
       renderOrders();
       renderReturns();
+      renderDisputes();
     }
 
     async function fetchProducts() {
@@ -347,9 +430,22 @@
     }
 
     async function fetchRiders() {
-      const { data } = await _supabase.from('riders').select('*');
+      const { data } = await _supabase.from('riders').select('*').order('id', { ascending: true });
       allRiders = data || [];
       document.getElementById('stat-riders-online').innerText = allRiders.length;
+      renderRiders();
+    }
+
+    async function fetchCoupons() {
+      const { data } = await _supabase.from('coupons').select('*').order('id', { ascending: false });
+      allCoupons = data || [];
+      renderCoupons();
+    }
+
+    async function fetchHubs() {
+      const { data } = await _supabase.from('hubs').select('*').order('id', { ascending: true });
+      allHubs = data || [];
+      renderHubs();
     }
 
     function updateDashboardStats() {
@@ -369,7 +465,7 @@
       document.getElementById('count-returns').innerText = returns.length;
     }
 
-    // RENDER ORDERS
+    // 1. ORDERS RENDER WITH RIDER ASSIGN & PROOF PREVIEW
     function renderOrders() {
       const box = document.getElementById('orders-list-box');
       const activeOrders = allOrders.filter(o => !o.status.toLowerCase().includes('delivered') && !o.status.toLowerCase().includes('cancelled'));
@@ -385,6 +481,10 @@
         try { items = Array.isArray(o.items) ? o.items : JSON.parse(o.items || '[]'); } catch(e){}
 
         const itemsList = items.map(i => `• ${i.name} × ${i.qty} (₹${i.price * i.qty})`).join('<br>');
+
+        const riderOptions = allRiders.map(r => `
+          <option value="${r.id}" ${o.assigned_rider_id === r.id ? 'selected' : ''}>${r.name} (${r.phone})</option>
+        `).join('');
 
         return `
           <div class="order-item-card">
@@ -405,11 +505,27 @@
               </div>
             </div>
 
+            <!-- PHOTO PROOFS IF UPLOADED BY RIDER -->
+            ${o.pickup_proof_photo || o.delivery_proof_photo ? `
+              <div style="background:#0f172a; padding:8px; border-radius:8px; margin-bottom:8px; display:flex; gap:10px;">
+                ${o.pickup_proof_photo ? `<div><span style="font-size:10px; color:#94a3b8;">Pickup Proof:</span><br><img src="${o.pickup_proof_photo}" style="width:50px; height:50px; border-radius:6px; object-fit:cover;" onclick="window.open(this.src)"></div>` : ''}
+                ${o.delivery_proof_photo ? `<div><span style="font-size:10px; color:#94a3b8;">Delivery Proof:</span><br><img src="${o.delivery_proof_photo}" style="width:50px; height:50px; border-radius:6px; object-fit:cover;" onclick="window.open(this.src)"></div>` : ''}
+              </div>
+            ` : ''}
+
+            <!-- ASSIGN RIDER -->
+            <div style="margin-bottom:8px;">
+              <select class="admin-input" onchange="assignRiderToOrder(${o.id}, this.value)" style="margin-bottom:0;">
+                <option value="">🛵 Rider Assign Karein...</option>
+                ${riderOptions}
+              </select>
+            </div>
+
             <div style="display:flex; gap:8px;">
               ${!isDispatched ? `
-                <button class="btn-admin btn-success" style="flex:1;" onclick="dispatchOrder(${o.id})">🛵 Dispatch (Out for Delivery)</button>
+                <button class="btn-admin btn-success" style="flex:1;" onclick="dispatchOrder(${o.id})">🛵 Dispatch (Out)</button>
               ` : `
-                <button class="btn-admin" style="flex:1; background:#0284c7;" onclick="alert('Rider deliver kar raha hai. Secret OTP: ${o.delivery_otp}')">🔐 View OTP: ${o.delivery_otp}</button>
+                <button class="btn-admin" style="flex:1; background:#0284c7;" onclick="alert('Secret OTP: ${o.delivery_otp}')">🔐 OTP: ${o.delivery_otp}</button>
               `}
               <button class="btn-admin btn-danger" onclick="cancelOrderAdmin(${o.id})">✕ Cancel</button>
             </div>
@@ -418,7 +534,14 @@
       }).join('');
     }
 
-    // 2. RENDER RETURN REQUESTS (APPROVAL / REJECTION TOWER)
+    async function assignRiderToOrder(orderId, riderId) {
+      if (!riderId) return;
+      await _supabase.from('orders').update({ assigned_rider_id: Number(riderId) }).eq('id', orderId);
+      alert('Rider assign ho gaya!');
+      fetchOrders();
+    }
+
+    // 2. RETURN MANAGEMENT TOWER (500M APPROVAL)
     function renderReturns() {
       const box = document.getElementById('returns-list-box');
       const returns = allOrders.filter(o => o.return_status === 'Requested');
@@ -441,11 +564,10 @@
           <div class="ord-details-box">
             <div class="ord-row"><span>👤</span> <b>${o.customer_name}</b> (📞 <a href="tel:${o.customer_phone}" style="color:#38bdf8;">${o.customer_phone}</a>)</div>
             <div class="ord-row"><span>📍</span> <span>${o.delivery_address}</span></div>
-            <div class="ord-row" style="color:#fca5a5;"><span>⚠️</span> <span><b>Wapsi Ka Karan:</b> ${o.return_reason || 'Nahi bataya'}</span></div>
+            <div class="ord-row" style="color:#fca5a5;"><span>⚠️</span> <span><b>Return Karan:</b> ${o.return_reason || 'Nahi bataya'}</span></div>
             <div class="ord-row" style="color:#fde047;"><span>📱</span> <span><b>Refund UPI ID:</b> <b style="background:#451a03; padding:2px 6px; border-radius:4px;">${o.return_customer_upi || 'Nahi di'}</b></span></div>
           </div>
 
-          <!-- Customer Uploaded Return Photo Proof -->
           <div style="margin:10px 0; background:#0f172a; padding:10px; border-radius:10px;">
             <div style="font-size:11.5px; font-weight:800; color:#94a3b8; margin-bottom:4px;">📸 Grahak dwara bheja gaya proof:</div>
             ${o.return_photo_url ? `
@@ -469,13 +591,10 @@
       if (!confirm('Kya aap is return ko approve karke 500m ke rider ke liye dispatch karna chahte hain?')) return;
       stopAlertTune();
 
-      const { error } = await _supabase.from('orders').update({
-        return_status: 'Approved'
-      }).eq('id', orderId);
-
+      const { error } = await _supabase.from('orders').update({ return_status: 'Approved' }).eq('id', orderId);
       if (error) alert('Error: ' + error.message);
       else {
-        alert('✅ Return Approved! Grahak ke 500m ke dayre me aate hi rider ke mobile par ringtone bajegi.');
+        alert('✅ Return Approved! 500m ke dayre me aate hi rider ke mobile par ghanti bajegi.');
         fetchOrders();
       }
     }
@@ -483,44 +602,33 @@
     async function rejectReturnRequest(orderId) {
       const reason = prompt('Return reject karne ka karan darj karein:');
       if (!reason) return;
-
-      await _supabase.from('orders').update({
-        return_status: 'Rejected',
-        cancellation_reason: reason
-      }).eq('id', orderId);
-
-      alert('Return request reject kar di gayi hai.');
+      await _supabase.from('orders').update({ return_status: 'Rejected', cancellation_reason: reason }).eq('id', orderId);
+      alert('Return reject ho gaya.');
       fetchOrders();
     }
 
     async function dispatchOrder(orderId) {
       stopAlertTune();
-      await _supabase.from('orders').update({
-        status: 'Out for Delivery',
-        estimated_delivery_time: '15-20 mins'
-      }).eq('id', orderId);
+      await _supabase.from('orders').update({ status: 'Out for Delivery', estimated_delivery_time: '15-20 mins' }).eq('id', orderId);
       fetchOrders();
     }
 
     async function cancelOrderAdmin(orderId) {
       if (!confirm('Kya aap sach me ye order cancel karna chahte hain?')) return;
-      await _supabase.from('orders').update({
-        status: 'Cancelled',
-        cancelled_by: 'Admin'
-      }).eq('id', orderId);
+      await _supabase.from('orders').update({ status: 'Cancelled', cancelled_by: 'Admin' }).eq('id', orderId);
       fetchOrders();
     }
 
-    // INVENTORY MANAGEMENT
+    // 3. INVENTORY & STOCK
     function renderInventory() {
       const box = document.getElementById('inventory-list-box');
       box.innerHTML = allProducts.map(p => `
         <div class="order-item-card" style="display:flex; justify-content:space-between; align-items:center;">
           <div style="display:flex; align-items:center; gap:10px;">
-            <img src="${p.image_url || 'https://via.placeholder.com/60'}" style="width:50px; height:50px; border-radius:10px; object-fit:cover;">
+            <img src="${p.image_url || 'https://via.placeholder.com/60'}" style="width:48px; height:48px; border-radius:10px; object-fit:cover;">
             <div>
-              <div style="font-size:14px; font-weight:800;">${p.name}</div>
-              <div style="font-size:12px; color:#94a3b8;">₹${p.price} | Stock: <b style="color:${p.stock_quantity < 5 ? '#ef4444' : '#10b981'};">${p.stock_quantity ?? 0}</b></div>
+              <div style="font-size:13.5px; font-weight:800;">${p.name}</div>
+              <div style="font-size:11.5px; color:#94a3b8;">₹${p.price} | Stock: <b style="color:${p.stock_quantity < 5 ? '#ef4444' : '#10b981'};">${p.stock_quantity ?? 0}</b></div>
             </div>
           </div>
           <div style="display:flex; gap:6px;">
@@ -548,7 +656,7 @@
         image_url: img || 'https://via.placeholder.com/150'
       }]);
 
-      alert('Item Safaltapoorvak Add Ho Gaya!');
+      alert('Item Add Ho Gaya!');
       document.getElementById('p-name').value = '';
       document.getElementById('p-price').value = '';
       fetchProducts();
@@ -557,38 +665,161 @@
     async function updateStockQuick(id, addQty) {
       const p = allProducts.find(x => x.id === id);
       if (!p) return;
-      const newStock = (p.stock_quantity || 0) + addQty;
-      await _supabase.from('products').update({ stock_quantity: newStock }).eq('id', id);
+      await _supabase.from('products').update({ stock_quantity: (p.stock_quantity || 0) + addQty }).eq('id', id);
       fetchProducts();
     }
 
     async function deleteProduct(id) {
-      if (!confirm('Kya aap sach me is item ko menu se hatana chahte hain?')) return;
+      if (!confirm('Item delete karein?')) return;
       await _supabase.from('products').delete().eq('id', id);
       fetchProducts();
     }
 
+    // 4. RIDERS MANAGEMENT
+    function renderRiders() {
+      const box = document.getElementById('riders-list-box');
+      if (allRiders.length === 0) {
+        box.innerHTML = '<div style="text-align:center; padding:20px; color:#94a3b8;">Koi rider registered nahi hai.</div>';
+        return;
+      }
+      box.innerHTML = allRiders.map(r => `
+        <div class="order-item-card" style="display:flex; justify-content:space-between; align-items:center;">
+          <div>
+            <div style="font-weight:900;">🛵 ${r.name}</div>
+            <div style="font-size:12px; color:#94a3b8;">📞 ${r.phone}</div>
+            ${r.current_lat ? `<div style="font-size:10px; color:#10b981; margin-top:2px;">📍 GPS: ${r.current_lat.toFixed(4)},${r.current_lng.toFixed(4)}</div>` : ''}
+          </div>
+          <button class="btn-admin btn-danger" style="padding:6px 10px;" onclick="deleteRider(${r.id})">Hatao</button>
+        </div>
+      `).join('');
+    }
+
+    async function addNewRider() {
+      const name = document.getElementById('r-name').value.trim();
+      const phone = document.getElementById('r-phone').value.trim();
+      if (!name || !phone) return alert('Rider ka naam aur phone daalein!');
+
+      await _supabase.from('riders').insert([{ name: name, phone: phone }]);
+      alert('Rider register ho gaya!');
+      document.getElementById('r-name').value = '';
+      document.getElementById('r-phone').value = '';
+      fetchRiders();
+    }
+
+    async function deleteRider(id) {
+      if (!confirm('Rider ko hatayein?')) return;
+      await _supabase.from('riders').delete().eq('id', id);
+      fetchRiders();
+    }
+
+    // 5. COUPONS MANAGEMENT
+    function renderCoupons() {
+      const box = document.getElementById('coupons-list-box');
+      if (allCoupons.length === 0) {
+        box.innerHTML = '<div style="text-align:center; padding:20px; color:#94a3b8;">Koi coupon nahi hai.</div>';
+        return;
+      }
+      box.innerHTML = allCoupons.map(c => `
+        <div class="order-item-card" style="display:flex; justify-content:space-between; align-items:center;">
+          <div>
+            <div style="font-weight:900; color:#38bdf8;">🎟️ ${c.code}</div>
+            <div style="font-size:12px; color:#94a3b8;">₹${c.discount_value} OFF (Min: ₹${c.min_order_amount})</div>
+          </div>
+          <button class="btn-admin btn-danger" style="padding:6px 10px;" onclick="deleteCoupon(${c.id})">Hatao</button>
+        </div>
+      `).join('');
+    }
+
+    async function addNewCoupon() {
+      const code = document.getElementById('c-code').value.trim().toUpperCase();
+      const disc = Number(document.getElementById('c-disc').value);
+      const min = Number(document.getElementById('c-min').value) || 0;
+
+      if (!code || !disc) return alert('Coupon code aur discount bharein!');
+      await _supabase.from('coupons').insert([{ code: code, discount_value: disc, min_order_amount: min, is_active: true }]);
+      alert('Coupon Ban Gaya!');
+      document.getElementById('c-code').value = '';
+      document.getElementById('c-disc').value = '';
+      fetchCoupons();
+    }
+
+    async function deleteCoupon(id) {
+      if (!confirm('Coupon delete karein?')) return;
+      await _supabase.from('coupons').delete().eq('id', id);
+      fetchCoupons();
+    }
+
+    // 6. HUBS MANAGEMENT
+    function renderHubs() {
+      const box = document.getElementById('hubs-list-box');
+      if (allHubs.length === 0) {
+        box.innerHTML = '<div style="text-align:center; padding:20px; color:#94a3b8;">Default Hub 1 Active Hai.</div>';
+        return;
+      }
+      box.innerHTML = allHubs.map(h => `
+        <div class="order-item-card">
+          <div style="font-weight:900;">🏬 ${h.name} (#${h.id})</div>
+          <div style="font-size:12px; color:#94a3b8;">${h.address || 'Central Store'}</div>
+        </div>
+      `).join('');
+    }
+
+    // 7. DISPUTES MANAGEMENT
+    function renderDisputes() {
+      const box = document.getElementById('disputes-list-box');
+      const disputes = allOrders.filter(o => o.dispute_status && o.dispute_status !== 'Resolved');
+
+      if (disputes.length === 0) {
+        box.innerHTML = '<div style="text-align:center; padding:30px; color:#94a3b8;">Koi open dispute ya complaint nahi hai.</div>';
+        return;
+      }
+
+      box.innerHTML = disputes.map(d => `
+        <div class="order-item-card" style="border-color:#f59e0b;">
+          <div style="display:flex; justify-content:space-between;">
+            <b>Order #ORD-${d.id}</b>
+            <span style="color:#f59e0b; font-weight:800;">${d.dispute_status}</span>
+          </div>
+          <div class="ord-details-box">
+            <div>👤 ${d.customer_name} (📞 ${d.customer_phone})</div>
+            <div style="color:#fcd34d; margin-top:4px;"><b>Complaint:</b> ${d.dispute_note || 'Nahi batayi'}</div>
+          </div>
+          ${d.dispute_photo_url ? `<img src="${d.dispute_photo_url}" class="return-proof-img" onclick="window.open(this.src)">` : ''}
+          <button class="btn-admin btn-success" style="width:100%; margin-top:8px;" onclick="resolveDispute(${d.id})">✓ Resolve / Band Karein</button>
+        </div>
+      `).join('');
+    }
+
+    async function resolveDispute(id) {
+      await _supabase.from('orders').update({ dispute_status: 'Resolved' }).eq('id', id);
+      alert('Dispute Resolved!');
+      fetchOrders();
+    }
+
+    // TAB SWITCHER
     function switchAdminTab(tab) {
       currentAdminTab = tab;
       document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
       document.getElementById(`tab-btn-${tab}`).classList.add('active');
 
-      document.getElementById('section-orders').style.display = tab === 'orders' ? 'block' : 'none';
-      document.getElementById('section-returns').style.display = tab === 'returns' ? 'block' : 'none';
-      document.getElementById('section-products').style.display = tab === 'products' ? 'block' : 'none';
-      document.getElementById('section-settings').style.display = tab === 'settings' ? 'block' : 'none';
+      const tabs = ['orders', 'returns', 'products', 'riders', 'coupons', 'hubs', 'disputes', 'settings'];
+      tabs.forEach(t => {
+        const el = document.getElementById(`section-${t}`);
+        if (el) el.style.display = t === tab ? 'block' : 'none';
+      });
     }
 
-    // REALTIME UPDATES
+    // REALTIME TOWER SYNC
     function setupRealtime() {
       _supabase
-        .channel('admin_realtime_tower')
+        .channel('admin_master_realtime')
         .on('postgres_changes', { event: '*', schema: 'public', table: 'orders' }, () => {
           fetchOrders();
           updateDashboardStats();
         })
         .on('postgres_changes', { event: '*', schema: 'public', table: 'app_settings' }, () => loadSettings())
         .on('postgres_changes', { event: '*', schema: 'public', table: 'riders' }, () => fetchRiders())
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'coupons' }, () => fetchCoupons())
         .subscribe();
     }
   </script>
