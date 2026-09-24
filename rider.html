@@ -13,6 +13,7 @@
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
 
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 
@@ -260,6 +261,7 @@
       justify-content: center;
       gap: 6px;
       margin-bottom: 8px;
+      width: 100%;
     }
 
     .modal-bg { 
@@ -346,7 +348,7 @@
       margin-top: 6px;
     }
 
-    /* RIDER CHAT DRAWER */
+    /* RIDER REAL-TIME CHAT DRAWER */
     .rider-chat-drawer {
       position: fixed;
       top: 0;
@@ -383,6 +385,7 @@
       font-size: 13px;
       line-height: 1.4;
       font-weight: 600;
+      word-break: break-word;
     }
     .chat-msg-row.rider {
       background: var(--primary-purple);
@@ -489,7 +492,7 @@
     </div>
   </div>
 
-  <!-- RIDER CHAT DRAWER -->
+  <!-- RIDER REAL-TIME CHAT DRAWER -->
   <div class="rider-chat-drawer" id="rider-chat-drawer">
     <div class="chat-head-bar">
       <div>
@@ -501,7 +504,7 @@
     <div class="chat-body-messages" id="chat-box-content"></div>
     <div class="chat-input-row">
       <input type="text" id="chat-input-field" class="chat-text-input" placeholder="Grahak ko message likhein..." onkeypress="if(event.key==='Enter') sendRiderMsg()">
-      <button class="btn-action-primary" style="width:auto; padding:0 18px; margin-bottom:0;" onclick="sendRiderMsg()">Bhejo</button>
+      <button class="btn-action-primary" style="width:auto; padding:0 20px; margin-bottom:0;" onclick="sendRiderMsg()">Bhejo</button>
     </div>
   </div>
 
@@ -511,6 +514,7 @@
   <script>
     var SUPABASE_URL = 'https://mpeikimhkjuinqkjaumr.supabase.co';
     var SUPABASE_KEY = 'sb_publishable_2_wD-pbi_pNf8niiHxFbYA_saCIhApN';
+    var _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
     var currentTab = 'active';
     var allRiderOrders = [];
@@ -523,7 +527,9 @@
     var lastKnownAlertId = null;
     var wakeLock = null;
     var riderCurrentCoords = null;
+
     var activeChatOrderId = null;
+    var riderChatChannel = null;
 
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('sw.js').catch(function(){});
@@ -781,7 +787,6 @@
         var isCancelled = st.includes('cancelled');
         var isReturnOrder = order.return_status === 'Approved';
 
-        // GPS Coordinates extract from address string: e.g. "Ghar No 12 [GPS: 28.12345, 77.12345]"
         var rawAddress = order.delivery_address || 'Address not specified';
         var cleanAddress = rawAddress;
         var mapNavUrl = null;
@@ -842,12 +847,12 @@
 
           (!isReturnOrder && itemsListHtml ? '<div class="items-summary-box">' + itemsListHtml + '</div>' : '') +
 
-          // ACTION BUTTONS (CALL + LIVE NAVIGATION + CHAT + ACCEPT/DELIVER)
+          // ACTION BUTTONS (CALL + LIVE NAVIGATION + REALTIME CHAT + ACCEPT/DELIVER)
           (isReturnOrder ? `
             <a href="tel:${order.customer_phone}" class="btn-action-call">📞 Call Customer for Return</a>
             <a href="${mapNavUrl}" target="_blank" class="btn-action-nav">📍 Open Google Maps Navigation ↗</a>
             <button class="btn-action-chat" onclick="openRiderChat(${order.id}, '${order.customer_name || 'Customer'}')">💬 Chat with Customer</button>
-            <button class="btn-action-primary" style="background:#ef4444;" onclick="acceptAndPickupReturn(${order.id})">
+            <button class="btn-action-primary" style="background:#ef4444; margin-top:8px;" onclick="acceptAndPickupReturn(${order.id})">
               📦 सामान जांच कर रिटर्न पिकअप करें
             </button>
           ` : !isDelivered && !isCancelled ? (
@@ -857,45 +862,94 @@
             '</div>' +
             '<button class="btn-action-chat" onclick="openRiderChat(' + order.id + ', \'' + (order.customer_name || 'Customer') + '\')">💬 Chat with Customer</button>' +
             (!isDispatched 
-              ? '<button class="btn-action-primary" style="background:#0284c7;" onclick="openPickupModal(' + order.id + ')">📸 Accept & Pickup</button>'
-              : '<button class="btn-action-primary" onclick="openDeliveryProofModal(' + order.id + ', \'' + (order.delivery_otp || '') + '\')">🔐 Deliver (Enter OTP)</button>')
+              ? '<button class="btn-action-primary" style="background:#0284c7; margin-top:8px;" onclick="openPickupModal(' + order.id + ')">📸 Accept & Pickup</button>'
+              : '<button class="btn-action-primary" style="margin-top:8px;" onclick="openDeliveryProofModal(' + order.id + ', \'' + (order.delivery_otp || '') + '\')">🔐 Deliver (Enter OTP)</button>')
           ) : '') +
         '</div>';
       }).join('');
     }
 
-    // LIVE RIDER CHAT SYSTEM
+    // REAL-TIME 2-WAY CHAT FUNCTIONS FOR RIDER
     function openRiderChat(orderId, custName) {
       activeChatOrderId = orderId;
       document.getElementById('chat-customer-title').innerText = '💬 Chat with ' + custName;
       document.getElementById('chat-order-subtitle').innerText = 'Order #ORD-' + orderId;
       document.getElementById('rider-chat-drawer').classList.add('active');
-      
+
       var box = document.getElementById('chat-box-content');
-      box.innerHTML = `
-        <div class="chat-msg-row customer">Namaste! Main aapka order check kar raha hoon. Koi specific direction ya landmark ho toh batayein.</div>
-      `;
+      box.innerHTML = '<div style="text-align:center; color:#94a3b8; font-size:12px; padding:20px;">Messages load ho rahe hain...</div>';
+
+      // 1. Fetch previous chats from Supabase
+      fetch(SUPABASE_URL + '/rest/v1/order_chats?order_id=eq.' + orderId + '&order=id.asc', {
+        headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY }
+      })
+      .then(function(res) { return res.json(); })
+      .then(function(messages) {
+        box.innerHTML = '';
+        if (messages && messages.length > 0) {
+          messages.forEach(function(m) { renderRiderChatBubble(m); });
+        } else {
+          box.innerHTML = '<div style="text-align:center; color:#94a3b8; font-size:12px; padding:20px;">Grahak se baat karein ya landmark puchein!</div>';
+        }
+        box.scrollTop = box.scrollHeight;
+      });
+
+      // 2. Real-time Subscription: Jab Customer message kare toh live show ho
+      if (riderChatChannel) {
+        _supabase.removeChannel(riderChatChannel);
+      }
+      riderChatChannel = _supabase
+        .channel('rider_chat_' + orderId)
+        .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'order_chats', filter: 'order_id=eq.' + orderId }, function(payload) {
+          if (payload.new.sender_type === 'customer') {
+            renderRiderChatBubble(payload.new);
+          }
+        })
+        .subscribe();
+    }
+
+    function renderRiderChatBubble(msg) {
+      var box = document.getElementById('chat-box-content');
+      var bubble = document.createElement('div');
+      bubble.className = 'chat-msg-row ' + msg.sender_type;
+      bubble.innerText = msg.message;
+      box.appendChild(bubble);
+      box.scrollTop = box.scrollHeight;
     }
 
     function closeRiderChat() {
       document.getElementById('rider-chat-drawer').classList.remove('active');
       activeChatOrderId = null;
+      if (riderChatChannel) {
+        _supabase.removeChannel(riderChatChannel);
+        riderChatChannel = null;
+      }
     }
 
     function sendRiderMsg() {
       var input = document.getElementById('chat-input-field');
       var text = input.value.trim();
-      if (!text) return;
+      if (!text || !activeChatOrderId) return;
 
-      var box = document.getElementById('chat-box-content');
-      box.innerHTML += '<div class="chat-msg-row rider">' + text + '</div>';
       input.value = '';
-      box.scrollTop = box.scrollHeight;
 
-      setTimeout(function() {
-        box.innerHTML += '<div class="chat-msg-row customer">Message received! Rider bhai, main location par hi available hoon.</div>';
-        box.scrollTop = box.scrollHeight;
-      }, 1000);
+      renderRiderChatBubble({ sender_type: 'rider', message: text });
+
+      fetch(SUPABASE_URL + '/rest/v1/order_chats', {
+        method: 'POST',
+        headers: {
+          'apikey': SUPABASE_KEY,
+          'Authorization': 'Bearer ' + SUPABASE_KEY,
+          'Content-Type': 'application/json',
+          'Prefer': 'return=minimal'
+        },
+        body: JSON.stringify({
+          order_id: activeChatOrderId,
+          sender_type: 'rider',
+          sender_name: 'Rider',
+          message: text
+        })
+      });
     }
 
     function acceptAndPickupReturn(orderId) {
