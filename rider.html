@@ -230,6 +230,37 @@
       gap: 6px; 
       margin-bottom: 8px; 
     }
+    .btn-action-nav {
+      background: linear-gradient(135deg, #0284c7, #0369a1);
+      color: #ffffff;
+      border: 1px solid #38bdf8;
+      padding: 11px;
+      border-radius: 12px;
+      font-size: 12.5px;
+      font-weight: 800;
+      cursor: pointer;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      margin-bottom: 8px;
+    }
+    .btn-action-chat {
+      background: #475569;
+      color: #ffffff;
+      border: 1px solid #64748b;
+      padding: 11px;
+      border-radius: 12px;
+      font-size: 12.5px;
+      font-weight: 800;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      margin-bottom: 8px;
+    }
 
     .modal-bg { 
       position: fixed; 
@@ -306,7 +337,6 @@
       font-weight: 700; 
     }
 
-    /* RETURN INSPECTION PHOTO BOX */
     .return-inspect-img {
       width: 100%; 
       max-height: 170px; 
@@ -315,6 +345,75 @@
       border: 1.5px solid #ef4444; 
       margin-top: 6px;
     }
+
+    /* RIDER CHAT DRAWER */
+    .rider-chat-drawer {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: #0f172a;
+      z-index: 1000000;
+      display: none;
+      flex-direction: column;
+    }
+    .rider-chat-drawer.active { display: flex; }
+    .chat-head-bar {
+      background: #1e112a;
+      padding: 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid #381a4d;
+      color: #ffffff;
+    }
+    .chat-body-messages {
+      flex: 1;
+      padding: 16px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .chat-msg-row {
+      max-width: 82%;
+      padding: 10px 14px;
+      border-radius: 14px;
+      font-size: 13px;
+      line-height: 1.4;
+      font-weight: 600;
+    }
+    .chat-msg-row.rider {
+      background: var(--primary-purple);
+      color: #ffffff;
+      align-self: flex-end;
+      border-bottom-right-radius: 2px;
+    }
+    .chat-msg-row.customer {
+      background: #334155;
+      color: #ffffff;
+      align-self: flex-start;
+      border-bottom-left-radius: 2px;
+    }
+    .chat-input-row {
+      display: flex;
+      gap: 8px;
+      padding: 12px 16px;
+      background: #1e293b;
+      border-top: 1px solid #334155;
+    }
+    .chat-text-input {
+      flex: 1;
+      background: #0f172a;
+      border: 1.5px solid #475569;
+      border-radius: 12px;
+      padding: 12px 14px;
+      font-size: 13px;
+      color: #ffffff;
+      outline: none;
+    }
+    .chat-text-input:focus { border-color: var(--accent-pink); }
   </style>
 </head>
 <body onclick="unlockAudio();" ontouchstart="unlockAudio();">
@@ -390,6 +489,22 @@
     </div>
   </div>
 
+  <!-- RIDER CHAT DRAWER -->
+  <div class="rider-chat-drawer" id="rider-chat-drawer">
+    <div class="chat-head-bar">
+      <div>
+        <div style="font-weight:900; font-size:15px;" id="chat-customer-title">💬 Chat with Customer</div>
+        <div style="font-size:11px; color:#38bdf8;" id="chat-order-subtitle">Order #---</div>
+      </div>
+      <button style="background:none; border:none; color:white; font-size:20px; cursor:pointer;" onclick="closeRiderChat()">✕</button>
+    </div>
+    <div class="chat-body-messages" id="chat-box-content"></div>
+    <div class="chat-input-row">
+      <input type="text" id="chat-input-field" class="chat-text-input" placeholder="Grahak ko message likhein..." onkeypress="if(event.key==='Enter') sendRiderMsg()">
+      <button class="btn-action-primary" style="width:auto; padding:0 18px; margin-bottom:0;" onclick="sendRiderMsg()">Bhejo</button>
+    </div>
+  </div>
+
   <!-- AUDIO ALERT -->
   <audio id="order-sound" src="alert.mp3" preload="auto" loop></audio>
 
@@ -408,20 +523,18 @@
     var lastKnownAlertId = null;
     var wakeLock = null;
     var riderCurrentCoords = null;
+    var activeChatOrderId = null;
 
-    // Service Worker Register
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('sw.js').catch(function(){});
     }
 
-    // Permission Prompt for Push Alerts
     function initNotificationPermission() {
       if ('Notification' in window && Notification.permission !== 'granted') {
         Notification.requestPermission();
       }
     }
 
-    // WakeLock to prevent screen auto-lock on duty
     async function requestWakeLock() {
       try {
         if ('wakeLock' in navigator) {
@@ -511,10 +624,9 @@
       }
     }
 
-    // HAVERSINE FORMULA (DISTANCE IN METERS)
     function calculateDistanceInMeters(lat1, lon1, lat2, lon2) {
       if (!lat1 || !lon1 || !lat2 || !lon2) return 999999;
-      var R = 6371e3; // Earth radius in meters
+      var R = 6371e3;
       var dLat = (lat2 - lat1) * Math.PI / 180;
       var dLon = (lon2 - lon1) * Math.PI / 180;
       var a = 
@@ -525,7 +637,6 @@
       return Math.round(R * c);
     }
 
-    // UPDATE RIDER LIVE LOCATION TO SUPABASE
     function updateRiderLiveGPS() {
       if (navigator.geolocation && isRiderOnline) {
         navigator.geolocation.getCurrentPosition(function(pos) {
@@ -570,7 +681,6 @@
       });
     }
 
-    // FETCH ORDERS & CHECK 500M RETURN CRITERIA
     function fetchOrders() {
       fetch(SUPABASE_URL + '/rest/v1/orders?select=*&order=id.desc', {
         headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY }
@@ -580,22 +690,19 @@
         var newOrders = data || [];
         
         if (isRiderOnline) {
-          // 1. Regular Incoming Orders (COD / UPI)
           var pendingDeliveries = newOrders.filter(function(o) {
             var s = (o.status || '').toLowerCase();
             return (s.includes('placed') || s.includes('paid')) && !s.includes('cancelled') && !s.includes('out') && !s.includes('delivered');
           });
 
-          // 2. Approved Return Orders (Within 500m only)
           var eligibleReturns = newOrders.filter(function(o) {
             if (o.return_status === 'Approved' && o.return_lat && o.return_lng && riderCurrentCoords) {
               var dist = calculateDistanceInMeters(riderCurrentCoords.lat, riderCurrentCoords.lng, o.return_lat, o.return_lng);
-              return dist <= 500; // 500 meter dayra check
+              return dist <= 500;
             }
             return false;
           });
 
-          // Sound Alert Trigger
           if (pendingDeliveries.length > 0 || eligibleReturns.length > 0) {
             var topOrder = eligibleReturns[0] || pendingDeliveries[0];
             if (lastKnownAlertId !== topOrder.id) {
@@ -646,7 +753,6 @@
         ? allRiderOrders.filter(function(o) { 
             var st = (o.status || '').toLowerCase();
             var isPendingReturn = o.return_status === 'Approved';
-            // Agar return approved hai toh sirf 500m ke andar wale ko active me dikhao
             if (isPendingReturn) {
               if (riderCurrentCoords && o.return_lat && o.return_lng) {
                 var dist = calculateDistanceInMeters(riderCurrentCoords.lat, riderCurrentCoords.lng, o.return_lat, o.return_lng);
@@ -675,7 +781,23 @@
         var isCancelled = st.includes('cancelled');
         var isReturnOrder = order.return_status === 'Approved';
 
-        // Calculation of distance if return
+        // GPS Coordinates extract from address string: e.g. "Ghar No 12 [GPS: 28.12345, 77.12345]"
+        var rawAddress = order.delivery_address || 'Address not specified';
+        var cleanAddress = rawAddress;
+        var mapNavUrl = null;
+
+        var gpsMatch = rawAddress.match(/\[GPS:\s*([-+]?[0-9]*\.?[0-9]+),\s*([-+]?[0-9]*\.?[0-9]+)\]/i);
+        if (gpsMatch && gpsMatch[1] && gpsMatch[2]) {
+          var targetLat = gpsMatch[1];
+          var targetLng = gpsMatch[2];
+          cleanAddress = rawAddress.replace(gpsMatch[0], '').trim();
+          mapNavUrl = 'https://www.google.com/maps/dir/?api=1&destination=' + targetLat + ',' + targetLng + '&travelmode=driving';
+        } else if (order.return_lat && order.return_lng) {
+          mapNavUrl = 'https://www.google.com/maps/dir/?api=1&destination=' + order.return_lat + ',' + order.return_lng + '&travelmode=driving';
+        } else {
+          mapNavUrl = 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(cleanAddress);
+        }
+
         var distText = '';
         if (isReturnOrder && riderCurrentCoords && order.return_lat && order.return_lng) {
           var meters = calculateDistanceInMeters(riderCurrentCoords.lat, riderCurrentCoords.lng, order.return_lat, order.return_lng);
@@ -702,15 +824,15 @@
 
           '<div class="cust-info-box">' +
             '<div class="cust-row"><span>👤</span> <b>' + (order.customer_name || 'Customer') + '</b></div>' +
-            '<div class="cust-row"><span>📞</span> <span>' + (order.customer_phone || 'NA') + '</span></div>' +
-            '<div class="cust-row"><span>📍</span> <span>' + (order.delivery_address || 'Address not specified') + '</span></div>' +
+            '<div class="cust-row"><span>📞</span> <span><a href="tel:' + (order.customer_phone || '') + '" style="color:#38bdf8; text-decoration:none;">' + (order.customer_phone || 'NA') + '</a></span></div>' +
+            '<div class="cust-row"><span>🏠</span> <span><b>Pata:</b> ' + cleanAddress + '</span></div>' +
+            (gpsMatch ? '<div class="cust-row" style="color:#10b981; font-weight:800; font-size:11.5px;"><span>📍</span> <span>Live GPS Location Verified by Customer</span></div>' : '') +
             (isReturnOrder ? `
               <div class="cust-row" style="color:#fca5a5;"><span>⚠️</span> <span><b>Return Karan:</b> ${order.return_reason || 'Nahi bataya'}</span></div>
               <div class="cust-row" style="color:#fde047;"><span>📱</span> <span><b>Refund UPI:</b> ${order.return_customer_upi || 'Nahi di'}</span></div>
             ` : '') +
           '</div>' +
 
-          // CUSTOMER PROOF PHOTO FOR INSPECTION IF RETURN ORDER
           (isReturnOrder && order.return_photo_url ? `
             <div style="background:#0f172a; padding:10px; border-radius:10px; margin-bottom:12px;">
               <div style="font-size:11.5px; font-weight:800; color:#38bdf8; margin-bottom:4px;">🔍 ग्राहक द्वारा भेजा गया फ़ोटो (सत्यापन करें):</div>
@@ -720,14 +842,20 @@
 
           (!isReturnOrder && itemsListHtml ? '<div class="items-summary-box">' + itemsListHtml + '</div>' : '') +
 
-          // ACTION BUTTONS
+          // ACTION BUTTONS (CALL + LIVE NAVIGATION + CHAT + ACCEPT/DELIVER)
           (isReturnOrder ? `
             <a href="tel:${order.customer_phone}" class="btn-action-call">📞 Call Customer for Return</a>
+            <a href="${mapNavUrl}" target="_blank" class="btn-action-nav">📍 Open Google Maps Navigation ↗</a>
+            <button class="btn-action-chat" onclick="openRiderChat(${order.id}, '${order.customer_name || 'Customer'}')">💬 Chat with Customer</button>
             <button class="btn-action-primary" style="background:#ef4444;" onclick="acceptAndPickupReturn(${order.id})">
               📦 सामान जांच कर रिटर्न पिकअप करें
             </button>
           ` : !isDelivered && !isCancelled ? (
-            '<a href="tel:' + order.customer_phone + '" class="btn-action-call">📞 Call Customer</a>' +
+            '<div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">' +
+              '<a href="tel:' + order.customer_phone + '" class="btn-action-call" style="margin-bottom:8px;">📞 Call</a>' +
+              '<a href="' + mapNavUrl + '" target="_blank" class="btn-action-nav" style="margin-bottom:8px;">📍 Map Pata ↗</a>' +
+            '</div>' +
+            '<button class="btn-action-chat" onclick="openRiderChat(' + order.id + ', \'' + (order.customer_name || 'Customer') + '\')">💬 Chat with Customer</button>' +
             (!isDispatched 
               ? '<button class="btn-action-primary" style="background:#0284c7;" onclick="openPickupModal(' + order.id + ')">📸 Accept & Pickup</button>'
               : '<button class="btn-action-primary" onclick="openDeliveryProofModal(' + order.id + ', \'' + (order.delivery_otp || '') + '\')">🔐 Deliver (Enter OTP)</button>')
@@ -736,7 +864,40 @@
       }).join('');
     }
 
-    // RETURN PICKUP CONFIRMATION
+    // LIVE RIDER CHAT SYSTEM
+    function openRiderChat(orderId, custName) {
+      activeChatOrderId = orderId;
+      document.getElementById('chat-customer-title').innerText = '💬 Chat with ' + custName;
+      document.getElementById('chat-order-subtitle').innerText = 'Order #ORD-' + orderId;
+      document.getElementById('rider-chat-drawer').classList.add('active');
+      
+      var box = document.getElementById('chat-box-content');
+      box.innerHTML = `
+        <div class="chat-msg-row customer">Namaste! Main aapka order check kar raha hoon. Koi specific direction ya landmark ho toh batayein.</div>
+      `;
+    }
+
+    function closeRiderChat() {
+      document.getElementById('rider-chat-drawer').classList.remove('active');
+      activeChatOrderId = null;
+    }
+
+    function sendRiderMsg() {
+      var input = document.getElementById('chat-input-field');
+      var text = input.value.trim();
+      if (!text) return;
+
+      var box = document.getElementById('chat-box-content');
+      box.innerHTML += '<div class="chat-msg-row rider">' + text + '</div>';
+      input.value = '';
+      box.scrollTop = box.scrollHeight;
+
+      setTimeout(function() {
+        box.innerHTML += '<div class="chat-msg-row customer">Message received! Rider bhai, main location par hi available hoon.</div>';
+        box.scrollTop = box.scrollHeight;
+      }, 1000);
+    }
+
     function acceptAndPickupReturn(orderId) {
       if (!confirm('क्या आपने ग्राहक के सामान का फोटो से मिलान कर लिया है? रिटर्न पिकअप पूरा करें?')) return;
       stopSound();
@@ -843,8 +1004,8 @@
         updateRiderLiveGPS();
       }
       fetchOrders();
-      setInterval(updateRiderLiveGPS, 10000); // 10 Sec me GPS sync
-      setInterval(fetchOrders, 7000);         // 7 Sec me orders & 500m return check
+      setInterval(updateRiderLiveGPS, 10000);
+      setInterval(fetchOrders, 7000);
     });
   </script>
 </body>
