@@ -154,7 +154,7 @@
 
   <div class="content-area">
 
-    <!-- 1. LIVE ORDERS SECTION (WITH ASSIGN RIDER DROPDOWN & PHOTO PROOFS) -->
+    <!-- 1. LIVE ORDERS SECTION -->
     <div id="section-orders">
       <div class="sec-title">
         <span>⚡ Live Incoming Orders</span>
@@ -190,17 +190,19 @@
       <div id="inventory-list-box"></div>
     </div>
 
-    <!-- 4. RIDERS MANAGEMENT -->
+    <!-- 4. RIDERS MANAGEMENT (WITH BIKE NO. & ADDRESS) -->
     <div id="section-riders" style="display:none;">
       <div class="section-card">
         <div class="sec-title">➕ Naya Delivery Rider Jodein</div>
         <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
-          <input type="text" id="r-name" class="admin-input" placeholder="Rider Name">
-          <input type="tel" id="r-phone" class="admin-input" placeholder="Phone Number (10 Digit)">
+          <input type="text" id="r-name" class="admin-input" placeholder="Rider Ka Naam *">
+          <input type="tel" id="r-phone" class="admin-input" placeholder="Mobile Number (10 Digit) *" maxlength="10">
+          <input type="text" id="r-bike" class="admin-input" placeholder="Bike / Vehicle Number (e.g. UP14AB1234) *" style="text-transform:uppercase;">
+          <input type="text" id="r-address" class="admin-input" placeholder="Rider Ka Ghar Ka Pata *">
         </div>
-        <button class="btn-admin btn-success" style="width:100%;" onclick="addNewRider()">+ Rider Register Karein</button>
+        <button class="btn-admin btn-success" style="width:100%; margin-top:4px;" onclick="addNewRider()">+ Rider Register Karein</button>
       </div>
-      <div class="sec-title">🛵 Active Riders List</div>
+      <div class="sec-title">🛵 Registered Riders List</div>
       <div id="riders-list-box"></div>
     </div>
 
@@ -219,14 +221,24 @@
       <div id="coupons-list-box"></div>
     </div>
 
-    <!-- 6. HUBS / MULTI-VENDOR MANAGEMENT -->
+    <!-- 6. HUBS / MULTI-VENDOR MANAGEMENT (WITH FULL ADD FUNCTION) -->
     <div id="section-hubs" style="display:none;">
+      <div class="section-card">
+        <div class="sec-title">➕ Naya Hub / Dukaan Jodein</div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
+          <input type="text" id="h-name" class="admin-input" placeholder="Hub / Dukaan Ka Naam *">
+          <input type="tel" id="h-phone" class="admin-input" placeholder="Contact Number">
+        </div>
+        <input type="text" id="h-address" class="admin-input" placeholder="Hub Address / Area Landmark *">
+        <button class="btn-admin btn-success" style="width:100%;" onclick="addNewHub()">+ Naya Hub Create Karein</button>
+      </div>
+
       <div class="section-card">
         <div class="sec-title">🏬 Store Hubs & Cart Lock</div>
         <div style="display:flex; justify-content:space-between; align-items:center; background:#0f172a; padding:12px; border-radius:10px; margin-bottom:12px;">
           <div>
             <div style="font-size:13px; font-weight:800;">Single Hub Cart Lock</div>
-            <div style="font-size:11px; color:#94a3b8;">Customer ek baar me ek hi dukaan se order karega</div>
+            <div style="font-size:11px; color:#94a3b8;">Customer ek baar me sirf ek dukaan se order kar sakega</div>
           </div>
           <button id="hub-lock-toggle-btn" class="btn-admin" onclick="toggleHubLock()"></button>
         </div>
@@ -465,7 +477,7 @@
       document.getElementById('count-returns').innerText = returns.length;
     }
 
-    // 1. ORDERS RENDER WITH RIDER ASSIGN & PROOF PREVIEW
+    // 1. ORDERS RENDER
     function renderOrders() {
       const box = document.getElementById('orders-list-box');
       const activeOrders = allOrders.filter(o => !o.status.toLowerCase().includes('delivered') && !o.status.toLowerCase().includes('cancelled'));
@@ -483,7 +495,7 @@
         const itemsList = items.map(i => `• ${i.name} × ${i.qty} (₹${i.price * i.qty})`).join('<br>');
 
         const riderOptions = allRiders.map(r => `
-          <option value="${r.id}" ${o.assigned_rider_id === r.id ? 'selected' : ''}>${r.name} (${r.phone})</option>
+          <option value="${r.id}" ${o.assigned_rider_id === r.id ? 'selected' : ''}>${r.name} (${r.vehicle_no || r.phone})</option>
         `).join('');
 
         return `
@@ -505,7 +517,6 @@
               </div>
             </div>
 
-            <!-- PHOTO PROOFS IF UPLOADED BY RIDER -->
             ${o.pickup_proof_photo || o.delivery_proof_photo ? `
               <div style="background:#0f172a; padding:8px; border-radius:8px; margin-bottom:8px; display:flex; gap:10px;">
                 ${o.pickup_proof_photo ? `<div><span style="font-size:10px; color:#94a3b8;">Pickup Proof:</span><br><img src="${o.pickup_proof_photo}" style="width:50px; height:50px; border-radius:6px; object-fit:cover;" onclick="window.open(this.src)"></div>` : ''}
@@ -513,7 +524,6 @@
               </div>
             ` : ''}
 
-            <!-- ASSIGN RIDER -->
             <div style="margin-bottom:8px;">
               <select class="admin-input" onchange="assignRiderToOrder(${o.id}, this.value)" style="margin-bottom:0;">
                 <option value="">🛵 Rider Assign Karein...</option>
@@ -675,7 +685,7 @@
       fetchProducts();
     }
 
-    // 4. RIDERS MANAGEMENT
+    // 4. RIDERS MANAGEMENT (FULL DETAILS)
     function renderRiders() {
       const box = document.getElementById('riders-list-box');
       if (allRiders.length === 0) {
@@ -685,8 +695,9 @@
       box.innerHTML = allRiders.map(r => `
         <div class="order-item-card" style="display:flex; justify-content:space-between; align-items:center;">
           <div>
-            <div style="font-weight:900;">🛵 ${r.name}</div>
+            <div style="font-weight:900;">🛵 ${r.name} <span style="font-size:11px; color:#38bdf8;">(${r.vehicle_no || 'No Bike No'})</span></div>
             <div style="font-size:12px; color:#94a3b8;">📞 ${r.phone}</div>
+            <div style="font-size:11px; color:#cbd5e1; margin-top:2px;">🏠 ${r.address || 'Address nahi diya'}</div>
             ${r.current_lat ? `<div style="font-size:10px; color:#10b981; margin-top:2px;">📍 GPS: ${r.current_lat.toFixed(4)},${r.current_lng.toFixed(4)}</div>` : ''}
           </div>
           <button class="btn-admin btn-danger" style="padding:6px 10px;" onclick="deleteRider(${r.id})">Hatao</button>
@@ -697,13 +708,28 @@
     async function addNewRider() {
       const name = document.getElementById('r-name').value.trim();
       const phone = document.getElementById('r-phone').value.trim();
-      if (!name || !phone) return alert('Rider ka naam aur phone daalein!');
+      const bike = document.getElementById('r-bike').value.trim().toUpperCase();
+      const address = document.getElementById('r-address').value.trim();
 
-      await _supabase.from('riders').insert([{ name: name, phone: phone }]);
-      alert('Rider register ho gaya!');
-      document.getElementById('r-name').value = '';
-      document.getElementById('r-phone').value = '';
-      fetchRiders();
+      if (!name || !phone || !bike) return alert('Rider Name, Phone aur Bike No. anivarya hain!');
+
+      const { error } = await _supabase.from('riders').insert([{
+        name: name,
+        phone: phone,
+        vehicle_no: bike,
+        address: address,
+        is_active: true
+      }]);
+
+      if (error) alert('Rider add karne me error: ' + error.message);
+      else {
+        alert('✅ Rider safaltapoorvak register ho gaya!');
+        document.getElementById('r-name').value = '';
+        document.getElementById('r-phone').value = '';
+        document.getElementById('r-bike').value = '';
+        document.getElementById('r-address').value = '';
+        fetchRiders();
+      }
     }
 
     async function deleteRider(id) {
@@ -749,19 +775,53 @@
       fetchCoupons();
     }
 
-    // 6. HUBS MANAGEMENT
+    // 6. HUBS MANAGEMENT (FULL IMPLEMENTATION)
     function renderHubs() {
       const box = document.getElementById('hubs-list-box');
       if (allHubs.length === 0) {
-        box.innerHTML = '<div style="text-align:center; padding:20px; color:#94a3b8;">Default Hub 1 Active Hai.</div>';
+        box.innerHTML = '<div style="text-align:center; padding:20px; color:#94a3b8;">Koi hub nahi mila. Default Hub active hai.</div>';
         return;
       }
       box.innerHTML = allHubs.map(h => `
-        <div class="order-item-card">
-          <div style="font-weight:900;">🏬 ${h.name} (#${h.id})</div>
-          <div style="font-size:12px; color:#94a3b8;">${h.address || 'Central Store'}</div>
+        <div class="order-item-card" style="display:flex; justify-content:space-between; align-items:center;">
+          <div>
+            <div style="font-weight:900;">🏬 ${h.name} <span style="font-size:11px; color:#38bdf8;">(#HUB-${h.id})</span></div>
+            <div style="font-size:12px; color:#94a3b8;">📍 ${h.address || 'Address not set'}</div>
+            ${h.phone ? `<div style="font-size:11.5px; color:#cbd5e1;">📞 ${h.phone}</div>` : ''}
+          </div>
+          <button class="btn-admin btn-danger" style="padding:6px 10px;" onclick="deleteHub(${h.id})">Hatao</button>
         </div>
       `).join('');
+    }
+
+    async function addNewHub() {
+      const name = document.getElementById('h-name').value.trim();
+      const phone = document.getElementById('h-phone').value.trim();
+      const address = document.getElementById('h-address').value.trim();
+
+      if (!name || !address) return alert('Hub ka naam aur address anivarya hai!');
+
+      const { error } = await _supabase.from('hubs').insert([{
+        name: name,
+        phone: phone,
+        address: address,
+        is_active: true
+      }]);
+
+      if (error) alert('Hub create error: ' + error.message);
+      else {
+        alert('✅ Naya Hub Create Ho Gaya!');
+        document.getElementById('h-name').value = '';
+        document.getElementById('h-phone').value = '';
+        document.getElementById('h-address').value = '';
+        fetchHubs();
+      }
+    }
+
+    async function deleteHub(id) {
+      if (!confirm('Kya aap sach me is Hub ko delete karna chahte hain?')) return;
+      await _supabase.from('hubs').delete().eq('id', id);
+      fetchHubs();
     }
 
     // 7. DISPUTES MANAGEMENT
@@ -820,6 +880,7 @@
         .on('postgres_changes', { event: '*', schema: 'public', table: 'app_settings' }, () => loadSettings())
         .on('postgres_changes', { event: '*', schema: 'public', table: 'riders' }, () => fetchRiders())
         .on('postgres_changes', { event: '*', schema: 'public', table: 'coupons' }, () => fetchCoupons())
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'hubs' }, () => fetchHubs())
         .subscribe();
     }
   </script>
