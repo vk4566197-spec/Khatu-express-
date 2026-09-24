@@ -1850,7 +1850,7 @@
       }, { enableHighAccuracy: true });
     }
 
-    // REAL-TIME 2-WAY CHAT FUNCTIONS
+    // REAL-TIME 2-WAY CHAT FUNCTIONS (FIXED WITH AUTO CLEANUP)
     async function openCustomerChat(orderId) {
       activeCustomerChatOrderId = orderId;
       document.getElementById('chat-order-indicator').innerText = `Order #ORD-${orderId}`;
@@ -1859,27 +1859,36 @@
       box.innerHTML = '<div style="text-align:center; color:#94a3b8; font-size:12px; padding:20px;">Messages load ho rahe hain...</div>';
 
       // 1. Purani chat fetch karein
-      const { data: messages } = await _supabase
+      const { data: messages, error } = await _supabase
         .from('order_chats')
         .select('*')
         .eq('order_id', orderId)
         .order('id', { ascending: true });
 
-      box.innerHTML = '';
-      if (messages && messages.length > 0) {
-        messages.forEach(m => renderCustomerChatBubble(m));
+      if (error) {
+        box.innerHTML = `<div style="text-align:center; color:#ef4444; font-size:12px; padding:20px;">Chat Load Error: ${error.message}</div>`;
       } else {
-        box.innerHTML = '<div style="text-align:center; color:#94a3b8; font-size:12px; padding:20px;">Abhi koi message nahi hai. Rider se baat shuru karein!</div>';
+        box.innerHTML = '';
+        if (messages && messages.length > 0) {
+          messages.forEach(m => renderCustomerChatBubble(m));
+        } else {
+          box.innerHTML = '<div style="text-align:center; color:#94a3b8; font-size:12px; padding:20px;">Abhi koi message nahi hai. Rider se baat shuru karein!</div>';
+        }
+        box.scrollTop = box.scrollHeight;
       }
-      box.scrollTop = box.scrollHeight;
 
       // 2. Realtime listener: Rider ka message aate hi add ho
       if (customerChatChannel) {
         _supabase.removeChannel(customerChatChannel);
       }
       customerChatChannel = _supabase
-        .channel(`cust_chat_${orderId}`)
-        .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'order_chats', filter: `order_id=eq.${orderId}` }, payload => {
+        .channel(`chat_cust_room_${orderId}`)
+        .on('postgres_changes', { 
+          event: 'INSERT', 
+          schema: 'public', 
+          table: 'order_chats', 
+          filter: `order_id=eq.${orderId}` 
+        }, payload => {
           if (payload.new.sender_type === 'rider') {
             renderCustomerChatBubble(payload.new);
           }
@@ -1889,6 +1898,9 @@
 
     function renderCustomerChatBubble(msg) {
       const box = document.getElementById('chat-msgs-box');
+      if (box.children.length === 1 && box.children[0].innerText.includes('Abhi koi message nahi')) {
+        box.innerHTML = '';
+      }
       const bubble = document.createElement('div');
       bubble.className = `chat-bubble ${msg.sender_type}`;
       bubble.innerText = msg.message;
@@ -1914,12 +1926,16 @@
 
       renderCustomerChatBubble({ sender_type: 'customer', message: text });
 
-      await _supabase.from('order_chats').insert([{
+      const { error } = await _supabase.from('order_chats').insert([{
         order_id: activeCustomerChatOrderId,
         sender_type: 'customer',
         sender_name: 'Customer',
         message: text
       }]);
+
+      if (error) {
+        alert('Message bhejne me dikkat aayi: ' + error.message);
+      }
     }
 
     // REALTIME UPDATES
