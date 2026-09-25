@@ -802,7 +802,7 @@
       align-self: flex-end;
       border-bottom-right-radius: 2px;
     }
-    .chat-bubble.rider {
+    .chat-bubble.rider, .chat-bubble.admin {
       background: #e2e8f0;
       color: #0f172a;
       align-self: flex-start;
@@ -814,6 +814,7 @@
       padding: 12px 16px;
       background: #ffffff;
       border-top: 1px solid var(--border-soft);
+      align-items: center;
     }
 
     /* RETURN MODAL STYLES */
@@ -1085,7 +1086,7 @@
     </div>
   </div>
 
-  <!-- CUSTOMER REAL-TIME 2-WAY CHAT DRAWER -->
+  <!-- CUSTOMER REAL-TIME 2-WAY CHAT DRAWER (WITH PHOTO SHARING) -->
   <div class="chat-drawer" id="cust-chat-drawer">
     <div class="chat-top-header">
       <div>
@@ -1096,8 +1097,10 @@
     </div>
     <div class="chat-messages-area" id="chat-msgs-box"></div>
     <div class="chat-input-bar">
+      <input type="file" id="cust-chat-photo-input" accept="image/*" capture="environment" style="display:none;" onchange="handleCustChatPhotoSelected(this)">
+      <button type="button" onclick="document.getElementById('cust-chat-photo-input').click()" style="background:#f1f5f9; border:1px solid #cbd5e1; border-radius:12px; width:44px; height:44px; font-size:18px; cursor:pointer; display:flex; align-items:center; justify-content:center;">📷</button>
       <input type="text" id="chat-text-input" class="zepto-input" placeholder="Message likhein..." onkeypress="if(event.key==='Enter') sendCustomerChatMessage()">
-      <button class="btn-add-zepto" onclick="sendCustomerChatMessage()" style="background:var(--primary-purple); color:white; border:none; padding: 0 20px;">Bhejo</button>
+      <button class="btn-add-zepto" onclick="sendCustomerChatMessage()" style="background:var(--primary-purple); color:white; border:none; padding: 0 18px; height:44px;">Bhejo</button>
     </div>
   </div>
 
@@ -1850,7 +1853,7 @@
       }, { enableHighAccuracy: true });
     }
 
-    // REAL-TIME 2-WAY CHAT FUNCTIONS (FIXED WITH AUTO CLEANUP)
+    // REAL-TIME 2-WAY CHAT FUNCTIONS (WITH PHOTO SHARING)
     async function openCustomerChat(orderId) {
       activeCustomerChatOrderId = orderId;
       document.getElementById('chat-order-indicator').innerText = `Order #ORD-${orderId}`;
@@ -1877,7 +1880,7 @@
         box.scrollTop = box.scrollHeight;
       }
 
-      // 2. Realtime listener: Rider ka message aate hi add ho
+      // 2. Realtime listener: Rider/Admin ka message aate hi add ho
       if (customerChatChannel) {
         _supabase.removeChannel(customerChatChannel);
       }
@@ -1889,7 +1892,7 @@
           table: 'order_chats', 
           filter: `order_id=eq.${orderId}` 
         }, payload => {
-          if (payload.new.sender_type === 'rider') {
+          if (payload.new.sender_type !== 'customer') {
             renderCustomerChatBubble(payload.new);
           }
         })
@@ -1903,7 +1906,16 @@
       }
       const bubble = document.createElement('div');
       bubble.className = `chat-bubble ${msg.sender_type}`;
-      bubble.innerText = msg.message;
+
+      let content = '';
+      if (msg.image_url) {
+        content += `<img src="${msg.image_url}" style="width:180px; max-height:220px; object-fit:cover; border-radius:10px; margin-bottom:4px; display:block; cursor:pointer;" onclick="window.open(this.src)">`;
+      }
+      if (msg.message) {
+        content += `<div>${msg.message}</div>`;
+      }
+
+      bubble.innerHTML = content;
       box.appendChild(bubble);
       box.scrollTop = box.scrollHeight;
     }
@@ -1917,6 +1929,26 @@
       activeCustomerChatOrderId = null;
     }
 
+    async function handleCustChatPhotoSelected(input) {
+      if (!input.files || !input.files[0] || !activeCustomerChatOrderId) return;
+      const file = input.files[0];
+      const base64Img = await compressImage(file, 600, 0.5);
+
+      renderCustomerChatBubble({ sender_type: 'customer', image_url: base64Img, message: '' });
+
+      const { error } = await _supabase.from('order_chats').insert([{
+        order_id: activeCustomerChatOrderId,
+        sender_type: 'customer',
+        sender: 'customer',
+        sender_name: 'Customer',
+        image_url: base64Img,
+        message: null
+      }]);
+
+      if (error) alert('Photo bhejne me dikkat aayi: ' + error.message);
+      input.value = '';
+    }
+
     async function sendCustomerChatMessage() {
       const input = document.getElementById('chat-text-input');
       const text = input.value.trim();
@@ -1924,13 +1956,15 @@
 
       input.value = '';
 
-      renderCustomerChatBubble({ sender_type: 'customer', message: text });
+      renderCustomerChatBubble({ sender_type: 'customer', message: text, image_url: null });
 
       const { error } = await _supabase.from('order_chats').insert([{
         order_id: activeCustomerChatOrderId,
         sender_type: 'customer',
+        sender: 'customer',
         sender_name: 'Customer',
-        message: text
+        message: text,
+        image_url: null
       }]);
 
       if (error) {
