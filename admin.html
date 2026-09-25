@@ -132,6 +132,18 @@
       display: inline-block; box-shadow: 0 0 10px #10b981; margin-right: 4px;
     }
     .live-dot.offline { background: #ef4444; box-shadow: none; }
+
+    /* MODAL BOXES */
+    .modal-box {
+      position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+      background: rgba(0,0,0,0.85); backdrop-filter: blur(4px); z-index: 10000;
+      display: none; align-items: center; justify-content: center; padding: 16px;
+    }
+    .modal-box.active { display: flex; }
+    .modal-inner {
+      background: #1e293b; border: 2px solid #a855f7; border-radius: 16px;
+      padding: 20px; width: 100%; max-width: 440px; max-height: 90vh; overflow-y: auto;
+    }
   </style>
 </head>
 <body>
@@ -203,7 +215,7 @@
       <div id="orders-list-box"><div style="text-align:center; padding:30px; color:#94a3b8;">Orders load ho rahe hain...</div></div>
     </div>
 
-    <!-- 2. RETURN MANAGEMENT TOWER (500M APPROVAL) -->
+    <!-- 2. RETURN MANAGEMENT TOWER (500M APPROVAL + DIRECT CHAT) -->
     <div id="section-returns" style="display:none;">
       <div class="sec-title" style="color:#ef4444;">
         <span>🚨 Customer Return Requests</span>
@@ -373,6 +385,28 @@
 
   </div>
 
+  <!-- ADMIN REAL-TIME DISPUTE & CUSTOMER CHAT MODAL (TEXT + CAMERA PHOTO SHARING) -->
+  <div id="admin-chat-modal" class="modal-box">
+    <div class="modal-inner" style="max-width:480px; height:85vh; display:flex; flex-direction:column; padding:0; background:#0f172a; overflow:hidden;">
+      <div style="background:#1e112a; padding:14px 16px; display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #381a4d;">
+        <div>
+          <div style="font-weight:900; font-size:14px; color:#fff;" id="admin-chat-title">💬 Chat with Customer</div>
+          <div style="font-size:11px; color:#38bdf8;" id="admin-chat-subtitle">Order #---</div>
+        </div>
+        <button style="background:none; border:none; color:white; font-size:20px; cursor:pointer;" onclick="closeAdminChat()">✕</button>
+      </div>
+
+      <div id="admin-chat-msgs-box" style="flex:1; padding:16px; overflow-y:auto; display:flex; flex-direction:column; gap:10px;"></div>
+
+      <div style="display:flex; gap:8px; padding:12px; background:#1e293b; border-top:1px solid #334155; align-items:center;">
+        <input type="file" id="admin-chat-photo-input" accept="image/*" style="display:none;" onchange="handleAdminChatPhotoSelected(this)">
+        <button type="button" onclick="document.getElementById('admin-chat-photo-input').click()" style="background:#0f172a; border:1px solid #475569; border-radius:10px; width:40px; height:40px; color:#fff; font-size:16px; cursor:pointer;" title="Photo Bhejein">📷</button>
+        <input type="text" id="admin-chat-input" class="admin-input" placeholder="Grahak ko jawab likhein..." style="margin-bottom:0;" onkeypress="if(event.key==='Enter') sendAdminChatMessage()">
+        <button class="btn-admin btn-success" style="padding:10px 16px;" onclick="sendAdminChatMessage()">Bhejo</button>
+      </div>
+    </div>
+  </div>
+
   <!-- AUDIO ALERT -->
   <audio id="admin-alert-sound" src="alert.mp3" preload="auto" loop></audio>
 
@@ -390,6 +424,9 @@
     let appSettings = {};
     let lastAlertOrderId = null;
     let audioUnlocked = false;
+
+    let activeAdminChatOrderId = null;
+    let adminChatChannel = null;
 
     function startMasterAudioGate() {
       const sound = document.getElementById('admin-alert-sound');
@@ -650,6 +687,10 @@
               </select>
             </div>
 
+            <div style="display:flex; gap:8px; margin-bottom:8px;">
+              <button class="btn-admin" style="background:#0284c7; flex:1;" onclick="openAdminChat(${o.id}, '${o.customer_name}')">💬 Chat with Customer</button>
+            </div>
+
             <div style="display:flex; gap:8px;">
               ${!isDispatched ? `
                 <button class="btn-admin btn-success" style="flex:1;" onclick="dispatchOrder(${o.id})">🛵 Dispatch (Out)</button>
@@ -670,7 +711,7 @@
       fetchOrders();
     }
 
-    // 2. RETURN MANAGEMENT TOWER
+    // 2. RETURN MANAGEMENT TOWER (500M APPROVAL + DIRECT CHAT)
     function renderReturns() {
       const box = document.getElementById('returns-list-box');
       const returns = allOrders.filter(o => o.return_status === 'Requested');
@@ -702,6 +743,12 @@
             ${o.return_photo_url ? `
               <img src="${o.return_photo_url}" class="return-proof-img" onclick="window.open(this.src)" title="Badi photo dekhne ke liye click karein">
             ` : '<div style="font-size:11px; color:#ef4444;">Photo upload nahi ki gayi.</div>'}
+          </div>
+
+          <div style="display:flex; gap:8px; margin-bottom:8px;">
+            <button class="btn-admin" style="background:#0284c7; flex:1;" onclick="openAdminChat(${o.id}, '${o.customer_name}')">
+              💬 Chat & Photo Proof
+            </button>
           </div>
 
           <div style="display:flex; gap:8px;">
@@ -857,6 +904,10 @@
                   ❌ Cancelled By: ${o.cancelled_by} (Reason:${o.cancellation_reason || 'Not Specified'})
                 </div>
               ` : ''}
+            </div>
+
+            <div style="display:flex; gap:8px; margin-top:8px;">
+              <button class="btn-admin" style="background:#0284c7; flex:1;" onclick="openAdminChat(${o.id}, '${o.customer_name}')">💬 View Chat History</button>
             </div>
           </div>
         `;
@@ -1084,7 +1135,10 @@
             <div style="color:#fcd34d; margin-top:4px;"><b>Complaint:</b> ${d.dispute_note || 'Nahi batayi'}</div>
           </div>
           ${d.dispute_photo_url ? `<img src="${d.dispute_photo_url}" class="return-proof-img" onclick="window.open(this.src)">` : ''}
-          <button class="btn-admin btn-success" style="width:100%; margin-top:8px;" onclick="resolveDispute(${d.id})">✓ Resolve / Band Karein</button>
+          <div style="display:flex; gap:8px; margin-top:8px;">
+            <button class="btn-admin" style="background:#0284c7; flex:1;" onclick="openAdminChat(${d.id}, '${d.customer_name}')">💬 Open Chat & Proofs</button>
+            <button class="btn-admin btn-success" style="flex:1;" onclick="resolveDispute(${d.id})">✓ Resolve / Band Karein</button>
+          </div>
         </div>
       `).join('');
     }
@@ -1093,6 +1147,150 @@
       await _supabase.from('orders').update({ dispute_status: 'Resolved' }).eq('id', id);
       alert('Dispute Resolved!');
       fetchOrders();
+    }
+
+    // 10. REAL-TIME ADMIN DISPUTE CHAT LOGIC (TEXT + CAMERA PHOTO SHARING)
+    function compressAdminImage(file, maxWidth, quality) {
+      maxWidth = maxWidth || 600; quality = quality || 0.5;
+      return new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = (event) => {
+          const img = new Image();
+          img.src = event.target.result;
+          img.onload = () => {
+            const canvas = document.createElement('canvas');
+            let width = img.width, height = img.height;
+            if (width > maxWidth) {
+              height = Math.round((height * maxWidth) / width);
+              width = maxWidth;
+            }
+            canvas.width = width;
+            canvas.height = height;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, width, height);
+            resolve(canvas.toDataURL('image/jpeg', quality));
+          };
+        };
+      });
+    }
+
+    async function openAdminChat(orderId, custName) {
+      activeAdminChatOrderId = orderId;
+      document.getElementById('admin-chat-title').innerText = `💬 Chat with ${custName || 'Customer'}`;
+      document.getElementById('admin-chat-subtitle').innerText = `Order #ORD-${orderId}`;
+      document.getElementById('admin-chat-modal').classList.add('active');
+
+      const box = document.getElementById('admin-chat-msgs-box');
+      box.innerHTML = '<div style="text-align:center; color:#94a3b8; font-size:12px; padding:20px;">Messages load ho rahe hain...</div>';
+
+      const { data: messages } = await _supabase
+        .from('order_chats')
+        .select('*')
+        .eq('order_id', orderId)
+        .order('id', { ascending: true });
+
+      box.innerHTML = '';
+      if (messages && messages.length > 0) {
+        messages.forEach(m => renderAdminChatBubble(m));
+      } else {
+        box.innerHTML = '<div style="text-align:center; color:#94a3b8; font-size:12px; padding:20px;">Koi purana message nahi mila. Grahak se chat shuru karein.</div>';
+      }
+      box.scrollTop = box.scrollHeight;
+
+      if (adminChatChannel) _supabase.removeChannel(adminChatChannel);
+      adminChatChannel = _supabase
+        .channel(`admin_chat_room_${orderId}`)
+        .on('postgres_changes', { 
+          event: 'INSERT', 
+          schema: 'public', 
+          table: 'order_chats', 
+          filter: `order_id=eq.${orderId}` 
+        }, payload => {
+          if (payload.new.sender_type === 'customer') {
+            renderAdminChatBubble(payload.new);
+          }
+        })
+        .subscribe();
+    }
+
+    function renderAdminChatBubble(msg) {
+      const box = document.getElementById('admin-chat-msgs-box');
+      if (box.children.length === 1 && box.children[0].innerText.includes('Koi purana message nahi')) {
+        box.innerHTML = '';
+      }
+      const bubble = document.createElement('div');
+      const isMe = msg.sender_type === 'admin' || msg.sender_type === 'rider';
+      bubble.style.maxWidth = '80%';
+      bubble.style.padding = '10px 14px';
+      bubble.style.borderRadius = '14px';
+      bubble.style.fontSize = '13px';
+      bubble.style.lineHeight = '1.4';
+      bubble.style.wordBreak = 'break-word';
+      bubble.style.alignSelf = isMe ? 'flex-end' : 'flex-start';
+      bubble.style.background = isMe ? '#3c006b' : '#334155';
+      bubble.style.color = '#ffffff';
+
+      let content = '';
+      if (msg.image_url) {
+        content += `<img src="${msg.image_url}" style="width:190px; max-height:220px; object-fit:cover; border-radius:10px; margin-bottom:4px; display:block; cursor:pointer;" onclick="window.open(this.src)">`;
+      }
+      if (msg.message) {
+        content += `<div>${msg.message}</div>`;
+      }
+
+      bubble.innerHTML = content;
+      box.appendChild(bubble);
+      box.scrollTop = box.scrollHeight;
+    }
+
+    function closeAdminChat() {
+      document.getElementById('admin-chat-modal').classList.remove('active');
+      if (adminChatChannel) {
+        _supabase.removeChannel(adminChatChannel);
+        adminChatChannel = null;
+      }
+      activeAdminChatOrderId = null;
+    }
+
+    async function handleAdminChatPhotoSelected(input) {
+      if (!input.files || !input.files[0] || !activeAdminChatOrderId) return;
+      const file = input.files[0];
+      const base64Img = await compressAdminImage(file, 600, 0.5);
+
+      renderAdminChatBubble({ sender_type: 'admin', image_url: base64Img, message: '' });
+
+      const { error } = await _supabase.from('order_chats').insert([{
+        order_id: activeAdminChatOrderId,
+        sender_type: 'admin',
+        sender: 'admin',
+        sender_name: 'Admin Support',
+        image_url: base64Img,
+        message: null
+      }]);
+
+      if (error) alert('Photo bhejne me dikkat aayi: ' + error.message);
+      input.value = '';
+    }
+
+    async function sendAdminChatMessage() {
+      const input = document.getElementById('admin-chat-input');
+      const text = input.value.trim();
+      if (!text || !activeAdminChatOrderId) return;
+
+      input.value = '';
+      renderAdminChatBubble({ sender_type: 'admin', message: text });
+
+      const { error } = await _supabase.from('order_chats').insert([{
+        order_id: activeAdminChatOrderId,
+        sender_type: 'admin',
+        sender: 'admin',
+        sender_name: 'Admin Support',
+        message: text,
+        image_url: null
+      }]);
+
+      if (error) alert('Message bhejne me dikkat aayi: ' + error.message);
     }
 
     // TAB SWITCHER
