@@ -264,6 +264,63 @@
       width: 100%;
     }
 
+    /* SLIDER FOR COD CONFIRMATION */
+    .cod-box-wrapper {
+      background: #3b110b;
+      border: 1.5px solid #ea580c;
+      border-radius: 14px;
+      padding: 12px;
+      margin-top: 8px;
+      margin-bottom: 6px;
+    }
+    .cod-notice-title {
+      font-size: 12px;
+      font-weight: 900;
+      color: #fdba74;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 8px;
+    }
+    .slide-track {
+      position: relative;
+      width: 100%;
+      height: 48px;
+      background: #1c1917;
+      border: 1.5px solid #78350f;
+      border-radius: 25px;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      user-select: none;
+    }
+    .slide-track-text {
+      font-size: 12px;
+      font-weight: 900;
+      color: #fde047;
+      pointer-events: none;
+      z-index: 1;
+      letter-spacing: 0.5px;
+    }
+    .slide-thumb {
+      position: absolute;
+      left: 2px;
+      top: 2px;
+      width: 44px;
+      height: 44px;
+      background: linear-gradient(135deg, #f59e0b, #d97706);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      cursor: pointer;
+      touch-action: none;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.5);
+      z-index: 2;
+    }
+
     .modal-bg { 
       position: fixed; 
       top: 0; 
@@ -528,6 +585,9 @@
     var wakeLock = null;
     var riderCurrentCoords = null;
 
+    // Track which orders have COD confirmed
+    var codConfirmedOrders = {};
+
     var activeChatOrderId = null;
     var riderChatChannel = null;
 
@@ -741,6 +801,73 @@
       renderOrdersList();
     }
 
+    // 🚀 COD SLIDER LOGIC INITIALIZER
+    function initCodSlider(orderId) {
+      var thumb = document.getElementById('slide-thumb-' + orderId);
+      var track = document.getElementById('slide-track-' + orderId);
+      if (!thumb || !track) return;
+
+      var isDragging = false;
+      var startX = 0;
+      var maxSlide = track.offsetWidth - thumb.offsetWidth - 4;
+
+      function onStart(e) {
+        isDragging = true;
+        startX = (e.touches ? e.touches[0].clientX : e.clientX) - thumb.offsetLeft;
+        document.addEventListener('mousemove', onMove);
+        document.addEventListener('mouseup', onEnd);
+        document.addEventListener('touchmove', onMove, { passive: false });
+        document.addEventListener('touchend', onEnd);
+      }
+
+      function onMove(e) {
+        if (!isDragging) return;
+        if (e.preventDefault) e.preventDefault();
+        var clientX = e.touches ? e.touches[0].clientX : e.clientX;
+        var currentX = clientX - startX;
+        if (currentX < 2) currentX = 2;
+        if (currentX > maxSlide) currentX = maxSlide;
+        thumb.style.left = currentX + 'px';
+
+        // Check if slid over 90%
+        if (currentX >= maxSlide * 0.88) {
+          isDragging = false;
+          onEnd();
+          confirmCodReceived(orderId);
+        }
+      }
+
+      function onEnd() {
+        if (!isDragging) return;
+        isDragging = false;
+        document.removeEventListener('mousemove', onMove);
+        document.removeEventListener('mouseup', onEnd);
+        document.removeEventListener('touchmove', onMove);
+        document.removeEventListener('touchend', onEnd);
+        // snap back if not confirmed
+        if (!codConfirmedOrders[orderId]) {
+          thumb.style.transition = 'left 0.2s ease';
+          thumb.style.left = '2px';
+          setTimeout(function() { thumb.style.transition = ''; }, 200);
+        }
+      }
+
+      thumb.addEventListener('mousedown', onStart);
+      thumb.addEventListener('touchstart', onStart, { passive: true });
+    }
+
+    function confirmCodReceived(orderId) {
+      codConfirmedOrders[orderId] = true;
+      var wrap = document.getElementById('cod-slider-wrap-' + orderId);
+      var deliverBtn = document.getElementById('btn-deliver-action-' + orderId);
+      if (wrap) {
+        wrap.innerHTML = '<div style="background:#065f46; border:1px solid #10b981; color:#a7f3d0; padding:10px; border-radius:10px; text-align:center; font-weight:800; font-size:12px;">✅ Cash Payment Received Confirmed! Ab deliver karein.</div>';
+      }
+      if (deliverBtn) {
+        deliverBtn.style.display = 'flex';
+      }
+    }
+
     function renderOrdersList() {
       var container = document.getElementById('orders-container');
       if (!container) return;
@@ -776,6 +903,8 @@
         var isDelivered = st.includes('delivered');
         var isCancelled = st.includes('cancelled');
         var isReturnOrder = order.return_status === 'Approved';
+        var isCod = (order.payment_mode || '').toUpperCase() === 'COD';
+        var isCodConfirmed = codConfirmedOrders[order.id] || false;
 
         var rawAddress = order.delivery_address || 'Address not specified';
         var cleanAddress = rawAddress;
@@ -853,13 +982,40 @@
             '<button class="btn-action-chat" onclick="openRiderChat(' + order.id + ', \'' + (order.customer_name || 'Customer') + '\')">💬 Chat with Customer</button>' +
             (!isDispatched 
               ? '<button class="btn-action-primary" style="background:#0284c7; margin-top:8px;" onclick="openPickupModal(' + order.id + ')">📸 Accept & Pickup</button>'
-              : '<button class="btn-action-primary" style="margin-top:8px;" onclick="openDeliveryProofModal(' + order.id + ', \'' + (order.delivery_otp || '') + '\')">🔐 Deliver (Enter OTP)</button>')
+              : (
+                // COD SLIDE CHECK BEFORE DELIVERY
+                (isCod && !isCodConfirmed ? `
+                  <div class="cod-box-wrapper" id="cod-slider-wrap-${order.id}">
+                    <div class="cod-notice-title">
+                      <span>💵 Cash on Delivery (COD)</span>
+                      <span style="font-size:14px; color:#facc15;">₹${order.total_amount} collect karein</span>
+                    </div>
+                    <div class="slide-track" id="slide-track-${order.id}">
+                      <div class="slide-thumb" id="slide-thumb-${order.id}">👉</div>
+                      <span class="slide-track-text">SLIDE TO CONFIRM CASH</span>
+                    </div>
+                  </div>
+                  <button class="btn-action-primary" id="btn-deliver-action-${order.id}" style="margin-top:8px; display:none;" onclick="openDeliveryProofModal(${order.id}, '${order.delivery_otp || ''}')">🔐 Deliver (Enter OTP)</button>
+                ` : `
+                  <button class="btn-action-primary" id="btn-deliver-action-${order.id}" style="margin-top:8px;" onclick="openDeliveryProofModal(${order.id}, '${order.delivery_otp || ''}')">🔐 Deliver (Enter OTP)</button>
+                `)
+              ))
           ) : '') +
         '</div>';
       }).join('');
+
+      // Initialize all COD slider gestures after rendering
+      filtered.forEach(function(o) {
+        var st = (o.status || '').toLowerCase();
+        var isDispatched = st.includes('out') || st.includes('running');
+        var isCod = (o.payment_mode || '').toUpperCase() === 'COD';
+        if (isDispatched && isCod && !codConfirmedOrders[o.id]) {
+          setTimeout(function() { initCodSlider(o.id); }, 50);
+        }
+      });
     }
 
-    // REAL-TIME 2-WAY CHAT FUNCTIONS FOR RIDER (FIXED WITH AUTO RE-SUBSCRIBE)
+    // REAL-TIME 2-WAY CHAT FUNCTIONS FOR RIDER
     async function openRiderChat(orderId, custName) {
       activeChatOrderId = orderId;
       document.getElementById('chat-customer-title').innerText = '💬 Chat with ' + custName;
@@ -869,7 +1025,6 @@
       var box = document.getElementById('chat-box-content');
       box.innerHTML = '<div style="text-align:center; color:#94a3b8; font-size:12px; padding:20px;">Messages load ho rahe hain...</div>';
 
-      // 1. Fetch previous chats from Supabase
       var { data: messages, error } = await _supabase
         .from('order_chats')
         .select('*')
@@ -888,7 +1043,6 @@
         box.scrollTop = box.scrollHeight;
       }
 
-      // 2. Real-time Subscription: Jab Customer message kare toh live show ho
       if (riderChatChannel) {
         _supabase.removeChannel(riderChatChannel);
       }
@@ -914,7 +1068,16 @@
       }
       var bubble = document.createElement('div');
       bubble.className = 'chat-msg-row ' + msg.sender_type;
-      bubble.innerText = msg.message;
+
+      var content = '';
+      if (msg.image_url) {
+        content += '<img src="' + msg.image_url + '" style="width:180px; max-height:220px; object-fit:cover; border-radius:10px; margin-bottom:4px; display:block; cursor:pointer;" onclick="window.open(this.src)">';
+      }
+      if (msg.message) {
+        content += '<div>' + msg.message + '</div>';
+      }
+
+      bubble.innerHTML = content;
       box.appendChild(bubble);
       box.scrollTop = box.scrollHeight;
     }
@@ -940,6 +1103,7 @@
       var { error } = await _supabase.from('order_chats').insert([{
         order_id: activeChatOrderId,
         sender_type: 'rider',
+        sender: 'rider',
         sender_name: 'Rider',
         message: text
       }]);
