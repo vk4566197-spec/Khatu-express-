@@ -1133,30 +1133,63 @@
     let activeCustomerChatOrderId = null;
     let customerChatChannel = null;
 
+    // 🔔 AUDIO UNLOCK SETUP
     function unlockCustomerAudio() {
       if (customerAudioUnlocked) return;
-      const sound = document.getElementById('arrived-sound-player');
-      if (sound) {
-        sound.play().then(() => {
-          sound.pause();
-          sound.currentTime = 0;
-          customerAudioUnlocked = true;
-        }).catch(() => {});
-      }
-    }
-
-    function playRiderArrivedChime() {
-      const sound = document.getElementById('arrived-sound-player');
-      if (sound) {
-        sound.currentTime = 0;
-        sound.play().catch(() => {});
-      }
       try {
-        if (navigator.vibrate) navigator.vibrate([300, 150, 300, 150, 500]);
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        const ctx = new AudioContext();
+        if (ctx.state === 'suspended') {
+          ctx.resume();
+        }
       } catch(e){}
+      customerAudioUnlocked = true;
     }
 
-    // 📚 HINDI-ENGLISH GROCERY SYNONYM DICTIONARY
+    // 🔔 HALKA AUR MADHUR RIDER ARRIVAL CHIME (SOFT LUXURY DING-DONG)
+    function playRiderArrivedChime() {
+      try {
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        const ctx = new AudioContext();
+
+        // 1st Note: Soft Ding (E5 - 659.25 Hz)
+        playSweetTone(ctx, 659.25, 0.0, 0.45);
+
+        // 2nd Note: Gentle Dong (C5 - 523.25 Hz)
+        playSweetTone(ctx, 523.25, 0.22, 0.65);
+
+        if (navigator.vibrate) navigator.vibrate([100, 80, 120]);
+      } catch (e) {
+        // Fallback agar Web Audio block ho toh halki volume me chime
+        const sound = document.getElementById('arrived-sound-player');
+        if (sound) {
+          sound.volume = 0.25;
+          sound.currentTime = 0;
+          sound.play().catch(() => {});
+        }
+      }
+    }
+
+    function playSweetTone(ctx, freq, startTime, duration) {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+
+      osc.type = 'sine'; // Sine wave is the softest and sweetest tone
+      osc.frequency.setValueAtTime(freq, ctx.currentTime + startTime);
+
+      // Controlled subtle volume curve
+      gain.gain.setValueAtTime(0.001, ctx.currentTime + startTime);
+      gain.gain.exponentialRampToValueAtTime(0.18, ctx.currentTime + startTime + 0.05);
+      gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + startTime + duration);
+
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+
+      osc.start(ctx.currentTime + startTime);
+      osc.stop(ctx.currentTime + startTime + duration);
+    }
+
+    // 📚 HINDI-ENGLISH GROCERY SYNONYM DICTIONARY (Doodh -> Milk, Anda -> Egg, etc.)
     const GROCERY_SYNONYMS = {
       'doodh': ['milk', 'dairy'],
       'dudh': ['milk', 'dairy'],
@@ -1345,9 +1378,11 @@
       const cat = (item.category || '').toLowerCase();
       const nameTranslit = transliterateHindiToEnglish(item.name || '');
 
+      // Direct Match
       if (name.includes(qClean) || cat.includes(qClean)) return true;
       if (name.includes(qTranslit) || nameTranslit.includes(qClean) || nameTranslit.includes(qTranslit)) return true;
 
+      // Dictionary Match (Doodh -> Milk, etc.)
       let mappedTerms = GROCERY_SYNONYMS[qClean] || GROCERY_SYNONYMS[qTranslit] || [];
 
       if (mappedTerms.length === 0) {
@@ -1775,7 +1810,7 @@
         <div style="background:#fff; border-radius:16px; border:1px solid var(--border-soft); padding:16px;">
           
           ${isArrived ? `
-            <div style="background:linear-gradient(135deg, #059669, #047857); color:white; border-radius:18px; padding:20px; text-align:center; margin-bottom:16px; box-shadow:0 8px 25px rgba(5,150,105,0.4); animation:bounce 1s infinite alternate;">
+            <div style="background:linear-gradient(135deg, #059669, #047857); color:white; border-radius:18px; padding:20px; text-align:center; margin-bottom:16px; box-shadow:0 8px 25px rgba(5,150,105,0.4);">
               <div style="font-size:32px; margin-bottom:4px;">🔔 🛵</div>
               <div style="font-size:18px; font-weight:900; letter-spacing:0.5px;">RIDER PAHUNCH GAYA HAI!</div>
               <div style="font-size:12px; opacity:0.95; margin-top:4px;">Delivery partner aapke darwaze par hai. Kripya apna Secret OTP batayein.</div>
