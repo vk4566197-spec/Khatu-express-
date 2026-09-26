@@ -857,7 +857,10 @@
     }
   </style>
 </head>
-<body>
+<body onclick="unlockCustomerAudio()" ontouchstart="unlockCustomerAudio()">
+
+  <!-- AUDIO ELEMENT FOR RIDER ARRIVAL ALERT -->
+  <audio id="arrived-sound-player" src="alert.mp3" preload="auto"></audio>
 
   <!-- 1. BROADCAST NOTICE TICKER -->
   <div id="broadcast-ticker" class="broadcast-ticker-wrap">
@@ -1121,6 +1124,8 @@
     let trackingInterval = null;
     let currentCalculatedTotal = 0;
     let countdownTimerInterval = null;
+    let customerAudioUnlocked = false;
+    let hasPlayedArrivedAlert = {};
 
     let selectedReturnOrderId = null;
     let base64ReturnPhoto = null;
@@ -1128,7 +1133,30 @@
     let activeCustomerChatOrderId = null;
     let customerChatChannel = null;
 
-    // 📚 HINDI-ENGLISH GROCERY SYNONYM DICTIONARY (Doodh -> Milk, Anda -> Egg, etc.)
+    function unlockCustomerAudio() {
+      if (customerAudioUnlocked) return;
+      const sound = document.getElementById('arrived-sound-player');
+      if (sound) {
+        sound.play().then(() => {
+          sound.pause();
+          sound.currentTime = 0;
+          customerAudioUnlocked = true;
+        }).catch(() => {});
+      }
+    }
+
+    function playRiderArrivedChime() {
+      const sound = document.getElementById('arrived-sound-player');
+      if (sound) {
+        sound.currentTime = 0;
+        sound.play().catch(() => {});
+      }
+      try {
+        if (navigator.vibrate) navigator.vibrate([300, 150, 300, 150, 500]);
+      } catch(e){}
+    }
+
+    // 📚 HINDI-ENGLISH GROCERY SYNONYM DICTIONARY
     const GROCERY_SYNONYMS = {
       'doodh': ['milk', 'dairy'],
       'dudh': ['milk', 'dairy'],
@@ -1288,7 +1316,6 @@
       container.innerHTML = catHtml;
     }
 
-    // 🔤 PHONETIC TRANSLITERATION (Hindi script -> Latin sounds)
     function transliterateHindiToEnglish(text) {
       if (!text) return '';
       const charMap = {
@@ -1308,7 +1335,6 @@
       return out.toLowerCase();
     }
 
-    // 🔍 FULL SEARCH MATCHER (Hindi, English, Doodh -> Milk Translation & Partial Words)
     function isSearchMatch(item, queryRaw) {
       if (!queryRaw) return true;
 
@@ -1319,15 +1345,11 @@
       const cat = (item.category || '').toLowerCase();
       const nameTranslit = transliterateHindiToEnglish(item.name || '');
 
-      // 1. Direct Name/Category match (e.g., "mil" for "milk", "bir" for "biryani")
       if (name.includes(qClean) || cat.includes(qClean)) return true;
       if (name.includes(qTranslit) || nameTranslit.includes(qClean) || nameTranslit.includes(qTranslit)) return true;
 
-      // 2. Dictionary / Hindi Translation check (e.g. doodh/दूध -> milk)
-      // Check direct query in dictionary
       let mappedTerms = GROCERY_SYNONYMS[qClean] || GROCERY_SYNONYMS[qTranslit] || [];
 
-      // Check partial dictionary matches (e.g. user typed "dood")
       if (mappedTerms.length === 0) {
         for (let key in GROCERY_SYNONYMS) {
           if (key.startsWith(qClean) || key.startsWith(qTranslit)) {
@@ -1336,12 +1358,10 @@
         }
       }
 
-      // Check if product name or category contains mapped English terms
       for (let syn of mappedTerms) {
         if (name.includes(syn) || cat.includes(syn)) return true;
       }
 
-      // Reverse Check: If product is English, does dictionary map it back to what user typed?
       for (let [hiKey, engList] of Object.entries(GROCERY_SYNONYMS)) {
         if (engList.some(e => name.includes(e))) {
           if (hiKey.includes(qClean) || hiKey.includes(qTranslit)) return true;
@@ -1351,7 +1371,6 @@
       return false;
     }
 
-    // 📋 RENDER PRODUCTS WITH SMART MULTI-LANGUAGE SEARCH
     function renderProducts() {
       const wrap = document.getElementById('product-grid-wrap');
       const query = (document.getElementById('cust-search-input')?.value || '').trim();
@@ -1702,7 +1721,7 @@
       document.getElementById('track-modal').classList.add('active');
       fetchTrackingData();
       if (trackingInterval) clearInterval(trackingInterval);
-      trackingInterval = setInterval(fetchTrackingData, 4000);
+      trackingInterval = setInterval(fetchTrackingData, 3000);
     }
 
     function closeTrackModal() {
@@ -1724,7 +1743,14 @@
       const canSelfCancel = (secondsPassed < cancelWindowSec) && !data.status.toLowerCase().includes('cancelled') && !data.status.toLowerCase().includes('delivered');
 
       const isDispatched = data.status.toLowerCase().includes('out') || data.status.toLowerCase().includes('running');
+      const isArrived = (data.status || '').toLowerCase() === 'arrived';
       const isDelivered = data.status.toLowerCase().includes('delivered');
+
+      // 🔔 SOUND TRIGGER: IF RIDER HAS ARRIVED AT DOORSTEP
+      if (isArrived && !hasPlayedArrivedAlert[data.id]) {
+        playRiderArrivedChime();
+        hasPlayedArrivedAlert[data.id] = true;
+      }
 
       let riderInfoHtml = '';
       if (data.assigned_rider_id) {
@@ -1748,7 +1774,13 @@
       body.innerHTML = `
         <div style="background:#fff; border-radius:16px; border:1px solid var(--border-soft); padding:16px;">
           
-          ${isDispatched ? `
+          ${isArrived ? `
+            <div style="background:linear-gradient(135deg, #059669, #047857); color:white; border-radius:18px; padding:20px; text-align:center; margin-bottom:16px; box-shadow:0 8px 25px rgba(5,150,105,0.4); animation:bounce 1s infinite alternate;">
+              <div style="font-size:32px; margin-bottom:4px;">🔔 🛵</div>
+              <div style="font-size:18px; font-weight:900; letter-spacing:0.5px;">RIDER PAHUNCH GAYA HAI!</div>
+              <div style="font-size:12px; opacity:0.95; margin-top:4px;">Delivery partner aapke darwaze par hai. Kripya apna Secret OTP batayein.</div>
+            </div>
+          ` : isDispatched ? `
             <div class="eta-countdown-card">
               <div style="font-size:12px; font-weight:800; opacity:0.9;">🛵 RIDER NE ORDER PICK KAR LIYA HAI!</div>
               <div class="eta-big-timer" id="eta-countdown-clock">14:59</div>
@@ -2009,7 +2041,6 @@
       const box = document.getElementById('chat-msgs-box');
       box.innerHTML = '<div style="text-align:center; color:#94a3b8; font-size:12px; padding:20px;">Messages load ho rahe hain...</div>';
 
-      // 1. Purani chat fetch karein
       const { data: messages, error } = await _supabase
         .from('order_chats')
         .select('*')
@@ -2028,7 +2059,6 @@
         box.scrollTop = box.scrollHeight;
       }
 
-      // 2. Realtime listener: Rider/Admin ka message aate hi add ho
       if (customerChatChannel) {
         _supabase.removeChannel(customerChatChannel);
       }
@@ -2127,7 +2157,9 @@
         .on('postgres_changes', { event: '*', schema: 'public', table: 'app_settings' }, () => loadSettings())
         .on('postgres_changes', { event: '*', schema: 'public', table: 'products' }, () => fetchCustomerProducts())
         .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'orders' }, payload => {
-          if (activeTrackOrderId === payload.new.id) fetchTrackingData();
+          if (activeTrackOrderId === payload.new.id) {
+            fetchTrackingData();
+          }
         })
         .subscribe();
     }
