@@ -899,7 +899,7 @@
     <!-- Search Box -->
     <div class="search-box-wrap">
       <span class="search-icon-pos">🔍</span>
-      <input type="text" id="cust-search-input" class="search-bar-input" placeholder="Search biryani, snacks, cold drink..." oninput="handleSearch()">
+      <input type="text" id="cust-search-input" class="search-bar-input" placeholder="Search biryani, समोसा, chai, snacks..." oninput="handleSearch()">
     </div>
 
     <!-- DYNAMIC CATEGORY FILTER -->
@@ -1211,18 +1211,71 @@
       container.innerHTML = catHtml;
     }
 
+    // 🔤 PHONETIC HINDI-TO-ENGLISH CONVERTER
+    function transliterateHindiToEnglish(text) {
+      if (!text) return '';
+      const charMap = {
+        'अ': 'a', 'आ': 'aa', 'इ': 'i', 'ई': 'ee', 'उ': 'u', 'ऊ': 'oo', 'ऋ': 'ri',
+        'ए': 'e', 'ऐ': 'ai', 'ओ': 'o', 'औ': 'au', 'अं': 'an', 'क': 'k', 'ख': 'kh',
+        'ग': 'g', 'घ': 'gh', 'च': 'ch', 'छ': 'chh', 'ज': 'j', 'झ': 'jh', 'ट': 't',
+        'ठ': 'th', 'ड': 'd', 'ढ': 'dh', 'त': 't', 'थ': 'th', 'द': 'd', 'ध': 'dh',
+        'न': 'n', 'प': 'p', 'फ': 'ph', 'ब': 'b', 'भ': 'bh', 'म': 'm', 'य': 'y',
+        'र': 'r', 'ल': 'l', 'व': 'v', 'श': 'sh', 'ष': 'sh', 'स': 's', 'ह': 'h',
+        'ा': 'a', 'ि': 'i', 'ी': 'ee', 'ु': 'u', 'ू': 'oo', 'ृ': 'ri', 'े': 'e',
+        'ै': 'ai', 'ो': 'o', 'ौ': 'au', 'ं': 'n', '्': ''
+      };
+      
+      let out = '';
+      for (let ch of text) {
+        out += charMap[ch] !== undefined ? charMap[ch] : ch;
+      }
+      return out.toLowerCase();
+    }
+
+    // 🔍 SMART PREFIX / HINDI / ENGLISH MATCHER
+    function isSearchMatch(item, queryRaw) {
+      if (!queryRaw) return true;
+
+      const qEnglish = queryRaw.toLowerCase().trim();
+      const qTransliterated = transliterateHindiToEnglish(queryRaw);
+
+      const name = (item.name || '').toLowerCase();
+      const cat = (item.category || '').toLowerCase();
+      const nameTranslit = transliterateHindiToEnglish(item.name || '');
+
+      // Direct Match
+      if (name.includes(qEnglish) || cat.includes(qEnglish)) return true;
+
+      // Hindi/Transliterated Match
+      if (name.includes(qTransliterated) || nameTranslit.includes(qEnglish) || nameTranslit.includes(qTransliterated)) {
+        return true;
+      }
+
+      // Multi-word Search
+      const queryWords = qEnglish.split(/\s+/);
+      const allWordsMatch = queryWords.every(w => name.includes(w) || cat.includes(w) || nameTranslit.includes(w));
+      if (allWordsMatch) return true;
+
+      return false;
+    }
+
+    // 📋 RENDER PRODUCTS WITH SMART MULTI-LANGUAGE SEARCH
     function renderProducts() {
       const wrap = document.getElementById('product-grid-wrap');
-      const query = (document.getElementById('cust-search-input').value || '').toLowerCase().trim();
+      const query = (document.getElementById('cust-search-input')?.value || '').trim();
 
       const filtered = allProducts.filter(p => {
         const matchCat = activeCategory === 'ALL' || (p.category || '').toLowerCase() === activeCategory.toLowerCase();
-        const matchQ = (p.name || '').toLowerCase().includes(query) || (p.category || '').toLowerCase().includes(query);
-        return matchCat && matchQ;
+        const matchQuery = isSearchMatch(p, query);
+        return matchCat && matchQuery;
       });
 
       if (filtered.length === 0) {
-        wrap.innerHTML = '<div style="grid-column:1/-1; text-align:center; padding:40px; color:var(--text-muted); font-weight:700;">Koi item nahi mila!</div>';
+        wrap.innerHTML = `
+          <div style="grid-column:1/-1; text-align:center; padding:40px; color:var(--text-muted); font-weight:700;">
+            🔍 "${query}" se milta julta koi item nahi mila!
+          </div>
+        `;
         return;
       }
 
@@ -1267,6 +1320,10 @@
           </div>
         `;
       }).join('');
+    }
+
+    function handleSearch() {
+      renderProducts();
     }
 
     function updateItemQty(prodId, delta) {
@@ -1784,7 +1841,6 @@
       if (el) el.classList.add('active');
       renderProducts();
     }
-    function handleSearch() { renderProducts(); }
 
     // CUSTOMER RETURN FUNCTIONS
     function openReturnModal(orderId) {
