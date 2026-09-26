@@ -896,10 +896,10 @@
       </button>
     </div>
 
-    <!-- Search Box -->
+    <!-- Search Box (Instant Multi-Language Smart Filter) -->
     <div class="search-box-wrap">
       <span class="search-icon-pos">🔍</span>
-      <input type="text" id="cust-search-input" class="search-bar-input" placeholder="Search biryani, समोसा, chai, snacks..." oninput="handleSearch()">
+      <input type="text" id="cust-search-input" class="search-bar-input" placeholder="Search doodh, दूध, milk, समोसा, chai..." oninput="handleSearch()">
     </div>
 
     <!-- DYNAMIC CATEGORY FILTER -->
@@ -1128,6 +1128,83 @@
     let activeCustomerChatOrderId = null;
     let customerChatChannel = null;
 
+    // 📚 HINDI-ENGLISH GROCERY SYNONYM DICTIONARY (Doodh -> Milk, Anda -> Egg, etc.)
+    const GROCERY_SYNONYMS = {
+      'doodh': ['milk', 'dairy'],
+      'dudh': ['milk', 'dairy'],
+      'dood': ['milk', 'dairy'],
+      'दूध': ['milk', 'dairy'],
+      'dahi': ['curd', 'yogurt'],
+      'दही': ['curd', 'yogurt'],
+      'makhan': ['butter'],
+      'makkhan': ['butter'],
+      'मक्खन': ['butter'],
+      'paneer': ['cheese', 'cottage cheese'],
+      'पनीर': ['paneer', 'cheese'],
+      'anda': ['egg', 'eggs'],
+      'ande': ['egg', 'eggs'],
+      'अंडा': ['egg', 'eggs'],
+      'अंडे': ['egg', 'eggs'],
+      'chawal': ['rice'],
+      'चावल': ['rice'],
+      'roti': ['bread', 'chapati'],
+      'रोटी': ['bread', 'roti'],
+      'cheeni': ['sugar'],
+      'chini': ['sugar'],
+      'चीनी': ['sugar'],
+      'shakkar': ['sugar'],
+      'शक्कर': ['sugar'],
+      'namak': ['salt'],
+      'नमक': ['salt'],
+      'tel': ['oil', 'mustard oil'],
+      'refined': ['oil'],
+      'तेल': ['oil'],
+      'aata': ['flour', 'atta', 'wheat'],
+      'atta': ['flour', 'aata', 'wheat'],
+      'आटा': ['flour', 'atta', 'wheat'],
+      'dal': ['pulse', 'lentil', 'daal'],
+      'daal': ['pulse', 'lentil', 'dal'],
+      'दाल': ['dal', 'daal', 'lentil'],
+      'chai': ['tea'],
+      'chaipatti': ['tea'],
+      'चाय': ['tea', 'chai'],
+      'paani': ['water', 'bisleri'],
+      'pani': ['water', 'bisleri'],
+      'पानी': ['water'],
+      'sabzi': ['vegetable', 'veg'],
+      'sabji': ['vegetable', 'veg'],
+      'सब्जी': ['vegetable'],
+      'aloo': ['potato'],
+      'aalu': ['potato'],
+      'आलू': ['potato'],
+      'pyaz': ['onion'],
+      'pyaj': ['onion'],
+      'प्याज': ['onion'],
+      'tamatar': ['tomato'],
+      'टमाटर': ['tomato'],
+      'nimbu': ['lemon'],
+      'नींबू': ['lemon'],
+      'adrak': ['ginger'],
+      'अदरक': ['ginger'],
+      'lehsun': ['garlic'],
+      'लहसुन': ['garlic'],
+      'masala': ['spice', 'spices'],
+      'मसाला': ['spice', 'masala'],
+      'mirch': ['chilli', 'chilly', 'pepper'],
+      'मिर्च': ['chilli', 'pepper'],
+      'haldi': ['turmeric'],
+      'हल्दी': ['turmeric'],
+      'dhaniya': ['coriander'],
+      'धनिया': ['coriander'],
+      'gosht': ['meat', 'mutton'],
+      'murga': ['chicken'],
+      'मांस': ['meat'],
+      'chickan': ['chicken'],
+      'चिकन': ['chicken'],
+      'biscuit': ['biskut', 'cookie', 'cookies'],
+      'बिस्कुट': ['biscuit', 'cookie']
+    };
+
     document.addEventListener('DOMContentLoaded', () => {
       loadSettings();
       fetchCustomerProducts();
@@ -1211,7 +1288,7 @@
       container.innerHTML = catHtml;
     }
 
-    // 🔤 PHONETIC HINDI-TO-ENGLISH CONVERTER
+    // 🔤 PHONETIC TRANSLITERATION (Hindi script -> Latin sounds)
     function transliterateHindiToEnglish(text) {
       if (!text) return '';
       const charMap = {
@@ -1224,7 +1301,6 @@
         'ा': 'a', 'ि': 'i', 'ी': 'ee', 'ु': 'u', 'ू': 'oo', 'ृ': 'ri', 'े': 'e',
         'ै': 'ai', 'ो': 'o', 'ौ': 'au', 'ं': 'n', '्': ''
       };
-      
       let out = '';
       for (let ch of text) {
         out += charMap[ch] !== undefined ? charMap[ch] : ch;
@@ -1232,29 +1308,45 @@
       return out.toLowerCase();
     }
 
-    // 🔍 SMART PREFIX / HINDI / ENGLISH MATCHER
+    // 🔍 FULL SEARCH MATCHER (Hindi, English, Doodh -> Milk Translation & Partial Words)
     function isSearchMatch(item, queryRaw) {
       if (!queryRaw) return true;
 
-      const qEnglish = queryRaw.toLowerCase().trim();
-      const qTransliterated = transliterateHindiToEnglish(queryRaw);
+      const qClean = queryRaw.toLowerCase().trim();
+      const qTranslit = transliterateHindiToEnglish(queryRaw).trim();
 
       const name = (item.name || '').toLowerCase();
       const cat = (item.category || '').toLowerCase();
       const nameTranslit = transliterateHindiToEnglish(item.name || '');
 
-      // Direct Match
-      if (name.includes(qEnglish) || cat.includes(qEnglish)) return true;
+      // 1. Direct Name/Category match (e.g., "mil" for "milk", "bir" for "biryani")
+      if (name.includes(qClean) || cat.includes(qClean)) return true;
+      if (name.includes(qTranslit) || nameTranslit.includes(qClean) || nameTranslit.includes(qTranslit)) return true;
 
-      // Hindi/Transliterated Match
-      if (name.includes(qTransliterated) || nameTranslit.includes(qEnglish) || nameTranslit.includes(qTransliterated)) {
-        return true;
+      // 2. Dictionary / Hindi Translation check (e.g. doodh/दूध -> milk)
+      // Check direct query in dictionary
+      let mappedTerms = GROCERY_SYNONYMS[qClean] || GROCERY_SYNONYMS[qTranslit] || [];
+
+      // Check partial dictionary matches (e.g. user typed "dood")
+      if (mappedTerms.length === 0) {
+        for (let key in GROCERY_SYNONYMS) {
+          if (key.startsWith(qClean) || key.startsWith(qTranslit)) {
+            mappedTerms = mappedTerms.concat(GROCERY_SYNONYMS[key]);
+          }
+        }
       }
 
-      // Multi-word Search
-      const queryWords = qEnglish.split(/\s+/);
-      const allWordsMatch = queryWords.every(w => name.includes(w) || cat.includes(w) || nameTranslit.includes(w));
-      if (allWordsMatch) return true;
+      // Check if product name or category contains mapped English terms
+      for (let syn of mappedTerms) {
+        if (name.includes(syn) || cat.includes(syn)) return true;
+      }
+
+      // Reverse Check: If product is English, does dictionary map it back to what user typed?
+      for (let [hiKey, engList] of Object.entries(GROCERY_SYNONYMS)) {
+        if (engList.some(e => name.includes(e))) {
+          if (hiKey.includes(qClean) || hiKey.includes(qTranslit)) return true;
+        }
+      }
 
       return false;
     }
