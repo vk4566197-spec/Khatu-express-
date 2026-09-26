@@ -346,12 +346,13 @@
       position: absolute; 
       top: 8px; 
       left: 8px; 
-      background: rgba(15, 23, 42, 0.85);
-      color: white; 
+      background: rgba(15, 23, 42, 0.88);
+      color: #fca5a5; 
       font-size: 9.5px; 
       font-weight: 800; 
       padding: 4px 8px; 
       border-radius: 8px;
+      letter-spacing: 0.5px;
     }
     .low-stock-tag {
       position: absolute;
@@ -1160,7 +1161,6 @@
 
         if (navigator.vibrate) navigator.vibrate([100, 80, 120]);
       } catch (e) {
-        // Fallback agar Web Audio block ho toh halki volume me chime
         const sound = document.getElementById('arrived-sound-player');
         if (sound) {
           sound.volume = 0.25;
@@ -1174,10 +1174,9 @@
       const osc = ctx.createOscillator();
       const gain = ctx.createGain();
 
-      osc.type = 'sine'; // Sine wave is the softest and sweetest tone
+      osc.type = 'sine';
       osc.frequency.setValueAtTime(freq, ctx.currentTime + startTime);
 
-      // Controlled subtle volume curve
       gain.gain.setValueAtTime(0.001, ctx.currentTime + startTime);
       gain.gain.exponentialRampToValueAtTime(0.18, ctx.currentTime + startTime + 0.05);
       gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + startTime + duration);
@@ -1189,7 +1188,7 @@
       osc.stop(ctx.currentTime + startTime + duration);
     }
 
-    // 📚 HINDI-ENGLISH GROCERY SYNONYM DICTIONARY (Doodh -> Milk, Anda -> Egg, etc.)
+    // 📚 HINDI-ENGLISH GROCERY SYNONYM DICTIONARY
     const GROCERY_SYNONYMS = {
       'doodh': ['milk', 'dairy'],
       'dudh': ['milk', 'dairy'],
@@ -1378,11 +1377,9 @@
       const cat = (item.category || '').toLowerCase();
       const nameTranslit = transliterateHindiToEnglish(item.name || '');
 
-      // Direct Match
       if (name.includes(qClean) || cat.includes(qClean)) return true;
       if (name.includes(qTranslit) || nameTranslit.includes(qClean) || nameTranslit.includes(qTranslit)) return true;
 
-      // Dictionary Match (Doodh -> Milk, etc.)
       let mappedTerms = GROCERY_SYNONYMS[qClean] || GROCERY_SYNONYMS[qTranslit] || [];
 
       if (mappedTerms.length === 0) {
@@ -1427,8 +1424,9 @@
 
       wrap.innerHTML = filtered.map(p => {
         const qtyInCart = cart[p.id]?.qty || 0;
-        const isOutOfStock = p.is_out_of_stock || (p.stock_quantity !== null && p.stock_quantity <= 0);
-        const isLow = !isOutOfStock && p.stock_quantity && p.stock_quantity <= (appSettings.low_stock_threshold || 5);
+        const availableStock = p.stock_quantity ?? 0;
+        const isOutOfStock = p.is_out_of_stock || availableStock <= 0;
+        const isLow = !isOutOfStock && availableStock <= (appSettings.low_stock_threshold || 5);
         const discPct = Number(p.discount_percent) || 0;
         
         let mrpHtml = '';
@@ -1442,7 +1440,7 @@
             <div class="img-box">
               <img src="${p.image_url || 'https://via.placeholder.com/150'}" alt="${p.name}" onerror="this.src='https://via.placeholder.com/150'">
               ${isOutOfStock ? `<span class="out-of-stock-tag">Out of Stock</span>` : ''}
-              ${isLow ? `<span class="low-stock-tag">Few Left</span>` : ''}
+              ${isLow ? `<span class="low-stock-tag">Only ${availableStock} Left</span>` : ''}
               ${discPct > 0 ? `<span class="discount-badge-pill">${discPct}% OFF</span>` : ''}
             </div>
             <div>
@@ -1452,7 +1450,7 @@
             <div class="price-action-row">
               <div class="price-tag">₹${p.price} ${mrpHtml}</div>
               ${isOutOfStock ? `
-                <button class="btn-add-zepto" style="border-color:#cbd5e1; color:#94a3b8;" disabled>Sold</button>
+                <button class="btn-add-zepto" style="border-color:#cbd5e1; color:#94a3b8; background:#f1f5f9; cursor:not-allowed;" disabled>Sold Out</button>
               ` : qtyInCart > 0 ? `
                 <div class="qty-counter">
                   <button class="qty-btn" onclick="updateItemQty(${p.id}, -1)">−</button>
@@ -1472,9 +1470,20 @@
       renderProducts();
     }
 
+    // ⚡ REAL-TIME STOCK CHECK JAB CUSTOMER ITEM CART MEIN JODTA HAI
     function updateItemQty(prodId, delta) {
       const prod = allProducts.find(p => p.id === prodId);
       if (!prod) return;
+
+      const currentInCart = cart[prodId]?.qty || 0;
+      const targetQty = currentInCart + delta;
+      const availableStock = prod.stock_quantity ?? 0;
+
+      // Agar stock se zyada add karne ki koshish kare
+      if (delta > 0 && targetQty > availableStock) {
+        alert(`⚠️ Maaf kijiye! Is item ka sirf ${availableStock} stock hi bacha hai.`);
+        return;
+      }
 
       if (appSettings.enable_hub_lock && delta > 0) {
         const targetHubId = prod.hub_id || 1;
@@ -1647,6 +1656,7 @@
       }, { enableHighAccuracy: true, timeout: 10000 });
     }
 
+    // 🚀 SUBMIT ORDER & AUTO-DEDUCT STOCK IN REAL-TIME
     async function submitCustomerOrder() {
       if (appSettings.store_status === 'CLOSED') {
         alert('Dukaan abhi band hai. Kripya thodi der baad koshish karein!');
@@ -1655,6 +1665,16 @@
 
       const itemsArr = Object.values(cart);
       if (itemsArr.length === 0) return alert('Aapka cart khaali hai!');
+
+      // Check stock before placing
+      for (let item of itemsArr) {
+        const prod = allProducts.find(p => p.id === item.id);
+        if (prod && (prod.stock_quantity ?? 0) < item.qty) {
+          alert(`⚠️ "${item.name}" ka stock abhi kam ho gaya hai! Stock: ${prod.stock_quantity ?? 0}`);
+          fetchCustomerProducts();
+          return;
+        }
+      }
 
       let subtotal = itemsArr.reduce((acc, it) => acc + (it.price * it.qty), 0);
       const minOrderVal = appSettings.min_order_value ?? 99;
@@ -1728,8 +1748,27 @@
       };
 
       try {
+        // 1. Order insert karein
         const { data, error } = await _supabase.from('orders').insert([orderPayload]).select().single();
         if (error) throw error;
+
+        // 2. Database se stock auto-deduct karein (Auto Stock Reduce)
+        const stockItems = itemsArr.map(i => ({ id: i.id, qty: i.qty }));
+        try {
+          await _supabase.rpc('deduct_order_stock', { order_items: stockItems });
+        } catch (rpcErr) {
+          // Fallback direct update agar RPC na ho
+          for (let it of itemsArr) {
+            const p = allProducts.find(x => x.id === it.id);
+            if (p) {
+              const newStock = Math.max(0, (p.stock_quantity ?? 0) - it.qty);
+              await _supabase.from('products').update({
+                stock_quantity: newStock,
+                is_out_of_stock: newStock <= 0
+              }).eq('id', it.id);
+            }
+          }
+        }
 
         localStorage.setItem('baba_cust_phone', phone);
         cart = {};
@@ -1742,6 +1781,7 @@
 
         alert(`🎉 Order #${data.id} Safaltapoorvak Lag Gaya!`);
         openTrackModal(data.id);
+        fetchCustomerProducts(); // Refresh products with new stock
       } catch (err) {
         alert('Order Error: ' + err.message);
         btn.disabled = false;
@@ -1781,7 +1821,6 @@
       const isArrived = (data.status || '').toLowerCase() === 'arrived';
       const isDelivered = data.status.toLowerCase().includes('delivered');
 
-      // 🔔 SOUND TRIGGER: IF RIDER HAS ARRIVED AT DOORSTEP
       if (isArrived && !hasPlayedArrivedAlert[data.id]) {
         playRiderArrivedChime();
         hasPlayedArrivedAlert[data.id] = true;
@@ -1899,6 +1938,7 @@
       }).eq('id', orderId);
       alert('Order Cancel Ho Gaya!');
       fetchTrackingData();
+      fetchCustomerProducts(); // Refresh stock
     }
 
     async function applyCouponCode() {
@@ -1913,7 +1953,6 @@
       updateCartUI();
     }
 
-    // IMAGE COMPRESSION HELPER
     function compressImage(file, maxWidth, quality) {
       maxWidth = maxWidth || 480; quality = quality || 0.45;
       return new Promise((resolve) => {
@@ -1939,7 +1978,6 @@
       });
     }
 
-    // PAST ORDERS & RETURN FLOW INTEGRATION
     async function openPastOrdersModal() {
       const phone = localStorage.getItem('baba_cust_phone');
       document.getElementById('orders-modal').classList.add('active');
@@ -2001,7 +2039,6 @@
       renderProducts();
     }
 
-    // CUSTOMER RETURN FUNCTIONS
     function openReturnModal(orderId) {
       selectedReturnOrderId = orderId;
       document.getElementById('return-modal').classList.add('active');
@@ -2068,7 +2105,6 @@
       }, { enableHighAccuracy: true });
     }
 
-    // REAL-TIME 2-WAY CHAT FUNCTIONS (WITH PHOTO SHARING)
     async function openCustomerChat(orderId) {
       activeCustomerChatOrderId = orderId;
       document.getElementById('chat-order-indicator').innerText = `Order #ORD-${orderId}`;
@@ -2185,12 +2221,15 @@
       }
     }
 
-    // REALTIME UPDATES
+    // REALTIME UPDATES: LIVE AUTO-STOCK SYNC
     function setupCustomerRealtime() {
       _supabase
         .channel('public_customer_updates')
         .on('postgres_changes', { event: '*', schema: 'public', table: 'app_settings' }, () => loadSettings())
-        .on('postgres_changes', { event: '*', schema: 'public', table: 'products' }, () => fetchCustomerProducts())
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'products' }, payload => {
+          // Stock badalte hi live screen par update
+          fetchCustomerProducts();
+        })
         .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'orders' }, payload => {
           if (activeTrackOrderId === payload.new.id) {
             fetchTrackingData();
