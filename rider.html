@@ -294,13 +294,50 @@
       box-shadow: none;
     }
 
+    /* PAYMENT MODE SELECTION BOX (CASH OR QR) */
+    .pay-choice-container {
+      background: #1e1b4b;
+      border: 1.5px solid #6366f1;
+      border-radius: 14px;
+      padding: 14px;
+      margin-top: 8px;
+      margin-bottom: 8px;
+    }
+    .choice-buttons-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 10px;
+    }
+    .choice-tab-btn {
+      background: #0f172a;
+      border: 1.5px solid #4338ca;
+      color: #ffffff;
+      padding: 12px 8px;
+      border-radius: 12px;
+      font-size: 12.5px;
+      font-weight: 900;
+      cursor: pointer;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      transition: all 0.2s;
+    }
+    .choice-tab-btn.selected {
+      background: #4f46e5;
+      border-color: #a5b4fc;
+      box-shadow: 0 4px 14px rgba(79, 70, 229, 0.4);
+    }
+
     /* SLIDER FOR COD CONFIRMATION */
     .cod-box-wrapper {
       background: #3b110b;
       border: 1.5px solid #ea580c;
       border-radius: 14px;
       padding: 12px;
-      margin-top: 8px;
+      margin-top: 10px;
       margin-bottom: 6px;
     }
     .cod-notice-title {
@@ -349,6 +386,26 @@
       touch-action: none;
       box-shadow: 0 2px 8px rgba(0,0,0,0.5);
       z-index: 2;
+    }
+
+    /* RIDER LIVE UPI QR DISPLAY CARD */
+    .rider-qr-box {
+      background: #2e1065;
+      border: 1.5px solid #a855f7;
+      border-radius: 14px;
+      padding: 14px;
+      margin-top: 10px;
+      text-align: center;
+    }
+    .rider-qr-img {
+      width: 170px;
+      height: 170px;
+      border-radius: 12px;
+      border: 2px solid #d8b4fe;
+      background: #ffffff;
+      padding: 6px;
+      margin: 8px auto;
+      display: block;
     }
 
     .modal-bg { 
@@ -603,6 +660,8 @@
     var SUPABASE_KEY = 'sb_publishable_2_wD-pbi_pNf8niiHxFbYA_saCIhApN';
     var _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
+    var STORE_UPI_ID = '7037647464-3@axl';
+
     var currentTab = 'active';
     var allRiderOrders = [];
     var isRiderOnline = localStorage.getItem('baba_rider_duty_status') !== 'OFFLINE';
@@ -615,7 +674,9 @@
     var wakeLock = null;
     var riderCurrentCoords = null;
 
-    var codConfirmedOrders = {};
+    // States for COD choice and confirmation
+    var selectedPayModeByRider = {}; // orderId -> 'CASH' or 'QR'
+    var paymentConfirmedOrders = {}; // orderId -> true/false
 
     var activeChatOrderId = null;
     var riderChatChannel = null;
@@ -841,12 +902,18 @@
       if (error) {
         alert('Status update error: ' + error.message);
       } else {
-        alert('🔔 Grahak ko notify kar diya gaya hai! Chime/bell sound baj gaya hai.');
+        alert('🔔 Grahak ko bell sound chala gaya hai! Ab payment confirm karein.');
         fetchOrders();
       }
     }
 
-    // 🚀 COD SLIDER LOGIC INITIALIZER
+    // SELECT CASH OR ONLINE QR OPTION
+    function selectPayChoice(orderId, choice) {
+      selectedPayModeByRider[orderId] = choice;
+      renderOrdersList();
+    }
+
+    // 🚀 COD SLIDER LOGIC INITIALIZER (FOR CASH CHOICE)
     function initCodSlider(orderId) {
       var thumb = document.getElementById('slide-thumb-' + orderId);
       var track = document.getElementById('slide-track-' + orderId);
@@ -877,7 +944,7 @@
         if (currentX >= maxSlide * 0.88) {
           isDragging = false;
           onEnd();
-          confirmCodReceived(orderId);
+          confirmCashReceived(orderId);
         }
       }
 
@@ -888,7 +955,7 @@
         document.removeEventListener('mouseup', onEnd);
         document.removeEventListener('touchmove', onMove);
         document.removeEventListener('touchend', onEnd);
-        if (!codConfirmedOrders[orderId]) {
+        if (!paymentConfirmedOrders[orderId]) {
           thumb.style.transition = 'left 0.2s ease';
           thumb.style.left = '2px';
           setTimeout(function() { thumb.style.transition = ''; }, 200);
@@ -899,16 +966,18 @@
       thumb.addEventListener('touchstart', onStart, { passive: true });
     }
 
-    function confirmCodReceived(orderId) {
-      codConfirmedOrders[orderId] = true;
-      var wrap = document.getElementById('cod-slider-wrap-' + orderId);
-      var deliverBtn = document.getElementById('btn-deliver-action-' + orderId);
-      if (wrap) {
-        wrap.innerHTML = '<div style="background:#065f46; border:1px solid #10b981; color:#a7f3d0; padding:10px; border-radius:10px; text-align:center; font-weight:800; font-size:12px;">✅ Cash Payment Received Confirmed! Ab deliver karein.</div>';
-      }
-      if (deliverBtn) {
-        deliverBtn.style.display = 'flex';
-      }
+    function confirmCashReceived(orderId) {
+      paymentConfirmedOrders[orderId] = true;
+      _supabase.from('orders').update({ payment_mode: 'COD (Cash Collected)' }).eq('id', orderId).then(function(){});
+      renderOrdersList();
+    }
+
+    // CONFIRM ONLINE QR PAYMENT DONE
+    function confirmOnlineQrPaid(orderId) {
+      paymentConfirmedOrders[orderId] = true;
+      _supabase.from('orders').update({ payment_mode: 'Online UPI (QR Paid at Door)' }).eq('id', orderId).then(function(){});
+      alert('✅ Online UPI Payment Confirmed! Ab customer ka secret OTP verify karein.');
+      renderOrdersList();
     }
 
     function renderOrdersList() {
@@ -947,8 +1016,10 @@
         var isDelivered = st.includes('delivered');
         var isCancelled = st.includes('cancelled');
         var isReturnOrder = order.return_status === 'Approved';
-        var isCod = (order.payment_mode || '').toUpperCase() === 'COD';
-        var isCodConfirmed = codConfirmedOrders[order.id] || false;
+        var isCod = (order.payment_mode || '').toUpperCase().includes('COD');
+        
+        var currentChoice = selectedPayModeByRider[order.id] || null;
+        var isPaymentDone = paymentConfirmedOrders[order.id] || false;
 
         var rawAddress = order.delivery_address || 'Address not specified';
         var cleanAddress = rawAddress;
@@ -969,7 +1040,6 @@
           mapNavUrl = 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(cleanAddress);
         }
 
-        // Distance from rider to customer
         var metersToCust = 999999;
         if (custLat && custLng && riderCurrentCoords) {
           metersToCust = calculateDistanceInMeters(riderCurrentCoords.lat, riderCurrentCoords.lng, custLat, custLng);
@@ -984,6 +1054,10 @@
         var itemsListHtml = items.map(function(it) {
           return '<div class="item-summary-line"><span>' + (it.name || 'Item') + ' × ' + (it.qty || 1) + '</span></div>';
         }).join('');
+
+        // Dynamic UPI QR Link for this order amount
+        var upiQrUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=' + 
+          encodeURIComponent('upi://pay?pa=' + STORE_UPI_ID + '&pn=BABA%20FOOD&am=' + order.total_amount + '&cu=INR&tn=Order-' + order.id);
 
         return '<div class="order-card ' + (isReturnOrder ? 'return-pulse' : (!isDispatched && !isArrived && !isDelivered && !isCancelled ? 'new-pulse' : '')) + '">' +
           '<div class="order-top">' +
@@ -1036,30 +1110,58 @@
             (!isDispatched && !isArrived 
               ? '<button class="btn-action-primary" style="background:#0284c7; margin-top:8px;" onclick="openPickupModal(' + order.id + ')">📸 Accept & Pickup</button>'
               : (!isArrived ? (
-                // 500M ARRIVAL CHECK
+                // 1. ARRIVAL BUTTON (LOCKED TILL 500M)
                 `<div class="arrival-lock-box">
                   <div style="font-size:12px; color:#cbd5e1; font-weight:700; margin-bottom:6px;">
-                    ${canArrive ? '🎯 Aap grahak ki location se 500m ke andar hain!' : '🔒 Grahak ki location se ' + (metersToCust !== 999999 ? metersToCust + 'm' : 'kuchh doori') + ' par hain (500m par khulega)'}
+                    ${canArrive ? '🎯 Aap grahak ki location se 500m ke andar hain!' : '🔒 Grahak ki location se ' + (metersToCust !== 999999 ? metersToCust + 'm' : 'kuchh doori') + ' par hain (500m par unlock hoga)'}
                   </div>
                   <button class="btn-arrive" ${!canArrive ? 'disabled' : ''} onclick="markRiderArrived(${order.id})">
                     🔔 I Have Arrived (Grahak ko Bell Bajao)
                   </button>
                 </div>`
               ) : (
-                // AFTER ARRIVED -> COD SLIDER OR DELIVER
-                (isCod && !isCodConfirmed ? `
-                  <div class="cod-box-wrapper" id="cod-slider-wrap-${order.id}">
-                    <div class="cod-notice-title">
-                      <span>💵 Cash on Delivery (COD)</span>
-                      <span style="font-size:14px; color:#facc15;">₹${order.total_amount} collect karein</span>
+                // 2. AFTER ARRIVED -> COD SELECTION (CASH OR ONLINE QR) OR DIRECT DELIVER
+                (isCod && !isPaymentDone ? `
+                  <div class="pay-choice-container">
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                      <span style="font-size:12px; font-weight:900; color:#c7d2fe;">💵 Payment Kaise Liya?</span>
+                      <span style="font-size:14px; font-weight:900; color:#34d399;">₹${order.total_amount}</span>
                     </div>
-                    <div class="slide-track" id="slide-track-${order.id}">
-                      <div class="slide-thumb" id="slide-thumb-${order.id}">👉</div>
-                      <span class="slide-track-text">SLIDE TO CONFIRM CASH</span>
+
+                    <div class="choice-buttons-grid">
+                      <div class="choice-tab-btn ${currentChoice === 'CASH' ? 'selected' : ''}" onclick="selectPayChoice(${order.id}, 'CASH')">
+                        <span style="font-size:18px;">💵</span>
+                        <span>Cash Mila</span>
+                      </div>
+                      <div class="choice-tab-btn ${currentChoice === 'QR' ? 'selected' : ''}" onclick="selectPayChoice(${order.id}, 'QR')">
+                        <span style="font-size:18px;">📱</span>
+                        <span>Online QR Scanner</span>
+                      </div>
                     </div>
+
+                    ${currentChoice === 'CASH' ? `
+                      <div class="cod-box-wrapper" id="cod-slider-wrap-${order.id}">
+                        <div class="cod-notice-title">
+                          <span>Grahak se ₹${order.total_amount} Cash lein:</span>
+                        </div>
+                        <div class="slide-track" id="slide-track-${order.id}">
+                          <div class="slide-thumb" id="slide-thumb-${order.id}">👉</div>
+                          <span class="slide-track-text">SLIDE TO CONFIRM CASH</span>
+                        </div>
+                      </div>
+                    ` : currentChoice === 'QR' ? `
+                      <div class="rider-qr-box">
+                        <div style="font-size:12px; font-weight:800; color:#e9d5ff;">Grahak ko ye QR scan karwayein:</div>
+                        <img src="${upiQrUrl}" class="rider-qr-img" alt="UPI QR">
+                        <div style="font-size:12px; font-weight:900; color:#facc15; margin-bottom:8px;">Amount: ₹${order.total_amount}</div>
+                        <button class="btn-action-primary" style="margin-bottom:0;" onclick="confirmOnlineQrPaid(${order.id})">
+                          ✓ Payment Ho Gaya (Verify)
+                        </button>
+                      </div>
+                    ` : ''}
                   </div>
-                  <button class="btn-action-primary" id="btn-deliver-action-${order.id}" style="margin-top:8px; display:none;" onclick="openDeliveryProofModal(${order.id}, '${order.delivery_otp || ''}')">🔐 Deliver (Enter OTP)</button>
                 ` : `
+                  ${isPaymentDone ? '<div style="background:#065f46; border:1px solid #10b981; color:#a7f3d0; padding:9px; border-radius:10px; text-align:center; font-weight:800; font-size:12px; margin-top:8px; margin-bottom:6px;">✅ Payment Verified! Ab deliver karein.</div>' : ''}
                   <button class="btn-action-primary" id="btn-deliver-action-${order.id}" style="margin-top:8px;" onclick="openDeliveryProofModal(${order.id}, '${order.delivery_otp || ''}')">🔐 Deliver (Enter OTP)</button>
                 `)
               )))
@@ -1067,11 +1169,12 @@
         '</div>';
       }).join('');
 
-      // Initialize all COD slider gestures after rendering
+      // Initialize all COD slider gestures after rendering if cash option selected
       filtered.forEach(function(o) {
         var st = (o.status || '').toLowerCase();
-        var isCod = (o.payment_mode || '').toUpperCase() === 'COD';
-        if (st === 'arrived' && isCod && !codConfirmedOrders[o.id]) {
+        var isCod = (o.payment_mode || '').toUpperCase().includes('COD');
+        var choice = selectedPayModeByRider[o.id];
+        if (st === 'arrived' && isCod && choice === 'CASH' && !paymentConfirmedOrders[o.id]) {
           setTimeout(function() { initCodSlider(o.id); }, 50);
         }
       });
