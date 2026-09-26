@@ -163,6 +163,7 @@
     }
     .tag-placed { background: #0284c7; color: #fff; }
     .tag-transit { background: #f59e0b; color: #000; }
+    .tag-arrived { background: #10b981; color: #fff; }
     .tag-delivered { background: #059669; color: #fff; }
     .tag-cancelled { background: #dc2626; color: #fff; }
     .tag-return { background: #ef4444; color: #fff; }
@@ -262,6 +263,35 @@
       gap: 6px;
       margin-bottom: 8px;
       width: 100%;
+    }
+
+    /* 500M ARRIVAL ACTION BOX */
+    .arrival-lock-box {
+      background: #172554;
+      border: 1.5px solid #3b82f6;
+      border-radius: 14px;
+      padding: 14px;
+      text-align: center;
+      margin-top: 8px;
+      margin-bottom: 8px;
+    }
+    .btn-arrive {
+      background: linear-gradient(135deg, #2563eb, #1d4ed8);
+      color: #ffffff;
+      border: none;
+      width: 100%;
+      padding: 13px;
+      border-radius: 12px;
+      font-size: 13.5px;
+      font-weight: 900;
+      cursor: pointer;
+      box-shadow: 0 4px 14px rgba(37, 99, 235, 0.4);
+    }
+    .btn-arrive:disabled {
+      background: #334155 !important;
+      color: #94a3b8 !important;
+      cursor: not-allowed;
+      box-shadow: none;
     }
 
     /* SLIDER FOR COD CONFIRMATION */
@@ -585,7 +615,6 @@
     var wakeLock = null;
     var riderCurrentCoords = null;
 
-    // Track which orders have COD confirmed
     var codConfirmedOrders = {};
 
     var activeChatOrderId = null;
@@ -715,6 +744,8 @@
             current_lat: riderCurrentCoords.lat,
             current_lng: riderCurrentCoords.lng
           }).eq('id', 1).then(function(){});
+          
+          renderOrdersList();
         }, function(err){}, { enableHighAccuracy: true });
       }
     }
@@ -749,7 +780,7 @@
         if (isRiderOnline) {
           var pendingDeliveries = newOrders.filter(function(o) {
             var s = (o.status || '').toLowerCase();
-            return (s.includes('placed') || s.includes('paid')) && !s.includes('cancelled') && !s.includes('out') && !s.includes('delivered');
+            return (s.includes('placed') || s.includes('paid')) && !s.includes('cancelled') && !s.includes('out') && !s.includes('delivered') && !s.includes('arrived');
           });
 
           var eligibleReturns = newOrders.filter(function(o) {
@@ -801,6 +832,20 @@
       renderOrdersList();
     }
 
+    // 📍 RIDER ARRIVED HANDLER (500M GEOFENCE)
+    async function markRiderArrived(orderId) {
+      var { error } = await _supabase.from('orders').update({
+        status: 'Arrived'
+      }).eq('id', orderId);
+
+      if (error) {
+        alert('Status update error: ' + error.message);
+      } else {
+        alert('🔔 Grahak ko notify kar diya gaya hai! Chime/bell sound baj gaya hai.');
+        fetchOrders();
+      }
+    }
+
     // 🚀 COD SLIDER LOGIC INITIALIZER
     function initCodSlider(orderId) {
       var thumb = document.getElementById('slide-thumb-' + orderId);
@@ -829,7 +874,6 @@
         if (currentX > maxSlide) currentX = maxSlide;
         thumb.style.left = currentX + 'px';
 
-        // Check if slid over 90%
         if (currentX >= maxSlide * 0.88) {
           isDragging = false;
           onEnd();
@@ -844,7 +888,6 @@
         document.removeEventListener('mouseup', onEnd);
         document.removeEventListener('touchmove', onMove);
         document.removeEventListener('touchend', onEnd);
-        // snap back if not confirmed
         if (!codConfirmedOrders[orderId]) {
           thumb.style.transition = 'left 0.2s ease';
           thumb.style.left = '2px';
@@ -900,6 +943,7 @@
         try { items = Array.isArray(order.items) ? order.items : JSON.parse(order.items || '[]'); } catch(e){}
         var st = (order.status || '').toLowerCase();
         var isDispatched = st.includes('out') || st.includes('running');
+        var isArrived = st === 'arrived';
         var isDelivered = st.includes('delivered');
         var isCancelled = st.includes('cancelled');
         var isReturnOrder = order.return_status === 'Approved';
@@ -909,34 +953,43 @@
         var rawAddress = order.delivery_address || 'Address not specified';
         var cleanAddress = rawAddress;
         var mapNavUrl = null;
+        var custLat = null, custLng = null;
 
         var gpsMatch = rawAddress.match(/\[GPS:\s*([-+]?[0-9]*\.?[0-9]+),\s*([-+]?[0-9]*\.?[0-9]+)\]/i);
         if (gpsMatch && gpsMatch[1] && gpsMatch[2]) {
-          var targetLat = gpsMatch[1];
-          var targetLng = gpsMatch[2];
+          custLat = parseFloat(gpsMatch[1]);
+          custLng = parseFloat(gpsMatch[2]);
           cleanAddress = rawAddress.replace(gpsMatch[0], '').trim();
-          mapNavUrl = 'https://www.google.com/maps/dir/?api=1&destination=' + targetLat + ',' + targetLng + '&travelmode=driving';
+          mapNavUrl = 'https://www.google.com/maps/dir/?api=1&destination=' + custLat + ',' + custLng + '&travelmode=driving';
         } else if (order.return_lat && order.return_lng) {
-          mapNavUrl = 'https://www.google.com/maps/dir/?api=1&destination=' + order.return_lat + ',' + order.return_lng + '&travelmode=driving';
+          custLat = order.return_lat;
+          custLng = order.return_lng;
+          mapNavUrl = 'https://www.google.com/maps/dir/?api=1&destination=' + custLat + ',' + custLng + '&travelmode=driving';
         } else {
           mapNavUrl = 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(cleanAddress);
         }
 
+        // Distance from rider to customer
+        var metersToCust = 999999;
+        if (custLat && custLng && riderCurrentCoords) {
+          metersToCust = calculateDistanceInMeters(riderCurrentCoords.lat, riderCurrentCoords.lng, custLat, custLng);
+        }
+        var canArrive = metersToCust <= 500;
+
         var distText = '';
         if (isReturnOrder && riderCurrentCoords && order.return_lat && order.return_lng) {
-          var meters = calculateDistanceInMeters(riderCurrentCoords.lat, riderCurrentCoords.lng, order.return_lat, order.return_lng);
-          distText = ' • ' + meters + 'm door';
+          distText = ' • ' + metersToCust + 'm door';
         }
 
         var itemsListHtml = items.map(function(it) {
           return '<div class="item-summary-line"><span>' + (it.name || 'Item') + ' × ' + (it.qty || 1) + '</span></div>';
         }).join('');
 
-        return '<div class="order-card ' + (isReturnOrder ? 'return-pulse' : (!isDispatched && !isDelivered && !isCancelled ? 'new-pulse' : '')) + '">' +
+        return '<div class="order-card ' + (isReturnOrder ? 'return-pulse' : (!isDispatched && !isArrived && !isDelivered && !isCancelled ? 'new-pulse' : '')) + '">' +
           '<div class="order-top">' +
             '<div>' +
               '<div class="ord-id">#ORD-' + order.id + '</div>' +
-              '<span class="ord-tag ' + (isReturnOrder ? 'tag-return' : isDelivered ? 'tag-delivered' : isDispatched ? 'tag-transit' : 'tag-placed') + '">' + 
+              '<span class="ord-tag ' + (isReturnOrder ? 'tag-return' : isDelivered ? 'tag-delivered' : isArrived ? 'tag-arrived' : isDispatched ? 'tag-transit' : 'tag-placed') + '">' + 
                 (isReturnOrder ? '🚨 RETURN PICKUP' + distText : (order.status || 'Placed')) + 
               '</span>' +
             '</div>' +
@@ -966,7 +1019,7 @@
 
           (!isReturnOrder && itemsListHtml ? '<div class="items-summary-box">' + itemsListHtml + '</div>' : '') +
 
-          // ACTION BUTTONS (CALL + LIVE NAVIGATION + REALTIME CHAT + ACCEPT/DELIVER)
+          // ACTION BUTTONS
           (isReturnOrder ? `
             <a href="tel:${order.customer_phone}" class="btn-action-call">📞 Call Customer for Return</a>
             <a href="${mapNavUrl}" target="_blank" class="btn-action-nav">📍 Open Google Maps Navigation ↗</a>
@@ -980,10 +1033,20 @@
               '<a href="' + mapNavUrl + '" target="_blank" class="btn-action-nav" style="margin-bottom:8px;">📍 Map Pata ↗</a>' +
             '</div>' +
             '<button class="btn-action-chat" onclick="openRiderChat(' + order.id + ', \'' + (order.customer_name || 'Customer') + '\')">💬 Chat with Customer</button>' +
-            (!isDispatched 
+            (!isDispatched && !isArrived 
               ? '<button class="btn-action-primary" style="background:#0284c7; margin-top:8px;" onclick="openPickupModal(' + order.id + ')">📸 Accept & Pickup</button>'
-              : (
-                // COD SLIDE CHECK BEFORE DELIVERY
+              : (!isArrived ? (
+                // 500M ARRIVAL CHECK
+                `<div class="arrival-lock-box">
+                  <div style="font-size:12px; color:#cbd5e1; font-weight:700; margin-bottom:6px;">
+                    ${canArrive ? '🎯 Aap grahak ki location se 500m ke andar hain!' : '🔒 Grahak ki location se ' + (metersToCust !== 999999 ? metersToCust + 'm' : 'kuchh doori') + ' par hain (500m par khulega)'}
+                  </div>
+                  <button class="btn-arrive" ${!canArrive ? 'disabled' : ''} onclick="markRiderArrived(${order.id})">
+                    🔔 I Have Arrived (Grahak ko Bell Bajao)
+                  </button>
+                </div>`
+              ) : (
+                // AFTER ARRIVED -> COD SLIDER OR DELIVER
                 (isCod && !isCodConfirmed ? `
                   <div class="cod-box-wrapper" id="cod-slider-wrap-${order.id}">
                     <div class="cod-notice-title">
@@ -999,7 +1062,7 @@
                 ` : `
                   <button class="btn-action-primary" id="btn-deliver-action-${order.id}" style="margin-top:8px;" onclick="openDeliveryProofModal(${order.id}, '${order.delivery_otp || ''}')">🔐 Deliver (Enter OTP)</button>
                 `)
-              ))
+              )))
           ) : '') +
         '</div>';
       }).join('');
@@ -1007,9 +1070,8 @@
       // Initialize all COD slider gestures after rendering
       filtered.forEach(function(o) {
         var st = (o.status || '').toLowerCase();
-        var isDispatched = st.includes('out') || st.includes('running');
         var isCod = (o.payment_mode || '').toUpperCase() === 'COD';
-        if (isDispatched && isCod && !codConfirmedOrders[o.id]) {
+        if (st === 'arrived' && isCod && !codConfirmedOrders[o.id]) {
           setTimeout(function() { initCodSlider(o.id); }, 50);
         }
       });
@@ -1207,8 +1269,8 @@
         updateRiderLiveGPS();
       }
       fetchOrders();
-      setInterval(updateRiderLiveGPS, 10000);
-      setInterval(fetchOrders, 7000);
+      setInterval(updateRiderLiveGPS, 7000);
+      setInterval(fetchOrders, 5000);
     });
   </script>
 </body>
