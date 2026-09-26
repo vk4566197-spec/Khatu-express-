@@ -245,7 +245,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 6px;
+      gap: 6px; 
       margin-bottom: 8px; 
     }
     .btn-action-chat {
@@ -260,8 +260,8 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 6px;
-      margin-bottom: 8px;
+      gap: 6px; 
+      margin-bottom: 8px; 
       width: 100%;
     }
 
@@ -388,7 +388,7 @@
       z-index: 2;
     }
 
-    /* RIDER LIVE UPI QR DISPLAY CARD */
+    /* RIDER LIVE UPI QR DISPLAY & VERIFICATION CARD */
     .rider-qr-box {
       background: #2e1065;
       border: 1.5px solid #a855f7;
@@ -406,6 +406,24 @@
       padding: 6px;
       margin: 8px auto;
       display: block;
+    }
+    .qr-verify-input {
+      width: 100%;
+      background: #0f172a;
+      border: 1.5px solid #c084fc;
+      border-radius: 10px;
+      padding: 11px 14px;
+      font-size: 13px;
+      font-weight: 700;
+      color: #ffffff;
+      text-align: center;
+      letter-spacing: 1px;
+      outline: none;
+      margin-top: 10px;
+      margin-bottom: 8px;
+    }
+    .qr-verify-input:focus {
+      border-color: #38bdf8;
     }
 
     .modal-bg { 
@@ -674,9 +692,10 @@
     var wakeLock = null;
     var riderCurrentCoords = null;
 
-    // States for COD choice and confirmation
+    // States for payment method & confirmation
     var selectedPayModeByRider = {}; // orderId -> 'CASH' or 'QR'
     var paymentConfirmedOrders = {}; // orderId -> true/false
+    var qrVerifyUtrMap = {};         // orderId -> utr string
 
     var activeChatOrderId = null;
     var riderChatChannel = null;
@@ -972,12 +991,40 @@
       renderOrdersList();
     }
 
-    // CONFIRM ONLINE QR PAYMENT DONE
-    function confirmOnlineQrPaid(orderId) {
-      paymentConfirmedOrders[orderId] = true;
-      _supabase.from('orders').update({ payment_mode: 'Online UPI (QR Paid at Door)' }).eq('id', orderId).then(function(){});
-      alert('✅ Online UPI Payment Confirmed! Ab customer ka secret OTP verify karein.');
-      renderOrdersList();
+    // 📱 VERIFY ONLINE QR PAYMENT (CHECKS 12-DIGIT UTR)
+    async function verifyAndConfirmOnlineQr(orderId) {
+      var utrInput = document.getElementById('qr-utr-input-' + orderId);
+      var utrVal = utrInput ? utrInput.value.trim() : '';
+
+      if (!utrVal || utrVal.length < 8) {
+        alert('❌ Kripya grahak ke phone se dekh kar 12-digit UTR / Ref No. darj karein!');
+        return;
+      }
+
+      var btn = document.getElementById('btn-qr-verify-' + orderId);
+      if (btn) {
+        btn.disabled = true;
+        btn.innerText = 'Verifying Payment... ⏳';
+      }
+
+      var { error } = await _supabase.from('orders').update({
+        payment_mode: 'Online UPI (Door QR)',
+        transaction_id: utrVal,
+        status: 'Paid Online (Verified at Door)'
+      }).eq('id', orderId);
+
+      if (error) {
+        alert('Verification error: ' + error.message);
+        if (btn) {
+          btn.disabled = false;
+          btn.innerText = '✓ Verify UTR & Confirm Payment';
+        }
+      } else {
+        paymentConfirmedOrders[orderId] = true;
+        qrVerifyUtrMap[orderId] = utrVal;
+        alert('✅ Online Payment Verified! UTR: ' + utrVal + '\nAb grahak ka secret OTP lein.');
+        renderOrdersList();
+      }
     }
 
     function renderOrdersList() {
@@ -1020,6 +1067,7 @@
         
         var currentChoice = selectedPayModeByRider[order.id] || null;
         var isPaymentDone = paymentConfirmedOrders[order.id] || false;
+        var verifiedUtr = qrVerifyUtrMap[order.id] || order.transaction_id || '';
 
         var rawAddress = order.delivery_address || 'Address not specified';
         var cleanAddress = rawAddress;
@@ -1120,11 +1168,11 @@
                   </button>
                 </div>`
               ) : (
-                // 2. AFTER ARRIVED -> COD SELECTION (CASH OR ONLINE QR) OR DIRECT DELIVER
+                // 2. AFTER ARRIVED -> COD SELECTION (CASH OR VERIFIED ONLINE QR)
                 (isCod && !isPaymentDone ? `
                   <div class="pay-choice-container">
                     <div style="display:flex; justify-content:space-between; align-items:center;">
-                      <span style="font-size:12px; font-weight:900; color:#c7d2fe;">💵 Payment Kaise Liya?</span>
+                      <span style="font-size:12px; font-weight:900; color:#c7d2fe;">💵 Payment Mode Chunein:</span>
                       <span style="font-size:14px; font-weight:900; color:#34d399;">₹${order.total_amount}</span>
                     </div>
 
@@ -1135,7 +1183,7 @@
                       </div>
                       <div class="choice-tab-btn ${currentChoice === 'QR' ? 'selected' : ''}" onclick="selectPayChoice(${order.id}, 'QR')">
                         <span style="font-size:18px;">📱</span>
-                        <span>Online QR Scanner</span>
+                        <span>Online UPI QR</span>
                       </div>
                     </div>
 
@@ -1153,15 +1201,23 @@
                       <div class="rider-qr-box">
                         <div style="font-size:12px; font-weight:800; color:#e9d5ff;">Grahak ko ye QR scan karwayein:</div>
                         <img src="${upiQrUrl}" class="rider-qr-img" alt="UPI QR">
-                        <div style="font-size:12px; font-weight:900; color:#facc15; margin-bottom:8px;">Amount: ₹${order.total_amount}</div>
-                        <button class="btn-action-primary" style="margin-bottom:0;" onclick="confirmOnlineQrPaid(${order.id})">
-                          ✓ Payment Ho Gaya (Verify)
-                        </button>
+                        <div style="font-size:13px; font-weight:900; color:#facc15; margin-bottom:8px;">Amount: ₹${order.total_amount}</div>
+                        
+                        <!-- ONLINE QR VERIFICATION INPUT -->
+                        <div style="background:#1e1b4b; padding:10px; border-radius:10px; border:1px dashed #c084fc;">
+                          <div style="font-size:11px; font-weight:800; color:#cbd5e1; text-align:left;">
+                            🔐 Payment Verification (अनिवार्य *):
+                          </div>
+                          <input type="text" id="qr-utr-input-${order.id}" class="qr-verify-input" placeholder="Grahak ka 12-digit UTR No. dalein *" maxlength="16">
+                          <button class="btn-action-primary" id="btn-qr-verify-${order.id}" style="margin-bottom:0;" onclick="verifyAndConfirmOnlineQr(${order.id})">
+                            ✓ Verify UTR & Confirm Payment
+                          </button>
+                        </div>
                       </div>
                     ` : ''}
                   </div>
                 ` : `
-                  ${isPaymentDone ? '<div style="background:#065f46; border:1px solid #10b981; color:#a7f3d0; padding:9px; border-radius:10px; text-align:center; font-weight:800; font-size:12px; margin-top:8px; margin-bottom:6px;">✅ Payment Verified! Ab deliver karein.</div>' : ''}
+                  ${isPaymentDone ? '<div style="background:#065f46; border:1px solid #10b981; color:#a7f3d0; padding:9px; border-radius:10px; text-align:center; font-weight:800; font-size:12px; margin-top:8px; margin-bottom:6px;">✅ Payment Verified (' + (verifiedUtr ? 'UTR: ' + verifiedUtr : 'Cash') + ')! Ab deliver karein.</div>' : ''}
                   <button class="btn-action-primary" id="btn-deliver-action-${order.id}" style="margin-top:8px;" onclick="openDeliveryProofModal(${order.id}, '${order.delivery_otp || ''}')">🔐 Deliver (Enter OTP)</button>
                 `)
               )))
