@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>🛵 BABA RIDER — Partner Dashboard</title>
+  <title>🛵 BABA RIDER — Secure Partner Portal</title>
 
   <link rel="icon" type="image/png" href="logo.png">
   <link rel="manifest" href="manifest-rider.json">
@@ -32,84 +32,68 @@
       --text-muted: #94a3b8;
     }
 
-    * { 
-      box-sizing: border-box; 
-      margin: 0; 
-      padding: 0; 
-      font-family: 'Plus Jakarta Sans', sans-serif; 
-      -webkit-tap-highlight-color: transparent; 
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; -webkit-tap-highlight-color: transparent; }
+    body { background-color: var(--bg-slate); color: var(--text-main); padding-bottom: 90px; min-height: 100vh; }
+
+    /* 1. SECURE LOGIN SCREEN */
+    .login-container {
+      position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+      background: radial-gradient(circle at top, #2e0854, #0f172a 80%);
+      z-index: 9999999; display: flex; align-items: center; justify-content: center; padding: 24px;
     }
-    
-    body { 
-      background-color: var(--bg-slate); 
-      color: var(--text-main); 
-      padding-bottom: 90px; 
-      min-height: 100vh; 
+    .login-card {
+      background: #1e293b; border: 2px solid #a855f7; border-radius: 24px;
+      padding: 28px 24px; width: 100%; max-width: 380px; text-align: center;
+      box-shadow: 0 12px 35px rgba(0,0,0,0.6);
+    }
+    .login-brand-img { width: 68px; height: 68px; border-radius: 50%; border: 2px solid #ff758c; margin-bottom: 12px; background: #fff; }
+    .role-toggle-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 16px 0; }
+    .role-btn {
+      background: #0f172a; border: 1.5px solid #475569; color: #cbd5e1;
+      padding: 12px 8px; border-radius: 12px; font-size: 12px; font-weight: 800;
+      cursor: pointer; transition: all 0.2s;
+    }
+    .role-btn.active {
+      background: #4f46e5; border-color: #a5b4fc; color: #ffffff;
+      box-shadow: 0 4px 14px rgba(79, 70, 229, 0.4);
+    }
+    .rider-input {
+      width: 100%; background: #0f172a; border: 1.5px solid #475569; border-radius: 12px;
+      padding: 13px 16px; font-size: 13px; font-weight: 700; color: #ffffff; outline: none; margin-bottom: 12px;
+    }
+    .rider-input:focus { border-color: #a855f7; }
+    .btn-login-submit {
+      background: linear-gradient(135deg, #a855f7, #6b21a8); color: white;
+      border: none; width: 100%; padding: 14px; border-radius: 12px; font-size: 14px;
+      font-weight: 900; cursor: pointer; box-shadow: 0 4px 15px rgba(168, 85, 247, 0.4);
     }
 
+    /* 2. TOP NAV & DUTY BAR */
     .top-nav {
-      background: #1e112a; 
-      padding: 14px 16px; 
-      border-bottom: 1px solid #381a4d;
-      display: flex; 
-      justify-content: space-between; 
-      align-items: center; 
-      position: sticky; 
-      top: 0; 
-      z-index: 1000;
+      background: #1e112a; padding: 14px 16px; border-bottom: 1px solid #381a4d;
+      display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 1000;
     }
     .rider-brand { display: flex; align-items: center; gap: 10px; }
     .rider-brand img { width: 38px; height: 38px; border-radius: 50%; border: 1.5px solid #ff758c; background: #fff; }
     .brand-title { font-size: 15px; font-weight: 900; color: #ffffff; line-height: 1.2; }
     .brand-sub { font-size: 11px; color: #38bdf8; font-weight: 700; }
+    .btn-logout {
+      background: #334155; border: 1px solid #64748b; color: #f87171;
+      padding: 6px 12px; border-radius: 10px; font-size: 11px; font-weight: 800; cursor: pointer;
+    }
 
-    .status-toggle-box {
-      display: inline-flex !important; 
-      align-items: center !important; 
-      gap: 8px !important;
-      background: #0f172a !important; 
-      padding: 9px 18px !important; 
-      border-radius: 25px !important;
-      border: 2px solid #10b981 !important; 
-      cursor: pointer !important; 
-      user-select: none !important;
-      touch-action: manipulation !important; 
-      box-shadow: 0 4px 12px rgba(0,0,0,0.4) !important;
-    }
-    .status-dot { 
-      width: 12px; 
-      height: 12px; 
-      border-radius: 50%; 
-      background: #10b981; 
-      box-shadow: 0 0 10px #10b981; 
-      display: inline-block; 
-    }
-    .status-dot.offline { 
-      background: #ef4444 !important; 
-      box-shadow: none !important; 
-    }
-    .status-text { font-size: 13px; font-weight: 900; color: #ffffff; }
-
-    /* RIDER PROFILE SELECTION BANNER */
-    .rider-mode-banner {
-      background: #1e1b4b;
+    .duty-bar {
+      background: #1e1b4b; padding: 10px 16px; display: flex; justify-content: space-between; align-items: center;
       border-bottom: 1.5px solid #4338ca;
-      padding: 10px 16px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
     }
-    .rider-select-dropdown {
-      background: #0f172a;
-      border: 1.5px solid #818cf8;
-      color: #ffffff;
-      padding: 6px 10px;
-      border-radius: 10px;
-      font-size: 12px;
-      font-weight: 800;
-      outline: none;
+    .status-toggle-box {
+      display: inline-flex; align-items: center; gap: 8px; background: #0f172a;
+      padding: 8px 16px; border-radius: 20px; border: 1.5px solid #10b981; cursor: pointer;
     }
+    .status-dot { width: 10px; height: 10px; border-radius: 50%; background: #10b981; box-shadow: 0 0 10px #10b981; }
+    .status-dot.offline { background: #ef4444 !important; box-shadow: none !important; }
 
+    /* STATS */
     .stats-bar { 
       display: grid; 
       grid-template-columns: repeat(3, 1fr); 
@@ -141,6 +125,7 @@
     }
     .tab-btn.active { background: var(--primary-purple); border-color: #a855f7; color: #ffffff; }
 
+    /* ORDER CARDS */
     .container { padding: 0 16px; }
     .order-card { 
       background: var(--card-bg); 
@@ -451,6 +436,7 @@
     }
     .qr-verify-input:focus { border-color: #38bdf8; }
 
+    /* MODAL */
     .modal-bg { 
       position: fixed; 
       top: 0; 
@@ -608,31 +594,50 @@
 </head>
 <body onclick="unlockAudio();" ontouchstart="unlockAudio();">
 
-  <!-- TOP APP BAR -->
+  <!-- 1. SECURE LOGIN SCREEN -->
+  <div class="login-container" id="login-screen">
+    <div class="login-card">
+      <img src="logo.png" class="login-brand-img" alt="Logo" onerror="this.style.display='none'">
+      <h2 style="font-size: 18px; font-weight: 900; color: #fff;">BABA RIDER PORTAL</h2>
+      <p style="font-size: 11.5px; color: #94a3b8; margin-top: 4px;">Apna Rider Account Login Karein</p>
+
+      <div class="role-toggle-grid">
+        <button type="button" class="role-btn active" id="btn-role-express" onclick="selectLoginRole('EXPRESS')">
+          ⚡ Normal Rider<br><span style="font-size:10px; opacity:0.8;">(10-20 Min)</span>
+        </button>
+        <button type="button" class="role-btn" id="btn-role-super" onclick="selectLoginRole('SUPER')">
+          👑 Super Rider<br><span style="font-size:10px; opacity:0.8;">(24 Hr Multi)</span>
+        </button>
+      </div>
+
+      <input type="tel" id="login-phone" class="rider-input" placeholder="Registered Mobile (10-Digit) *" maxlength="10">
+      <input type="password" id="login-pass" class="rider-input" placeholder="Enter Password *">
+
+      <button type="button" class="btn-login-submit" onclick="performRiderLogin()">Secure Login 🚀</button>
+    </div>
+  </div>
+
+  <!-- 2. MAIN LOGGED-IN DASHBOARD -->
   <div class="top-nav">
     <div class="rider-brand">
       <img src="logo.png" alt="Logo" onerror="this.style.display='none'">
       <div>
-        <div class="brand-title" id="rider-app-title">BABA RIDER 🛵</div>
-        <div class="brand-sub" id="rider-app-subtitle">Express Delivery Partner</div>
+        <div class="brand-title" id="app-title-display">BABA RIDER 🛵</div>
+        <div style="font-size:11px; color:#38bdf8;" id="logged-rider-name">Partner #---</div>
       </div>
     </div>
-    <div class="status-toggle-box" id="duty-btn" onclick="toggleDuty();">
-      <span class="status-dot" id="online-indicator"></span>
-      <span class="status-text" id="online-status-text">ONLINE</span>
-    </div>
+    <button class="btn-logout" onclick="performRiderLogout()">🚪 Logout</button>
   </div>
 
-  <!-- RIDER PROFILE SELECTION BANNER -->
-  <div class="rider-mode-banner">
+  <div class="duty-bar">
     <div>
-      <div style="font-size: 11px; color: #a5b4fc; font-weight: 700;">ACTIVE RIDER PROFILE:</div>
-      <div style="font-size: 13px; font-weight: 900; color: #ffffff;" id="current-rider-badge">🛵 Normal Rider</div>
+      <div style="font-size:10.5px; color:#a5b4fc; font-weight:700;">CURRENT PROFILE:</div>
+      <div style="font-size:13px; font-weight:900;" id="role-tag-display">⚡ Express Rider</div>
     </div>
-    <select id="rider-profile-select" class="rider-select-dropdown" onchange="changeRiderProfile(this.value)">
-      <option value="EXPRESS">⚡ Normal Express Rider (10-20 Min)</option>
-      <option value="SUPER">👑 Super Rider (24 Hr Multi-Orders)</option>
-    </select>
+    <div class="status-toggle-box" id="duty-btn" onclick="toggleDuty()">
+      <span class="status-dot" id="online-indicator"></span>
+      <span style="font-size:12px; font-weight:900;" id="online-text">ONLINE</span>
+    </div>
   </div>
 
   <!-- STATS BAR -->
@@ -702,6 +707,8 @@
     </div>
     <div class="chat-body-messages" id="chat-box-content"></div>
     <div class="chat-input-row">
+      <input type="file" id="rider-chat-photo-input" accept="image/*" style="display:none;" onchange="handleRiderChatPhotoSelected(this)">
+      <button type="button" onclick="document.getElementById('rider-chat-photo-input').click()" style="background:#0f172a; border:1px solid #475569; border-radius:10px; width:40px; height:40px; color:#fff; font-size:16px; cursor:pointer;">📷</button>
       <input type="text" id="chat-input-field" class="chat-text-input" placeholder="Grahak ko message likhein..." onkeypress="if(event.key==='Enter') sendRiderMsg()">
       <button class="btn-action-primary" style="width:auto; padding:0 20px; margin-bottom:0;" onclick="sendRiderMsg()">Bhejo</button>
     </div>
@@ -711,34 +718,33 @@
   <audio id="order-sound" src="alert.mp3" preload="auto" loop></audio>
 
   <script>
-    var SUPABASE_URL = 'https://mpeikimhkjuinqkjaumr.supabase.co';
-    var SUPABASE_KEY = 'sb_publishable_2_wD-pbi_pNf8niiHxFbYA_saCIhApN';
-    var _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    const SUPABASE_URL = 'https://mpeikimhkjuinqkjaumr.supabase.co';
+    const SUPABASE_KEY = 'sb_publishable_2_wD-pbi_pNf8niiHxFbYA_saCIhApN';
+    const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    var STORE_UPI_ID = '7037647464-3@axl';
+    const STORE_UPI_ID = '7037647464-3@axl';
 
-    var currentTab = 'active';
-    var allRiderOrders = [];
-    var isRiderOnline = localStorage.getItem('baba_rider_duty_status') !== 'OFFLINE';
-    
-    // RIDER TYPE: 'EXPRESS' (10-20 Min) ya 'SUPER' (Dedicated 24 Hours Multi-Orders)
-    var activeRiderRole = localStorage.getItem('baba_active_rider_role') || 'EXPRESS';
+    let currentTab = 'active';
+    let allRiderOrders = [];
+    let loggedRider = null;
+    let selectedLoginRole = 'EXPRESS';
+    let isRiderOnline = localStorage.getItem('baba_rider_duty_status') !== 'OFFLINE';
+    let audioUnlocked = false;
 
-    var audioUnlocked = false;
-    var selectedOrderForDelivery = null;
-    var selectedOrderForPickup = null;
-    var base64PickupPhoto = null;
-    var base64DeliveryPhoto = null;
-    var lastKnownAlertId = null;
-    var wakeLock = null;
-    var riderCurrentCoords = null;
+    let selectedOrderForDelivery = null;
+    let selectedOrderForPickup = null;
+    let base64PickupPhoto = null;
+    let base64DeliveryPhoto = null;
+    let lastKnownAlertId = null;
+    let wakeLock = null;
+    let riderCurrentCoords = null;
 
-    var selectedPayModeByRider = {}; 
-    var paymentConfirmedOrders = {}; 
-    var qrVerifyUtrMap = {};         
+    let selectedPayModeByRider = {}; 
+    let paymentConfirmedOrders = {}; 
+    let qrVerifyUtrMap = {};         
 
-    var activeChatOrderId = null;
-    var riderChatChannel = null;
+    let activeChatOrderId = null;
+    let riderChatChannel = null;
 
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('sw.js').catch(function(){});
@@ -762,7 +768,7 @@
 
     function unlockAudio() {
       if (audioUnlocked) return;
-      var sound = document.getElementById('order-sound');
+      const sound = document.getElementById('order-sound');
       if (sound) {
         sound.play().then(function() {
           sound.pause();
@@ -774,12 +780,12 @@
 
     function playSound(amount, isReturn) {
       if (!isRiderOnline) return;
-      var sound = document.getElementById('order-sound');
+      const sound = document.getElementById('order-sound');
       if (sound) {
         sound.play().catch(function() {
           try {
-            var ctx = new (window.AudioContext || window.webkitAudioContext)();
-            var osc = ctx.createOscillator();
+            const ctx = new (window.AudioContext || window.webkitAudioContext)();
+            const osc = ctx.createOscillator();
             osc.type = 'sine';
             osc.frequency.setValueAtTime(880, ctx.currentTime);
             osc.connect(ctx.destination);
@@ -799,11 +805,79 @@
     }
 
     function stopSound() {
-      var sound = document.getElementById('order-sound');
+      const sound = document.getElementById('order-sound');
       if (sound) {
         sound.pause();
         sound.currentTime = 0;
       }
+    }
+
+    // 1. SESSION MANAGEMENT
+    function checkRiderSession() {
+      const saved = localStorage.getItem('baba_logged_rider');
+      if (saved) {
+        loggedRider = JSON.parse(saved);
+        document.getElementById('login-screen').style.display = 'none';
+        setupRiderDashboard();
+      } else {
+        document.getElementById('login-screen').style.display = 'flex';
+      }
+    }
+
+    function selectLoginRole(role) {
+      selectedLoginRole = role;
+      document.getElementById('btn-role-express').className = role === 'EXPRESS' ? 'role-btn active' : 'role-btn';
+      document.getElementById('btn-role-super').className = role === 'SUPER' ? 'role-btn active' : 'role-btn';
+    }
+
+    async function performRiderLogin() {
+      const phone = document.getElementById('login-phone').value.trim();
+      const pass = document.getElementById('login-pass').value.trim();
+
+      if (!phone || !pass) return alert('Kripya mobile number aur password bharein!');
+
+      const { data, error } = await _supabase
+        .from('riders')
+        .select('*')
+        .eq('phone', phone)
+        .eq('password', pass)
+        .single();
+
+      if (error || !data) {
+        return alert('❌ Galat Mobile Number ya Password! Admin se apna password check karwayein.');
+      }
+
+      if (data.rider_type !== selectedLoginRole) {
+        return alert(`⚠️ Aapka account "${data.rider_type === 'SUPER' ? 'Super Rider' : 'Normal Express Rider'}" registered hai. Sahi role select karein!`);
+      }
+
+      loggedRider = data;
+      localStorage.setItem('baba_logged_rider', JSON.stringify(data));
+      document.getElementById('login-screen').style.display = 'none';
+      setupRiderDashboard();
+    }
+
+    function performRiderLogout() {
+      if (!confirm('Kya aap logout karna chahte hain?')) return;
+      localStorage.removeItem('baba_logged_rider');
+      loggedRider = null;
+      document.getElementById('login-screen').style.display = 'flex';
+      stopSound();
+    }
+
+    function setupRiderDashboard() {
+      document.getElementById('logged-rider-name').innerText = `${loggedRider.name} (${loggedRider.phone})`;
+      const isSuper = loggedRider.rider_type === 'SUPER';
+      document.getElementById('app-title-display').innerText = isSuper ? 'BABA SUPER RIDER 👑' : 'BABA RIDER 🛵';
+      document.getElementById('role-tag-display').innerHTML = isSuper ? '<span style="color:#a5b4fc;">👑 Super Rider (24 Hr Dedicated)</span>' : '<span style="color:#38bdf8;">⚡ Normal Express Rider</span>';
+
+      renderDutyUI();
+      initNotificationPermission();
+      if (isRiderOnline) {
+        requestWakeLock();
+        updateRiderLiveGPS();
+      }
+      fetchOrders();
     }
 
     function toggleDuty() {
@@ -823,9 +897,9 @@
     }
 
     function renderDutyUI() {
-      var dot = document.getElementById('online-indicator');
-      var txt = document.getElementById('online-status-text');
-      var box = document.getElementById('duty-btn');
+      const dot = document.getElementById('online-indicator');
+      const txt = document.getElementById('online-text');
+      const box = document.getElementById('duty-btn');
       if (!dot || !txt || !box) return;
 
       if (isRiderOnline) {
@@ -839,50 +913,21 @@
       }
     }
 
-    // SWITCH BETWEEN NORMAL EXPRESS RIDER & SUPER RIDER
-    function changeRiderProfile(role) {
-      activeRiderRole = role;
-      localStorage.setItem('baba_active_rider_role', role);
-      updateRiderRoleUI();
-      stopSound();
-      lastKnownAlertId = null;
-      fetchOrders();
-    }
-
-    function updateRiderRoleUI() {
-      var badge = document.getElementById('current-rider-badge');
-      var select = document.getElementById('rider-profile-select');
-      var appTitle = document.getElementById('rider-app-title');
-      var appSubtitle = document.getElementById('rider-app-subtitle');
-
-      if (select) select.value = activeRiderRole;
-
-      if (activeRiderRole === 'SUPER') {
-        if (badge) badge.innerHTML = '<span style="color:#a5b4fc;">👑 SUPER RIDER (24 HR MULTI)</span>';
-        if (appTitle) appTitle.innerHTML = 'BABA SUPER RIDER 👑';
-        if (appSubtitle) appSubtitle.innerHTML = '24-Hour Multi-Order Logistics';
-      } else {
-        if (badge) badge.innerHTML = '<span style="color:#38bdf8;">🛵 NORMAL EXPRESS RIDER</span>';
-        if (appTitle) appTitle.innerHTML = 'BABA RIDER 🛵';
-        if (appSubtitle) appSubtitle.innerHTML = '10-20 Min Express Partner';
-      }
-    }
-
     function calculateDistanceInMeters(lat1, lon1, lat2, lon2) {
       if (!lat1 || !lon1 || !lat2 || !lon2) return 999999;
-      var R = 6371e3;
-      var dLat = (lat2 - lat1) * Math.PI / 180;
-      var dLon = (lon2 - lon1) * Math.PI / 180;
-      var a = 
+      const R = 6371e3;
+      const dLat = (lat2 - lat1) * Math.PI / 180;
+      const dLon = (lon2 - lon1) * Math.PI / 180;
+      const a = 
         Math.sin(dLat/2) * Math.sin(dLat/2) +
         Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * 
         Math.sin(dLon/2) * Math.sin(dLon/2);
-      var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
       return Math.round(R * c);
     }
 
     function updateRiderLiveGPS() {
-      if (navigator.geolocation && isRiderOnline) {
+      if (navigator.geolocation && isRiderOnline && loggedRider) {
         navigator.geolocation.getCurrentPosition(function(pos) {
           riderCurrentCoords = {
             lat: pos.coords.latitude,
@@ -892,7 +937,7 @@
           _supabase.from('riders').update({
             current_lat: riderCurrentCoords.lat,
             current_lng: riderCurrentCoords.lng
-          }).eq('id', 1).then(function(){});
+          }).eq('id', loggedRider.id).then(function(){});
           
           renderOrdersList();
         }, function(err){}, { enableHighAccuracy: true });
@@ -902,17 +947,17 @@
     function compressImage(file, maxWidth, quality) {
       maxWidth = maxWidth || 480; quality = quality || 0.45;
       return new Promise(function(resolve, reject) {
-        var reader = new FileReader();
+        const reader = new FileReader();
         reader.readAsDataURL(file);
         reader.onload = function(event) {
-          var img = new Image();
+          const img = new Image();
           img.src = event.target.result;
           img.onload = function() {
-            var canvas = document.createElement('canvas');
-            var width = img.width, height = img.height;
+            const canvas = document.createElement('canvas');
+            let width = img.width, height = img.height;
             if (width > maxWidth) { height = Math.round((height * maxWidth) / width); width = maxWidth; }
             canvas.width = width; canvas.height = height;
-            var ctx = canvas.getContext('2d');
+            const ctx = canvas.getContext('2d');
             ctx.drawImage(img, 0, 0, width, height);
             resolve(canvas.toDataURL('image/jpeg', quality));
           };
@@ -920,42 +965,39 @@
       });
     }
 
-    // 🔒 STRICT ORDER ISOLATION ENGINE
+    // 🔒 STRICT ROLE-BASED ORDER ENGINE
     async function fetchOrders() {
+      if (!loggedRider) return;
       try {
-        var { data, error } = await _supabase.from('orders').select('*').order('id', { ascending: false });
+        const { data, error } = await _supabase.from('orders').select('*').order('id', { ascending: false });
         if (error) return;
-        var newOrders = data || [];
+        const newOrders = data || [];
         
-        // 1. FILTER ORDERS ACCORDING TO ACTIVE RIDER ROLE
-        var roleFilteredOrders = newOrders.filter(function(o) {
-          var is24Hr = (o.delivery_type === '24_HOURS');
-          if (activeRiderRole === 'SUPER') {
-            // Super rider gets ONLY 24_HOURS orders
-            return is24Hr;
-          } else {
-            // Normal rider gets ONLY EXPRESS orders (never 24_HOURS)
-            return !is24Hr;
-          }
+        const isSuper = (loggedRider.rider_type === 'SUPER');
+
+        // SUPER RIDER gets ONLY 24_HOURS (Multi-orders allowed)
+        // NORMAL RIDER gets ONLY EXPRESS orders
+        const roleFilteredOrders = newOrders.filter(function(o) {
+          const is24Hr = (o.delivery_type === '24_HOURS');
+          return isSuper ? is24Hr : !is24Hr;
         });
 
-        // 2. ALERT SOUND LOGIC
         if (isRiderOnline) {
-          var pendingAlertOrders = roleFilteredOrders.filter(function(o) {
-            var s = (o.status || '').toLowerCase();
+          const pendingAlertOrders = roleFilteredOrders.filter(function(o) {
+            const s = (o.status || '').toLowerCase();
             return (s.includes('placed') || s.includes('paid')) && !s.includes('cancelled') && !s.includes('out') && !s.includes('delivered') && !s.includes('arrived');
           });
 
-          var eligibleReturns = (activeRiderRole !== 'SUPER') ? roleFilteredOrders.filter(function(o) {
+          const eligibleReturns = (!isSuper) ? roleFilteredOrders.filter(function(o) {
             if (o.return_status === 'Approved' && o.return_lat && o.return_lng && riderCurrentCoords) {
-              var dist = calculateDistanceInMeters(riderCurrentCoords.lat, riderCurrentCoords.lng, o.return_lat, o.return_lng);
+              const dist = calculateDistanceInMeters(riderCurrentCoords.lat, riderCurrentCoords.lng, o.return_lat, o.return_lng);
               return dist <= 500;
             }
             return false;
           }) : [];
 
           if (pendingAlertOrders.length > 0 || eligibleReturns.length > 0) {
-            var topOrder = eligibleReturns[0] || pendingAlertOrders[0];
+            const topOrder = eligibleReturns[0] || pendingAlertOrders[0];
             if (lastKnownAlertId !== topOrder.id) {
               playSound(topOrder.total_amount, !!eligibleReturns[0]);
               lastKnownAlertId = topOrder.id;
@@ -976,11 +1018,11 @@
     }
 
     function updateStats() {
-      var active = allRiderOrders.filter(function(o) { 
-        var st = (o.status || '').toLowerCase();
+      const active = allRiderOrders.filter(function(o) { 
+        const st = (o.status || '').toLowerCase();
         return !st.includes('delivered') && !st.includes('cancelled'); 
       });
-      var delivered = allRiderOrders.filter(function(o) { 
+      const delivered = allRiderOrders.filter(function(o) { 
         return (o.status || '').toLowerCase().includes('delivered'); 
       });
       document.getElementById('stat-active-count').innerText = active.length;
@@ -997,14 +1039,14 @@
 
     // 📍 500M GEOFENCE ARRIVED HANDLER
     async function markRiderArrived(orderId) {
-      var { error } = await _supabase.from('orders').update({
+      const { error } = await _supabase.from('orders').update({
         status: 'Arrived'
       }).eq('id', orderId);
 
       if (error) {
         alert('Status update error: ' + error.message);
       } else {
-        alert('🔔 Grahak ke phone par madhur bell chime baj gaya hai! Ab payment verify karein.');
+        alert('🔔 Grahak ke phone par bell baj gaya hai! Ab payment verify karein.');
         fetchOrders();
       }
     }
@@ -1016,13 +1058,13 @@
 
     // 🚀 COD SLIDER LOGIC INITIALIZER
     function initCodSlider(orderId) {
-      var thumb = document.getElementById('slide-thumb-' + orderId);
-      var track = document.getElementById('slide-track-' + orderId);
+      const thumb = document.getElementById('slide-thumb-' + orderId);
+      const track = document.getElementById('slide-track-' + orderId);
       if (!thumb || !track) return;
 
-      var isDragging = false;
-      var startX = 0;
-      var maxSlide = track.offsetWidth - thumb.offsetWidth - 4;
+      let isDragging = false;
+      let startX = 0;
+      const maxSlide = track.offsetWidth - thumb.offsetWidth - 4;
 
       function onStart(e) {
         isDragging = true;
@@ -1036,8 +1078,8 @@
       function onMove(e) {
         if (!isDragging) return;
         if (e.preventDefault) e.preventDefault();
-        var clientX = e.touches ? e.touches[0].clientX : e.clientX;
-        var currentX = clientX - startX;
+        const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+        let currentX = clientX - startX;
         if (currentX < 2) currentX = 2;
         if (currentX > maxSlide) currentX = maxSlide;
         thumb.style.left = currentX + 'px';
@@ -1075,21 +1117,21 @@
 
     // 📱 VERIFY ONLINE QR PAYMENT
     async function verifyAndConfirmOnlineQr(orderId) {
-      var utrInput = document.getElementById('qr-utr-input-' + orderId);
-      var utrVal = utrInput ? utrInput.value.trim() : '';
+      const utrInput = document.getElementById('qr-utr-input-' + orderId);
+      const utrVal = utrInput ? utrInput.value.trim() : '';
 
       if (!utrVal || utrVal.length < 8) {
         alert('❌ Kripya grahak ke phone se dekh kar 12-digit UTR / Ref No. darj karein!');
         return;
       }
 
-      var btn = document.getElementById('btn-qr-verify-' + orderId);
+      const btn = document.getElementById('btn-qr-verify-' + orderId);
       if (btn) {
         btn.disabled = true;
         btn.innerText = 'Verifying Payment... ⏳';
       }
 
-      var { error } = await _supabase.from('orders').update({
+      const { error } = await _supabase.from('orders').update({
         payment_mode: 'Online UPI (Door QR)',
         transaction_id: utrVal,
         status: 'Paid Online (Verified at Door)'
@@ -1110,16 +1152,16 @@
     }
 
     function renderOrdersList() {
-      var container = document.getElementById('orders-container');
-      if (!container) return;
+      const container = document.getElementById('orders-container');
+      if (!container || !loggedRider) return;
       
-      var filtered = currentTab === 'active' 
+      const filtered = currentTab === 'active' 
         ? allRiderOrders.filter(function(o) { 
-            var st = (o.status || '').toLowerCase();
-            var isPendingReturn = o.return_status === 'Approved';
+            const st = (o.status || '').toLowerCase();
+            const isPendingReturn = o.return_status === 'Approved';
             if (isPendingReturn) {
               if (riderCurrentCoords && o.return_lat && o.return_lng) {
-                var dist = calculateDistanceInMeters(riderCurrentCoords.lat, riderCurrentCoords.lng, o.return_lat, o.return_lng);
+                const dist = calculateDistanceInMeters(riderCurrentCoords.lat, riderCurrentCoords.lng, o.return_lat, o.return_lng);
                 return dist <= 500;
               }
               return false;
@@ -1127,40 +1169,40 @@
             return !st.includes('delivered') && !st.includes('cancelled'); 
           })
         : allRiderOrders.filter(function(o) { 
-            var st = (o.status || '').toLowerCase();
+            const st = (o.status || '').toLowerCase();
             return st.includes('delivered') || st.includes('cancelled') || o.return_status === 'Returned'; 
           });
 
       if (filtered.length === 0) {
         container.innerHTML = '<div class="empty-msg">' + 
-          (activeRiderRole === 'SUPER' 
+          (loggedRider.rider_type === 'SUPER' 
             ? '👑 अभी कोई 24 घंटे का पेंडिंग सुपर ऑर्डर नहीं है।' 
             : '🎉 अभी कोई 10-20 मिनट का एक्टिव एक्सप्रेस ऑर्डर नहीं है।') + '</div>';
         return;
       }
 
       container.innerHTML = filtered.map(function(order) {
-        var items = [];
+        let items = [];
         try { items = Array.isArray(order.items) ? order.items : JSON.parse(order.items || '[]'); } catch(e){}
-        var st = (order.status || '').toLowerCase();
-        var isDispatched = st.includes('out') || st.includes('running');
-        var isArrived = st === 'arrived';
-        var isDelivered = st.includes('delivered');
-        var isCancelled = st.includes('cancelled');
-        var isReturnOrder = order.return_status === 'Approved';
-        var is24Hr = (order.delivery_type === '24_HOURS');
-        var isCod = (order.payment_mode || '').toUpperCase().includes('COD');
+        const st = (order.status || '').toLowerCase();
+        const isDispatched = st.includes('out') || st.includes('running');
+        const isArrived = st === 'arrived';
+        const isDelivered = st.includes('delivered');
+        const isCancelled = st.includes('cancelled');
+        const isReturnOrder = order.return_status === 'Approved';
+        const is24Hr = (order.delivery_type === '24_HOURS');
+        const isCod = (order.payment_mode || '').toUpperCase().includes('COD');
         
-        var currentChoice = selectedPayModeByRider[order.id] || null;
-        var isPaymentDone = paymentConfirmedOrders[order.id] || false;
-        var verifiedUtr = qrVerifyUtrMap[order.id] || order.transaction_id || '';
+        const currentChoice = selectedPayModeByRider[order.id] || null;
+        const isPaymentDone = paymentConfirmedOrders[order.id] || false;
+        const verifiedUtr = qrVerifyUtrMap[order.id] || order.transaction_id || '';
 
-        var rawAddress = order.delivery_address || 'Address not specified';
-        var cleanAddress = rawAddress;
-        var mapNavUrl = null;
-        var custLat = null, custLng = null;
+        const rawAddress = order.delivery_address || 'Address not specified';
+        let cleanAddress = rawAddress;
+        let mapNavUrl = null;
+        let custLat = null, custLng = null;
 
-        var gpsMatch = rawAddress.match(/\[GPS:\s*([-+]?[0-9]*\.?[0-9]+),\s*([-+]?[0-9]*\.?[0-9]+)\]/i);
+        const gpsMatch = rawAddress.match(/\[GPS:\s*([-+]?[0-9]*\.?[0-9]+),\s*([-+]?[0-9]*\.?[0-9]+)\]/i);
         if (gpsMatch && gpsMatch[1] && gpsMatch[2]) {
           custLat = parseFloat(gpsMatch[1]);
           custLng = parseFloat(gpsMatch[2]);
@@ -1174,22 +1216,22 @@
           mapNavUrl = 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(cleanAddress);
         }
 
-        var metersToCust = 999999;
+        let metersToCust = 999999;
         if (custLat && custLng && riderCurrentCoords) {
           metersToCust = calculateDistanceInMeters(riderCurrentCoords.lat, riderCurrentCoords.lng, custLat, custLng);
         }
-        var canArrive = metersToCust <= 500;
+        const canArrive = metersToCust <= 500;
 
-        var distText = '';
+        let distText = '';
         if (isReturnOrder && riderCurrentCoords && order.return_lat && order.return_lng) {
           distText = ' • ' + metersToCust + 'm door';
         }
 
-        var itemsListHtml = items.map(function(it) {
+        const itemsListHtml = items.map(function(it) {
           return '<div class="item-summary-line"><span>' + (it.name || 'Item') + ' × ' + (it.qty || 1) + '</span></div>';
         }).join('');
 
-        var upiQrUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=' + 
+        const upiQrUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=' + 
           encodeURIComponent('upi://pay?pa=' + STORE_UPI_ID + '&pn=BABA%20FOOD&am=' + order.total_amount + '&cu=INR&tn=Order-' + order.id);
 
         return '<div class="order-card ' + (isReturnOrder ? 'return-pulse' : is24Hr ? 'super-card' : (!isDispatched && !isArrived && !isDelivered && !isCancelled ? 'new-pulse' : '')) + '">' +
@@ -1311,9 +1353,9 @@
       }).join('');
 
       filtered.forEach(function(o) {
-        var st = (o.status || '').toLowerCase();
-        var isCod = (o.payment_mode || '').toUpperCase().includes('COD');
-        var choice = selectedPayModeByRider[o.id];
+        const st = (o.status || '').toLowerCase();
+        const isCod = (o.payment_mode || '').toUpperCase().includes('COD');
+        const choice = selectedPayModeByRider[o.id];
         if (st === 'arrived' && isCod && choice === 'CASH' && !paymentConfirmedOrders[o.id]) {
           setTimeout(function() { initCodSlider(o.id); }, 50);
         }
@@ -1327,10 +1369,10 @@
       document.getElementById('chat-order-subtitle').innerText = 'Order #ORD-' + orderId;
       document.getElementById('rider-chat-drawer').classList.add('active');
 
-      var box = document.getElementById('chat-box-content');
+      const box = document.getElementById('chat-box-content');
       box.innerHTML = '<div style="text-align:center; color:#94a3b8; font-size:12px; padding:20px;">Messages load ho rahe hain...</div>';
 
-      var { data: messages, error } = await _supabase
+      const { data: messages, error } = await _supabase
         .from('order_chats')
         .select('*')
         .eq('order_id', orderId)
@@ -1367,14 +1409,14 @@
     }
 
     function renderRiderChatBubble(msg) {
-      var box = document.getElementById('chat-box-content');
+      const box = document.getElementById('chat-box-content');
       if (box.children.length === 1 && box.children[0].innerText.includes('Grahak se baat karein')) {
         box.innerHTML = '';
       }
-      var bubble = document.createElement('div');
+      const bubble = document.createElement('div');
       bubble.className = 'chat-msg-row ' + msg.sender_type;
 
-      var content = '';
+      let content = '';
       if (msg.image_url) {
         content += '<img src="' + msg.image_url + '" style="width:180px; max-height:220px; object-fit:cover; border-radius:10px; margin-bottom:4px; display:block; cursor:pointer;" onclick="window.open(this.src)">';
       }
@@ -1396,21 +1438,42 @@
       activeChatOrderId = null;
     }
 
+    async function handleRiderChatPhotoSelected(input) {
+      if (!input.files || !input.files[0] || !activeChatOrderId) return;
+      const file = input.files[0];
+      const base64Img = await compressImage(file, 600, 0.5);
+
+      renderRiderChatBubble({ sender_type: 'rider', image_url: base64Img, message: '' });
+
+      const { error } = await _supabase.from('order_chats').insert([{
+        order_id: activeChatOrderId,
+        sender_type: 'rider',
+        sender: 'rider',
+        sender_name: loggedRider ? loggedRider.name : 'Rider',
+        image_url: base64Img,
+        message: null
+      }]);
+
+      if (error) alert('Photo bhejne me dikkat aayi: ' + error.message);
+      input.value = '';
+    }
+
     async function sendRiderMsg() {
-      var input = document.getElementById('chat-input-field');
-      var text = input.value.trim();
+      const input = document.getElementById('chat-input-field');
+      const text = input.value.trim();
       if (!text || !activeChatOrderId) return;
 
       input.value = '';
 
       renderRiderChatBubble({ sender_type: 'rider', message: text });
 
-      var { error } = await _supabase.from('order_chats').insert([{
+      const { error } = await _supabase.from('order_chats').insert([{
         order_id: activeChatOrderId,
         sender_type: 'rider',
         sender: 'rider',
-        sender_name: 'Rider',
-        message: text
+        sender_name: loggedRider ? loggedRider.name : 'Rider',
+        message: text,
+        image_url: null
       }]);
 
       if (error) {
@@ -1422,7 +1485,7 @@
       if (!confirm('क्या आपने ग्राहक के सामान का फोटो से मिलान कर लिया है? रिटर्न पिकअप पूरा करें?')) return;
       stopSound();
 
-      var { error } = await _supabase.from('orders').update({
+      const { error } = await _supabase.from('orders').update({
         return_status: 'Returned',
         status: 'Returned'
       }).eq('id', orderId);
@@ -1454,10 +1517,11 @@
     }
 
     async function confirmPickupWithPhoto() {
-      var { error } = await _supabase.from('orders').update({
+      const isSuper = loggedRider && (loggedRider.rider_type === 'SUPER');
+      const { error } = await _supabase.from('orders').update({
         status: 'Out for Delivery',
         pickup_proof_photo: base64PickupPhoto,
-        estimated_delivery_time: activeRiderRole === 'SUPER' ? '24 Hours' : '15-20 mins'
+        estimated_delivery_time: isSuper ? '24 Hours' : '15-20 mins'
       }).eq('id', selectedOrderForPickup);
 
       if (error) alert('Error: ' + error.message);
@@ -1486,12 +1550,12 @@
     }
 
     async function confirmDeliveryWithProof() {
-      var entered = document.getElementById('input-delivery-otp').value.trim();
+      const entered = document.getElementById('input-delivery-otp').value.trim();
       if (selectedOrderForDelivery.otp && entered !== selectedOrderForDelivery.otp) {
         return alert('❌ Galat OTP! Grahak se sahi 4-digit code lein.');
       }
 
-      var { error } = await _supabase.from('orders').update({ 
+      const { error } = await _supabase.from('orders').update({ 
         status: 'Delivered', 
         delivery_proof_photo: base64DeliveryPhoto 
       }).eq('id', selectedOrderForDelivery.id);
@@ -1505,16 +1569,7 @@
     }
 
     window.addEventListener('DOMContentLoaded', function() {
-      renderDutyUI();
-      updateRiderRoleUI();
-      initNotificationPermission();
-      if (isRiderOnline) {
-        requestWakeLock();
-        updateRiderLiveGPS();
-      }
-      fetchOrders();
-      setInterval(updateRiderLiveGPS, 7000);
-      setInterval(fetchOrders, 5000);
+      checkRiderSession();
     });
   </script>
 </body>
