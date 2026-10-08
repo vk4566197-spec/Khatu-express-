@@ -111,14 +111,24 @@
     .btn-success { background: #059669; border: none; }
     .btn-danger { background: #dc2626; border: none; }
 
+    /* TWO PHOTO COMPARISON BOX */
+    .compare-photo-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 10px 0;
+      background: #0f172a; padding: 12px; border-radius: 12px; border: 1px dashed #ef4444;
+    }
+    .photo-card-box { text-align: center; }
+    .photo-card-box span { font-size: 11px; font-weight: 800; color: #94a3b8; display: block; margin-bottom: 4px; }
+    .compare-img {
+      width: 100%; height: 130px; object-fit: cover; border-radius: 10px;
+      border: 1.5px solid #475569; cursor: pointer; transition: transform 0.2s;
+    }
+    .compare-img:hover { transform: scale(1.02); }
+
     .radar-card {
       background: #151f32; border: 1.5px solid #38bdf8; border-radius: 14px;
       padding: 14px; margin-bottom: 12px; box-shadow: 0 4px 15px rgba(56, 189, 248, 0.15);
     }
-    .radar-card.super-rider-radar {
-      border-color: #818cf8;
-      background: #1a1b3a;
-    }
+    .radar-card.super-rider-radar { border-color: #818cf8; background: #1a1b3a; }
     .live-dot {
       width: 10px; height: 10px; border-radius: 50%; background: #10b981;
       display: inline-block; box-shadow: 0 0 10px #10b981; margin-right: 4px;
@@ -142,7 +152,7 @@
   <div class="audio-gate" id="audio-gate">
     <div style="font-size: 34px;">🔔</div>
     <h2 style="margin-top: 10px; font-weight: 900; font-size: 20px;">BABA Master Dashboard</h2>
-    <p style="font-size: 13px; color: #94a3b8; margin-top: 8px;">Naye order aane par sound alert ke liye click karein:</p>
+    <p style="font-size: 13px; color: #94a3b8; margin-top: 8px;">Naye order sound alert ke liye dashboard chalu karein:</p>
     <button class="gate-btn" onclick="startMasterAudioGate()">🎧 Start Dashboard & Audio</button>
   </div>
 
@@ -151,7 +161,7 @@
       <img src="logo.png" alt="Logo" onerror="this.style.display='none'">
       <div>
         <div class="brand-title">BABA COMMAND TOWER 👑</div>
-        <div class="brand-sub">Master Store Control</div>
+        <div class="brand-sub">Master Store Control (2 Days Auto-Purge)</div>
       </div>
     </div>
     <div class="header-actions">
@@ -169,12 +179,12 @@
       <div class="stat-title">24 Hr Orders</div>
     </div>
     <div class="stat-box">
-      <div class="stat-val" id="stat-riders-online" style="color:#10b981;">0</div>
-      <div class="stat-title">Riders</div>
+      <div class="stat-val" id="stat-return-reqs" style="color:#ef4444;">0</div>
+      <div class="stat-title">Returns</div>
     </div>
     <div class="stat-box">
       <div class="stat-val" id="stat-revenue">₹0</div>
-      <div class="stat-title">Revenue</div>
+      <div class="stat-title">2-Day Sales</div>
     </div>
   </div>
 
@@ -182,7 +192,7 @@
     <button class="tab-btn active" id="tab-btn-orders" onclick="switchAdminTab('orders')">📦 Orders (<span id="count-orders">0</span>)</button>
     <button class="tab-btn" id="tab-btn-returns" onclick="switchAdminTab('returns')" style="color:#f87171;">🚨 Returns (<span id="count-returns">0</span>)</button>
     <button class="tab-btn" id="tab-btn-radar" onclick="switchAdminTab('radar')" style="color:#38bdf8;">🛰️ Live Radar</button>
-    <button class="tab-btn" id="tab-btn-history" onclick="switchAdminTab('history')">📜 History</button>
+    <button class="tab-btn" id="tab-btn-history" onclick="switchAdminTab('history')">📜 2-Day History</button>
     <button class="tab-btn" id="tab-btn-products" onclick="switchAdminTab('products')">🍔 Menu / Stock</button>
     <button class="tab-btn" id="tab-btn-riders" onclick="switchAdminTab('riders')">🛵 Riders & Passwords</button>
     <button class="tab-btn" id="tab-btn-coupons" onclick="switchAdminTab('coupons')">🎟️ Coupons</button>
@@ -201,9 +211,11 @@
       <div id="orders-list-box"><div style="text-align:center; padding:30px; color:#94a3b8;">Orders load ho rahe hain...</div></div>
     </div>
 
-    <!-- 2. RETURN MANAGEMENT -->
+    <!-- 2. RETURN MANAGEMENT (2 PHOTOS SIDE-BY-SIDE: DELIVERY VS RETURN) -->
     <div id="section-returns" style="display:none;">
-      <div class="sec-title" style="color:#ef4444;"><span>🚨 Customer Return Requests</span></div>
+      <div class="sec-title" style="color:#ef4444;">
+        <span>🚨 Customer Return Requests (2-Photo Verify)</span>
+      </div>
       <div id="returns-list-box"><div style="text-align:center; padding:30px; color:#94a3b8;">Koi return request pending nahi hai.</div></div>
     </div>
 
@@ -216,12 +228,13 @@
       <div id="radar-list-box"><div style="text-align:center; padding:30px; color:#94a3b8;">Riders location load ho rahi hai...</div></div>
     </div>
 
-    <!-- 4. PAST ORDERS HISTORY -->
+    <!-- 4. PAST ORDERS HISTORY (COMPLETE DETAILS BREAKDOWN - LAST 2 DAYS) -->
     <div id="section-history" style="display:none;">
       <div class="sec-title">
-        <span>📜 All Past Orders</span>
-        <input type="text" id="history-search" class="admin-input" style="max-width:200px; margin-bottom:0;" placeholder="Search Order..." oninput="renderHistory()">
+        <span>📜 All Past Orders (Past 48 Hours)</span>
+        <input type="text" id="history-search" class="admin-input" style="max-width:220px; margin-bottom:0;" placeholder="Search Order/Phone/Customer..." oninput="renderHistory()">
       </div>
+      <div style="font-size:11px; color:#94a3b8; margin-bottom:10px;">ℹ️ 2 din se purana data automatic delete ho jata hai taaki system fast rahe.</div>
       <div id="history-list-box"></div>
     </div>
 
@@ -251,22 +264,22 @@
       <div id="inventory-list-box"></div>
     </div>
 
-    <!-- 6. RIDERS & SUPER RIDERS (WITH PASSWORD ENTRY & VIEW) -->
+    <!-- 6. RIDERS & PASSWORDS -->
     <div id="section-riders" style="display:none;">
       <div class="section-card">
-        <div class="sec-title">➕ Naya Rider Jodein (Set Password)</div>
+        <div class="sec-title">➕ Naya Rider Jodein</div>
         <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
-          <input type="text" id="r-name" class="admin-input" placeholder="Rider Ka Naam *">
+          <input type="text" id="r-name" class="admin-input" placeholder="Rider Name *">
           <input type="tel" id="r-phone" class="admin-input" placeholder="Mobile Number (10 Digit) *" maxlength="10">
-          <input type="text" id="r-bike" class="admin-input" placeholder="Vehicle No (e.g. UP14AB1234) *" style="text-transform:uppercase;">
-          <input type="text" id="r-pass" class="admin-input" placeholder="Login Password Set Karein *" style="border-color:#f59e0b; font-weight:800;">
-          <input type="text" id="r-address" class="admin-input" placeholder="Rider Ka Address" style="grid-column:1 / -1;">
+          <input type="text" id="r-bike" class="admin-input" placeholder="Vehicle No *" style="text-transform:uppercase;">
+          <input type="text" id="r-pass" class="admin-input" placeholder="Login Password *" style="border-color:#f59e0b; font-weight:800;">
+          <input type="text" id="r-address" class="admin-input" placeholder="Rider Address" style="grid-column:1 / -1;">
           <select id="r-type" class="admin-input" style="grid-column: 1 / -1; border-color:#818cf8; font-weight:800;">
             <option value="EXPRESS">⚡ Normal Express Rider (10-20 Min)</option>
             <option value="SUPER">👑 Super Rider (24 Hours Dedicated)</option>
           </select>
         </div>
-        <button class="btn-admin btn-success" style="width:100%; margin-top:4px;" onclick="addNewRider()">+ Rider Register Karein</button>
+        <button class="btn-admin btn-success" style="width:100%;" onclick="addNewRider()">+ Rider Register Karein</button>
       </div>
       <div class="sec-title">🛵 Registered Riders & Passwords</div>
       <div id="riders-list-box"></div>
@@ -277,13 +290,12 @@
       <div class="section-card">
         <div class="sec-title">➕ Naya Coupon</div>
         <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
-          <input type="text" id="c-code" class="admin-input" placeholder="Code (e.g. BABA50)" style="text-transform:uppercase;">
+          <input type="text" id="c-code" class="admin-input" placeholder="Code" style="text-transform:uppercase;">
           <input type="number" id="c-disc" class="admin-input" placeholder="Discount (₹)">
           <input type="number" id="c-min" class="admin-input" placeholder="Min Order (₹)">
         </div>
         <button class="btn-admin btn-success" style="width:100%;" onclick="addNewCoupon()">+ Coupon Banayein</button>
       </div>
-      <div class="sec-title">🎟️ Active Coupons</div>
       <div id="coupons-list-box"></div>
     </div>
 
@@ -387,9 +399,24 @@
     }
 
     document.addEventListener('DOMContentLoaded', () => {
+      autoPurgeOldOrders();
       fetchAdminData();
       setupRealtime();
     });
+
+    // 🧹 AUTOMATIC 2-DAY DATA CLEANER (PURGES COMPLETED/CANCELLED ORDERS OLDER THAN 48 HOURS)
+    async function autoPurgeOldOrders() {
+      try {
+        const twoDaysAgo = new Date(Date.now() - (2 * 24 * 60 * 60 * 1000)).toISOString();
+        await _supabase
+          .from('orders')
+          .delete()
+          .lt('created_at', twoDaysAgo)
+          .in('status', ['Delivered', 'Cancelled', 'Returned']);
+      } catch (err) {
+        console.warn('Auto purge error:', err.message);
+      }
+    }
 
     async function fetchAdminData() {
       await Promise.all([loadSettings(), fetchOrders(), fetchProducts(), fetchRiders(), fetchCoupons(), fetchHubs()]);
@@ -474,7 +501,6 @@
     async function fetchRiders() {
       const { data } = await _supabase.from('riders').select('*').order('id', { ascending: true });
       allRiders = data || [];
-      document.getElementById('stat-riders-online').innerText = allRiders.length;
       renderRiders();
       renderRadar();
     }
@@ -510,7 +536,7 @@
       document.getElementById('count-returns').innerText = returns.length;
     }
 
-    // 1. ORDERS RENDER
+    // 1. LIVE ORDERS
     function renderOrders() {
       const box = document.getElementById('orders-list-box');
       const activeOrders = allOrders.filter(o => !o.status.toLowerCase().includes('delivered') && !o.status.toLowerCase().includes('cancelled'));
@@ -600,7 +626,7 @@
       fetchOrders();
     }
 
-    // 2. RETURNS
+    // 2. RETURN MANAGEMENT (2 PHOTOS: DELIVERY PROOF VS CUSTOMER RETURN PROOF)
     function renderReturns() {
       const box = document.getElementById('returns-list-box');
       const returns = allOrders.filter(o => o.return_status === 'Requested');
@@ -611,17 +637,39 @@
       box.innerHTML = returns.map(o => `
         <div class="order-item-card return-card-style">
           <div class="order-head">
-            <b>#ORD-${o.id}</b>
-            <span class="ord-badge badge-return">Return Requested</span>
+            <div>
+              <b style="font-size:15px; color:#ef4444;">#ORD-${o.id}</b>
+              <span class="ord-badge badge-return" style="margin-left:6px;">Return Requested</span>
+            </div>
+            <div style="font-size:15px; font-weight:900; color:#ef4444;">₹${o.total_amount}</div>
           </div>
+
           <div class="ord-details-box">
-            <div>👤 ${o.customer_name} (${o.customer_phone})</div>
-            <div>⚠️ Reason: ${o.return_reason || 'NA'}</div>
-            <div>📱 UPI: <b>${o.return_customer_upi || 'NA'}</b></div>
+            <div>👤 <b>Customer:</b> ${o.customer_name} (📞 <a href="tel:${o.customer_phone}" style="color:#38bdf8;">${o.customer_phone}</a>)</div>
+            <div>📍 <b>Address:</b> ${o.delivery_address}</div>
+            <div style="color:#fca5a5; margin-top:4px;">⚠️ <b>Return Reason:</b> ${o.return_reason || 'Nahi bataya'}</div>
+            <div style="color:#fde047; margin-top:2px;">📱 <b>Refund UPI ID:</b> <b style="background:#451a03; padding:2px 6px; border-radius:4px;">${o.return_customer_upi || 'Nahi di'}</b></div>
           </div>
-          ${o.return_photo_url ? `<img src="${o.return_photo_url}" style="width:100px; height:100px; border-radius:8px; object-fit:cover; margin:6px 0;" onclick="window.open(this.src)">` : ''}
-          <div style="display:flex; gap:8px;">
-            <button class="btn-admin btn-success" style="flex:2;" onclick="approveReturnRequest(${o.id})">✓ Approve (500m Pickup)</button>
+
+          <!-- TWO PHOTO SIDE-BY-SIDE VERIFICATION -->
+          <div class="compare-photo-grid">
+            <div class="photo-card-box">
+              <span>1. Delivery Proof Photo (Rider)</span>
+              ${o.delivery_proof_photo ? `
+                <img src="${o.delivery_proof_photo}" class="compare-img" onclick="window.open(this.src)" title="Click to view full photo">
+              ` : '<div style="height:130px; display:flex; align-items:center; justify-content:center; background:#1e293b; border-radius:10px; font-size:11px; color:#94a3b8;">No Delivery Photo</div>'}
+            </div>
+            <div class="photo-card-box">
+              <span style="color:#f87171;">2. Return Reason Photo (Customer)</span>
+              ${o.return_photo_url ? `
+                <img src="${o.return_photo_url}" class="compare-img" style="border-color:#ef4444;" onclick="window.open(this.src)" title="Click to view full photo">
+              ` : '<div style="height:130px; display:flex; align-items:center; justify-content:center; background:#1e293b; border-radius:10px; font-size:11px; color:#ef4444;">No Return Photo</div>'}
+            </div>
+          </div>
+
+          <div style="display:flex; gap:8px; margin-top:8px;">
+            <button class="btn-admin" style="background:#0284c7; flex:1;" onclick="openAdminChat(${o.id}, '${o.customer_name}')">💬 Chat with Customer</button>
+            <button class="btn-admin btn-success" style="flex:1.5;" onclick="approveReturnRequest(${o.id})">✓ Approve (500m Pickup)</button>
             <button class="btn-admin btn-danger" style="flex:1;" onclick="rejectReturnRequest(${o.id})">✕ Reject</button>
           </div>
         </div>
@@ -629,17 +677,20 @@
     }
 
     async function approveReturnRequest(id) {
+      if (!confirm('Kya dono photos verify kar li hain? Return approve karein?')) return;
       await _supabase.from('orders').update({ return_status: 'Approved' }).eq('id', id);
-      alert('Return approved!');
+      alert('✅ Return Approved! 500m ke rider ke dashboard par alert jayega.');
       fetchOrders();
     }
 
     async function rejectReturnRequest(id) {
-      await _supabase.from('orders').update({ return_status: 'Rejected' }).eq('id', id);
+      const reason = prompt('Return reject karne ka karan:');
+      if (!reason) return;
+      await _supabase.from('orders').update({ return_status: 'Rejected', cancellation_reason: reason }).eq('id', id);
       fetchOrders();
     }
 
-    // 3. RADAR
+    // 3. LIVE RADAR
     function renderRadar() {
       const box = document.getElementById('radar-list-box');
       box.innerHTML = allRiders.map(r => `
@@ -647,7 +698,7 @@
           <div style="display:flex; justify-content:space-between;">
             <div>
               <span class="live-dot ${r.is_active ? '' : 'offline'}"></span>
-              <b>${r.rider_type === 'SUPER' ? '👑 ' : '🛵 '}${r.name}</b>
+              <b>${r.rider_type === 'SUPER' ? '👑 Super: ' : '🛵 '} ${r.name}</b>
               <span style="font-size:11px; color:#38bdf8;">(${r.vehicle_no || 'NA'})</span>
             </div>
             <span class="ord-badge ${r.is_active ? 'badge-delivered' : 'badge-cancelled'}">${r.is_active ? 'ON DUTY' : 'OFFLINE'}</span>
@@ -658,22 +709,75 @@
       `).join('');
     }
 
-    // 4. HISTORY
+    // 4. ORDER HISTORY (COMPLETE ORDER DETAILS BREAKDOWN)
     function renderHistory() {
       const box = document.getElementById('history-list-box');
-      const past = allOrders.filter(o => o.status.toLowerCase().includes('delivered') || o.status.toLowerCase().includes('cancelled'));
-      box.innerHTML = past.map(o => `
-        <div class="order-item-card">
-          <div class="order-head">
-            <b>#ORD-${o.id}</b>
-            <span class="ord-badge ${o.status.toLowerCase().includes('delivered') ? 'badge-delivered' : 'badge-cancelled'}">${o.status}</span>
+      const query = (document.getElementById('history-search')?.value || '').toLowerCase().trim();
+
+      const past = allOrders.filter(o => {
+        const isPast = o.status.toLowerCase().includes('delivered') || o.status.toLowerCase().includes('cancelled') || o.return_status === 'Returned';
+        const matchQ = (o.id + '').includes(query) || (o.customer_name || '').toLowerCase().includes(query) || (o.customer_phone || '').includes(query);
+        return isPast && matchQ;
+      });
+
+      if (past.length === 0) {
+        box.innerHTML = '<div style="text-align:center; padding:30px; color:#94a3b8;">Pichhle 2 dino me koi order record nahi mila.</div>';
+        return;
+      }
+
+      box.innerHTML = past.map(o => {
+        let items = [];
+        try { items = Array.isArray(o.items) ? o.items : JSON.parse(o.items || '[]'); } catch(e){}
+        const itemsList = items.map(i => `• ${i.name} × ${i.qty} (₹${i.price * i.qty})`).join('<br>');
+
+        const assignedRider = allRiders.find(r => r.id === o.assigned_rider_id);
+        const riderInfoText = assignedRider 
+          ? `${assignedRider.rider_type === 'SUPER' ? '👑 Super Rider: ' : '🛵 Express Rider: '} <b>${assignedRider.name}</b> (📞 <a href="tel:${assignedRider.phone}" style="color:#38bdf8;">${assignedRider.phone}</a> • ${assignedRider.vehicle_no || 'NA'})`
+          : '🛵 Direct Store / Not Assigned';
+
+        return `
+          <div class="order-item-card" style="border-color:#334155;">
+            <div class="order-head">
+              <div>
+                <b style="font-size:15px; color:#38bdf8;">#ORD-${o.id}</b>
+                <span class="ord-badge ${o.status.toLowerCase().includes('delivered') ? 'badge-delivered' : 'badge-cancelled'}" style="margin-left:6px;">${o.status}</span>
+                ${o.delivery_type === '24_HOURS' ? `<span class="ord-badge badge-24hr" style="margin-left:4px;">24 HR</span>` : ''}
+              </div>
+              <div style="text-align:right;">
+                <div style="font-size:16px; font-weight:900; color:#34d399;">₹${o.total_amount}</div>
+                <div style="font-size:10.5px; color:#94a3b8;">${new Date(o.created_at).toLocaleString()}</div>
+              </div>
+            </div>
+
+            <div class="ord-details-box">
+              <div class="ord-row"><span>👤</span> <b>Customer:</b> <span>${o.customer_name} (📞 <a href="tel:${o.customer_phone}" style="color:#38bdf8;">${o.customer_phone}</a>)</span></div>
+              <div class="ord-row"><span>🏠</span> <b>Delivery Address:</b> <span>${o.delivery_address}</span></div>
+              <div class="ord-row"><span>🛵</span> <b>Delivered By:</b> <span>${riderInfoText}</span></div>
+              <div class="ord-row"><span>💳</span> <b>Payment Mode:</b> <span>${o.payment_mode} ${o.transaction_id ? '(UTR: <b>' + o.transaction_id + '</b>)' : ''}</span></div>
+              <div class="ord-row"><span>🔐</span> <b>Delivery Secret OTP:</b> <span>${o.delivery_otp || '----'}</span></div>
+
+              <div style="margin-top:8px; padding-top:6px; border-top:1px dashed #334155;">
+                <b style="color:#38bdf8;">Purchased Items:</b><br>${itemsList || 'No Items'}
+              </div>
+
+              ${o.delivery_proof_photo ? `
+                <div style="margin-top:8px; padding-top:6px; border-top:1px dashed #334155;">
+                  <b style="color:#10b981;">📸 Delivery Proof Photo:</b><br>
+                  <img src="${o.delivery_proof_photo}" style="width:70px; height:70px; border-radius:8px; object-fit:cover; margin-top:4px; border:1px solid #10b981; cursor:pointer;" onclick="window.open(this.src)">
+                </div>
+              ` : ''}
+
+              ${o.cancelled_by ? `
+                <div style="margin-top:6px; color:#f87171; font-weight:800;">
+                  ❌ Cancelled By: ${o.cancelled_by} (${o.cancellation_reason || 'No reason'})
+                </div>
+              ` : ''}
+            </div>
+
+            <button class="btn-admin" style="background:#0284c7; width:100%; margin-top:6px;" onclick="openAdminChat(${o.id}, '${o.customer_name}')">💬 View Complete Chat History</button>
           </div>
-          <div class="ord-details-box">
-            <div>👤 ${o.customer_name} (${o.customer_phone})</div>
-            <div>Total: ₹${o.total_amount} (${o.payment_mode})</div>
-          </div>
-        </div>
-      `).join('');
+        `;
+      }).join('');
     }
 
     // 5. INVENTORY
