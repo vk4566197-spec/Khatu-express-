@@ -24,6 +24,7 @@
       --accent-pink: #ff2a6d;
       --accent-green: #059669;
       --accent-red: #dc2626;
+      --accent-super: #6366f1;
       --bg-slate: #0f172a;
       --card-bg: #1e293b;
       --border-color: #334155;
@@ -89,6 +90,26 @@
     }
     .status-text { font-size: 13px; font-weight: 900; color: #ffffff; }
 
+    /* RIDER PROFILE SELECTION BANNER */
+    .rider-mode-banner {
+      background: #1e1b4b;
+      border-bottom: 1.5px solid #4338ca;
+      padding: 10px 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .rider-select-dropdown {
+      background: #0f172a;
+      border: 1.5px solid #818cf8;
+      color: #ffffff;
+      padding: 6px 10px;
+      border-radius: 10px;
+      font-size: 12px;
+      font-weight: 800;
+      outline: none;
+    }
+
     .stats-bar { 
       display: grid; 
       grid-template-columns: repeat(3, 1fr); 
@@ -131,11 +152,16 @@
       position: relative; 
     }
     .order-card.new-pulse { border-color: #38bdf8; animation: glowCard 1.5s infinite alternate; }
+    .order-card.super-card { border-color: #818cf8; background: #161836; animation: glowSuper 1.5s infinite alternate; }
     .order-card.return-pulse { border-color: #ef4444; background: #23121d; animation: glowReturn 1.5s infinite alternate; }
     
     @keyframes glowCard { 
       0% { box-shadow: 0 0 10px rgba(56, 189, 248, 0.3); } 
       100% { box-shadow: 0 0 20px rgba(56, 189, 248, 0.7); } 
+    }
+    @keyframes glowSuper { 
+      0% { box-shadow: 0 0 10px rgba(129, 140, 248, 0.3); } 
+      100% { box-shadow: 0 0 22px rgba(129, 140, 248, 0.7); } 
     }
     @keyframes glowReturn { 
       0% { box-shadow: 0 0 10px rgba(239, 68, 68, 0.4); } 
@@ -167,6 +193,7 @@
     .tag-delivered { background: #059669; color: #fff; }
     .tag-cancelled { background: #dc2626; color: #fff; }
     .tag-return { background: #ef4444; color: #fff; }
+    .tag-super { background: #6366f1; color: #fff; }
 
     .cust-info-box { 
       background: #0f172a; 
@@ -294,7 +321,7 @@
       box-shadow: none;
     }
 
-    /* PAYMENT MODE SELECTION BOX (CASH OR QR) */
+    /* PAYMENT MODE SELECTION BOX */
     .pay-choice-container {
       background: #1e1b4b;
       border: 1.5px solid #6366f1;
@@ -422,9 +449,7 @@
       margin-top: 10px;
       margin-bottom: 8px;
     }
-    .qr-verify-input:focus {
-      border-color: #38bdf8;
-    }
+    .qr-verify-input:focus { border-color: #38bdf8; }
 
     .modal-bg { 
       position: fixed; 
@@ -588,14 +613,26 @@
     <div class="rider-brand">
       <img src="logo.png" alt="Logo" onerror="this.style.display='none'">
       <div>
-        <div class="brand-title">BABA RIDER 🛵</div>
-        <div class="brand-sub">Express Delivery Partner</div>
+        <div class="brand-title" id="rider-app-title">BABA RIDER 🛵</div>
+        <div class="brand-sub" id="rider-app-subtitle">Express Delivery Partner</div>
       </div>
     </div>
     <div class="status-toggle-box" id="duty-btn" onclick="toggleDuty();">
       <span class="status-dot" id="online-indicator"></span>
       <span class="status-text" id="online-status-text">ONLINE</span>
     </div>
+  </div>
+
+  <!-- RIDER PROFILE SELECTION BANNER -->
+  <div class="rider-mode-banner">
+    <div>
+      <div style="font-size: 11px; color: #a5b4fc; font-weight: 700;">ACTIVE RIDER PROFILE:</div>
+      <div style="font-size: 13px; font-weight: 900; color: #ffffff;" id="current-rider-badge">🛵 Normal Rider</div>
+    </div>
+    <select id="rider-profile-select" class="rider-select-dropdown" onchange="changeRiderProfile(this.value)">
+      <option value="EXPRESS">⚡ Normal Express Rider (10-20 Min)</option>
+      <option value="SUPER">👑 Super Rider (24 Hr Multi-Orders)</option>
+    </select>
   </div>
 
   <!-- STATS BAR -->
@@ -683,6 +720,10 @@
     var currentTab = 'active';
     var allRiderOrders = [];
     var isRiderOnline = localStorage.getItem('baba_rider_duty_status') !== 'OFFLINE';
+    
+    // RIDER TYPE: 'EXPRESS' (10-20 Min) ya 'SUPER' (Dedicated 24 Hours Multi-Orders)
+    var activeRiderRole = localStorage.getItem('baba_active_rider_role') || 'EXPRESS';
+
     var audioUnlocked = false;
     var selectedOrderForDelivery = null;
     var selectedOrderForPickup = null;
@@ -692,10 +733,9 @@
     var wakeLock = null;
     var riderCurrentCoords = null;
 
-    // States for payment method & confirmation
-    var selectedPayModeByRider = {}; // orderId -> 'CASH' or 'QR'
-    var paymentConfirmedOrders = {}; // orderId -> true/false
-    var qrVerifyUtrMap = {};         // orderId -> utr string
+    var selectedPayModeByRider = {}; 
+    var paymentConfirmedOrders = {}; 
+    var qrVerifyUtrMap = {};         
 
     var activeChatOrderId = null;
     var riderChatChannel = null;
@@ -799,6 +839,35 @@
       }
     }
 
+    // SWITCH BETWEEN NORMAL EXPRESS RIDER & SUPER RIDER
+    function changeRiderProfile(role) {
+      activeRiderRole = role;
+      localStorage.setItem('baba_active_rider_role', role);
+      updateRiderRoleUI();
+      stopSound();
+      lastKnownAlertId = null;
+      fetchOrders();
+    }
+
+    function updateRiderRoleUI() {
+      var badge = document.getElementById('current-rider-badge');
+      var select = document.getElementById('rider-profile-select');
+      var appTitle = document.getElementById('rider-app-title');
+      var appSubtitle = document.getElementById('rider-app-subtitle');
+
+      if (select) select.value = activeRiderRole;
+
+      if (activeRiderRole === 'SUPER') {
+        if (badge) badge.innerHTML = '<span style="color:#a5b4fc;">👑 SUPER RIDER (24 HR MULTI)</span>';
+        if (appTitle) appTitle.innerHTML = 'BABA SUPER RIDER 👑';
+        if (appSubtitle) appSubtitle.innerHTML = '24-Hour Multi-Order Logistics';
+      } else {
+        if (badge) badge.innerHTML = '<span style="color:#38bdf8;">🛵 NORMAL EXPRESS RIDER</span>';
+        if (appTitle) appTitle.innerHTML = 'BABA RIDER 🛵';
+        if (appSubtitle) appSubtitle.innerHTML = '10-20 Min Express Partner';
+      }
+    }
+
     function calculateDistanceInMeters(lat1, lon1, lat2, lon2) {
       if (!lat1 || !lon1 || !lat2 || !lon2) return 999999;
       var R = 6371e3;
@@ -851,28 +920,42 @@
       });
     }
 
+    // 🔒 STRICT ORDER ISOLATION ENGINE
     async function fetchOrders() {
       try {
         var { data, error } = await _supabase.from('orders').select('*').order('id', { ascending: false });
         if (error) return;
         var newOrders = data || [];
         
+        // 1. FILTER ORDERS ACCORDING TO ACTIVE RIDER ROLE
+        var roleFilteredOrders = newOrders.filter(function(o) {
+          var is24Hr = (o.delivery_type === '24_HOURS');
+          if (activeRiderRole === 'SUPER') {
+            // Super rider gets ONLY 24_HOURS orders
+            return is24Hr;
+          } else {
+            // Normal rider gets ONLY EXPRESS orders (never 24_HOURS)
+            return !is24Hr;
+          }
+        });
+
+        // 2. ALERT SOUND LOGIC
         if (isRiderOnline) {
-          var pendingDeliveries = newOrders.filter(function(o) {
+          var pendingAlertOrders = roleFilteredOrders.filter(function(o) {
             var s = (o.status || '').toLowerCase();
             return (s.includes('placed') || s.includes('paid')) && !s.includes('cancelled') && !s.includes('out') && !s.includes('delivered') && !s.includes('arrived');
           });
 
-          var eligibleReturns = newOrders.filter(function(o) {
+          var eligibleReturns = (activeRiderRole !== 'SUPER') ? roleFilteredOrders.filter(function(o) {
             if (o.return_status === 'Approved' && o.return_lat && o.return_lng && riderCurrentCoords) {
               var dist = calculateDistanceInMeters(riderCurrentCoords.lat, riderCurrentCoords.lng, o.return_lat, o.return_lng);
               return dist <= 500;
             }
             return false;
-          });
+          }) : [];
 
-          if (pendingDeliveries.length > 0 || eligibleReturns.length > 0) {
-            var topOrder = eligibleReturns[0] || pendingDeliveries[0];
+          if (pendingAlertOrders.length > 0 || eligibleReturns.length > 0) {
+            var topOrder = eligibleReturns[0] || pendingAlertOrders[0];
             if (lastKnownAlertId !== topOrder.id) {
               playSound(topOrder.total_amount, !!eligibleReturns[0]);
               lastKnownAlertId = topOrder.id;
@@ -886,7 +969,7 @@
           lastKnownAlertId = null;
         }
 
-        allRiderOrders = newOrders;
+        allRiderOrders = roleFilteredOrders;
         updateStats();
         renderOrdersList();
       } catch(err){}
@@ -912,7 +995,7 @@
       renderOrdersList();
     }
 
-    // 📍 RIDER ARRIVED HANDLER (500M GEOFENCE)
+    // 📍 500M GEOFENCE ARRIVED HANDLER
     async function markRiderArrived(orderId) {
       var { error } = await _supabase.from('orders').update({
         status: 'Arrived'
@@ -921,18 +1004,17 @@
       if (error) {
         alert('Status update error: ' + error.message);
       } else {
-        alert('🔔 Grahak ko bell sound chala gaya hai! Ab payment confirm karein.');
+        alert('🔔 Grahak ke phone par madhur bell chime baj gaya hai! Ab payment verify karein.');
         fetchOrders();
       }
     }
 
-    // SELECT CASH OR ONLINE QR OPTION
     function selectPayChoice(orderId, choice) {
       selectedPayModeByRider[orderId] = choice;
       renderOrdersList();
     }
 
-    // 🚀 COD SLIDER LOGIC INITIALIZER (FOR CASH CHOICE)
+    // 🚀 COD SLIDER LOGIC INITIALIZER
     function initCodSlider(orderId) {
       var thumb = document.getElementById('slide-thumb-' + orderId);
       var track = document.getElementById('slide-track-' + orderId);
@@ -991,7 +1073,7 @@
       renderOrdersList();
     }
 
-    // 📱 VERIFY ONLINE QR PAYMENT (CHECKS 12-DIGIT UTR)
+    // 📱 VERIFY ONLINE QR PAYMENT
     async function verifyAndConfirmOnlineQr(orderId) {
       var utrInput = document.getElementById('qr-utr-input-' + orderId);
       var utrVal = utrInput ? utrInput.value.trim() : '';
@@ -1050,7 +1132,10 @@
           });
 
       if (filtered.length === 0) {
-        container.innerHTML = '<div class="empty-msg">' + (currentTab === 'active' ? '🎉 अभी कोई एक्टिव ऑर्डर या 500m रिटर्न नहीं है।' : 'कोई पुराना रिकॉर्ड नहीं मिला।') + '</div>';
+        container.innerHTML = '<div class="empty-msg">' + 
+          (activeRiderRole === 'SUPER' 
+            ? '👑 अभी कोई 24 घंटे का पेंडिंग सुपर ऑर्डर नहीं है।' 
+            : '🎉 अभी कोई 10-20 मिनट का एक्टिव एक्सप्रेस ऑर्डर नहीं है।') + '</div>';
         return;
       }
 
@@ -1063,6 +1148,7 @@
         var isDelivered = st.includes('delivered');
         var isCancelled = st.includes('cancelled');
         var isReturnOrder = order.return_status === 'Approved';
+        var is24Hr = (order.delivery_type === '24_HOURS');
         var isCod = (order.payment_mode || '').toUpperCase().includes('COD');
         
         var currentChoice = selectedPayModeByRider[order.id] || null;
@@ -1103,16 +1189,15 @@
           return '<div class="item-summary-line"><span>' + (it.name || 'Item') + ' × ' + (it.qty || 1) + '</span></div>';
         }).join('');
 
-        // Dynamic UPI QR Link for this order amount
         var upiQrUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=' + 
           encodeURIComponent('upi://pay?pa=' + STORE_UPI_ID + '&pn=BABA%20FOOD&am=' + order.total_amount + '&cu=INR&tn=Order-' + order.id);
 
-        return '<div class="order-card ' + (isReturnOrder ? 'return-pulse' : (!isDispatched && !isArrived && !isDelivered && !isCancelled ? 'new-pulse' : '')) + '">' +
+        return '<div class="order-card ' + (isReturnOrder ? 'return-pulse' : is24Hr ? 'super-card' : (!isDispatched && !isArrived && !isDelivered && !isCancelled ? 'new-pulse' : '')) + '">' +
           '<div class="order-top">' +
             '<div>' +
               '<div class="ord-id">#ORD-' + order.id + '</div>' +
-              '<span class="ord-tag ' + (isReturnOrder ? 'tag-return' : isDelivered ? 'tag-delivered' : isArrived ? 'tag-arrived' : isDispatched ? 'tag-transit' : 'tag-placed') + '">' + 
-                (isReturnOrder ? '🚨 RETURN PICKUP' + distText : (order.status || 'Placed')) + 
+              '<span class="ord-tag ' + (isReturnOrder ? 'tag-return' : is24Hr ? 'tag-super' : isDelivered ? 'tag-delivered' : isArrived ? 'tag-arrived' : isDispatched ? 'tag-transit' : 'tag-placed') + '">' + 
+                (isReturnOrder ? '🚨 RETURN PICKUP' + distText : is24Hr ? '👑 24 HR SUPER ORDER' : (order.status || 'Placed')) + 
               '</span>' +
             '</div>' +
             '<div style="text-align:right;">' +
@@ -1126,6 +1211,7 @@
             '<div class="cust-row"><span>📞</span> <span><a href="tel:' + (order.customer_phone || '') + '" style="color:#38bdf8; text-decoration:none;">' + (order.customer_phone || 'NA') + '</a></span></div>' +
             '<div class="cust-row"><span>🏠</span> <span><b>Pata:</b> ' + cleanAddress + '</span></div>' +
             (gpsMatch ? '<div class="cust-row" style="color:#10b981; font-weight:800; font-size:11.5px;"><span>📍</span> <span>Live GPS Location Verified by Customer</span></div>' : '') +
+            (is24Hr ? '<div class="cust-row" style="color:#a5b4fc; font-weight:800; font-size:11.5px;"><span>⏳</span> <span>Super Rider Dedicated Slot (Multi-Order Enabled)</span></div>' : '') +
             (isReturnOrder ? `
               <div class="cust-row" style="color:#fca5a5;"><span>⚠️</span> <span><b>Return Karan:</b> ${order.return_reason || 'Nahi bataya'}</span></div>
               <div class="cust-row" style="color:#fde047;"><span>📱</span> <span><b>Refund UPI:</b> ${order.return_customer_upi || 'Nahi di'}</span></div>
@@ -1156,7 +1242,7 @@
             '</div>' +
             '<button class="btn-action-chat" onclick="openRiderChat(' + order.id + ', \'' + (order.customer_name || 'Customer') + '\')">💬 Chat with Customer</button>' +
             (!isDispatched && !isArrived 
-              ? '<button class="btn-action-primary" style="background:#0284c7; margin-top:8px;" onclick="openPickupModal(' + order.id + ')">📸 Accept & Pickup</button>'
+              ? '<button class="btn-action-primary" style="background:' + (is24Hr ? '#4f46e5' : '#0284c7') + '; margin-top:8px;" onclick="openPickupModal(' + order.id + ')">📸 Accept & Pickup (' + (is24Hr ? 'Super' : 'Express') + ')</button>'
               : (!isArrived ? (
                 // 1. ARRIVAL BUTTON (LOCKED TILL 500M)
                 `<div class="arrival-lock-box">
@@ -1168,7 +1254,7 @@
                   </button>
                 </div>`
               ) : (
-                // 2. AFTER ARRIVED -> COD SELECTION (CASH OR VERIFIED ONLINE QR)
+                // 2. AFTER ARRIVED -> PAYMENT VERIFICATION
                 (isCod && !isPaymentDone ? `
                   <div class="pay-choice-container">
                     <div style="display:flex; justify-content:space-between; align-items:center;">
@@ -1203,7 +1289,6 @@
                         <img src="${upiQrUrl}" class="rider-qr-img" alt="UPI QR">
                         <div style="font-size:13px; font-weight:900; color:#facc15; margin-bottom:8px;">Amount: ₹${order.total_amount}</div>
                         
-                        <!-- ONLINE QR VERIFICATION INPUT -->
                         <div style="background:#1e1b4b; padding:10px; border-radius:10px; border:1px dashed #c084fc;">
                           <div style="font-size:11px; font-weight:800; color:#cbd5e1; text-align:left;">
                             🔐 Payment Verification (अनिवार्य *):
@@ -1225,7 +1310,6 @@
         '</div>';
       }).join('');
 
-      // Initialize all COD slider gestures after rendering if cash option selected
       filtered.forEach(function(o) {
         var st = (o.status || '').toLowerCase();
         var isCod = (o.payment_mode || '').toUpperCase().includes('COD');
@@ -1373,7 +1457,7 @@
       var { error } = await _supabase.from('orders').update({
         status: 'Out for Delivery',
         pickup_proof_photo: base64PickupPhoto,
-        estimated_delivery_time: '15-20 mins'
+        estimated_delivery_time: activeRiderRole === 'SUPER' ? '24 Hours' : '15-20 mins'
       }).eq('id', selectedOrderForPickup);
 
       if (error) alert('Error: ' + error.message);
@@ -1422,6 +1506,7 @@
 
     window.addEventListener('DOMContentLoaded', function() {
       renderDutyUI();
+      updateRiderRoleUI();
       initNotificationPermission();
       if (isRiderOnline) {
         requestWakeLock();
