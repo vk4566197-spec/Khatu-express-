@@ -245,7 +245,7 @@
       color: #64748b; 
     }
 
-    /* CATEGORIES DYNAMIC - FIXED OVERLAPPING ISSUE */
+    /* CATEGORIES DYNAMIC - OVERLAPPING FIXED */
     .category-scroll { 
       display: flex; 
       gap: 8px; 
@@ -358,6 +358,17 @@
       font-weight: 800; 
       padding: 3px 6px; 
       border-radius: 6px;
+    }
+    .low-stock-tag {
+      position: absolute; 
+      top: 6px; 
+      left: 6px; 
+      background: #f59e0b; 
+      color: white; 
+      font-size: 9px; 
+      font-weight: 800; 
+      padding: 3px 6px; 
+      border-radius: 6px; 
     }
     .badge-delivery-type {
       position: absolute;
@@ -715,7 +726,7 @@
       background: #fff; 
       border-radius: 16px; 
       border: 1px solid var(--border-soft); 
-      padding: 13px; 
+      padding: 14px; 
       margin-bottom: 12px; 
       box-shadow: var(--shadow-sm);
     }
@@ -826,28 +837,41 @@
 
     /* RETURN MODAL */
     .return-modal-box {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      background: rgba(15, 23, 42, 0.75);
-      backdrop-filter: blur(4px);
-      z-index: 2000;
-      display: none;
-      align-items: center;
-      justify-content: center;
-      padding: 16px;
+      position: fixed; 
+      top: 0; 
+      left: 0; 
+      width: 100vw; 
+      height: 100vh; 
+      background: rgba(15, 23, 42, 0.75); 
+      backdrop-filter: blur(4px); 
+      z-index: 2000; 
+      display: none; 
+      align-items: center; 
+      justify-content: center; 
+      padding: 16px; 
     }
     .return-modal-box.active { display: flex; }
     .return-card {
-      background: #ffffff;
-      border-radius: 20px;
-      padding: 18px;
-      width: 100%;
-      max-width: 380px;
-      max-height: 90vh;
-      overflow-y: auto;
+      background: #ffffff; 
+      border-radius: 20px; 
+      padding: 20px; 
+      width: 100%; 
+      max-width: 400px; 
+      max-height: 90vh; 
+      overflow-y: auto; 
+      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    }
+    .photo-upload-box {
+      width: 100%; 
+      height: 140px; 
+      border: 2px dashed #cbd5e1; 
+      border-radius: 14px; 
+      display: flex; 
+      align-items: center; 
+      justify-content: center; 
+      margin: 10px 0; 
+      overflow: hidden; 
+      background: #f8fafc;
     }
   </style>
 </head>
@@ -898,7 +922,7 @@
       <input type="text" id="cust-search-input" class="search-bar-input" placeholder="Search doodh, दूध, bread, chai, samosa..." oninput="debounceSearch()">
     </div>
 
-    <!-- DYNAMIC CATEGORY FILTER (FIXED OVERLAPPING) -->
+    <!-- DYNAMIC CATEGORY FILTER (OVERLAPPING FIXED) -->
     <div class="category-scroll" id="cat-scroll-container">
       <div class="cat-item active" onclick="filterCategory('ALL', this)">
         <div class="cat-icon-circle">🍽️ All</div>
@@ -1029,7 +1053,7 @@
     </div>
   </div>
 
-  <!-- PAST ORDERS MODAL -->
+  <!-- PAST ORDERS MODAL (INCLUDES WORKING RETURN BUTTON) -->
   <div class="modal-overlay" id="orders-modal">
     <div class="fullpage-content">
       <div class="fullpage-head">
@@ -1051,14 +1075,14 @@
     </div>
   </div>
 
-  <!-- CUSTOMER RETURN MODAL -->
+  <!-- CUSTOMER RETURN / REPLACEMENT MODAL -->
   <div class="return-modal-box" id="return-modal">
     <div class="return-card">
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
         <h3 style="font-size:16px; font-weight:900; color:#dc2626;">📦 Return Order Request</h3>
         <button onclick="closeReturnModal()" style="border:none; background:#f1f5f9; width:28px; height:28px; border-radius:50%; font-weight:bold; cursor:pointer;">✕</button>
       </div>
-      <p style="font-size:11.5px; color:#64748b; margin-bottom:12px;">Admin jaanch ke liye photo aur refund UPI ID anivarya hai.</p>
+      <p style="font-size:11.5px; color:#64748b; margin-bottom:12px;">Admin jaanch aur rider pickup ke liye photo aur refund UPI ID anivarya hai.</p>
 
       <div class="photo-upload-box" id="return-photo-preview">
         <span style="font-size:11.5px; color:#94a3b8; font-weight:700;">📸 Saman Ka Photo Yahan Dikhega *</span>
@@ -1068,8 +1092,8 @@
         📸 Saman Ka Photo Kheinchein *
       </button>
 
-      <textarea id="return-reason-input" class="zepto-input" rows="2" placeholder="Wapsi ka karan *" style="margin-bottom:10px;"></textarea>
-      <input type="text" id="return-upi-input" class="zepto-input" placeholder="Aapka UPI ID (e.g. 9876543210@paytm) *" style="margin-bottom:14px;">
+      <textarea id="return-reason-input" class="zepto-input" rows="2" placeholder="Wapsi ka karan (e.g. Saman kharab hai ya galat mila) *" style="margin-bottom:10px;"></textarea>
+      <input type="text" id="return-upi-input" class="zepto-input" placeholder="Refund lene ke liye Aapka UPI ID (e.g. 9876543210@paytm) *" style="margin-bottom:14px;">
 
       <button type="button" class="btn-checkout-sticky" id="btn-submit-return" onclick="submitReturnRequest()">
         Admin Approval Ke Liye Bhejo 🚀
@@ -1241,7 +1265,6 @@
       }
     }
 
-    // CATEGORY LIST - CLEAN & OVERLAP-FREE
     function buildDynamicCategories() {
       const container = document.getElementById('cat-scroll-container');
       const uniqueCategories = new Set();
@@ -1324,7 +1347,6 @@
       return false;
     }
 
-    // ⚡ SUPER-FAST RENDER WITH 14 MIN FAST DELIVERY BADGE
     function renderProducts() {
       const wrap = document.getElementById('product-grid-wrap');
       const query = (document.getElementById('cust-search-input')?.value || '').trim();
@@ -1364,7 +1386,6 @@
           mrpHtml = `<span class="mrp-cut">₹${mrp}</span>`;
         }
 
-        // NON-24 HR KE LIYE: 14 MINS FAST DELIVERY BADGE
         let deliveryTagHtml = '';
         if (is24Hr) {
           deliveryTagHtml = `<div class="badge-delivery-type badge-24hr-tag">⏳ 24 Hr Slot</div>`;
@@ -1405,7 +1426,6 @@
       }).join('');
     }
 
-    // 🚀 DEBOUNCED SEARCH FOR ULTRA-FAST PERFORMANCE
     function debounceSearch() {
       clearTimeout(searchDebounceTimer);
       searchDebounceTimer = setTimeout(renderProducts, 80);
@@ -1923,6 +1943,7 @@
       });
     }
 
+    // 📦 PAST ORDERS - WORKING RETURN BUTTON INCLUDED
     async function openPastOrdersModal() {
       const phone = localStorage.getItem('baba_cust_phone');
       document.getElementById('orders-modal').classList.add('active');
@@ -1940,7 +1961,18 @@
 
       box.innerHTML = orders.map(o => {
         const isDelivered = (o.status || '').toLowerCase().includes('delivered');
+        const returnStatus = o.return_status;
         const is24Hr = o.delivery_type === '24_HOURS';
+
+        let returnButtonHtml = '';
+        if (isDelivered) {
+          if (!returnStatus) {
+            returnButtonHtml = `<button class="btn-add-zepto" style="background:#fee2e2; border-color:#f87171; color:#dc2626;" onclick="closePastOrdersModal(); openReturnModal(${o.id});">🔄 Return / Replace</button>`;
+          } else {
+            returnButtonHtml = `<span style="font-size:11.5px; font-weight:800; color:#dc2626; background:#fef2f2; padding:4px 8px; border-radius:6px;">Return: ${returnStatus}</span>`;
+          }
+        }
+
         return `
           <div class="past-order-box">
             <div style="display:flex; justify-content:space-between; align-items:center;">
@@ -1953,6 +1985,7 @@
             <div style="font-size:12px; color:var(--text-muted); margin:4px 0;">Total: <b>₹${o.total_amount}</b> | ${new Date(o.created_at).toLocaleDateString()}</div>
             <div style="display:flex; gap:8px; margin-top:10px;">
               <button class="btn-add-zepto" style="flex:1;" onclick="closePastOrdersModal(); openTrackModal(${o.id});">Track / View Details ➔</button>
+              ${returnButtonHtml}
             </div>
           </div>
         `;
@@ -1973,12 +2006,71 @@
       renderProducts();
     }
 
+    // 🔄 RETURN MODAL FUNCTIONS
     function openReturnModal(orderId) {
       selectedReturnOrderId = orderId;
       document.getElementById('return-modal').classList.add('active');
     }
+
     function closeReturnModal() {
       document.getElementById('return-modal').classList.remove('active');
+      base64ReturnPhoto = null;
+      document.getElementById('return-photo-preview').innerHTML = '<span style="font-size:11.5px; color:#94a3b8; font-weight:700;">📸 Saman Ka Photo Yahan Dikhega *</span>';
+      document.getElementById('return-reason-input').value = '';
+      document.getElementById('return-upi-input').value = '';
+    }
+
+    function handleReturnPhotoChosen(input) {
+      if (!input.files || !input.files[0]) return;
+      compressImage(input.files[0], 480, 0.45).then(b64 => {
+        base64ReturnPhoto = b64;
+        document.getElementById('return-photo-preview').innerHTML = `<img src="${b64}" style="width:100%; height:100%; object-fit:cover;">`;
+      });
+    }
+
+    async function submitReturnRequest() {
+      const reason = document.getElementById('return-reason-input').value.trim();
+      const upiId = document.getElementById('return-upi-input').value.trim();
+
+      if (!base64ReturnPhoto) return alert('Kripya kharab/galat saman ka photo kheinchein!');
+      if (!reason) return alert('Wapsi ka karan likhna anivarya hai!');
+      if (!upiId || !upiId.includes('@')) return alert('Sahi UPI ID darj karein jisme @ ho!');
+
+      if (!navigator.geolocation) return alert('GPS support uplabdh nahi hai.');
+      
+      const submitBtn = document.getElementById('btn-submit-return');
+      submitBtn.disabled = true;
+      submitBtn.innerText = 'Bheja Ja Raha Hai... ⏳';
+
+      navigator.geolocation.getCurrentPosition(async (pos) => {
+        const lat = pos.coords.latitude;
+        const lng = pos.coords.longitude;
+
+        const { error } = await _supabase.from('orders').update({
+          return_status: 'Requested',
+          return_reason: reason,
+          return_photo_url: base64ReturnPhoto,
+          return_customer_upi: upiId,
+          return_lat: lat,
+          return_lng: lng
+        }).eq('id', selectedReturnOrderId);
+
+        if (error) {
+          alert('Return request submit nahi ho payi: ' + error.message);
+          submitBtn.disabled = false;
+          submitBtn.innerText = 'Admin Approval Ke Liye Bhejo 🚀';
+        } else {
+          alert('✅ Return Request Admin ke paas bhej di gayi hai! Jaanch ke baad rider pickup karega.');
+          closeReturnModal();
+          submitBtn.disabled = false;
+          submitBtn.innerText = 'Admin Approval Ke Liye Bhejo 🚀';
+          openPastOrdersModal();
+        }
+      }, (err) => {
+        alert('Return verify karne ke liye GPS anivarya hai: ' + err.message);
+        submitBtn.disabled = false;
+        submitBtn.innerText = 'Admin Approval Ke Liye Bhejo 🚀';
+      }, { enableHighAccuracy: true });
     }
 
     async function openCustomerChat(orderId) {
@@ -1988,7 +2080,7 @@
       const box = document.getElementById('chat-msgs-box');
       box.innerHTML = '<div style="text-align:center; color:#94a3b8; font-size:12px; padding:20px;">Messages load ho rahe hain...</div>';
 
-      const { data: messages } = await _supabase.from('order_chats').select('*').eq('order_id', orderId).order('id', { ascending: true });
+      const { data: messages, error } = await _supabase.from('order_chats').select('*').eq('order_id', orderId).order('id', { ascending: true });
       box.innerHTML = '';
       if (messages && messages.length > 0) messages.forEach(m => renderCustomerChatBubble(m));
       box.scrollTop = box.scrollHeight;
