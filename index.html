@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>👑 BABA FOOD DELIVERY — 10 Min Express</title>
+  <title>👑 BABA FOOD DELIVERY — 10 Min & 24 Hr Express</title>
 
   <link rel="icon" type="image/png" href="logo.png">
   <link rel="manifest" href="manifest-customer.json">
@@ -30,6 +30,7 @@
       --accent-pink: #ff2a6d;
       --accent-pink-gradient: linear-gradient(135deg, #ff2a6d 0%, #e0115f 100%);
       --accent-green: #059669;
+      --accent-super: #6366f1;
       --bg-light: #f8fafc;
       --text-main: #0f172a;
       --text-muted: #64748b;
@@ -364,6 +365,20 @@
       font-weight: 800;
       padding: 3px 6px;
       border-radius: 6px;
+    }
+    .badge-delivery-type {
+      position: absolute;
+      top: 8px;
+      left: 8px;
+      font-size: 9px;
+      font-weight: 900;
+      padding: 3px 6px;
+      border-radius: 6px;
+      color: white;
+    }
+    .badge-24hr-tag {
+      background: #4f46e5;
+      box-shadow: 0 2px 6px rgba(79, 70, 229, 0.4);
     }
     .discount-badge-pill {
       position: absolute; 
@@ -874,13 +889,13 @@
     <div class="drawer-header">
       <img src="logo.png" class="drawer-logo-img" alt="Logo" onerror="this.style.display='none'">
       <div class="drawer-brand">👑 BABA FOOD EXPRESS</div>
-      <div style="font-size: 11px; color: #fdf4ff; margin-top: 2px;">Fresh & Fast Delivery in 10-20 Mins</div>
+      <div style="font-size: 11px; color: #fdf4ff; margin-top: 2px;">Fresh & Fast Delivery in 10-20 Mins & 24 Hr</div>
     </div>
     <div class="drawer-menu-list">
       <div class="drawer-item" onclick="toggleDrawer(false); openCartModal();">🛒 Mera Cart</div>
       <div class="drawer-item" onclick="toggleDrawer(false); openPastOrdersModal();">📦 Purane Orders</div>
       <div class="drawer-item" onclick="toggleDrawer(false); alert('Customer Support Call: 7037647464');">📞 Help & Support</div>
-      <div class="drawer-item" onclick="toggleDrawer(false); alert('Baba Food Delivery Express v2.0');">ℹ️ App Info</div>
+      <div class="drawer-item" onclick="toggleDrawer(false); alert('Baba Food Delivery Express v3.0');">ℹ️ App Info</div>
     </div>
   </div>
 
@@ -892,7 +907,7 @@
         <img src="logo.png" class="header-app-logo" alt="Logo" onerror="this.style.display='none'">
         <div class="brand-meta">
           <h1>BABA FOOD <span>🏹</span></h1>
-          <div class="eta-pill">⚡ 10-20 Min Delivery</div>
+          <div class="eta-pill">⚡ 10-20 Min & ⏳ 24 Hr Delivery</div>
         </div>
       </div>
       <button id="store-badge-top" style="background:#10b981; border:none; color:white; font-size:10px; font-weight:800; padding:6px 12px; border-radius:20px;">
@@ -903,7 +918,7 @@
     <!-- Search Box (Instant Multi-Language Smart Filter) -->
     <div class="search-box-wrap">
       <span class="search-icon-pos">🔍</span>
-      <input type="text" id="cust-search-input" class="search-bar-input" placeholder="Search doodh, दूध, milk, समोसा, chai..." oninput="handleSearch()">
+      <input type="text" id="cust-search-input" class="search-bar-input" placeholder="Search doodh, दूध, cake, biryani, चाय..." oninput="handleSearch()">
     </div>
 
     <!-- DYNAMIC CATEGORY FILTER -->
@@ -918,7 +933,7 @@
   <div class="promo-banner" id="promo-banner-card">
     <div class="promo-text">
       <h3 id="promo-banner-title">Express Grocery & Food</h3>
-      <div class="promo-sub" id="promo-banner-sub">Free Delivery On Selected Orders</div>
+      <div class="promo-sub" id="promo-banner-sub">10-20 Min Instant & 24 Hr Scheduled Delivery</div>
     </div>
     <div style="font-size: 28px;">🚀</div>
   </div>
@@ -975,6 +990,9 @@
         </div>
       </div>
 
+      <!-- Cart Delivery Type Indicator Banner -->
+      <div id="cart-type-indicator-banner" style="display:none; background:#e0e7ff; border:1px solid #818cf8; color:#3730a3; padding:10px 14px; border-radius:12px; font-size:12px; font-weight:800; margin-bottom:12px;"></div>
+
       <!-- Items List -->
       <div id="cart-items-container"></div>
 
@@ -1015,13 +1033,13 @@
         </div>
       </div>
 
-      <!-- FULL PAYMENT SUMMARY (ALWAYS VISIBLE & SCROLLABLE) -->
+      <!-- FULL PAYMENT SUMMARY -->
       <div class="bill-box" id="cart-bill-summary-box">
         <div style="font-size:14px; font-weight:900; color:#0f172a; margin-bottom:12px; border-bottom:1px solid #e2e8f0; padding-bottom:6px;">
           🧾 Payment Summary
         </div>
         <div class="bill-row"><span>Item Subtotal:</span><span id="bill-subtotal">₹0</span></div>
-        <div class="bill-row"><span>Standard Delivery:</span><span id="bill-delivery">₹0</span></div>
+        <div class="bill-row"><span>Delivery Charge:</span><span id="bill-delivery">₹0</span></div>
         <div class="bill-row" id="row-rain-surge" style="display:none; color:#0284c7;"><span>🌧️ Rain Surge:</span><span id="bill-rain-surge">₹0</span></div>
         <div class="bill-row" id="row-night-surge" style="display:none; color:#7c3aed;"><span>🌙 Night Surge:</span><span id="bill-night-surge">₹0</span></div>
         <div class="bill-row" id="row-coupon-disc" style="display:none; color:#059669;"><span>🎟️ Coupon Discount:</span><span id="bill-coupon-disc">-₹0</span></div>
@@ -1029,19 +1047,18 @@
         <div class="bill-row total"><span>Kul Rashi (Grand Total):</span><span id="bill-grand-total">₹0</span></div>
       </div>
 
-      <!-- Extra Safety Bottom Space -->
       <div style="height: 30px; width: 100%;"></div>
     </div>
 
     <!-- Sticky Bottom Place Order Button -->
     <div class="cart-sticky-bottom-bar">
       <button class="btn-checkout-sticky" id="btn-place-order" onclick="submitCustomerOrder()">
-        Place Express Order 🚀
+        Place Order 🚀
       </button>
     </div>
   </div>
 
-  <!-- PAST ORDERS MODAL (INCLUDES RETURN INITIATION) -->
+  <!-- PAST ORDERS MODAL -->
   <div class="modal-overlay" id="orders-modal">
     <div class="fullpage-content">
       <div class="fullpage-head">
@@ -1052,7 +1069,7 @@
     </div>
   </div>
 
-  <!-- LIVE TRACKING MODAL WITH COUNTDOWN & MAP -->
+  <!-- LIVE TRACKING MODAL (WITH 24-HR OR EXPRESS VIEW) -->
   <div class="modal-overlay" id="track-modal">
     <div class="fullpage-content">
       <div class="fullpage-head">
@@ -1070,7 +1087,7 @@
         <h3 style="font-size:16px; font-weight:900; color:#dc2626;">📦 Return Order Request</h3>
         <button onclick="closeReturnModal()" style="border:none; background:#f1f5f9; width:28px; height:28px; border-radius:50%; font-weight:bold; cursor:pointer;">✕</button>
       </div>
-      <p style="font-size:11.5px; color:#64748b; margin-bottom:12px;">Admin jaanch aur 500m rider pickup ke liye photo aur refund UPI ID anivarya hai.</p>
+      <p style="font-size:11.5px; color:#64748b; margin-bottom:12px;">Admin jaanch aur rider pickup ke liye photo aur refund UPI ID anivarya hai.</p>
 
       <div class="photo-upload-box" id="return-photo-preview">
         <span style="font-size:11.5px; color:#94a3b8; font-weight:700;">📸 Saman Ka Photo Yahan Dikhega *</span>
@@ -1090,7 +1107,7 @@
     </div>
   </div>
 
-  <!-- CUSTOMER REAL-TIME 2-WAY CHAT DRAWER (WITH PHOTO SHARING) -->
+  <!-- CUSTOMER REAL-TIME 2-WAY CHAT DRAWER -->
   <div class="chat-drawer" id="cust-chat-drawer">
     <div class="chat-top-header">
       <div>
@@ -1134,7 +1151,6 @@
     let activeCustomerChatOrderId = null;
     let customerChatChannel = null;
 
-    // 🔔 AUDIO UNLOCK SETUP
     function unlockCustomerAudio() {
       if (customerAudioUnlocked) return;
       try {
@@ -1147,16 +1163,13 @@
       customerAudioUnlocked = true;
     }
 
-    // 🔔 HALKA AUR MADHUR RIDER ARRIVAL CHIME (SOFT LUXURY DING-DONG)
+    // 🔔 HALKA AUR MADHUR RIDER ARRIVAL CHIME
     function playRiderArrivedChime() {
       try {
         const AudioContext = window.AudioContext || window.webkitAudioContext;
         const ctx = new AudioContext();
 
-        // 1st Note: Soft Ding (E5 - 659.25 Hz)
         playSweetTone(ctx, 659.25, 0.0, 0.45);
-
-        // 2nd Note: Gentle Dong (C5 - 523.25 Hz)
         playSweetTone(ctx, 523.25, 0.22, 0.65);
 
         if (navigator.vibrate) navigator.vibrate([100, 80, 120]);
@@ -1335,6 +1348,9 @@
         <div class="cat-item ${activeCategory === 'ALL' ? 'active' : ''}" onclick="filterCategory('ALL', this)">
           <div class="cat-icon-circle">🍽️ All</div>
         </div>
+        <div class="cat-item ${activeCategory === '24_HOURS' ? 'active' : ''}" onclick="filterCategory('24_HOURS', this)">
+          <div class="cat-icon-circle" style="background:#4f46e5; color:#fff;">⏳ 24 Hr Special</div>
+        </div>
       `;
 
       uniqueCategories.forEach(cat => {
@@ -1408,7 +1424,14 @@
       const query = (document.getElementById('cust-search-input')?.value || '').trim();
 
       const filtered = allProducts.filter(p => {
-        const matchCat = activeCategory === 'ALL' || (p.category || '').toLowerCase() === activeCategory.toLowerCase();
+        let matchCat = true;
+        if (activeCategory === 'ALL') {
+          matchCat = true;
+        } else if (activeCategory === '24_HOURS') {
+          matchCat = (p.delivery_type === '24_HOURS');
+        } else {
+          matchCat = (p.category || '').toLowerCase() === activeCategory.toLowerCase();
+        }
         const matchQuery = isSearchMatch(p, query);
         return matchCat && matchQuery;
       });
@@ -1427,6 +1450,7 @@
         const availableStock = p.stock_quantity ?? 0;
         const isOutOfStock = p.is_out_of_stock || availableStock <= 0;
         const isLow = !isOutOfStock && availableStock <= (appSettings.low_stock_threshold || 5);
+        const is24Hr = (p.delivery_type === '24_HOURS');
         const discPct = Number(p.discount_percent) || 0;
         
         let mrpHtml = '';
@@ -1441,6 +1465,7 @@
               <img src="${p.image_url || 'https://via.placeholder.com/150'}" alt="${p.name}" onerror="this.src='https://via.placeholder.com/150'">
               ${isOutOfStock ? `<span class="out-of-stock-tag">Out of Stock</span>` : ''}
               ${isLow ? `<span class="low-stock-tag">Only ${availableStock} Left</span>` : ''}
+              ${is24Hr ? `<span class="badge-delivery-type badge-24hr-tag">⏳ 24 Hr Delivery</span>` : ''}
               ${discPct > 0 ? `<span class="discount-badge-pill">${discPct}% OFF</span>` : ''}
             </div>
             <div>
@@ -1470,7 +1495,7 @@
       renderProducts();
     }
 
-    // ⚡ REAL-TIME STOCK CHECK JAB CUSTOMER ITEM CART MEIN JODTA HAI
+    // 🔒 24-HOUR CART ISOLATION & LIVE STOCK DEDUCTION CHECK
     function updateItemQty(prodId, delta) {
       const prod = allProducts.find(p => p.id === prodId);
       if (!prod) return;
@@ -1479,12 +1504,31 @@
       const targetQty = currentInCart + delta;
       const availableStock = prod.stock_quantity ?? 0;
 
-      // Agar stock se zyada add karne ki koshish kare
+      // 1. Stock Check
       if (delta > 0 && targetQty > availableStock) {
         alert(`⚠️ Maaf kijiye! Is item ka sirf ${availableStock} stock hi bacha hai.`);
         return;
       }
 
+      // 2. ⏳ 24-HOUR VS EXPRESS CART ISOLATION RULE (EXCLUSIVE CART LOCK)
+      if (delta > 0) {
+        const currentCartItems = Object.values(cart);
+        if (currentCartItems.length > 0) {
+          const cartType = currentCartItems[0].delivery_type === '24_HOURS' ? '24_HOURS' : 'EXPRESS';
+          const incomingType = prod.delivery_type === '24_HOURS' ? '24_HOURS' : 'EXPRESS';
+
+          if (cartType !== incomingType) {
+            if (incomingType === '24_HOURS') {
+              alert('⚠️ 24 घंटे डिलीवरी वाले आइटम के साथ केवल 24 घंटे वाले आइटम ही जोड़े जा सकते हैं!\n\nकृपया पहले कार्ट खाली करें या अपना 10-20 मिनट वाला एक्सप्रेस ऑर्डर अलग से पूरा करें।');
+            } else {
+              alert('⚠️ आपके कार्ट में 24 घंटे डिलीवरी वाले विशेष आइटम हैं! 10-20 मिनट वाले एक्सप्रेस आइटम को अलग से ऑर्डर करें।');
+            }
+            return;
+          }
+        }
+      }
+
+      // 3. Hub Lock Check
       if (appSettings.enable_hub_lock && delta > 0) {
         const targetHubId = prod.hub_id || 1;
         const currentCartHubs = Object.values(cart).map(i => i.hub_id || 1);
@@ -1580,6 +1624,27 @@
 
       document.getElementById('bill-grand-total').innerText = `₹${currentCalculatedTotal}`;
 
+      // Cart Type Banner Display
+      const cartItemsArr = Object.values(cart);
+      const indicatorBanner = document.getElementById('cart-type-indicator-banner');
+      if (cartItemsArr.length > 0) {
+        const is24HrCart = cartItemsArr[0].delivery_type === '24_HOURS';
+        indicatorBanner.style.display = 'block';
+        if (is24HrCart) {
+          indicatorBanner.style.background = '#e0e7ff';
+          indicatorBanner.style.borderColor = '#818cf8';
+          indicatorBanner.style.color = '#3730a3';
+          indicatorBanner.innerHTML = '⏳ <b>24-Hour Delivery Slot Active</b> — Ye order Super Rider dwara 24 ghante me deliver hoga.';
+        } else {
+          indicatorBanner.style.background = '#ecfdf5';
+          indicatorBanner.style.borderColor = '#86efac';
+          indicatorBanner.style.color = '#065f46';
+          indicatorBanner.innerHTML = '⚡ <b>10-20 Min Express Delivery Active</b> — Garama garam turant delivery.';
+        }
+      } else {
+        indicatorBanner.style.display = 'none';
+      }
+
       const targetFill = document.getElementById('target-progress-fill');
       const targetText = document.getElementById('target-headline-text');
       if (subtotal >= freeDelMin) {
@@ -1593,14 +1658,16 @@
       }
 
       const cartItemsBox = document.getElementById('cart-items-container');
-      const itemsArr = Object.values(cart);
-      if (itemsArr.length === 0) {
+      if (cartItemsArr.length === 0) {
         cartItemsBox.innerHTML = '<div style="text-align:center; padding:20px; color:var(--text-muted); font-weight:700;">Cart khaali hai.</div>';
       } else {
-        cartItemsBox.innerHTML = itemsArr.map(it => `
+        cartItemsBox.innerHTML = cartItemsArr.map(it => `
           <div style="display:flex; justify-content:space-between; align-items:center; padding:10px 0; border-bottom:1px solid #f1f5f9;">
             <div>
-              <div style="font-size:13px; font-weight:800;">${it.name}</div>
+              <div style="font-size:13px; font-weight:800;">
+                ${it.name}
+                ${it.delivery_type === '24_HOURS' ? `<span style="font-size:9.5px; background:#4f46e5; color:#fff; padding:2px 6px; border-radius:4px; margin-left:4px;">⏳ 24 HR</span>` : ''}
+              </div>
               <div style="font-size:11px; color:var(--text-muted);">₹${it.price} × ${it.qty}</div>
             </div>
             <div class="qty-counter">
@@ -1656,7 +1723,7 @@
       }, { enableHighAccuracy: true, timeout: 10000 });
     }
 
-    // 🚀 SUBMIT ORDER & AUTO-DEDUCT STOCK IN REAL-TIME
+    // 🚀 SUBMIT ORDER WITH DELIVERY_TYPE RECORDED FOR SUPER RIDER
     async function submitCustomerOrder() {
       if (appSettings.store_status === 'CLOSED') {
         alert('Dukaan abhi band hai. Kripya thodi der baad koshish karein!');
@@ -1729,17 +1796,21 @@
       const freeGift = (appSettings.is_free_gift_active && subtotal >= (appSettings.free_gift_min_order ?? 499)) ? appSettings.free_gift_item_name : null;
       const hubId = itemsArr[0]?.hub_id || 1;
 
+      // Check whether this order is 24_HOURS or EXPRESS
+      const orderDeliveryType = (itemsArr[0]?.delivery_type === '24_HOURS') ? '24_HOURS' : 'EXPRESS';
+
       const orderPayload = {
         customer_name: name,
         customer_phone: phone,
         delivery_address: `${addr} [GPS: ${userCoords.lat.toFixed(5)}, ${userCoords.lng.toFixed(5)}]`,
-        items: itemsArr.map(i => ({ id: i.id, name: i.name, qty: i.qty, price: i.price, subtotal: i.price * i.qty })),
+        items: itemsArr.map(i => ({ id: i.id, name: i.name, qty: i.qty, price: i.price, delivery_type: i.delivery_type, subtotal: i.price * i.qty })),
         total_amount: currentCalculatedTotal,
         payment_mode: payMode,
         transaction_id: payMode === 'UPI' ? utrNo : null,
         status: payMode === 'UPI' ? 'Paid Online / Placed' : 'Placed',
         delivery_otp: otp,
         hub_id: hubId,
+        delivery_type: orderDeliveryType,
         rain_surge_fee: rainFee,
         night_surge_fee: nightFee,
         coupon_code: appliedCoupon ? appliedCoupon.code : null,
@@ -1748,16 +1819,14 @@
       };
 
       try {
-        // 1. Order insert karein
         const { data, error } = await _supabase.from('orders').insert([orderPayload]).select().single();
         if (error) throw error;
 
-        // 2. Database se stock auto-deduct karein (Auto Stock Reduce)
+        // Auto Stock Deduction
         const stockItems = itemsArr.map(i => ({ id: i.id, qty: i.qty }));
         try {
           await _supabase.rpc('deduct_order_stock', { order_items: stockItems });
         } catch (rpcErr) {
-          // Fallback direct update agar RPC na ho
           for (let it of itemsArr) {
             const p = allProducts.find(x => x.id === it.id);
             if (p) {
@@ -1777,19 +1846,19 @@
         updateCartUI();
         closeCartModal();
         btn.disabled = false;
-        btn.innerText = 'Place Express Order 🚀';
+        btn.innerText = 'Place Order 🚀';
 
-        alert(`🎉 Order #${data.id} Safaltapoorvak Lag Gaya!`);
+        alert(`🎉 Order #${data.id} Safaltapoorvak Lag Gaya! (${orderDeliveryType === '24_HOURS' ? '⏳ 24 Ghante Slot' : '⚡ 10-20 Min Express'})`);
         openTrackModal(data.id);
-        fetchCustomerProducts(); // Refresh products with new stock
+        fetchCustomerProducts();
       } catch (err) {
         alert('Order Error: ' + err.message);
         btn.disabled = false;
-        btn.innerText = 'Place Express Order 🚀';
+        btn.innerText = 'Place Order 🚀';
       }
     }
 
-    // LIVE TRACKING
+    // LIVE TRACKING (WITH 24-HR SPECIAL BANNER)
     async function openTrackModal(orderId) {
       activeTrackOrderId = orderId;
       document.getElementById('track-order-num').innerText = `Order #ORD-${orderId}`;
@@ -1817,6 +1886,7 @@
       const secondsPassed = Math.floor((now - orderTime) / 1000);
       const canSelfCancel = (secondsPassed < cancelWindowSec) && !data.status.toLowerCase().includes('cancelled') && !data.status.toLowerCase().includes('delivered');
 
+      const is24Hr = (data.delivery_type === '24_HOURS');
       const isDispatched = data.status.toLowerCase().includes('out') || data.status.toLowerCase().includes('running');
       const isArrived = (data.status || '').toLowerCase() === 'arrived';
       const isDelivered = data.status.toLowerCase().includes('delivered');
@@ -1828,11 +1898,11 @@
 
       let riderInfoHtml = '';
       if (data.assigned_rider_id) {
-        const { data: rider } = await _supabase.from('riders').select('name, phone, current_lat, current_lng').eq('id', data.assigned_rider_id).single();
+        const { data: rider } = await _supabase.from('riders').select('name, phone, current_lat, current_lng, rider_type').eq('id', data.assigned_rider_id).single();
         if (rider) {
           riderInfoHtml = `
             <div style="background:#f1f5f9; border-radius:12px; padding:12px; margin:12px 0; font-size:12.5px;">
-              <div>🛵 Delivery Partner: <b>${rider.name}</b> (📞 <a href="tel:${rider.phone}">${rider.phone}</a>)</div>
+              <div>${rider.rider_type === 'SUPER' ? '👑 <b>Super Rider (24 Hr):</b>' : '🛵 <b>Delivery Partner:</b>'} <b>${rider.name}</b> (📞 <a href="tel:${rider.phone}">${rider.phone}</a>)</div>
               ${rider.current_lat && rider.current_lng ? `
                 <div style="margin-top:6px;">
                   <a href="https://maps.google.com/?q=${rider.current_lat},${rider.current_lng}" target="_blank" style="color:#0284c7; font-weight:800; text-decoration:none;">
@@ -1854,15 +1924,27 @@
               <div style="font-size:18px; font-weight:900; letter-spacing:0.5px;">RIDER PAHUNCH GAYA HAI!</div>
               <div style="font-size:12px; opacity:0.95; margin-top:4px;">Delivery partner aapke darwaze par hai. Kripya apna Secret OTP batayein.</div>
             </div>
-          ` : isDispatched ? `
-            <div class="eta-countdown-card">
-              <div style="font-size:12px; font-weight:800; opacity:0.9;">🛵 RIDER NE ORDER PICK KAR LIYA HAI!</div>
-              <div class="eta-big-timer" id="eta-countdown-clock">14:59</div>
-              <div class="rider-live-status-pill">⚡ Express Delivery in Progress</div>
-            </div>
-          ` : isDelivered ? `
+          ` : isDispatched ? (
+            is24Hr ? `
+              <div style="background:linear-gradient(135deg, #3730a3, #1e1b4b); color:#ffffff; border-radius:18px; padding:18px; text-align:center; margin-bottom:16px;">
+                <div style="font-size:12px; font-weight:800; opacity:0.9;">👑 SUPER RIDER NE ORDER PICK KAR LIYA HAI!</div>
+                <div style="font-size:24px; font-weight:900; color:#a5b4fc; margin:8px 0;">⏳ 24 Ghante Slot Dispatch</div>
+                <div class="rider-live-status-pill" style="background:#4f46e5;">👑 Scheduled Delivery in Progress</div>
+              </div>
+            ` : `
+              <div class="eta-countdown-card">
+                <div style="font-size:12px; font-weight:800; opacity:0.9;">🛵 RIDER NE ORDER PICK KAR LIYA HAI!</div>
+                <div class="eta-big-timer" id="eta-countdown-clock">14:59</div>
+                <div class="rider-live-status-pill">⚡ Express Delivery in Progress</div>
+              </div>
+            `
+          ) : isDelivered ? `
             <div style="background:#ecfdf5; border:1.5px solid #86efac; border-radius:14px; padding:16px; text-align:center; color:#065f46; font-weight:900; margin-bottom:14px;">
               🎉 ORDER SAFALTAPOORVAK DELIVER HO GAYA!
+            </div>
+          ` : is24Hr ? `
+            <div style="background:#e0e7ff; border:1.5px solid #a5b4fc; border-radius:14px; padding:14px; text-align:center; color:#312e81; font-weight:800; margin-bottom:14px;">
+              ⏳ <b>24 Ghante Scheduled Delivery:</b> Aapka order Super Rider dwara 24 ghante ke andar deliver hoga!
             </div>
           ` : `
             <div style="background:#eff6ff; border:1.5px solid #bfdbfe; border-radius:14px; padding:14px; text-align:center; color:#1e40af; font-weight:800; margin-bottom:14px;">
@@ -1871,8 +1953,11 @@
           `}
 
           <div style="display:flex; justify-content:space-between; align-items:center;">
-            <div style="font-size:15px; font-weight:900;">Status: <span style="color:var(--accent-pink);">${data.status}</span></div>
-            <div style="font-size:13px; font-weight:800; color:var(--text-muted);">₹${data.total_amount} (${data.payment_mode})</div>
+            <div>
+              <div style="font-size:15px; font-weight:900;">Status: <span style="color:var(--accent-pink);">${data.status}</span></div>
+              ${is24Hr ? `<span style="font-size:10px; font-weight:800; background:#4f46e5; color:#fff; padding:2px 6px; border-radius:4px;">⏳ 24 Hr Super Rider Order</span>` : ''}
+            </div>
+            <div style="font-size:13px; font-weight:800; color:var(--text-muted); text-align:right;">₹${data.total_amount} (${data.payment_mode})</div>
           </div>
 
           ${riderInfoHtml}
@@ -1898,7 +1983,7 @@
         </div>
       `;
 
-      if (isDispatched && !countdownTimerInterval) {
+      if (isDispatched && !is24Hr && !countdownTimerInterval) {
         startLiveCountdown(15 * 60);
       }
     }
@@ -1938,7 +2023,7 @@
       }).eq('id', orderId);
       alert('Order Cancel Ho Gaya!');
       fetchTrackingData();
-      fetchCustomerProducts(); // Refresh stock
+      fetchCustomerProducts();
     }
 
     async function applyCouponCode() {
@@ -1999,6 +2084,7 @@
       box.innerHTML = orders.map(o => {
         const isDelivered = (o.status || '').toLowerCase().includes('delivered');
         const returnStatus = o.return_status;
+        const is24Hr = o.delivery_type === '24_HOURS';
 
         let returnButtonHtml = '';
         if (isDelivered) {
@@ -2012,7 +2098,10 @@
         return `
           <div class="past-order-box">
             <div style="display:flex; justify-content:space-between; align-items:center;">
-              <div style="font-weight:900;">#ORD-${o.id}</div>
+              <div>
+                <b style="font-weight:900;">#ORD-${o.id}</b>
+                ${is24Hr ? `<span style="font-size:10px; background:#4f46e5; color:#fff; padding:2px 6px; border-radius:4px; margin-left:4px;">⏳ 24 HR</span>` : ''}
+              </div>
               <span style="font-size:12px; font-weight:800; color:var(--accent-pink);">${o.status}</span>
             </div>
             <div style="font-size:12px; color:var(--text-muted); margin:4px 0;">Total: <b>₹${o.total_amount}</b> | ${new Date(o.created_at).toLocaleDateString()}</div>
@@ -2092,7 +2181,7 @@
           submitBtn.disabled = false;
           submitBtn.innerText = 'Admin Approval Ke Liye Bhejo 🚀';
         } else {
-          alert('✅ Return Request Admin ke paas bhej di gayi hai! Jaanch ke baad 500m rider pickup karega.');
+          alert('✅ Return Request Admin ke paas bhej di gayi hai!');
           closeReturnModal();
           submitBtn.disabled = false;
           submitBtn.innerText = 'Admin Approval Ke Liye Bhejo 🚀';
@@ -2227,7 +2316,6 @@
         .channel('public_customer_updates')
         .on('postgres_changes', { event: '*', schema: 'public', table: 'app_settings' }, () => loadSettings())
         .on('postgres_changes', { event: '*', schema: 'public', table: 'products' }, payload => {
-          // Stock badalte hi live screen par update
           fetchCustomerProducts();
         })
         .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'orders' }, payload => {
