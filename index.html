@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>👑 BABA FOOD DELIVERY — 10 Min & 24 Hr Express</title>
+  <title>👑 BABA FOOD DELIVERY — 14 Min Express</title>
 
   <link rel="icon" type="image/png" href="logo.png">
   <link rel="manifest" href="manifest-customer.json">
@@ -20,6 +20,7 @@
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   
   <style>
@@ -30,7 +31,6 @@
       --accent-pink: #ff2a6d;
       --accent-pink-gradient: linear-gradient(135deg, #ff2a6d 0%, #e0115f 100%);
       --accent-green: #059669;
-      --accent-super: #6366f1;
       --bg-light: #f8fafc;
       --text-main: #0f172a;
       --text-muted: #64748b;
@@ -57,6 +57,7 @@
       color: var(--text-main); 
       padding-bottom: 120px;
       overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
     }
 
     /* 1. SIDE DRAWER */
@@ -157,7 +158,7 @@
     /* 3. TOP HERO HEADER */
     .top-hero-area {
       background: var(--primary-gradient);
-      padding: 16px 16px 20px 16px; 
+      padding: 16px 16px 16px 16px; 
       border-radius: 0 0 26px 26px;
       box-shadow: 0 10px 30px rgba(42, 8, 69, 0.2);
       color: white;
@@ -221,13 +222,13 @@
     /* SEARCH BAR */
     .search-box-wrap { 
       position: relative; 
-      margin-bottom: 14px; 
+      margin-bottom: 12px; 
       display: flex; 
       align-items: center; 
     }
     .search-bar-input {
       width: 100%; 
-      background: rgba(255, 255, 255, 0.96); 
+      background: rgba(255, 255, 255, 0.98); 
       border: none;
       border-radius: 16px;
       padding: 13px 46px 13px 40px; 
@@ -244,51 +245,53 @@
       color: #64748b; 
     }
 
-    /* CATEGORIES DYNAMIC */
+    /* CATEGORIES DYNAMIC - FIXED OVERLAPPING ISSUE */
     .category-scroll { 
       display: flex; 
-      gap: 10px; 
+      gap: 8px; 
       overflow-x: auto; 
+      overflow-y: hidden;
+      white-space: nowrap;
+      padding: 4px 2px 8px 2px;
       scrollbar-width: none; 
-      padding-top: 4px;
+      -webkit-overflow-scrolling: touch;
     }
     .category-scroll::-webkit-scrollbar { display: none; }
+    
     .cat-item { 
-      display: flex; 
-      flex-direction: column; 
-      align-items: center; 
+      display: inline-flex;
+      flex-shrink: 0;
       cursor: pointer; 
-      min-width: 60px; 
     }
     .cat-icon-circle {
-      padding: 9px 14px;
+      padding: 8px 14px;
       border-radius: 14px; 
-      background: rgba(255,255,255,0.14); 
-      border: 1px solid rgba(255,255,255,0.2);
+      background: rgba(255,255,255,0.16); 
+      border: 1px solid rgba(255,255,255,0.24);
       display: flex; 
       align-items: center; 
       justify-content: center; 
       font-size: 12px; 
       font-weight: 800;
-      color: #fff;
+      color: #ffffff;
       backdrop-filter: blur(8px);
-      transition: all 0.2s ease;
+      transition: background 0.15s ease, transform 0.15s ease;
       white-space: nowrap;
+      user-select: none;
     }
     .cat-item.active .cat-icon-circle { 
-      background: #ffffff; 
-      color: var(--primary-purple);
-      border-color: #ffffff;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-      transform: translateY(-2px);
+      background: #ffffff !important; 
+      color: var(--primary-purple) !important;
+      border-color: #ffffff !important;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.18);
     }
 
     /* PROMO HERO CARD */
     .promo-banner {
-      margin: 14px 16px; 
+      margin: 12px 16px 14px 16px; 
       background: linear-gradient(135deg, #ffffff 0%, #fff1f5 100%);
       border-radius: 18px; 
-      padding: 16px 18px; 
+      padding: 14px 18px; 
       display: flex; 
       justify-content: space-between; 
       align-items: center; 
@@ -313,7 +316,7 @@
     .grid { 
       display: grid; 
       grid-template-columns: repeat(2, 1fr); 
-      gap: 14px; 
+      gap: 12px; 
     }
     .product-card {
       background: #ffffff; 
@@ -325,51 +328,41 @@
       justify-content: space-between; 
       position: relative;
       box-shadow: var(--shadow-sm);
+      contain: layout style;
     }
     .img-box {
       width: 100%; 
-      height: 125px; 
+      height: 120px; 
       border-radius: 14px; 
       background: #f8fafc;
       display: flex; 
       align-items: center; 
       justify-content: center; 
       overflow: hidden; 
-      margin-bottom: 10px; 
+      margin-bottom: 8px; 
       position: relative;
     }
     .img-box img { 
       width: 100%; 
       height: 100%; 
       object-fit: cover; 
+      content-visibility: auto;
     }
     .out-of-stock-tag {
       position: absolute; 
-      top: 8px; 
-      left: 8px; 
+      top: 6px; 
+      left: 6px; 
       background: rgba(15, 23, 42, 0.88);
       color: #fca5a5; 
-      font-size: 9.5px; 
+      font-size: 9px; 
       font-weight: 800; 
-      padding: 4px 8px; 
-      border-radius: 8px;
-      letter-spacing: 0.5px;
-    }
-    .low-stock-tag {
-      position: absolute;
-      top: 8px;
-      left: 8px;
-      background: #f59e0b;
-      color: white;
-      font-size: 9px;
-      font-weight: 800;
-      padding: 3px 6px;
+      padding: 3px 6px; 
       border-radius: 6px;
     }
     .badge-delivery-type {
       position: absolute;
-      top: 8px;
-      left: 8px;
+      top: 6px;
+      left: 6px;
       font-size: 9px;
       font-weight: 900;
       padding: 3px 6px;
@@ -382,23 +375,40 @@
     }
     .discount-badge-pill {
       position: absolute; 
-      top: 8px; 
-      right: 8px; 
+      top: 6px; 
+      right: 6px; 
       background: linear-gradient(135deg, #10b981, #059669);
       color: #ffffff; 
-      font-size: 10px; 
+      font-size: 9.5px; 
       font-weight: 900; 
-      padding: 3px 8px;
-      border-radius: 8px; 
-      box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
+      padding: 2px 6px;
+      border-radius: 6px; 
+      box-shadow: 0 2px 6px rgba(16, 185, 129, 0.3);
     }
+
+    /* 14 MIN FAST DELIVERY CHIP */
+    .fast-delivery-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      background: #f0fdf4;
+      border: 1px solid #bbf7d0;
+      color: #15803d;
+      font-size: 10px;
+      font-weight: 800;
+      padding: 2px 6px;
+      border-radius: 6px;
+      margin-bottom: 6px;
+      width: fit-content;
+    }
+
     .prod-title { 
       font-size: 13px; 
       font-weight: 800; 
       color: #0f172a; 
-      line-height: 1.35; 
+      line-height: 1.3; 
       margin-bottom: 2px; 
-      height: 35px; 
+      height: 34px; 
       display: -webkit-box; 
       -webkit-line-clamp: 2; 
       -webkit-box-orient: vertical; 
@@ -408,7 +418,7 @@
       font-size: 11px; 
       color: var(--text-muted); 
       font-weight: 600;
-      margin-bottom: 10px; 
+      margin-bottom: 4px; 
     }
     .price-action-row { 
       display: flex; 
@@ -424,15 +434,15 @@
     .mrp-cut {
       text-decoration: line-through; 
       color: #94a3b8; 
-      font-size: 11px;
+      font-size: 10.5px; 
       font-weight: 600; 
-      margin-left: 4px;
+      margin-left: 3px;
     }
     .btn-add-zepto {
       background: #ffffff; 
       border: 1.5px solid var(--accent-pink); 
       color: var(--accent-pink);
-      padding: 6px 18px; 
+      padding: 5px 16px; 
       border-radius: 10px; 
       font-weight: 900; 
       font-size: 12px; 
@@ -445,45 +455,45 @@
       background: var(--accent-pink-gradient);
       border-radius: 10px; 
       color: white; 
-      padding: 4px 8px; 
-      gap: 10px; 
+      padding: 3px 6px; 
+      gap: 8px; 
       font-weight: 900; 
-      font-size: 13px;
+      font-size: 12.5px;
     }
     .qty-btn { 
       background: none; 
       border: none; 
       color: white; 
-      font-size: 16px; 
+      font-size: 15px; 
       font-weight: 900; 
       cursor: pointer; 
       line-height: 1;
     }
 
-    /* SMART GLOWING UPSELL CARD */
+    /* SMART TARGET BANNER */
     .cart-target-banner {
       background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
       border: 1.5px solid #fcd34d;
       border-radius: 16px;
-      padding: 14px 16px;
-      margin-bottom: 14px;
+      padding: 12px 14px;
+      margin-bottom: 12px;
       display: flex;
       flex-direction: column;
-      gap: 8px;
-      box-shadow: 0 4px 16px rgba(245, 158, 11, 0.12);
+      gap: 6px;
+      box-shadow: 0 4px 16px rgba(245, 158, 11, 0.1);
     }
     .target-headline {
       display: flex;
       align-items: center;
       gap: 8px;
-      font-size: 13px;
+      font-size: 12.5px;
       font-weight: 900;
       color: #92400e;
       line-height: 1.35;
     }
     .target-progress-bg {
       width: 100%;
-      height: 7px;
+      height: 6px;
       background: #fde68a;
       border-radius: 8px;
       overflow: hidden;
@@ -493,10 +503,10 @@
       background: linear-gradient(90deg, #f59e0b, #10b981);
       width: 0%;
       border-radius: 8px;
-      transition: width 0.4s ease;
+      transition: width 0.3s ease;
     }
 
-    /* FLOATING CART & NAV */
+    /* FLOATING CART BAR */
     .floating-cart-bar {
       position: fixed; 
       bottom: 74px; 
@@ -505,7 +515,7 @@
       background: var(--accent-pink-gradient);
       color: white; 
       border-radius: 18px; 
-      padding: 14px 20px; 
+      padding: 13px 18px; 
       display: none;
       justify-content: space-between; 
       align-items: center; 
@@ -518,8 +528,8 @@
       bottom: 0; 
       left: 0; 
       width: 100%; 
-      height: 64px;
-      background: rgba(255, 255, 255, 0.95); 
+      height: 62px;
+      background: rgba(255, 255, 255, 0.98); 
       backdrop-filter: blur(12px);
       border-top: 1px solid var(--border-soft); 
       display: flex;
@@ -531,16 +541,16 @@
       display: flex; 
       flex-direction: column; 
       align-items: center; 
-      gap: 3px; 
+      gap: 2px; 
       font-size: 10px; 
       font-weight: 700; 
       color: #64748b; 
       cursor: pointer; 
     }
     .nav-item.active { color: var(--accent-pink); }
-    .nav-item-icon { font-size: 19px; }
+    .nav-item-icon { font-size: 18px; }
 
-    /* FULL-PAGE VIEW FOR CART & MODALS */
+    /* MODALS */
     .modal-overlay {
       position: fixed; 
       top: 0; 
@@ -562,7 +572,7 @@
       flex: 1;
       overflow-y: auto !important;
       -webkit-overflow-scrolling: touch;
-      padding: 18px 18px 140px 18px !important;
+      padding: 16px 16px 140px 16px !important;
       display: flex;
       flex-direction: column;
     }
@@ -570,57 +580,55 @@
       display: flex; 
       justify-content: space-between; 
       align-items: center;
-      margin-bottom: 16px; 
-      padding-bottom: 14px; 
+      margin-bottom: 14px; 
+      padding-bottom: 12px; 
       border-bottom: 1px solid var(--border-soft);
     }
-    .fullpage-title { font-size: 18px; font-weight: 900; color: var(--text-main); }
+    .fullpage-title { font-size: 17px; font-weight: 900; color: var(--text-main); }
     .fullpage-close {
       background: #f1f5f9; 
       border: none; 
-      width: 36px; 
-      height: 36px;
+      width: 34px; 
+      height: 34px;
       border-radius: 50%; 
       font-size: 16px;
       font-weight: bold; 
       cursor: pointer;
     }
 
-    /* CLEAR, BOLD PAYMENT SUMMARY */
     .bill-box { 
       background: #f8fafc; 
-      padding: 16px; 
+      padding: 14px; 
       border-radius: 16px; 
-      margin: 16px 0 20px 0; 
-      font-size: 13.5px; 
+      margin: 14px 0 18px 0; 
+      font-size: 13px; 
       border: 1.5px solid #e2e8f0;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+      box-shadow: 0 2px 10px rgba(0,0,0,0.02);
     }
     .bill-row { 
       display: flex; 
       justify-content: space-between; 
-      margin-bottom: 9px; 
+      margin-bottom: 8px; 
       font-weight: 700;
       color: #475569;
     }
     .bill-row.total { 
       font-weight: 900; 
-      font-size: 17px; 
-      margin-top: 10px; 
-      padding-top: 10px; 
+      font-size: 16px; 
+      margin-top: 8px; 
+      padding-top: 8px; 
       border-top: 2px dashed #cbd5e1; 
       color: #0f172a; 
     }
     
-    /* STICKY BOTTOM BAR */
     .cart-sticky-bottom-bar {
       position: absolute;
       bottom: 0;
       left: 0;
       width: 100%;
       background: #ffffff;
-      padding: 12px 18px 16px 18px;
-      box-shadow: 0 -8px 25px rgba(0, 0, 0, 0.12);
+      padding: 12px 16px 14px 16px;
+      box-shadow: 0 -8px 25px rgba(0, 0, 0, 0.1);
       z-index: 1050;
       border-top: 1.5px solid #f1f5f9;
     }
@@ -629,7 +637,7 @@
       background: var(--accent-pink-gradient); 
       color: white; 
       border: none; 
-      padding: 16px; 
+      padding: 15px; 
       border-radius: 14px; 
       font-size: 15px; 
       font-weight: 900; 
@@ -638,7 +646,6 @@
       box-shadow: 0 4px 14px rgba(255, 42, 109, 0.35);
       display: block;
       text-align: center;
-      transition: all 0.2s;
     }
     .btn-checkout-sticky:disabled {
       background: #94a3b8 !important;
@@ -648,7 +655,7 @@
 
     .zepto-input { 
       width: 100%; 
-      padding: 14px 16px; 
+      padding: 13px 15px; 
       border-radius: 12px; 
       border: 1.5px solid #cbd5e1; 
       font-size: 13px; 
@@ -656,63 +663,48 @@
       outline: none; 
       background: #fff;
     }
-    .zepto-input:focus {
-      border-color: var(--accent-pink);
-    }
+    .zepto-input:focus { border-color: var(--accent-pink); }
 
     .loc-card-box {
       background: #f0fdf4;
       border: 1.5px solid #86efac;
-      border-radius: 14px;
-      padding: 12px 14px;
+      border-radius: 12px;
+      padding: 10px 12px;
       margin-top: 4px;
-      margin-bottom: 12px;
+      margin-bottom: 10px;
     }
-    .loc-card-title {
-      font-size: 11px;
-      font-weight: 800;
-      color: #166534;
-      text-transform: uppercase;
-      margin-bottom: 4px;
-    }
-    .loc-card-val {
-      font-size: 12px;
-      font-weight: 700;
-      color: #15803d;
-      word-break: break-all;
-    }
+    .loc-card-title { font-size: 11px; font-weight: 800; color: #166534; text-transform: uppercase; margin-bottom: 2px; }
+    .loc-card-val { font-size: 11.5px; font-weight: 700; color: #15803d; word-break: break-all; }
+    
     .btn-fetch-gps {
       background: #0284c7;
       color: white;
       border: none;
       width: 100%;
-      padding: 14px;
+      padding: 13px;
       border-radius: 12px;
-      font-size: 13px;
+      font-size: 12.5px;
       font-weight: 800;
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
       gap: 6px;
-      box-shadow: 0 2px 8px rgba(2, 132, 199, 0.25);
-      transition: background 0.3s ease;
     }
 
-    /* DYNAMIC UPI QR BOX */
     .upi-qr-card {
       background: #fdf4ff;
       border: 2px dashed #d8b4fe;
       border-radius: 16px;
-      padding: 16px;
+      padding: 14px;
       text-align: center;
-      margin: 12px 0;
+      margin: 10px 0;
       display: none;
     }
     .upi-qr-img {
-      width: 180px;
-      height: 180px;
-      margin: 10px auto;
+      width: 170px;
+      height: 170px;
+      margin: 8px auto;
       border-radius: 12px;
       border: 2px solid #a855f7;
       background: #fff;
@@ -723,27 +715,26 @@
       background: #fff; 
       border-radius: 16px; 
       border: 1px solid var(--border-soft); 
-      padding: 14px; 
+      padding: 13px; 
       margin-bottom: 12px; 
       box-shadow: var(--shadow-sm);
     }
     
-    /* LIVE COUNTDOWN & DISPATCH BOX */
     .eta-countdown-card {
       background: linear-gradient(135deg, #0c4a6e, #075985);
       color: #ffffff;
       border-radius: 18px;
-      padding: 18px;
+      padding: 16px;
       text-align: center;
-      margin-bottom: 16px;
+      margin-bottom: 14px;
       box-shadow: 0 6px 20px rgba(7, 89, 133, 0.3);
     }
     .eta-big-timer {
-      font-size: 38px;
+      font-size: 34px;
       font-weight: 900;
       letter-spacing: 2px;
       color: #38bdf8;
-      margin: 6px 0;
+      margin: 4px 0;
       font-variant-numeric: tabular-nums;
     }
     .rider-live-status-pill {
@@ -751,30 +742,30 @@
       align-items: center;
       gap: 6px;
       background: rgba(255,255,255,0.18);
-      padding: 5px 12px;
+      padding: 4px 10px;
       border-radius: 20px;
-      font-size: 11.5px;
+      font-size: 11px;
       font-weight: 800;
-      margin-top: 6px;
+      margin-top: 4px;
     }
 
     .cust-otp-box {
       background: linear-gradient(135deg, #fdf4ff, #fae8ff);
       border: 2px dashed #c084fc; 
       border-radius: 16px;
-      padding: 14px; 
+      padding: 12px; 
       text-align: center; 
-      margin: 14px 0;
+      margin: 12px 0;
     }
     .cust-otp-code { 
-      font-size: 32px; 
+      font-size: 30px; 
       font-weight: 900; 
       color: #581c87; 
       letter-spacing: 6px; 
       margin: 4px 0; 
     }
 
-    /* REALTIME 2-WAY CHAT DRAWER */
+    /* CHAT */
     .chat-drawer { 
       position: fixed; 
       top: 0; 
@@ -790,22 +781,22 @@
     .chat-top-header { 
       background: var(--primary-purple); 
       color: white; 
-      padding: 16px; 
+      padding: 14px; 
       display: flex; 
       justify-content: space-between; 
       align-items: center; 
     }
     .chat-messages-area { 
       flex: 1; 
-      padding: 16px; 
+      padding: 14px; 
       overflow-y: auto; 
       display: flex;
       flex-direction: column;
-      gap: 10px;
+      gap: 8px;
     }
     .chat-bubble {
       max-width: 80%;
-      padding: 10px 14px;
+      padding: 9px 13px;
       border-radius: 14px;
       font-size: 13px;
       line-height: 1.4;
@@ -827,13 +818,13 @@
     .chat-input-bar {
       display: flex;
       gap: 8px;
-      padding: 12px 16px;
+      padding: 10px 14px;
       background: #ffffff;
       border-top: 1px solid var(--border-soft);
       align-items: center;
     }
 
-    /* RETURN MODAL STYLES */
+    /* RETURN MODAL */
     .return-modal-box {
       position: fixed;
       top: 0;
@@ -852,30 +843,16 @@
     .return-card {
       background: #ffffff;
       border-radius: 20px;
-      padding: 20px;
+      padding: 18px;
       width: 100%;
-      max-width: 400px;
+      max-width: 380px;
       max-height: 90vh;
       overflow-y: auto;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-    }
-    .photo-upload-box {
-      width: 100%;
-      height: 140px;
-      border: 2px dashed #cbd5e1;
-      border-radius: 14px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin: 10px 0;
-      overflow: hidden;
-      background: #f8fafc;
     }
   </style>
 </head>
 <body onclick="unlockCustomerAudio()" ontouchstart="unlockCustomerAudio()">
 
-  <!-- AUDIO ELEMENT FOR RIDER ARRIVAL ALERT -->
   <audio id="arrived-sound-player" src="alert.mp3" preload="auto"></audio>
 
   <!-- 1. BROADCAST NOTICE TICKER -->
@@ -889,13 +866,13 @@
     <div class="drawer-header">
       <img src="logo.png" class="drawer-logo-img" alt="Logo" onerror="this.style.display='none'">
       <div class="drawer-brand">👑 BABA FOOD EXPRESS</div>
-      <div style="font-size: 11px; color: #fdf4ff; margin-top: 2px;">Fresh & Fast Delivery in 10-20 Mins & 24 Hr</div>
+      <div style="font-size: 11px; color: #fdf4ff; margin-top: 2px;">14 Min Fast Express & 24 Hr Slots</div>
     </div>
     <div class="drawer-menu-list">
       <div class="drawer-item" onclick="toggleDrawer(false); openCartModal();">🛒 Mera Cart</div>
       <div class="drawer-item" onclick="toggleDrawer(false); openPastOrdersModal();">📦 Purane Orders</div>
       <div class="drawer-item" onclick="toggleDrawer(false); alert('Customer Support Call: 7037647464');">📞 Help & Support</div>
-      <div class="drawer-item" onclick="toggleDrawer(false); alert('Baba Food Delivery Express v3.0');">ℹ️ App Info</div>
+      <div class="drawer-item" onclick="toggleDrawer(false); alert('Baba Food Express v3.5');">ℹ️ App Info</div>
     </div>
   </div>
 
@@ -907,7 +884,7 @@
         <img src="logo.png" class="header-app-logo" alt="Logo" onerror="this.style.display='none'">
         <div class="brand-meta">
           <h1>BABA FOOD <span>🏹</span></h1>
-          <div class="eta-pill">⚡ 10-20 Min & ⏳ 24 Hr Delivery</div>
+          <div class="eta-pill">⚡ 14 Mins Fast Delivery</div>
         </div>
       </div>
       <button id="store-badge-top" style="background:#10b981; border:none; color:white; font-size:10px; font-weight:800; padding:6px 12px; border-radius:20px;">
@@ -915,16 +892,19 @@
       </button>
     </div>
 
-    <!-- Search Box (Instant Multi-Language Smart Filter) -->
+    <!-- Search Box -->
     <div class="search-box-wrap">
       <span class="search-icon-pos">🔍</span>
-      <input type="text" id="cust-search-input" class="search-bar-input" placeholder="Search doodh, दूध, cake, biryani, चाय..." oninput="handleSearch()">
+      <input type="text" id="cust-search-input" class="search-bar-input" placeholder="Search doodh, दूध, bread, chai, samosa..." oninput="debounceSearch()">
     </div>
 
-    <!-- DYNAMIC CATEGORY FILTER -->
+    <!-- DYNAMIC CATEGORY FILTER (FIXED OVERLAPPING) -->
     <div class="category-scroll" id="cat-scroll-container">
       <div class="cat-item active" onclick="filterCategory('ALL', this)">
         <div class="cat-icon-circle">🍽️ All</div>
+      </div>
+      <div class="cat-item" onclick="filterCategory('24_HOURS', this)">
+        <div class="cat-icon-circle" style="background:#4f46e5; border-color:#6366f1;">⏳ 24 Hr Special</div>
       </div>
     </div>
   </div>
@@ -933,9 +913,9 @@
   <div class="promo-banner" id="promo-banner-card">
     <div class="promo-text">
       <h3 id="promo-banner-title">Express Grocery & Food</h3>
-      <div class="promo-sub" id="promo-banner-sub">10-20 Min Instant & 24 Hr Scheduled Delivery</div>
+      <div class="promo-sub" id="promo-banner-sub">⚡ 14 Minute Fast Delivery at your Doorstep</div>
     </div>
-    <div style="font-size: 28px;">🚀</div>
+    <div style="font-size: 26px;">🚀</div>
   </div>
 
   <!-- MAIN PRODUCT GRID -->
@@ -974,7 +954,7 @@
     </div>
   </div>
 
-  <!-- CART & CHECKOUT MODAL (INTERNAL SCROLL FIXED) -->
+  <!-- CART & CHECKOUT MODAL -->
   <div class="modal-overlay" id="cart-modal">
     <div class="fullpage-content" id="cart-content-scrollable">
       <div class="fullpage-head">
@@ -982,7 +962,6 @@
         <button class="fullpage-close" onclick="closeCartModal()">✕</button>
       </div>
 
-      <!-- Target Progress Banner -->
       <div class="cart-target-banner" id="target-progress-box">
         <div class="target-headline" id="target-headline-text">Free delivery target</div>
         <div class="target-progress-bg">
@@ -990,26 +969,21 @@
         </div>
       </div>
 
-      <!-- Cart Delivery Type Indicator Banner -->
       <div id="cart-type-indicator-banner" style="display:none; background:#e0e7ff; border:1px solid #818cf8; color:#3730a3; padding:10px 14px; border-radius:12px; font-size:12px; font-weight:800; margin-bottom:12px;"></div>
 
-      <!-- Items List -->
       <div id="cart-items-container"></div>
 
-      <!-- Coupon Apply -->
       <div style="display:flex; gap:8px; margin: 12px 0;">
         <input type="text" id="coupon-input" class="zepto-input" placeholder="Coupon Code (e.g. BABA50)" style="text-transform:uppercase;">
         <button class="btn-add-zepto" onclick="applyCouponCode()" style="background:var(--primary-purple); color:white; border:none; padding:0 20px;">Apply</button>
       </div>
       <div id="coupon-applied-msg" style="font-size:12px; font-weight:800; color:#059669; margin-bottom:8px;"></div>
 
-      <!-- Customer Details Form -->
       <div style="display:flex; flex-direction:column; gap:10px; margin-top:8px;">
         <input type="text" id="cust-name" class="zepto-input" placeholder="Aapka Poora Naam *">
         <input type="tel" id="cust-phone" class="zepto-input" placeholder="Mobile Number (10 Digit) *" maxlength="10">
         <textarea id="cust-address" class="zepto-input" rows="2" placeholder="Ghar Ka Pata / Landmark *"></textarea>
         
-        <!-- MANDATORY GPS LOCATION -->
         <button type="button" class="btn-fetch-gps" id="btn-gps-action" onclick="fetchLiveGps()">
           📍 Auto Fetch My Live GPS Location (अनिवार्य *)
         </button>
@@ -1023,7 +997,6 @@
           <option value="UPI">📱 Online UPI / Instant Scanner</option>
         </select>
 
-        <!-- DYNAMIC UPI QR SCANNER BOX -->
         <div class="upi-qr-card" id="upi-qr-card">
           <div style="font-size:13px; font-weight:900; color:#6b21a8;">QR Code Scan Karke Payment Karein</div>
           <div style="font-size:11px; color:#64748b; margin-top:2px;">(Exact amount auto-filled aayega)</div>
@@ -1033,9 +1006,8 @@
         </div>
       </div>
 
-      <!-- FULL PAYMENT SUMMARY -->
       <div class="bill-box" id="cart-bill-summary-box">
-        <div style="font-size:14px; font-weight:900; color:#0f172a; margin-bottom:12px; border-bottom:1px solid #e2e8f0; padding-bottom:6px;">
+        <div style="font-size:14px; font-weight:900; color:#0f172a; margin-bottom:10px; border-bottom:1px solid #e2e8f0; padding-bottom:6px;">
           🧾 Payment Summary
         </div>
         <div class="bill-row"><span>Item Subtotal:</span><span id="bill-subtotal">₹0</span></div>
@@ -1050,7 +1022,6 @@
       <div style="height: 30px; width: 100%;"></div>
     </div>
 
-    <!-- Sticky Bottom Place Order Button -->
     <div class="cart-sticky-bottom-bar">
       <button class="btn-checkout-sticky" id="btn-place-order" onclick="submitCustomerOrder()">
         Place Order 🚀
@@ -1069,7 +1040,7 @@
     </div>
   </div>
 
-  <!-- LIVE TRACKING MODAL (WITH 24-HR OR EXPRESS VIEW) -->
+  <!-- LIVE TRACKING MODAL -->
   <div class="modal-overlay" id="track-modal">
     <div class="fullpage-content">
       <div class="fullpage-head">
@@ -1080,14 +1051,14 @@
     </div>
   </div>
 
-  <!-- CUSTOMER RETURN / REPLACEMENT MODAL -->
+  <!-- CUSTOMER RETURN MODAL -->
   <div class="return-modal-box" id="return-modal">
     <div class="return-card">
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
         <h3 style="font-size:16px; font-weight:900; color:#dc2626;">📦 Return Order Request</h3>
         <button onclick="closeReturnModal()" style="border:none; background:#f1f5f9; width:28px; height:28px; border-radius:50%; font-weight:bold; cursor:pointer;">✕</button>
       </div>
-      <p style="font-size:11.5px; color:#64748b; margin-bottom:12px;">Admin jaanch aur rider pickup ke liye photo aur refund UPI ID anivarya hai.</p>
+      <p style="font-size:11.5px; color:#64748b; margin-bottom:12px;">Admin jaanch ke liye photo aur refund UPI ID anivarya hai.</p>
 
       <div class="photo-upload-box" id="return-photo-preview">
         <span style="font-size:11.5px; color:#94a3b8; font-weight:700;">📸 Saman Ka Photo Yahan Dikhega *</span>
@@ -1097,9 +1068,8 @@
         📸 Saman Ka Photo Kheinchein *
       </button>
 
-      <textarea id="return-reason-input" class="zepto-input" rows="2" placeholder="Wapsi ka karan (e.g. Saman kharab hai ya galat mila) *" style="margin-bottom:10px;"></textarea>
-      
-      <input type="text" id="return-upi-input" class="zepto-input" placeholder="Refund lene ke liye Aapka UPI ID (e.g. 9876543210@paytm) *" style="margin-bottom:14px;">
+      <textarea id="return-reason-input" class="zepto-input" rows="2" placeholder="Wapsi ka karan *" style="margin-bottom:10px;"></textarea>
+      <input type="text" id="return-upi-input" class="zepto-input" placeholder="Aapka UPI ID (e.g. 9876543210@paytm) *" style="margin-bottom:14px;">
 
       <button type="button" class="btn-checkout-sticky" id="btn-submit-return" onclick="submitReturnRequest()">
         Admin Approval Ke Liye Bhejo 🚀
@@ -1107,7 +1077,7 @@
     </div>
   </div>
 
-  <!-- CUSTOMER REAL-TIME 2-WAY CHAT DRAWER -->
+  <!-- CHAT DRAWER -->
   <div class="chat-drawer" id="cust-chat-drawer">
     <div class="chat-top-header">
       <div>
@@ -1144,6 +1114,7 @@
     let countdownTimerInterval = null;
     let customerAudioUnlocked = false;
     let hasPlayedArrivedAlert = {};
+    let searchDebounceTimer = null;
 
     let selectedReturnOrderId = null;
     let base64ReturnPhoto = null;
@@ -1156,22 +1127,17 @@
       try {
         const AudioContext = window.AudioContext || window.webkitAudioContext;
         const ctx = new AudioContext();
-        if (ctx.state === 'suspended') {
-          ctx.resume();
-        }
+        if (ctx.state === 'suspended') ctx.resume();
       } catch(e){}
       customerAudioUnlocked = true;
     }
 
-    // 🔔 HALKA AUR MADHUR RIDER ARRIVAL CHIME
     function playRiderArrivedChime() {
       try {
         const AudioContext = window.AudioContext || window.webkitAudioContext;
         const ctx = new AudioContext();
-
         playSweetTone(ctx, 659.25, 0.0, 0.45);
         playSweetTone(ctx, 523.25, 0.22, 0.65);
-
         if (navigator.vibrate) navigator.vibrate([100, 80, 120]);
       } catch (e) {
         const sound = document.getElementById('arrived-sound-player');
@@ -1186,96 +1152,40 @@
     function playSweetTone(ctx, freq, startTime, duration) {
       const osc = ctx.createOscillator();
       const gain = ctx.createGain();
-
       osc.type = 'sine';
       osc.frequency.setValueAtTime(freq, ctx.currentTime + startTime);
-
       gain.gain.setValueAtTime(0.001, ctx.currentTime + startTime);
       gain.gain.exponentialRampToValueAtTime(0.18, ctx.currentTime + startTime + 0.05);
       gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + startTime + duration);
-
       osc.connect(gain);
       gain.connect(ctx.destination);
-
       osc.start(ctx.currentTime + startTime);
       osc.stop(ctx.currentTime + startTime + duration);
     }
 
-    // 📚 HINDI-ENGLISH GROCERY SYNONYM DICTIONARY
     const GROCERY_SYNONYMS = {
-      'doodh': ['milk', 'dairy'],
-      'dudh': ['milk', 'dairy'],
-      'dood': ['milk', 'dairy'],
-      'दूध': ['milk', 'dairy'],
-      'dahi': ['curd', 'yogurt'],
-      'दही': ['curd', 'yogurt'],
-      'makhan': ['butter'],
-      'makkhan': ['butter'],
-      'मक्खन': ['butter'],
-      'paneer': ['cheese', 'cottage cheese'],
-      'पनीर': ['paneer', 'cheese'],
-      'anda': ['egg', 'eggs'],
-      'ande': ['egg', 'eggs'],
-      'अंडा': ['egg', 'eggs'],
-      'अंडे': ['egg', 'eggs'],
-      'chawal': ['rice'],
-      'चावल': ['rice'],
-      'roti': ['bread', 'chapati'],
-      'रोटी': ['bread', 'roti'],
-      'cheeni': ['sugar'],
-      'chini': ['sugar'],
-      'चीनी': ['sugar'],
-      'shakkar': ['sugar'],
-      'शक्कर': ['sugar'],
-      'namak': ['salt'],
-      'नमक': ['salt'],
-      'tel': ['oil', 'mustard oil'],
-      'refined': ['oil'],
-      'तेल': ['oil'],
-      'aata': ['flour', 'atta', 'wheat'],
-      'atta': ['flour', 'aata', 'wheat'],
-      'आटा': ['flour', 'atta', 'wheat'],
-      'dal': ['pulse', 'lentil', 'daal'],
-      'daal': ['pulse', 'lentil', 'dal'],
-      'दाल': ['dal', 'daal', 'lentil'],
-      'chai': ['tea'],
-      'chaipatti': ['tea'],
-      'चाय': ['tea', 'chai'],
-      'paani': ['water', 'bisleri'],
-      'pani': ['water', 'bisleri'],
-      'पानी': ['water'],
-      'sabzi': ['vegetable', 'veg'],
-      'sabji': ['vegetable', 'veg'],
-      'सब्जी': ['vegetable'],
-      'aloo': ['potato'],
-      'aalu': ['potato'],
-      'आलू': ['potato'],
-      'pyaz': ['onion'],
-      'pyaj': ['onion'],
-      'प्याज': ['onion'],
-      'tamatar': ['tomato'],
-      'टमाटर': ['tomato'],
-      'nimbu': ['lemon'],
-      'नींबू': ['lemon'],
-      'adrak': ['ginger'],
-      'अदरक': ['ginger'],
-      'lehsun': ['garlic'],
-      'लहसुन': ['garlic'],
-      'masala': ['spice', 'spices'],
-      'मसाला': ['spice', 'masala'],
-      'mirch': ['chilli', 'chilly', 'pepper'],
-      'मिर्च': ['chilli', 'pepper'],
-      'haldi': ['turmeric'],
-      'हल्दी': ['turmeric'],
-      'dhaniya': ['coriander'],
-      'धनिया': ['coriander'],
-      'gosht': ['meat', 'mutton'],
-      'murga': ['chicken'],
-      'मांस': ['meat'],
-      'chickan': ['chicken'],
-      'चिकन': ['chicken'],
-      'biscuit': ['biskut', 'cookie', 'cookies'],
-      'बिस्कुट': ['biscuit', 'cookie']
+      'doodh': ['milk', 'dairy'], 'dudh': ['milk', 'dairy'], 'दूध': ['milk', 'dairy'],
+      'dahi': ['curd', 'yogurt'], 'दही': ['curd', 'yogurt'],
+      'makhan': ['butter'], 'मक्खन': ['butter'],
+      'paneer': ['cheese', 'cottage cheese'], 'पनीर': ['paneer', 'cheese'],
+      'anda': ['egg', 'eggs'], 'ande': ['egg', 'eggs'], 'अंडा': ['egg', 'eggs'],
+      'chawal': ['rice'], 'चावल': ['rice'],
+      'roti': ['bread', 'chapati'], 'रोटी': ['bread', 'roti'],
+      'cheeni': ['sugar'], 'चीनी': ['sugar'],
+      'namak': ['salt'], 'नमक': ['salt'],
+      'tel': ['oil'], 'तेल': ['oil'],
+      'aata': ['flour', 'atta', 'wheat'], 'आटा': ['flour', 'atta', 'wheat'],
+      'dal': ['pulse', 'lentil', 'daal'], 'दाल': ['dal', 'daal'],
+      'chai': ['tea'], 'चाय': ['tea', 'chai'],
+      'paani': ['water'], 'पानी': ['water'],
+      'sabzi': ['vegetable', 'veg'], 'सब्जी': ['vegetable'],
+      'aloo': ['potato'], 'आलू': ['potato'],
+      'pyaz': ['onion'], 'प्याज': ['onion'],
+      'tamatar': ['tomato'], 'टमाटर': ['tomato'],
+      'adrak': ['ginger'], 'अदरक': ['ginger'],
+      'lehsun': ['garlic'], 'लहसुन': ['garlic'],
+      'murga': ['chicken'], 'चिकन': ['chicken'],
+      'biscuit': ['biskut', 'cookie'], 'बिस्कुट': ['biscuit']
     };
 
     document.addEventListener('DOMContentLoaded', () => {
@@ -1295,7 +1205,6 @@
         const { data } = await _supabase.from('app_settings').select('*').eq('id', 1).single();
         if (data) {
           appSettings = data;
-          
           const storeBtn = document.getElementById('store-badge-top');
           if (data.store_status === 'CLOSED') {
             storeBtn.style.background = '#dc2626';
@@ -1316,9 +1225,7 @@
           if (data.banner_title) document.getElementById('promo-banner-title').innerText = data.banner_title;
           if (data.banner_subtitle) document.getElementById('promo-banner-sub').innerText = data.banner_subtitle;
         }
-      } catch (err) {
-        console.warn('Settings load error:', err);
-      }
+      } catch (err){}
     }
 
     async function fetchCustomerProducts() {
@@ -1334,6 +1241,7 @@
       }
     }
 
+    // CATEGORY LIST - CLEAN & OVERLAP-FREE
     function buildDynamicCategories() {
       const container = document.getElementById('cat-scroll-container');
       const uniqueCategories = new Set();
@@ -1349,7 +1257,7 @@
           <div class="cat-icon-circle">🍽️ All</div>
         </div>
         <div class="cat-item ${activeCategory === '24_HOURS' ? 'active' : ''}" onclick="filterCategory('24_HOURS', this)">
-          <div class="cat-icon-circle" style="background:#4f46e5; color:#fff;">⏳ 24 Hr Special</div>
+          <div class="cat-icon-circle" style="background:#4f46e5; border-color:#6366f1;">⏳ 24 Hr Special</div>
         </div>
       `;
 
@@ -1385,7 +1293,6 @@
 
     function isSearchMatch(item, queryRaw) {
       if (!queryRaw) return true;
-
       const qClean = queryRaw.toLowerCase().trim();
       const qTranslit = transliterateHindiToEnglish(queryRaw).trim();
 
@@ -1397,7 +1304,6 @@
       if (name.includes(qTranslit) || nameTranslit.includes(qClean) || nameTranslit.includes(qTranslit)) return true;
 
       let mappedTerms = GROCERY_SYNONYMS[qClean] || GROCERY_SYNONYMS[qTranslit] || [];
-
       if (mappedTerms.length === 0) {
         for (let key in GROCERY_SYNONYMS) {
           if (key.startsWith(qClean) || key.startsWith(qTranslit)) {
@@ -1415,10 +1321,10 @@
           if (hiKey.includes(qClean) || hiKey.includes(qTranslit)) return true;
         }
       }
-
       return false;
     }
 
+    // ⚡ SUPER-FAST RENDER WITH 14 MIN FAST DELIVERY BADGE
     function renderProducts() {
       const wrap = document.getElementById('product-grid-wrap');
       const query = (document.getElementById('cust-search-input')?.value || '').trim();
@@ -1432,8 +1338,7 @@
         } else {
           matchCat = (p.category || '').toLowerCase() === activeCategory.toLowerCase();
         }
-        const matchQuery = isSearchMatch(p, query);
-        return matchCat && matchQuery;
+        return matchCat && isSearchMatch(p, query);
       });
 
       if (filtered.length === 0) {
@@ -1459,23 +1364,32 @@
           mrpHtml = `<span class="mrp-cut">₹${mrp}</span>`;
         }
 
+        // NON-24 HR KE LIYE: 14 MINS FAST DELIVERY BADGE
+        let deliveryTagHtml = '';
+        if (is24Hr) {
+          deliveryTagHtml = `<div class="badge-delivery-type badge-24hr-tag">⏳ 24 Hr Slot</div>`;
+        } else {
+          deliveryTagHtml = `<div class="fast-delivery-badge">⚡ 14 MINS</div>`;
+        }
+
         return `
           <div class="product-card">
             <div class="img-box">
-              <img src="${p.image_url || 'https://via.placeholder.com/150'}" alt="${p.name}" onerror="this.src='https://via.placeholder.com/150'">
+              <img src="${p.image_url || 'https://via.placeholder.com/150'}" alt="${p.name}" loading="lazy" decoding="async" onerror="this.src='https://via.placeholder.com/150'">
               ${isOutOfStock ? `<span class="out-of-stock-tag">Out of Stock</span>` : ''}
               ${isLow ? `<span class="low-stock-tag">Only ${availableStock} Left</span>` : ''}
-              ${is24Hr ? `<span class="badge-delivery-type badge-24hr-tag">⏳ 24 Hr Delivery</span>` : ''}
+              ${is24Hr ? deliveryTagHtml : ''}
               ${discPct > 0 ? `<span class="discount-badge-pill">${discPct}% OFF</span>` : ''}
             </div>
             <div>
+              ${!is24Hr ? deliveryTagHtml : ''}
               <div class="prod-title">${p.name}</div>
               <div class="prod-unit">${p.unit || '1 unit'}</div>
             </div>
             <div class="price-action-row">
               <div class="price-tag">₹${p.price} ${mrpHtml}</div>
               ${isOutOfStock ? `
-                <button class="btn-add-zepto" style="border-color:#cbd5e1; color:#94a3b8; background:#f1f5f9; cursor:not-allowed;" disabled>Sold Out</button>
+                <button class="btn-add-zepto" style="border-color:#cbd5e1; color:#94a3b8; background:#f1f5f9; cursor:not-allowed;" disabled>Sold</button>
               ` : qtyInCart > 0 ? `
                 <div class="qty-counter">
                   <button class="qty-btn" onclick="updateItemQty(${p.id}, -1)">−</button>
@@ -1491,11 +1405,12 @@
       }).join('');
     }
 
-    function handleSearch() {
-      renderProducts();
+    // 🚀 DEBOUNCED SEARCH FOR ULTRA-FAST PERFORMANCE
+    function debounceSearch() {
+      clearTimeout(searchDebounceTimer);
+      searchDebounceTimer = setTimeout(renderProducts, 80);
     }
 
-    // 🔒 24-HOUR CART ISOLATION & LIVE STOCK DEDUCTION CHECK
     function updateItemQty(prodId, delta) {
       const prod = allProducts.find(p => p.id === prodId);
       if (!prod) return;
@@ -1504,13 +1419,12 @@
       const targetQty = currentInCart + delta;
       const availableStock = prod.stock_quantity ?? 0;
 
-      // 1. Stock Check
       if (delta > 0 && targetQty > availableStock) {
         alert(`⚠️ Maaf kijiye! Is item ka sirf ${availableStock} stock hi bacha hai.`);
         return;
       }
 
-      // 2. ⏳ 24-HOUR VS EXPRESS CART ISOLATION RULE (EXCLUSIVE CART LOCK)
+      // ⏳ 24-HOUR CART ISOLATION RULE
       if (delta > 0) {
         const currentCartItems = Object.values(cart);
         if (currentCartItems.length > 0) {
@@ -1519,34 +1433,18 @@
 
           if (cartType !== incomingType) {
             if (incomingType === '24_HOURS') {
-              alert('⚠️ 24 घंटे डिलीवरी वाले आइटम के साथ केवल 24 घंटे वाले आइटम ही जोड़े जा सकते हैं!\n\nकृपया पहले कार्ट खाली करें या अपना 10-20 मिनट वाला एक्सप्रेस ऑर्डर अलग से पूरा करें।');
+              alert('⚠️ 24 घंटे डिलीवरी वाले सामान के साथ केवल 24 घंटे वाले सामान ही जोड़े जा सकते हैं!\n\nकृपया पहले कार्ट खाली करें या अपना 14 मिनट वाला एक्सप्रेस ऑर्डर अलग से पूरा करें।');
             } else {
-              alert('⚠️ आपके कार्ट में 24 घंटे डिलीवरी वाले विशेष आइटम हैं! 10-20 मिनट वाले एक्सप्रेस आइटम को अलग से ऑर्डर करें।');
+              alert('⚠️ आपके कार्ट में 24 घंटे डिलीवरी वाले विशेष आइटम हैं! 14 मिनट वाले एक्सप्रेस सामान को अलग से ऑर्डर करें।');
             }
             return;
           }
         }
       }
 
-      // 3. Hub Lock Check
-      if (appSettings.enable_hub_lock && delta > 0) {
-        const targetHubId = prod.hub_id || 1;
-        const currentCartHubs = Object.values(cart).map(i => i.hub_id || 1);
-
-        if (currentCartHubs.length > 0 && !currentCartHubs.includes(targetHubId)) {
-          alert('⚠️ Ek cart mein sirf ek hi dukaan/hub ke items add ho sakte hain!');
-          return;
-        }
-      }
-
-      if (!cart[prodId]) {
-        cart[prodId] = { ...prod, qty: 0 };
-      }
-
+      if (!cart[prodId]) cart[prodId] = { ...prod, qty: 0 };
       cart[prodId].qty += delta;
-      if (cart[prodId].qty <= 0) {
-        delete cart[prodId];
-      }
+      if (cart[prodId].qty <= 0) delete cart[prodId];
 
       renderProducts();
       updateCartUI();
@@ -1581,18 +1479,12 @@
         const curHr = new Date().getHours();
         const start = appSettings.night_surge_start_hour ?? 22;
         const end = appSettings.night_surge_end_hour ?? 6;
-        if (start > end) {
-          if (curHr >= start || curHr < end) nightFee = Number(appSettings.night_surge_fee || 20);
-        } else {
-          if (curHr >= start && curHr < end) nightFee = Number(appSettings.night_surge_fee || 20);
+        if (start > end ? (curHr >= start || curHr < end) : (curHr >= start && curHr < end)) {
+          nightFee = Number(appSettings.night_surge_fee || 20);
         }
       }
 
-      let couponDisc = 0;
-      if (appliedCoupon && subtotal >= (appliedCoupon.min_order_amount || 0)) {
-        couponDisc = Number(appliedCoupon.discount_value || 0);
-      }
-
+      let couponDisc = (appliedCoupon && subtotal >= (appliedCoupon.min_order_amount || 0)) ? Number(appliedCoupon.discount_value || 0) : 0;
       currentCalculatedTotal = Math.max(0, (subtotal + deliveryFee + rainFee + nightFee) - couponDisc);
 
       document.getElementById('bill-subtotal').innerText = `₹${subtotal}`;
@@ -1624,7 +1516,6 @@
 
       document.getElementById('bill-grand-total').innerText = `₹${currentCalculatedTotal}`;
 
-      // Cart Type Banner Display
       const cartItemsArr = Object.values(cart);
       const indicatorBanner = document.getElementById('cart-type-indicator-banner');
       if (cartItemsArr.length > 0) {
@@ -1634,12 +1525,12 @@
           indicatorBanner.style.background = '#e0e7ff';
           indicatorBanner.style.borderColor = '#818cf8';
           indicatorBanner.style.color = '#3730a3';
-          indicatorBanner.innerHTML = '⏳ <b>24-Hour Delivery Slot Active</b> — Ye order Super Rider dwara 24 ghante me deliver hoga.';
+          indicatorBanner.innerHTML = '⏳ <b>24-Hour Delivery Slot Active</b> — Super Rider dwara 24 ghante me deliver hoga.';
         } else {
           indicatorBanner.style.background = '#ecfdf5';
           indicatorBanner.style.borderColor = '#86efac';
           indicatorBanner.style.color = '#065f46';
-          indicatorBanner.innerHTML = '⚡ <b>10-20 Min Express Delivery Active</b> — Garama garam turant delivery.';
+          indicatorBanner.innerHTML = '⚡ <b>14 Minute Express Delivery Active</b> — Rider turant 14 min me ghar layega.';
         }
       } else {
         indicatorBanner.style.display = 'none';
@@ -1666,7 +1557,7 @@
             <div>
               <div style="font-size:13px; font-weight:800;">
                 ${it.name}
-                ${it.delivery_type === '24_HOURS' ? `<span style="font-size:9.5px; background:#4f46e5; color:#fff; padding:2px 6px; border-radius:4px; margin-left:4px;">⏳ 24 HR</span>` : ''}
+                ${it.delivery_type === '24_HOURS' ? `<span style="font-size:9.5px; background:#4f46e5; color:#fff; padding:2px 5px; border-radius:4px; margin-left:4px;">⏳ 24 HR</span>` : `<span style="font-size:9.5px; background:#10b981; color:#fff; padding:2px 5px; border-radius:4px; margin-left:4px;">⚡ 14 MIN</span>`}
               </div>
               <div style="font-size:11px; color:var(--text-muted);">₹${it.price} × ${it.qty}</div>
             </div>
@@ -1687,14 +1578,8 @@
 
       if (mode === 'UPI' && currentCalculatedTotal > 0) {
         const upiString = `upi://pay?pa=${STORE_UPI_ID}&pn=BABA%20FOOD%20DELIVERY&am=${currentCalculatedTotal}&cu=INR&tn=OrderPayment`;
-        const qrApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(upiString)}`;
-        qrImg.src = qrApiUrl;
+        qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(upiString)}`;
         qrCard.style.display = 'block';
-
-        setTimeout(() => {
-          const scrollBox = document.getElementById('cart-content-scrollable');
-          if (scrollBox) scrollBox.scrollTo({ top: scrollBox.scrollHeight, behavior: 'smooth' });
-        }, 120);
       } else {
         qrCard.style.display = 'none';
       }
@@ -1702,7 +1587,6 @@
 
     function fetchLiveGps() {
       if (!navigator.geolocation) return alert('GPS uplabdh nahi hai!');
-
       const btn = document.getElementById('btn-gps-action');
       btn.innerText = '📡 Live GPS Lock Ho Raha Hai...';
 
@@ -1712,32 +1596,25 @@
         document.getElementById('loc-val').innerText = `${userCoords.lat.toFixed(5)}, ${userCoords.lng.toFixed(5)}`;
         btn.style.background = '#10b981';
         btn.innerText = '✅ Live Location Locked';
-        
-        setTimeout(() => {
-          const scrollBox = document.getElementById('cart-content-scrollable');
-          if (scrollBox) scrollBox.scrollBy({ top: 120, behavior: 'smooth' });
-        }, 100);
       }, err => {
         btn.innerText = '📍 Auto Fetch My Live GPS Location (अनिवार्य *)';
-        alert('GPS Access Dena Zaroori Hai! Error: ' + err.message);
+        alert('GPS Access Dena Zaroori Hai: ' + err.message);
       }, { enableHighAccuracy: true, timeout: 10000 });
     }
 
-    // 🚀 SUBMIT ORDER WITH DELIVERY_TYPE RECORDED FOR SUPER RIDER
     async function submitCustomerOrder() {
       if (appSettings.store_status === 'CLOSED') {
-        alert('Dukaan abhi band hai. Kripya thodi der baad koshish karein!');
+        alert('Dukaan abhi band hai!');
         return;
       }
 
       const itemsArr = Object.values(cart);
       if (itemsArr.length === 0) return alert('Aapka cart khaali hai!');
 
-      // Check stock before placing
       for (let item of itemsArr) {
         const prod = allProducts.find(p => p.id === item.id);
         if (prod && (prod.stock_quantity ?? 0) < item.qty) {
-          alert(`⚠️ "${item.name}" ka stock abhi kam ho gaya hai! Stock: ${prod.stock_quantity ?? 0}`);
+          alert(`⚠️ "${item.name}" ka stock kam hai! Bacha stock: ${prod.stock_quantity ?? 0}`);
           fetchCustomerProducts();
           return;
         }
@@ -1762,7 +1639,7 @@
       }
 
       if (!userCoords || !userCoords.lat || !userCoords.lng) {
-        alert('⚠️ Delivery ke liye Live GPS location anivarya hai! Kripya neele button par click karein.');
+        alert('⚠️ Live GPS location anivarya hai! Kripya neele button par click karein.');
         fetchLiveGps();
         return;
       }
@@ -1795,8 +1672,6 @@
       const otp = Math.floor(1000 + Math.random() * 9000).toString();
       const freeGift = (appSettings.is_free_gift_active && subtotal >= (appSettings.free_gift_min_order ?? 499)) ? appSettings.free_gift_item_name : null;
       const hubId = itemsArr[0]?.hub_id || 1;
-
-      // Check whether this order is 24_HOURS or EXPRESS
       const orderDeliveryType = (itemsArr[0]?.delivery_type === '24_HOURS') ? '24_HOURS' : 'EXPRESS';
 
       const orderPayload = {
@@ -1831,10 +1706,7 @@
             const p = allProducts.find(x => x.id === it.id);
             if (p) {
               const newStock = Math.max(0, (p.stock_quantity ?? 0) - it.qty);
-              await _supabase.from('products').update({
-                stock_quantity: newStock,
-                is_out_of_stock: newStock <= 0
-              }).eq('id', it.id);
+              await _supabase.from('products').update({ stock_quantity: newStock, is_out_of_stock: newStock <= 0 }).eq('id', it.id);
             }
           }
         }
@@ -1848,7 +1720,7 @@
         btn.disabled = false;
         btn.innerText = 'Place Order 🚀';
 
-        alert(`🎉 Order #${data.id} Safaltapoorvak Lag Gaya! (${orderDeliveryType === '24_HOURS' ? '⏳ 24 Ghante Slot' : '⚡ 10-20 Min Express'})`);
+        alert(`🎉 Order #${data.id} Lag Gaya! (${orderDeliveryType === '24_HOURS' ? '⏳ 24 Ghante Slot' : '⚡ 14 Min Fast Delivery'})`);
         openTrackModal(data.id);
         fetchCustomerProducts();
       } catch (err) {
@@ -1858,7 +1730,6 @@
       }
     }
 
-    // LIVE TRACKING (WITH 24-HR SPECIAL BANNER)
     async function openTrackModal(orderId) {
       activeTrackOrderId = orderId;
       document.getElementById('track-order-num').innerText = `Order #ORD-${orderId}`;
@@ -1902,7 +1773,7 @@
         if (rider) {
           riderInfoHtml = `
             <div style="background:#f1f5f9; border-radius:12px; padding:12px; margin:12px 0; font-size:12.5px;">
-              <div>${rider.rider_type === 'SUPER' ? '👑 <b>Super Rider (24 Hr):</b>' : '🛵 <b>Delivery Partner:</b>'} <b>${rider.name}</b> (📞 <a href="tel:${rider.phone}">${rider.phone}</a>)</div>
+              <div>${rider.rider_type === 'SUPER' ? '👑 <b>Super Rider (24 Hr):</b>' : '🛵 <b>Delivery Partner (14 Min):</b>'} <b>${rider.name}</b> (📞 <a href="tel:${rider.phone}">${rider.phone}</a>)</div>
               ${rider.current_lat && rider.current_lng ? `
                 <div style="margin-top:6px;">
                   <a href="https://maps.google.com/?q=${rider.current_lat},${rider.current_lng}" target="_blank" style="color:#0284c7; font-weight:800; text-decoration:none;">
@@ -1922,7 +1793,7 @@
             <div style="background:linear-gradient(135deg, #059669, #047857); color:white; border-radius:18px; padding:20px; text-align:center; margin-bottom:16px; box-shadow:0 8px 25px rgba(5,150,105,0.4);">
               <div style="font-size:32px; margin-bottom:4px;">🔔 🛵</div>
               <div style="font-size:18px; font-weight:900; letter-spacing:0.5px;">RIDER PAHUNCH GAYA HAI!</div>
-              <div style="font-size:12px; opacity:0.95; margin-top:4px;">Delivery partner aapke darwaze par hai. Kripya apna Secret OTP batayein.</div>
+              <div style="font-size:12px; opacity:0.95; margin-top:4px;">Delivery partner aapke darwaze par hai. Secret OTP batayein.</div>
             </div>
           ` : isDispatched ? (
             is24Hr ? `
@@ -1933,29 +1804,29 @@
               </div>
             ` : `
               <div class="eta-countdown-card">
-                <div style="font-size:12px; font-weight:800; opacity:0.9;">🛵 RIDER NE ORDER PICK KAR LIYA HAI!</div>
-                <div class="eta-big-timer" id="eta-countdown-clock">14:59</div>
-                <div class="rider-live-status-pill">⚡ Express Delivery in Progress</div>
+                <div style="font-size:12px; font-weight:800; opacity:0.9;">🛵 14 MIN FAST DELIVERY IN PROGRESS!</div>
+                <div class="eta-big-timer" id="eta-countdown-clock">13:59</div>
+                <div class="rider-live-status-pill">⚡ Express Rider On The Way</div>
               </div>
             `
           ) : isDelivered ? `
             <div style="background:#ecfdf5; border:1.5px solid #86efac; border-radius:14px; padding:16px; text-align:center; color:#065f46; font-weight:900; margin-bottom:14px;">
-              🎉 ORDER SAFALTAPOORVAK DELIVER HO GAYA!
+              🎉 ORDER DELIVER HO GAYA!
             </div>
           ` : is24Hr ? `
             <div style="background:#e0e7ff; border:1.5px solid #a5b4fc; border-radius:14px; padding:14px; text-align:center; color:#312e81; font-weight:800; margin-bottom:14px;">
-              ⏳ <b>24 Ghante Scheduled Delivery:</b> Aapka order Super Rider dwara 24 ghante ke andar deliver hoga!
+              ⏳ <b>24 Ghante Scheduled Delivery:</b> Super Rider dwara 24 ghante ke andar deliver hoga!
             </div>
           ` : `
             <div style="background:#eff6ff; border:1.5px solid #bfdbfe; border-radius:14px; padding:14px; text-align:center; color:#1e40af; font-weight:800; margin-bottom:14px;">
-              ⏳ Dukaan par order taiyar ho raha hai... Rider turant pick karega!
+              ⚡ <b>14 Min Express Order:</b> Dukaan par pack ho raha hai... Rider turant le kar nikal raha hai!
             </div>
           `}
 
           <div style="display:flex; justify-content:space-between; align-items:center;">
             <div>
               <div style="font-size:15px; font-weight:900;">Status: <span style="color:var(--accent-pink);">${data.status}</span></div>
-              ${is24Hr ? `<span style="font-size:10px; font-weight:800; background:#4f46e5; color:#fff; padding:2px 6px; border-radius:4px;">⏳ 24 Hr Super Rider Order</span>` : ''}
+              ${is24Hr ? `<span style="font-size:10px; font-weight:800; background:#4f46e5; color:#fff; padding:2px 6px; border-radius:4px;">⏳ 24 Hr Super Order</span>` : `<span style="font-size:10px; font-weight:800; background:#059669; color:#fff; padding:2px 6px; border-radius:4px;">⚡ 14 Min Fast Express</span>`}
             </div>
             <div style="font-size:13px; font-weight:800; color:var(--text-muted); text-align:right;">₹${data.total_amount} (${data.payment_mode})</div>
           </div>
@@ -1963,7 +1834,7 @@
           ${riderInfoHtml}
 
           <div class="cust-otp-box">
-            <div style="font-size:12px; font-weight:800; color:#6b21a8;">DELIVERY SECRET OTP (Rider ko batayein):</div>
+            <div style="font-size:12px; font-weight:800; color:#6b21a8;">DELIVERY SECRET OTP:</div>
             <div class="cust-otp-code">${data.delivery_otp || '----'}</div>
           </div>
 
@@ -1984,7 +1855,7 @@
       `;
 
       if (isDispatched && !is24Hr && !countdownTimerInterval) {
-        startLiveCountdown(15 * 60);
+        startLiveCountdown(14 * 60);
       }
     }
 
@@ -1994,19 +1865,10 @@
 
       countdownTimerInterval = setInterval(() => {
         const el = document.getElementById('eta-countdown-clock');
-        if (!el) {
-          clearInterval(countdownTimerInterval);
-          return;
-        }
-
+        if (!el) { clearInterval(countdownTimerInterval); return; }
         const minutes = parseInt(timer / 60, 10);
         const seconds = parseInt(timer % 60, 10);
-
-        const mStr = minutes < 10 ? "0" + minutes : minutes;
-        const sStr = seconds < 10 ? "0" + seconds : seconds;
-
-        el.textContent = mStr + ":" + sStr;
-
+        el.textContent = (minutes < 10 ? "0" + minutes : minutes) + ":" + (seconds < 10 ? "0" + seconds : seconds);
         if (--timer < 0) {
           clearInterval(countdownTimerInterval);
           el.textContent = "00:00 (Rider pahunch gaya hai)";
@@ -2015,11 +1877,11 @@
     }
 
     async function selfCancelOrder(orderId) {
-      if (!confirm('Kya aap sach me ye order cancel karna chahte hain?')) return;
+      if (!confirm('Kya aap order cancel karna chahte hain?')) return;
       await _supabase.from('orders').update({
         status: 'Cancelled',
         cancelled_by: 'Customer',
-        cancellation_reason: 'Self cancelled within window'
+        cancellation_reason: 'Self cancelled'
       }).eq('id', orderId);
       alert('Order Cancel Ho Gaya!');
       fetchTrackingData();
@@ -2029,10 +1891,8 @@
     async function applyCouponCode() {
       const code = document.getElementById('coupon-input').value.trim().toUpperCase();
       if (!code) return alert('Coupon code daalein!');
-
       const { data } = await _supabase.from('coupons').select('*').eq('code', code).eq('is_active', true).single();
-      if (!data) return alert('Invalid ya expired coupon code!');
-
+      if (!data) return alert('Invalid coupon code!');
       appliedCoupon = data;
       document.getElementById('coupon-applied-msg').innerText = `✅ Coupon ${data.code} Applied (₹${data.discount_value} OFF)!`;
       updateCartUI();
@@ -2067,15 +1927,12 @@
       const phone = localStorage.getItem('baba_cust_phone');
       document.getElementById('orders-modal').classList.add('active');
       const box = document.getElementById('past-orders-list');
-
       if (!phone) {
         box.innerHTML = '<div style="text-align:center; padding:30px; color:var(--text-muted); font-weight:700;">Pehle ek order place karein!</div>';
         return;
       }
-
       const { data } = await _supabase.from('orders').select('*').eq('customer_phone', phone).order('id', { ascending: false });
       const orders = data || [];
-
       if (orders.length === 0) {
         box.innerHTML = '<div style="text-align:center; padding:30px; color:var(--text-muted); font-weight:700;">Koi purana order nahi mila.</div>';
         return;
@@ -2083,31 +1940,19 @@
 
       box.innerHTML = orders.map(o => {
         const isDelivered = (o.status || '').toLowerCase().includes('delivered');
-        const returnStatus = o.return_status;
         const is24Hr = o.delivery_type === '24_HOURS';
-
-        let returnButtonHtml = '';
-        if (isDelivered) {
-          if (!returnStatus) {
-            returnButtonHtml = `<button class="btn-add-zepto" style="background:#fee2e2; border-color:#f87171; color:#dc2626;" onclick="closePastOrdersModal(); openReturnModal(${o.id});">🔄 Return / Replace</button>`;
-          } else {
-            returnButtonHtml = `<span style="font-size:11.5px; font-weight:800; color:#dc2626; background:#fef2f2; padding:4px 8px; border-radius:6px;">Return: ${returnStatus}</span>`;
-          }
-        }
-
         return `
           <div class="past-order-box">
             <div style="display:flex; justify-content:space-between; align-items:center;">
               <div>
                 <b style="font-weight:900;">#ORD-${o.id}</b>
-                ${is24Hr ? `<span style="font-size:10px; background:#4f46e5; color:#fff; padding:2px 6px; border-radius:4px; margin-left:4px;">⏳ 24 HR</span>` : ''}
+                ${is24Hr ? `<span style="font-size:10px; background:#4f46e5; color:#fff; padding:2px 6px; border-radius:4px; margin-left:4px;">⏳ 24 HR</span>` : `<span style="font-size:10px; background:#059669; color:#fff; padding:2px 6px; border-radius:4px; margin-left:4px;">⚡ 14 MIN</span>`}
               </div>
               <span style="font-size:12px; font-weight:800; color:var(--accent-pink);">${o.status}</span>
             </div>
             <div style="font-size:12px; color:var(--text-muted); margin:4px 0;">Total: <b>₹${o.total_amount}</b> | ${new Date(o.created_at).toLocaleDateString()}</div>
             <div style="display:flex; gap:8px; margin-top:10px;">
               <button class="btn-add-zepto" style="flex:1;" onclick="closePastOrdersModal(); openTrackModal(${o.id});">Track / View Details ➔</button>
-              ${returnButtonHtml}
             </div>
           </div>
         `;
@@ -2132,66 +1977,8 @@
       selectedReturnOrderId = orderId;
       document.getElementById('return-modal').classList.add('active');
     }
-
     function closeReturnModal() {
       document.getElementById('return-modal').classList.remove('active');
-      base64ReturnPhoto = null;
-      document.getElementById('return-photo-preview').innerHTML = '<span style="font-size:11.5px; color:#94a3b8; font-weight:700;">📸 Saman Ka Photo Yahan Dikhega *</span>';
-      document.getElementById('return-reason-input').value = '';
-      document.getElementById('return-upi-input').value = '';
-    }
-
-    function handleReturnPhotoChosen(input) {
-      if (!input.files || !input.files[0]) return;
-      compressImage(input.files[0], 480, 0.45).then(b64 => {
-        base64ReturnPhoto = b64;
-        document.getElementById('return-photo-preview').innerHTML = `<img src="${b64}" style="width:100%; height:100%; object-fit:cover;">`;
-      });
-    }
-
-    async function submitReturnRequest() {
-      const reason = document.getElementById('return-reason-input').value.trim();
-      const upiId = document.getElementById('return-upi-input').value.trim();
-
-      if (!base64ReturnPhoto) return alert('Kripya kharab/galat saman ka photo kheinchein!');
-      if (!reason) return alert('Wapsi ka karan likhna anivarya hai!');
-      if (!upiId || !upiId.includes('@')) return alert('Sahi UPI ID darj karein jisme @ ho!');
-
-      if (!navigator.geolocation) return alert('GPS support uplabdh nahi hai.');
-      
-      const submitBtn = document.getElementById('btn-submit-return');
-      submitBtn.disabled = true;
-      submitBtn.innerText = 'Bheja Ja Raha Hai... ⏳';
-
-      navigator.geolocation.getCurrentPosition(async (pos) => {
-        const lat = pos.coords.latitude;
-        const lng = pos.coords.longitude;
-
-        const { error } = await _supabase.from('orders').update({
-          return_status: 'Requested',
-          return_reason: reason,
-          return_photo_url: base64ReturnPhoto,
-          return_customer_upi: upiId,
-          return_lat: lat,
-          return_lng: lng
-        }).eq('id', selectedReturnOrderId);
-
-        if (error) {
-          alert('Return request submit nahi ho payi: ' + error.message);
-          submitBtn.disabled = false;
-          submitBtn.innerText = 'Admin Approval Ke Liye Bhejo 🚀';
-        } else {
-          alert('✅ Return Request Admin ke paas bhej di gayi hai!');
-          closeReturnModal();
-          submitBtn.disabled = false;
-          submitBtn.innerText = 'Admin Approval Ke Liye Bhejo 🚀';
-          openPastOrdersModal();
-        }
-      }, (err) => {
-        alert('Return verify karne ke liye GPS anivarya hai: ' + err.message);
-        submitBtn.disabled = false;
-        submitBtn.innerText = 'Admin Approval Ke Liye Bhejo 🚀';
-      }, { enableHighAccuracy: true });
     }
 
     async function openCustomerChat(orderId) {
@@ -2201,58 +1988,26 @@
       const box = document.getElementById('chat-msgs-box');
       box.innerHTML = '<div style="text-align:center; color:#94a3b8; font-size:12px; padding:20px;">Messages load ho rahe hain...</div>';
 
-      const { data: messages, error } = await _supabase
-        .from('order_chats')
-        .select('*')
-        .eq('order_id', orderId)
-        .order('id', { ascending: true });
+      const { data: messages } = await _supabase.from('order_chats').select('*').eq('order_id', orderId).order('id', { ascending: true });
+      box.innerHTML = '';
+      if (messages && messages.length > 0) messages.forEach(m => renderCustomerChatBubble(m));
+      box.scrollTop = box.scrollHeight;
 
-      if (error) {
-        box.innerHTML = `<div style="text-align:center; color:#ef4444; font-size:12px; padding:20px;">Chat Load Error: ${error.message}</div>`;
-      } else {
-        box.innerHTML = '';
-        if (messages && messages.length > 0) {
-          messages.forEach(m => renderCustomerChatBubble(m));
-        } else {
-          box.innerHTML = '<div style="text-align:center; color:#94a3b8; font-size:12px; padding:20px;">Abhi koi message nahi hai. Rider se baat shuru karein!</div>';
-        }
-        box.scrollTop = box.scrollHeight;
-      }
-
-      if (customerChatChannel) {
-        _supabase.removeChannel(customerChatChannel);
-      }
-      customerChatChannel = _supabase
-        .channel(`chat_cust_room_${orderId}`)
-        .on('postgres_changes', { 
-          event: 'INSERT', 
-          schema: 'public', 
-          table: 'order_chats', 
-          filter: `order_id=eq.${orderId}` 
-        }, payload => {
-          if (payload.new.sender_type !== 'customer') {
-            renderCustomerChatBubble(payload.new);
-          }
-        })
-        .subscribe();
+      if (customerChatChannel) _supabase.removeChannel(customerChatChannel);
+      customerChatChannel = _supabase.channel(`chat_cust_room_${orderId}`).on('postgres_changes', {
+        event: 'INSERT', schema: 'public', table: 'order_chats', filter: `order_id=eq.${orderId}`
+      }, payload => {
+        if (payload.new.sender_type !== 'customer') renderCustomerChatBubble(payload.new);
+      }).subscribe();
     }
 
     function renderCustomerChatBubble(msg) {
       const box = document.getElementById('chat-msgs-box');
-      if (box.children.length === 1 && box.children[0].innerText.includes('Abhi koi message nahi')) {
-        box.innerHTML = '';
-      }
       const bubble = document.createElement('div');
       bubble.className = `chat-bubble ${msg.sender_type}`;
-
       let content = '';
-      if (msg.image_url) {
-        content += `<img src="${msg.image_url}" style="width:180px; max-height:220px; object-fit:cover; border-radius:10px; margin-bottom:4px; display:block; cursor:pointer;" onclick="window.open(this.src)">`;
-      }
-      if (msg.message) {
-        content += `<div>${msg.message}</div>`;
-      }
-
+      if (msg.image_url) content += `<img src="${msg.image_url}" style="width:180px; max-height:220px; object-fit:cover; border-radius:10px; margin-bottom:4px; display:block;" onclick="window.open(this.src)">`;
+      if (msg.message) content += `<div>${msg.message}</div>`;
       bubble.innerHTML = content;
       box.appendChild(bubble);
       box.scrollTop = box.scrollHeight;
@@ -2260,10 +2015,7 @@
 
     function closeCustomerChat() {
       document.getElementById('cust-chat-drawer').classList.remove('active');
-      if (customerChatChannel) {
-        _supabase.removeChannel(customerChatChannel);
-        customerChatChannel = null;
-      }
+      if (customerChatChannel) { _supabase.removeChannel(customerChatChannel); customerChatChannel = null; }
       activeCustomerChatOrderId = null;
     }
 
@@ -2271,19 +2023,10 @@
       if (!input.files || !input.files[0] || !activeCustomerChatOrderId) return;
       const file = input.files[0];
       const base64Img = await compressImage(file, 600, 0.5);
-
       renderCustomerChatBubble({ sender_type: 'customer', image_url: base64Img, message: '' });
-
-      const { error } = await _supabase.from('order_chats').insert([{
-        order_id: activeCustomerChatOrderId,
-        sender_type: 'customer',
-        sender: 'customer',
-        sender_name: 'Customer',
-        image_url: base64Img,
-        message: null
+      await _supabase.from('order_chats').insert([{
+        order_id: activeCustomerChatOrderId, sender_type: 'customer', sender: 'customer', sender_name: 'Customer', image_url: base64Img, message: null
       }]);
-
-      if (error) alert('Photo bhejne me dikkat aayi: ' + error.message);
       input.value = '';
     }
 
@@ -2291,37 +2034,19 @@
       const input = document.getElementById('chat-text-input');
       const text = input.value.trim();
       if (!text || !activeCustomerChatOrderId) return;
-
       input.value = '';
-
       renderCustomerChatBubble({ sender_type: 'customer', message: text, image_url: null });
-
-      const { error } = await _supabase.from('order_chats').insert([{
-        order_id: activeCustomerChatOrderId,
-        sender_type: 'customer',
-        sender: 'customer',
-        sender_name: 'Customer',
-        message: text,
-        image_url: null
+      await _supabase.from('order_chats').insert([{
+        order_id: activeCustomerChatOrderId, sender_type: 'customer', sender: 'customer', sender_name: 'Customer', message: text, image_url: null
       }]);
-
-      if (error) {
-        alert('Message bhejne me dikkat aayi: ' + error.message);
-      }
     }
 
-    // REALTIME UPDATES: LIVE AUTO-STOCK SYNC
     function setupCustomerRealtime() {
-      _supabase
-        .channel('public_customer_updates')
+      _supabase.channel('customer_sync')
         .on('postgres_changes', { event: '*', schema: 'public', table: 'app_settings' }, () => loadSettings())
-        .on('postgres_changes', { event: '*', schema: 'public', table: 'products' }, payload => {
-          fetchCustomerProducts();
-        })
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'products' }, () => fetchCustomerProducts())
         .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'orders' }, payload => {
-          if (activeTrackOrderId === payload.new.id) {
-            fetchTrackingData();
-          }
+          if (activeTrackOrderId === payload.new.id) fetchTrackingData();
         })
         .subscribe();
     }
