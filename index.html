@@ -3,11 +3,11 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>👑 BABA FOOD DELIVERY — 14 Min Express</title>
+  <title>꧁༺ SM ༻꧂ — 14 MIN DELIVERY</title>
 
   <link rel="icon" type="image/png" href="logo.png">
   <link rel="manifest" href="manifest-customer.json">
-  <meta name="theme-color" content="#3c006b">
+  <meta name="theme-color" content="#120224">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <script>
@@ -25,18 +25,18 @@
   
   <style>
     :root {
-      --primary-dark: #1b042d;
-      --primary-purple: #3c006b;
-      --primary-gradient: linear-gradient(135deg, #490082 0%, #1f0237 100%);
-      --accent-pink: #ff2a6d;
-      --accent-pink-gradient: linear-gradient(135deg, #ff2a6d 0%, #e0115f 100%);
-      --accent-green: #059669;
+      --primary-dark: #0f021c;
+      --primary-purple: #2a004f;
+      --primary-gradient: linear-gradient(135deg, #240046 0%, #10002b 100%);
+      --accent-pink: #ff007f;
+      --accent-pink-gradient: linear-gradient(135deg, #ff007f 0%, #ff5400 100%);
+      --accent-green: #00f5d4;
       --bg-light: #f8fafc;
       --text-main: #0f172a;
       --text-muted: #64748b;
       --border-soft: #f1f5f9;
       --shadow-sm: 0 2px 8px rgba(0,0,0,0.04);
-      --shadow-float: 0 12px 30px rgba(255, 42, 109, 0.35);
+      --shadow-float: 0 12px 30px rgba(255, 0, 127, 0.35);
     }
 
     * { 
@@ -58,6 +58,41 @@
       padding-bottom: 120px;
       overflow-x: hidden;
       -webkit-font-smoothing: antialiased;
+    }
+
+    /* 🌟 UNIQUE COLOURFUL BRAND STYLING */
+    .brand-crown-wrapper {
+      display: flex;
+      flex-direction: column;
+      line-height: 1.15;
+    }
+    .brand-sm-title {
+      font-size: 17px;
+      font-weight: 900;
+      letter-spacing: 0.5px;
+      background: linear-gradient(90deg, #ff007f, #ff5400, #ffbe0b);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      filter: drop-shadow(0 2px 8px rgba(255, 84, 0, 0.45));
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .wing-ornament {
+      color: #ffd166;
+      font-size: 15px;
+      -webkit-text-fill-color: #ffd166;
+      filter: drop-shadow(0 0 5px rgba(255, 209, 102, 0.8));
+    }
+    .brand-delivery-badge {
+      font-size: 10.5px;
+      font-weight: 900;
+      letter-spacing: 1.2px;
+      background: linear-gradient(90deg, #00f5d4, #00bbf9);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-transform: uppercase;
+      margin-top: 1px;
     }
 
     /* 1. SIDE DRAWER */
@@ -98,19 +133,13 @@
     .drawer-logo-img {
       width: 64px !important; 
       height: 64px !important; 
-      border-radius: 50% !important;
+      border-radius: 16px !important;
       object-fit: cover !important; 
       background: #fff; 
-      border: 2px solid #ff758c;
+      border: 2px solid #ff007f;
       display: block !important; 
       margin-bottom: 10px; 
-      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-    }
-    .drawer-brand { 
-      font-size: 15px; 
-      font-weight: 900; 
-      color: #ff94b4; 
-      line-height: 1.2; 
+      box-shadow: 0 4px 14px rgba(255, 0, 127, 0.4);
     }
     .drawer-menu-list { 
       padding: 12px 0; 
@@ -135,7 +164,7 @@
     /* 2. BROADCAST NOTICE TICKER */
     .broadcast-ticker-wrap {
       display: none; 
-      background: linear-gradient(90deg, #ea580c, #c2410c); 
+      background: linear-gradient(90deg, #ff007f, #7928ca); 
       color: #ffffff; 
       padding: 8px 14px;
       font-size: 11.5px; 
@@ -143,7 +172,7 @@
       letter-spacing: 0.3px;
       overflow: hidden; 
       white-space: nowrap;
-      box-shadow: 0 2px 8px rgba(234, 88, 12, 0.2);
+      box-shadow: 0 2px 10px rgba(121, 40, 202, 0.3);
     }
     .broadcast-ticker-text {
       display: inline-block; 
@@ -160,7 +189,7 @@
       background: var(--primary-gradient);
       padding: 16px 16px 16px 16px; 
       border-radius: 0 0 26px 26px;
-      box-shadow: 0 10px 30px rgba(42, 8, 69, 0.2);
+      box-shadow: 0 10px 30px rgba(16, 0, 43, 0.4);
       color: white;
     }
     .location-row { 
@@ -175,15 +204,16 @@
       gap: 10px;
     }
     .header-app-logo {
-      width: 36px;
-      height: 36px;
-      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
       object-fit: cover;
-      border: 1.5px solid #ff758c;
+      border: 1.5px solid #ff007f;
       background: #fff;
+      box-shadow: 0 2px 10px rgba(255, 0, 127, 0.35);
     }
     .menu-trigger-btn {
-      background: rgba(255,255,255,0.14); 
+      background: rgba(255,255,255,0.12); 
       border: 1px solid rgba(255,255,255,0.22); 
       width: 38px; 
       height: 38px;
@@ -196,27 +226,19 @@
       cursor: pointer;
       backdrop-filter: blur(10px);
     }
-    .brand-meta h1 {
-      font-size: 14px;
-      font-weight: 900;
-      letter-spacing: -0.2px;
-      color: #ffffff;
-      display: flex;
-      align-items: center;
-      gap: 5px;
-    }
     .eta-pill {
       display: inline-flex;
       align-items: center;
       gap: 4px;
-      background: rgba(255, 42, 109, 0.25);
-      border: 1px solid rgba(255, 42, 109, 0.4);
-      color: #ff94b4;
+      background: rgba(0, 245, 212, 0.15);
+      border: 1px solid rgba(0, 245, 212, 0.45);
+      color: #00f5d4;
       font-size: 10px;
-      font-weight: 800;
-      padding: 2px 7px;
+      font-weight: 900;
+      padding: 2px 8px;
       border-radius: 12px;
-      margin-top: 2px;
+      margin-top: 3px;
+      letter-spacing: 0.3px;
     }
 
     /* SEARCH BAR */
@@ -236,7 +258,7 @@
       font-weight: 600;
       color: #1e293b;
       outline: none;
-      box-shadow: 0 4px 14px rgba(0,0,0,0.1);
+      box-shadow: 0 4px 14px rgba(0,0,0,0.12);
     }
     .search-icon-pos { 
       position: absolute; 
@@ -245,7 +267,7 @@
       color: #64748b; 
     }
 
-    /* CATEGORIES DYNAMIC - OVERLAPPING FIXED */
+    /* CATEGORIES DYNAMIC */
     .category-scroll { 
       display: flex; 
       gap: 8px; 
@@ -266,8 +288,8 @@
     .cat-icon-circle {
       padding: 8px 14px;
       border-radius: 14px; 
-      background: rgba(255,255,255,0.16); 
-      border: 1px solid rgba(255,255,255,0.24);
+      background: rgba(255,255,255,0.12); 
+      border: 1px solid rgba(255,255,255,0.22);
       display: flex; 
       align-items: center; 
       justify-content: center; 
@@ -281,34 +303,51 @@
     }
     .cat-item.active .cat-icon-circle { 
       background: #ffffff !important; 
-      color: var(--primary-purple) !important;
+      color: #240046 !important;
       border-color: #ffffff !important;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.18);
+      box-shadow: 0 4px 14px rgba(0,0,0,0.2);
     }
 
-    /* PROMO HERO CARD */
+    /* 🌈 PROMO BANNER */
     .promo-banner {
       margin: 12px 16px 14px 16px; 
-      background: linear-gradient(135deg, #ffffff 0%, #fff1f5 100%);
-      border-radius: 18px; 
-      padding: 14px 18px; 
+      background: linear-gradient(135deg, #10002b 0%, #240046 50%, #3c096c 100%);
+      border-radius: 20px; 
+      padding: 15px 18px; 
       display: flex; 
       justify-content: space-between; 
       align-items: center; 
-      border: 1px solid #ffe4ec;
-      box-shadow: var(--shadow-sm);
+      border: 1px solid #7b2cbf;
+      box-shadow: 0 6px 20px rgba(36, 0, 70, 0.35);
+      position: relative;
+      overflow: hidden;
+    }
+    .promo-banner::after {
+      content: '';
+      position: absolute;
+      top: -50%;
+      right: -20%;
+      width: 140px;
+      height: 140px;
+      background: radial-gradient(circle, rgba(255, 0, 127, 0.25), transparent 70%);
+      pointer-events: none;
     }
     .promo-text h3 { 
-      font-size: 14px; 
+      font-size: 15px; 
       font-weight: 900; 
-      color: var(--primary-purple); 
+      background: linear-gradient(90deg, #ffbe0b, #ff007f);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
       line-height: 1.3; 
     }
     .promo-sub { 
       font-size: 11px; 
-      color: var(--accent-pink); 
-      font-weight: 700; 
+      color: #00f5d4; 
+      font-weight: 800; 
       margin-top: 3px; 
+      display: flex;
+      align-items: center;
+      gap: 4px;
     }
 
     /* PRODUCT CARDS GRID */
@@ -397,20 +436,21 @@
       box-shadow: 0 2px 6px rgba(16, 185, 129, 0.3);
     }
 
-    /* 14 MIN FAST DELIVERY CHIP */
+    /* ⚡ 14 MIN FAST DELIVERY CHIP */
     .fast-delivery-badge {
       display: inline-flex;
       align-items: center;
       gap: 3px;
-      background: #f0fdf4;
-      border: 1px solid #bbf7d0;
-      color: #15803d;
+      background: #ecfdf5;
+      border: 1px solid #a7f3d0;
+      color: #047857;
       font-size: 10px;
-      font-weight: 800;
+      font-weight: 900;
       padding: 2px 6px;
       border-radius: 6px;
-      margin-bottom: 6px;
+      margin-bottom: 5px;
       width: fit-content;
+      box-shadow: 0 1px 3px rgba(16, 185, 129, 0.1);
     }
 
     .prod-title { 
@@ -458,7 +498,7 @@
       font-weight: 900; 
       font-size: 12px; 
       cursor: pointer;
-      box-shadow: 0 2px 6px rgba(255, 42, 109, 0.12);
+      box-shadow: 0 2px 6px rgba(255, 0, 127, 0.15);
     }
     .qty-counter {
       display: flex; 
@@ -654,7 +694,7 @@
       font-weight: 900; 
       cursor: pointer; 
       width: 100%; 
-      box-shadow: 0 4px 14px rgba(255, 42, 109, 0.35);
+      box-shadow: 0 4px 14px rgba(255, 0, 127, 0.35);
       display: block;
       text-align: center;
     }
@@ -889,14 +929,16 @@
   <div class="side-drawer" id="side-drawer">
     <div class="drawer-header">
       <img src="logo.png" class="drawer-logo-img" alt="Logo" onerror="this.style.display='none'">
-      <div class="drawer-brand">👑 BABA FOOD EXPRESS</div>
-      <div style="font-size: 11px; color: #fdf4ff; margin-top: 2px;">14 Min Fast Express & 24 Hr Slots</div>
+      <div class="brand-sm-title" style="font-size:18px;">
+        <span class="wing-ornament">꧁༺</span> SM <span class="wing-ornament">༻꧂</span>
+      </div>
+      <div style="font-size: 11px; color: #00f5d4; font-weight:800; margin-top: 2px;">⚡ 14 MIN DELIVERY — Grocery & Shopping</div>
     </div>
     <div class="drawer-menu-list">
       <div class="drawer-item" onclick="toggleDrawer(false); openCartModal();">🛒 Mera Cart</div>
       <div class="drawer-item" onclick="toggleDrawer(false); openPastOrdersModal();">📦 Purane Orders</div>
       <div class="drawer-item" onclick="toggleDrawer(false); alert('Customer Support Call: 7037647464');">📞 Help & Support</div>
-      <div class="drawer-item" onclick="toggleDrawer(false); alert('Baba Food Express v3.5');">ℹ️ App Info</div>
+      <div class="drawer-item" onclick="toggleDrawer(false); alert('SM 14-Min Express Portal v4.0');">ℹ️ App Info</div>
     </div>
   </div>
 
@@ -906,14 +948,20 @@
       <div class="brand-cluster">
         <button class="menu-trigger-btn" onclick="toggleDrawer(true)">☰</button>
         <img src="logo.png" class="header-app-logo" alt="Logo" onerror="this.style.display='none'">
-        <div class="brand-meta">
-          <h1>BABA FOOD <span>🏹</span></h1>
-          <div class="eta-pill">⚡ 14 Mins Fast Delivery</div>
+        <div class="brand-crown-wrapper">
+          <!-- 👑 UNIQUE VIBRANT BRAND LOGO TEXT -->
+          <div class="brand-sm-title">
+            <span class="wing-ornament">꧁༺</span> SM <span class="wing-ornament">༻꧂</span>
+          </div>
+          <div class="brand-delivery-badge">⚡ DELIVERY ⚡</div>
         </div>
       </div>
-      <button id="store-badge-top" style="background:#10b981; border:none; color:white; font-size:10px; font-weight:800; padding:6px 12px; border-radius:20px;">
-        🟢 OPEN
-      </button>
+      <div style="display:flex; flex-direction:column; align-items:flex-end;">
+        <button id="store-badge-top" style="background:#10b981; border:none; color:white; font-size:10px; font-weight:900; padding:5px 12px; border-radius:20px; box-shadow:0 0 10px rgba(16,185,129,0.5);">
+          🟢 OPEN
+        </button>
+        <div class="eta-pill">🚀 14 MINS</div>
+      </div>
     </div>
 
     <!-- Search Box -->
@@ -922,7 +970,7 @@
       <input type="text" id="cust-search-input" class="search-bar-input" placeholder="Search doodh, दूध, bread, chai, samosa..." oninput="debounceSearch()">
     </div>
 
-    <!-- DYNAMIC CATEGORY FILTER (OVERLAPPING FIXED) -->
+    <!-- DYNAMIC CATEGORY FILTER -->
     <div class="category-scroll" id="cat-scroll-container">
       <div class="cat-item active" onclick="filterCategory('ALL', this)">
         <div class="cat-icon-circle">🍽️ All</div>
@@ -933,13 +981,15 @@
     </div>
   </div>
 
-  <!-- PROMO BANNER -->
+  <!-- 🌈 UNIQUE STYLED PROMO BANNER -->
   <div class="promo-banner" id="promo-banner-card">
     <div class="promo-text">
-      <h3 id="promo-banner-title">Express Grocery & Food</h3>
-      <div class="promo-sub" id="promo-banner-sub">⚡ 14 Minute Fast Delivery at your Doorstep</div>
+      <h3 id="promo-banner-title">⚡ 14 MIN FAST DELIVERY</h3>
+      <div class="promo-sub" id="promo-banner-sub">
+        <span>🛍️ Grocery and Shopping Instant</span>
+      </div>
     </div>
-    <div style="font-size: 26px;">🚀</div>
+    <div style="font-size: 30px; filter: drop-shadow(0 0 10px rgba(255,255,255,0.4));">🚀</div>
   </div>
 
   <!-- MAIN PRODUCT GRID -->
@@ -1053,7 +1103,7 @@
     </div>
   </div>
 
-  <!-- PAST ORDERS MODAL (INCLUDES WORKING RETURN BUTTON) -->
+  <!-- PAST ORDERS MODAL -->
   <div class="modal-overlay" id="orders-modal">
     <div class="fullpage-content">
       <div class="fullpage-head">
@@ -1453,9 +1503,9 @@
 
           if (cartType !== incomingType) {
             if (incomingType === '24_HOURS') {
-              alert('⚠️ 24 घंटे डिलीवरी वाले सामान के साथ केवल 24 घंटे वाले सामान ही जोड़े जा सकते हैं!\n\nकृपया पहले कार्ट खाली करें या अपना 14 मिनट वाला एक्सप्रेस ऑर्डर अलग से पूरा करें।');
+              alert('⚠️ 24 घंटे डिलीवरी वाले सामान के साथ केवल 24 घंटे वाले सामान ही जोड़े जा सकते हैं!\n\nपहले कार्ट खाली करें या अपना 14 मिनट वाला एक्सप्रेस ऑर्डर अलग से पूरा करें।');
             } else {
-              alert('⚠️ आपके कार्ट में 24 घंटे डिलीवरी वाले विशेष आइटम हैं! 14 मिनट वाले एक्सप्रेस सामान को अलग से ऑर्डर करें।');
+              alert('⚠️ कार्ट में 24 घंटे डिलीवरी वाले विशेष सामान हैं! 14 मिनट वाले सामान को अलग से ऑर्डर करें।');
             }
             return;
           }
@@ -1597,7 +1647,7 @@
       const qrImg = document.getElementById('dynamic-qr-image');
 
       if (mode === 'UPI' && currentCalculatedTotal > 0) {
-        const upiString = `upi://pay?pa=${STORE_UPI_ID}&pn=BABA%20FOOD%20DELIVERY&am=${currentCalculatedTotal}&cu=INR&tn=OrderPayment`;
+        const upiString = `upi://pay?pa=${STORE_UPI_ID}&pn=SM%20FOOD%20DELIVERY&am=${currentCalculatedTotal}&cu=INR&tn=OrderPayment`;
         qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(upiString)}`;
         qrCard.style.display = 'block';
       } else {
@@ -1717,7 +1767,6 @@
         const { data, error } = await _supabase.from('orders').insert([orderPayload]).select().single();
         if (error) throw error;
 
-        // Auto Stock Deduction
         const stockItems = itemsArr.map(i => ({ id: i.id, qty: i.qty }));
         try {
           await _supabase.rpc('deduct_order_stock', { order_items: stockItems });
