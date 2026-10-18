@@ -4,7 +4,7 @@
   "start_url": "./rider.html",
   "display": "standalone",
   "background_color": "#0f172a",
-  "theme_color": "#1b042d",
+  "theme_color": "#120224",
   "orientation": "portrait",
   "icons": [
     {
