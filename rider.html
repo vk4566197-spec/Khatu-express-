@@ -42,6 +42,24 @@
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; -webkit-tap-highlight-color: transparent; }
     body { background-color: var(--bg-dark); color: var(--text-main); min-height: 100vh; padding-bottom: 90px; }
 
+    /* HIGH ALERT BANNER */
+    .alert-banner {
+      background: linear-gradient(90deg, #dc2626, #b91c1c);
+      color: white;
+      padding: 12px 16px;
+      font-size: 13px;
+      font-weight: 900;
+      display: none;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 4px 14px rgba(220, 38, 38, 0.5);
+      animation: alertPulse 1s infinite alternate;
+    }
+    @keyframes alertPulse {
+      0% { opacity: 0.9; }
+      100% { opacity: 1; transform: scale(1.01); }
+    }
+
     .rider-top-nav {
       background: #18052e;
       padding: 14px 16px;
@@ -188,12 +206,16 @@
       border: 1.5px solid var(--border-color);
       border-radius: 16px;
       padding: 14px;
-      margin-bottom: 12px;
+      margin-bottom: 14px;
       box-shadow: 0 4px 14px rgba(0,0,0,0.25);
     }
     .order-card.super-order {
       background: var(--card-super);
       border-color: #6366f1;
+    }
+    .order-card.alert-pulse-card {
+      border-color: #ef4444;
+      background: #23121d;
     }
 
     .order-badge {
@@ -205,6 +227,8 @@
     }
     .badge-express { background: #059669; color: white; }
     .badge-24hr { background: #4f46e5; color: white; }
+    .badge-pending { background: #f59e0b; color: black; }
+    .badge-picked { background: #0284c7; color: white; }
 
     .detail-box {
       background: #0f172a;
@@ -222,9 +246,9 @@
       background: var(--primary-purple);
       color: white;
       border: 1px solid #a855f7;
-      padding: 11px 14px;
+      padding: 12px 14px;
       border-radius: 12px;
-      font-size: 12.5px;
+      font-size: 13px;
       font-weight: 800;
       cursor: pointer;
       display: flex;
@@ -236,8 +260,9 @@
     .btn-success { background: #059669; border: none; }
     .btn-danger { background: #dc2626; border: none; }
     .btn-map { background: #0284c7; border: none; }
+    .btn-pick { background: linear-gradient(135deg, #f59e0b, #d97706); color: black; border: none; }
 
-    /* LOGIN MODAL WITH LOGIN TYPE */
+    /* LOGIN MODAL */
     .login-container {
       position: fixed;
       top: 0;
@@ -302,7 +327,19 @@
     }
   </style>
 </head>
-<body>
+<body onclick="unlockRiderAudio()" ontouchstart="unlockRiderAudio()">
+
+  <!-- AUDIO ELEMENT FOR HIGH ALERT TUNE -->
+  <audio id="rider-high-alert-audio" src="alert.mp3" preload="auto" loop></audio>
+
+  <!-- TOP HIGH ALERT NOTIFICATION -->
+  <div class="alert-banner" id="order-alert-bar">
+    <div style="display:flex; align-items:center; gap:8px;">
+      <span style="font-size:18px;">🔔</span>
+      <span>NAYA ORDER AAYA HAI! TURANT PICKUP KAREIN!</span>
+    </div>
+    <button onclick="stopHighAlertTune()" style="background:#0f172a; border:none; color:white; padding:4px 8px; border-radius:6px; font-size:11px; font-weight:800; cursor:pointer;">Mute 🔕</button>
+  </div>
 
   <!-- LOGIN SCREEN (WITH LOGIN TYPE DROPDOWN) -->
   <div class="login-container" id="rider-login-screen">
@@ -311,7 +348,6 @@
       <h2 style="font-size:18px; font-weight:900; margin-bottom:2px;">SM RIDER LOGIN</h2>
       <p style="font-size:11.5px; color:var(--text-muted); margin-bottom:16px;">Delivery Partner Portal</p>
 
-      <!-- 👑 LOGIN ROLE/TYPE SELECTION -->
       <select id="login-rider-type" class="input-rider" style="border-color:#a855f7; font-weight:800; color:#38bdf8;">
         <option value="EXPRESS">⚡ Normal Express Rider (10-20 Min)</option>
         <option value="SUPER">👑 Super Rider (24 Hours Dedicated)</option>
@@ -412,6 +448,39 @@
     let base64DeliveryProof = null;
     let liveGpsWatchId = null;
     let deferredPrompt = null;
+    let isAudioUnlocked = false;
+    let lastAlertedOrderId = null;
+
+    function unlockRiderAudio() {
+      if (isAudioUnlocked) return;
+      const audio = document.getElementById('rider-high-alert-audio');
+      if (audio) {
+        audio.play().then(() => {
+          audio.pause();
+          audio.currentTime = 0;
+          isAudioUnlocked = true;
+        }).catch(() => {});
+      }
+    }
+
+    function playHighAlertTune() {
+      const audio = document.getElementById('rider-high-alert-audio');
+      document.getElementById('order-alert-bar').style.display = 'flex';
+      if (audio) {
+        audio.currentTime = 0;
+        audio.play().catch(() => {});
+      }
+      if (navigator.vibrate) navigator.vibrate([300, 150, 300, 150, 400]);
+    }
+
+    function stopHighAlertTune() {
+      const audio = document.getElementById('rider-high-alert-audio');
+      document.getElementById('order-alert-bar').style.display = 'none';
+      if (audio) {
+        audio.pause();
+        audio.currentTime = 0;
+      }
+    }
 
     // PWA INSTALL PROMPT HANDLER
     window.addEventListener('beforeinstallprompt', (e) => {
@@ -442,6 +511,7 @@
     });
 
     async function riderLogin() {
+      unlockRiderAudio();
       const selectedType = document.getElementById('login-rider-type').value;
       const phone = document.getElementById('login-phone').value.trim();
       const pass = document.getElementById('login-password').value.trim();
@@ -457,7 +527,6 @@
         return alert('Galat Password! Kripya sahi password darj karein.');
       }
 
-      // Check or update role
       if (data.rider_type !== selectedType) {
         await _supabase.from('riders').update({ rider_type: selectedType }).eq('id', data.id);
         data.rider_type = selectedType;
@@ -484,6 +553,7 @@
 
     function riderLogout() {
       if (!confirm('Logout karna chahte hain?')) return;
+      stopHighAlertTune();
       if (liveGpsWatchId) navigator.geolocation.clearWatch(liveGpsWatchId);
       localStorage.removeItem('sm_rider_data');
       location.reload();
@@ -495,6 +565,7 @@
       currentRider.is_active = newStatus;
       localStorage.setItem('sm_rider_data', JSON.stringify(currentRider));
       updateDutyUI(newStatus);
+      if (!newStatus) stopHighAlertTune();
     }
 
     function updateDutyUI(isActive) {
@@ -526,14 +597,33 @@
       
       const isSuper = currentRider.rider_type === 'SUPER';
       
+      // Rider relevant orders filter
       allRiderOrders = (data || []).filter(o => {
+        // Agar rider ko assign ho chuka hai
         if (o.assigned_rider_id === currentRider.id) return true;
-        if (!o.assigned_rider_id) {
+        
+        // Agar abhi tak assign nahi hua hai aur online hai toh role match karein
+        if (!o.assigned_rider_id && currentRider.is_active) {
           if (isSuper) return o.delivery_type === '24_HOURS';
           return o.delivery_type !== '24_HOURS';
         }
         return false;
       });
+
+      // CHECK FOR NEW INCOMING ORDER REQUIRING HIGH ALERT
+      const incomingPending = allRiderOrders.find(o => {
+        const st = (o.status || '').toLowerCase();
+        return !st.includes('delivered') && !st.includes('cancelled') && (!o.assigned_rider_id || !st.includes('out'));
+      });
+
+      if (incomingPending && currentRider.is_active) {
+        if (lastAlertedOrderId !== incomingPending.id) {
+          lastAlertedOrderId = incomingPending.id;
+          playHighAlertTune();
+        }
+      } else {
+        stopHighAlertTune();
+      }
 
       renderRiderOrders();
     }
@@ -563,22 +653,25 @@
           const itemsText = items.map(i => `• ${i.name} × ${i.qty}`).join('<br>');
 
           return `
-            <div class="order-card ${isSuper ? 'super-order' : ''}">
+            <div class="order-card ${isSuper ? 'super-order' : ''} ${!isAssignedToMe ? 'alert-pulse-card' : ''}">
               <div style="display:flex; justify-content:space-between; align-items:flex-start;">
                 <div>
                   <b style="font-size:15px; color:var(--accent-cyan);">#ORD-${o.id}</b>
                   <span class="order-badge ${isSuper ? 'badge-24hr' : 'badge-express'}" style="margin-left:6px;">
                     ${isSuper ? '⏳ 24 HR' : '⚡ 14 MIN'}
                   </span>
+                  <span class="order-badge ${isOut ? 'badge-picked' : 'badge-pending'}" style="margin-left:4px;">
+                    ${o.status}
+                  </span>
                 </div>
                 <div style="text-align:right;">
-                  <b style="font-size:15px; color:#10b981;">₹${o.total_amount}</b>
-                  <div style="font-size:11px; color:var(--text-muted);">${o.payment_mode}</div>
+                  <b style="font-size:16px; color:#10b981;">₹${o.total_amount}</b>
+                  <div style="font-size:11px; color:var(--text-muted); font-weight:700;">${o.payment_mode}</div>
                 </div>
               </div>
 
               <div class="detail-box">
-                <div>👤 <b>Customer:</b> ${o.customer_name} (📞 <a href="tel:${o.customer_phone}" style="color:#38bdf8;">${o.customer_phone}</a>)</div>
+                <div>👤 <b>Customer:</b> ${o.customer_name} (📞 <a href="tel:${o.customer_phone}" style="color:#38bdf8; font-weight:800;">${o.customer_phone}</a>)</div>
                 <div>📍 <b>Address:</b> ${o.delivery_address}</div>
                 <div style="margin-top:4px; padding-top:4px; border-top:1px dashed var(--border-color);">
                   <b>Items:</b><br>${itemsText}
@@ -592,21 +685,25 @@
                   </a>
                 ` : ''}
 
+                <!-- STEP 1: PICKUP / ACCEPT ORDER -->
                 ${!isAssignedToMe ? `
-                  <button class="btn-rider-action btn-success" onclick="acceptOrder(${o.id})">
-                    🤝 Order Accept Karein
+                  <button class="btn-rider-action btn-pick" onclick="pickupAndAcceptOrder(${o.id})">
+                    📦 Order Pickup Karein & Accept (Duty Alert Off)
                   </button>
                 ` : !isOut ? `
+                  <!-- STEP 2: SAMAN PICK KIYA AUR DISPATCH -->
                   <button class="btn-rider-action btn-success" onclick="startDelivery(${o.id})">
-                    🛵 Saman Pick Kiya & Start Delivery
+                    🛵 Saman Dukan Se Liya — Start Delivery
                   </button>
                 ` : !isArrived ? `
+                  <!-- STEP 3: CUSTOMER KE GHAR PAHUNCHNA -->
                   <button class="btn-rider-action btn-map" style="background:#f59e0b; color:black;" onclick="markArrived(${o.id})">
-                    🔔 Customer Ke Ghar Pahunch Gaya (Arrived Alert)
+                    🔔 Customer Ke Ghar Pahunch Gaya (Doorbell Alert)
                   </button>
                 ` : `
+                  <!-- STEP 4: SECRET OTP AUR PHOTO COMPLETE -->
                   <button class="btn-rider-action btn-success" onclick="openCompleteModal(${o.id})">
-                    🏁 Complete Delivery (OTP & Photo)
+                    🏁 Complete Delivery (Enter Secret OTP & Photo)
                   </button>
                 `}
               </div>
@@ -637,20 +734,28 @@
       return match ? `${match[1]},${match[2]}` : '';
     }
 
-    async function acceptOrder(id) {
-      await _supabase.from('orders').update({ assigned_rider_id: currentRider.id }).eq('id', id);
-      alert('Order accept ho gaya!');
+    async function pickupAndAcceptOrder(id) {
+      stopHighAlertTune();
+      await _supabase.from('orders').update({
+        assigned_rider_id: currentRider.id,
+        status: 'Rider Assigned'
+      }).eq('id', id);
+      alert('✅ Order Pickup ho gaya! Ab dukaan se saman lekar "Start Delivery" karein.');
       fetchRiderOrders();
     }
 
     async function startDelivery(id) {
-      await _supabase.from('orders').update({ status: 'Out for Delivery' }).eq('id', id);
+      stopHighAlertTune();
+      await _supabase.from('orders').update({
+        status: 'Out for Delivery',
+        estimated_delivery_time: '10-15 mins'
+      }).eq('id', id);
       fetchRiderOrders();
     }
 
     async function markArrived(id) {
       await _supabase.from('orders').update({ status: 'Arrived' }).eq('id', id);
-      alert('🔔 Customer ko door-bell alert bhej diya gaya hai!');
+      alert('🔔 Customer ko alert bhej diya gaya hai!');
       fetchRiderOrders();
     }
 
@@ -707,8 +812,10 @@
     }
 
     function setupRiderRealtime() {
-      _supabase.channel('rider_sync')
-        .on('postgres_changes', { event: '*', schema: 'public', table: 'orders' }, () => fetchRiderOrders())
+      _supabase.channel('rider_sync_channel')
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'orders' }, () => {
+          fetchRiderOrders();
+        })
         .subscribe();
     }
   </script>
