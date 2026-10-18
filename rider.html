@@ -14,7 +14,7 @@
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('sw.js');
+        navigator.serviceWorker.register('sw.js', { scope: './' });
       });
     }
   </script>
@@ -79,6 +79,22 @@
       font-weight: 700;
     }
 
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .btn-install-header {
+      background: linear-gradient(135deg, #ff007f, #ff5400);
+      color: white;
+      border: none;
+      padding: 6px 10px;
+      border-radius: 10px;
+      font-size: 11px;
+      font-weight: 800;
+      cursor: pointer;
+      display: none;
+    }
     .btn-logout {
       background: rgba(239, 68, 68, 0.2);
       border: 1px solid #ef4444;
@@ -179,10 +195,6 @@
       background: var(--card-super);
       border-color: #6366f1;
     }
-    .order-card.return-order {
-      background: #25131a;
-      border-color: #ef4444;
-    }
 
     .order-badge {
       font-size: 9.5px;
@@ -193,7 +205,6 @@
     }
     .badge-express { background: #059669; color: white; }
     .badge-24hr { background: #4f46e5; color: white; }
-    .badge-return { background: #ef4444; color: white; }
 
     .detail-box {
       background: #0f172a;
@@ -226,6 +237,7 @@
     .btn-danger { background: #dc2626; border: none; }
     .btn-map { background: #0284c7; border: none; }
 
+    /* LOGIN MODAL WITH LOGIN TYPE */
     .login-container {
       position: fixed;
       top: 0;
@@ -292,12 +304,18 @@
 </head>
 <body>
 
-  <!-- LOGIN SCREEN -->
+  <!-- LOGIN SCREEN (WITH LOGIN TYPE DROPDOWN) -->
   <div class="login-container" id="rider-login-screen">
     <div class="login-card">
       <img src="logo.png" style="width:70px; height:70px; border-radius:18px; object-fit:contain; border:2px solid var(--accent-pink); margin-bottom:12px;" onerror="this.style.display='none'">
       <h2 style="font-size:18px; font-weight:900; margin-bottom:2px;">SM RIDER LOGIN</h2>
-      <p style="font-size:11.5px; color:var(--text-muted); margin-bottom:18px;">Delivery Partner Portal</p>
+      <p style="font-size:11.5px; color:var(--text-muted); margin-bottom:16px;">Delivery Partner Portal</p>
+
+      <!-- 👑 LOGIN ROLE/TYPE SELECTION -->
+      <select id="login-rider-type" class="input-rider" style="border-color:#a855f7; font-weight:800; color:#38bdf8;">
+        <option value="EXPRESS">⚡ Normal Express Rider (10-20 Min)</option>
+        <option value="SUPER">👑 Super Rider (24 Hours Dedicated)</option>
+      </select>
       
       <input type="tel" id="login-phone" class="input-rider" placeholder="Mobile Number (10 Digit)" maxlength="10">
       <input type="password" id="login-password" class="input-rider" placeholder="Password (Default: 1234)">
@@ -317,7 +335,10 @@
         <div class="brand-sub" id="nav-rider-phone">----</div>
       </div>
     </div>
-    <button class="btn-logout" onclick="riderLogout()">🚪 Logout</button>
+    <div class="header-actions">
+      <button id="btn-install-app" class="btn-install-header" onclick="triggerPWAInstall()">📲 Install</button>
+      <button class="btn-logout" onclick="riderLogout()">🚪 Logout</button>
+    </div>
   </div>
 
   <div class="profile-banner">
@@ -390,6 +411,25 @@
     let activeCompleteOrderId = null;
     let base64DeliveryProof = null;
     let liveGpsWatchId = null;
+    let deferredPrompt = null;
+
+    // PWA INSTALL PROMPT HANDLER
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+      const installBtn = document.getElementById('btn-install-app');
+      if (installBtn) installBtn.style.display = 'block';
+    });
+
+    function triggerPWAInstall() {
+      if (deferredPrompt) {
+        deferredPrompt.prompt();
+        deferredPrompt.userChoice.then(() => {
+          deferredPrompt = null;
+          document.getElementById('btn-install-app').style.display = 'none';
+        });
+      }
+    }
 
     document.addEventListener('DOMContentLoaded', () => {
       const savedRider = localStorage.getItem('sm_rider_data');
@@ -402,6 +442,7 @@
     });
 
     async function riderLogin() {
+      const selectedType = document.getElementById('login-rider-type').value;
       const phone = document.getElementById('login-phone').value.trim();
       const pass = document.getElementById('login-password').value.trim();
 
@@ -414,6 +455,12 @@
 
       if (data.password && data.password !== pass) {
         return alert('Galat Password! Kripya sahi password darj karein.');
+      }
+
+      // Check or update role
+      if (data.rider_type !== selectedType) {
+        await _supabase.from('riders').update({ rider_type: selectedType }).eq('id', data.id);
+        data.rider_type = selectedType;
       }
 
       currentRider = data;
