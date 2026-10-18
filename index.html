@@ -58,9 +58,21 @@
       padding-bottom: 120px;
       overflow-x: hidden;
       -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
     }
 
-    /* 🚀 PREMIUM FULL-FRAME 3-SECOND SPLASH SCREEN */
+    /* 🚀 HD QUALITY & HARDWARE ACCELERATION FOR LOGOS */
+    .splash-logo-img, .header-app-logo, .drawer-logo-img {
+      image-rendering: -webkit-optimize-contrast;
+      image-rendering: crisp-edges;
+      image-rendering: pixelated;
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
+      transform: translateZ(0);
+      -webkit-transform: translateZ(0);
+    }
+
+    /* 🚀 PREMIUM FULL-FRAME 6-SECOND SPLASH SCREEN */
     #app-splash-screen {
       position: fixed;
       top: 0;
@@ -75,7 +87,7 @@
       align-items: center;
       justify-content: center;
       padding: 24px;
-      transition: opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1), visibility 0.6s;
+      transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1), visibility 0.8s;
     }
     #app-splash-screen.fade-out {
       opacity: 0;
@@ -84,36 +96,36 @@
     }
     .splash-logo-container {
       position: relative;
-      width: 220px;
-      height: 220px;
+      width: 230px;
+      height: 230px;
       display: flex;
       align-items: center;
       justify-content: center;
-      animation: pulseGlow 2.5s ease-in-out infinite alternate;
+      animation: pulseGlow 3s ease-in-out infinite alternate;
     }
     .splash-glow-ring {
       position: absolute;
-      width: 210px;
-      height: 210px;
+      width: 220px;
+      height: 220px;
       border-radius: 40px;
       background: linear-gradient(135deg, #ff007f, #ff5400, #00f5d4);
       filter: blur(25px);
-      opacity: 0.65;
-      animation: rotateRing 6s linear infinite;
+      opacity: 0.7;
+      animation: rotateRing 8s linear infinite;
     }
     .splash-logo-img {
       position: relative;
-      width: 200px;
-      height: 200px;
+      width: 210px;
+      height: 210px;
       border-radius: 36px;
-      object-fit: cover;
-      box-shadow: 0 15px 40px rgba(0, 0, 0, 0.8), 0 0 25px rgba(255, 0, 127, 0.4);
-      border: 2.5px solid rgba(255, 255, 255, 0.25);
+      object-fit: contain;
+      box-shadow: 0 15px 45px rgba(0, 0, 0, 0.85), 0 0 30px rgba(255, 0, 127, 0.45);
+      border: 2.5px solid rgba(255, 255, 255, 0.3);
       z-index: 2;
     }
     .splash-title-text {
-      margin-top: 26px;
-      font-size: 24px;
+      margin-top: 28px;
+      font-size: 25px;
       font-weight: 900;
       letter-spacing: 1px;
       background: linear-gradient(90deg, #ff007f, #ffbe0b, #00f5d4);
@@ -131,11 +143,11 @@
       text-transform: uppercase;
     }
     .splash-progress-track {
-      width: 140px;
-      height: 4px;
+      width: 160px;
+      height: 5px;
       background: rgba(255, 255, 255, 0.12);
       border-radius: 10px;
-      margin-top: 30px;
+      margin-top: 32px;
       overflow: hidden;
       position: relative;
     }
@@ -144,7 +156,7 @@
       height: 100%;
       background: linear-gradient(90deg, #ff007f, #00f5d4);
       border-radius: 10px;
-      animation: splashProgressFill 3s ease-out forwards;
+      animation: splashProgressFill 6s ease-out forwards;
     }
 
     @keyframes pulseGlow {
@@ -157,8 +169,9 @@
     }
     @keyframes splashProgressFill {
       0% { width: 0%; }
-      40% { width: 55%; }
-      80% { width: 90%; }
+      30% { width: 35%; }
+      60% { width: 68%; }
+      85% { width: 88%; }
       100% { width: 100%; }
     }
 
@@ -236,7 +249,7 @@
       width: 64px !important; 
       height: 64px !important; 
       border-radius: 16px !important;
-      object-fit: cover !important; 
+      object-fit: contain !important; 
       background: #fff; 
       border: 2px solid #ff007f;
       display: block !important; 
@@ -309,7 +322,7 @@
       width: 40px;
       height: 40px;
       border-radius: 12px;
-      object-fit: cover;
+      object-fit: contain;
       border: 1.5px solid #ff007f;
       background: #fff;
       box-shadow: 0 2px 10px rgba(255, 0, 127, 0.35);
@@ -1019,7 +1032,7 @@
 </head>
 <body onclick="unlockCustomerAudio()" ontouchstart="unlockCustomerAudio()">
 
-  <!-- 🌟 FULL-FRAME 3-SECOND SPLASH SCREEN -->
+  <!-- 🌟 FULL-FRAME 6-SECOND SPLASH SCREEN -->
   <div id="app-splash-screen">
     <div class="splash-logo-container">
       <div class="splash-glow-ring"></div>
@@ -1317,7 +1330,7 @@
     let activeCustomerChatOrderId = null;
     let customerChatChannel = null;
 
-    // 🚀 3-SECOND SPLASH SCREEN LOGIC
+    // 🚀 EXACT 6-SECOND HD SPLASH SCREEN LOGIC
     function initSplashScreen() {
       const splash = document.getElementById('app-splash-screen');
       if (!splash) return;
@@ -1326,8 +1339,8 @@
         splash.classList.add('fade-out');
         setTimeout(() => {
           splash.style.display = 'none';
-        }, 650);
-      }, 3000); // Exact 3 seconds
+        }, 800);
+      }, 6000); // 6000ms = Exactly 6 seconds
     }
 
     function unlockCustomerAudio() {
@@ -1397,7 +1410,7 @@
     };
 
     document.addEventListener('DOMContentLoaded', () => {
-      initSplashScreen(); // 3-second splash screen starts
+      initSplashScreen(); // 6-second splash screen starts
       loadSettings();
       fetchCustomerProducts();
       setupCustomerRealtime();
