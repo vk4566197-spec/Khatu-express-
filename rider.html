@@ -42,7 +42,7 @@
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; -webkit-tap-highlight-color: transparent; }
     body { background-color: var(--bg-dark); color: var(--text-main); min-height: 100vh; padding-bottom: 90px; }
 
-    /* HIGH ALERT BANNER */
+    /* LOUD ALERT FLASHING BAR */
     .alert-banner {
       background: linear-gradient(90deg, #dc2626, #b91c1c);
       color: white;
@@ -52,11 +52,11 @@
       display: none;
       align-items: center;
       justify-content: space-between;
-      box-shadow: 0 4px 14px rgba(220, 38, 38, 0.5);
-      animation: alertPulse 1s infinite alternate;
+      box-shadow: 0 4px 14px rgba(220, 38, 38, 0.6);
+      animation: alertPulse 0.8s infinite alternate;
     }
     @keyframes alertPulse {
-      0% { opacity: 0.9; }
+      0% { opacity: 0.85; transform: scale(0.99); }
       100% { opacity: 1; transform: scale(1.01); }
     }
 
@@ -136,9 +136,9 @@
       background: var(--accent-green);
       color: #fff;
       border: none;
-      padding: 6px 14px;
+      padding: 7px 16px;
       border-radius: 20px;
-      font-size: 11px;
+      font-size: 12px;
       font-weight: 900;
       cursor: pointer;
       display: flex;
@@ -208,14 +208,20 @@
       padding: 14px;
       margin-bottom: 14px;
       box-shadow: 0 4px 14px rgba(0,0,0,0.25);
+      position: relative;
     }
     .order-card.super-order {
       background: var(--card-super);
       border-color: #6366f1;
     }
     .order-card.alert-pulse-card {
-      border-color: #ef4444;
-      background: #23121d;
+      border: 2px solid #ef4444;
+      background: #25121e;
+      animation: glowBorder 1.2s infinite alternate;
+    }
+    @keyframes glowBorder {
+      0% { box-shadow: 0 0 5px rgba(239, 68, 68, 0.4); }
+      100% { box-shadow: 0 0 18px rgba(239, 68, 68, 0.85); }
     }
 
     .order-badge {
@@ -249,7 +255,7 @@
       padding: 12px 14px;
       border-radius: 12px;
       font-size: 13px;
-      font-weight: 800;
+      font-weight: 900;
       cursor: pointer;
       display: flex;
       align-items: center;
@@ -260,7 +266,7 @@
     .btn-success { background: #059669; border: none; }
     .btn-danger { background: #dc2626; border: none; }
     .btn-map { background: #0284c7; border: none; }
-    .btn-pick { background: linear-gradient(135deg, #f59e0b, #d97706); color: black; border: none; }
+    .btn-pick { background: linear-gradient(135deg, #f59e0b, #d97706); color: black; border: none; font-size: 14px; }
 
     /* LOGIN MODAL */
     .login-container {
@@ -335,13 +341,13 @@
   <!-- TOP HIGH ALERT NOTIFICATION -->
   <div class="alert-banner" id="order-alert-bar">
     <div style="display:flex; align-items:center; gap:8px;">
-      <span style="font-size:18px;">🔔</span>
-      <span>NAYA ORDER AAYA HAI! TURANT PICKUP KAREIN!</span>
+      <span style="font-size:20px;">🚨</span>
+      <span>NAYA ORDER AAYA! TURANT ACCEPT KAREIN!</span>
     </div>
-    <button onclick="stopHighAlertTune()" style="background:#0f172a; border:none; color:white; padding:4px 8px; border-radius:6px; font-size:11px; font-weight:800; cursor:pointer;">Mute 🔕</button>
+    <button onclick="stopHighAlertTune()" style="background:#0f172a; border:none; color:white; padding:5px 10px; border-radius:6px; font-size:11px; font-weight:800; cursor:pointer;">Mute 🔕</button>
   </div>
 
-  <!-- LOGIN SCREEN (WITH LOGIN TYPE DROPDOWN) -->
+  <!-- LOGIN SCREEN -->
   <div class="login-container" id="rider-login-screen">
     <div class="login-card">
       <img src="logo.png" style="width:70px; height:70px; border-radius:18px; object-fit:contain; border:2px solid var(--accent-pink); margin-bottom:12px;" onerror="this.style.display='none'">
@@ -372,6 +378,7 @@
       </div>
     </div>
     <div class="header-actions">
+      <button id="btn-sound-test" class="btn-install-header" style="display:inline-block; background:#0284c7;" onclick="testSirenTune()">🔊 Siren Test</button>
       <button id="btn-install-app" class="btn-install-header" onclick="triggerPWAInstall()">📲 Install</button>
       <button class="btn-logout" onclick="riderLogout()">🚪 Logout</button>
     </div>
@@ -407,7 +414,7 @@
 
   <div class="content-area">
     <div id="section-active-orders">
-      <div id="rider-orders-list"><div style="text-align:center; padding:30px; color:var(--text-muted);">Orders load ho rahe hain...</div></div>
+      <div id="rider-orders-list"><div style="text-align:center; padding:30px; color:var(--text-muted);">Orders check ho rahe hain...</div></div>
     </div>
     <div id="section-history-orders" style="display:none;">
       <div id="rider-history-list"></div>
@@ -418,7 +425,7 @@
   <div class="modal-box" id="complete-modal">
     <div class="modal-inner">
       <h3 style="font-size:16px; font-weight:900; margin-bottom:8px; color:var(--accent-cyan);">🏁 Order Delivery Complete Karein</h3>
-      <p style="font-size:11.5px; color:var(--text-muted); margin-bottom:12px;">Customer ka secret OTP darj karein aur delivery photo kheinchein:</p>
+      <p style="font-size:11.5px; color:var(--text-muted); margin-bottom:12px;">Customer ka 4-digit secret OTP daalein aur delivery photo upload karein:</p>
 
       <input type="tel" id="verify-otp-input" class="input-rider" placeholder="Customer 4-Digit OTP *" maxlength="4" style="text-align:center; font-size:18px; font-weight:900; letter-spacing:4px;">
       
@@ -449,8 +456,10 @@
     let liveGpsWatchId = null;
     let deferredPrompt = null;
     let isAudioUnlocked = false;
-    let lastAlertedOrderId = null;
+    let isAlertPlaying = false;
+    let autoRefreshTimer = null;
 
+    // AUDIO UNLOCK FOR ANDROID CHROME
     function unlockRiderAudio() {
       if (isAudioUnlocked) return;
       const audio = document.getElementById('rider-high-alert-audio');
@@ -463,14 +472,24 @@
       }
     }
 
+    function testSirenTune() {
+      unlockRiderAudio();
+      playHighAlertTune();
+      setTimeout(stopHighAlertTune, 3000);
+    }
+
     function playHighAlertTune() {
       const audio = document.getElementById('rider-high-alert-audio');
       document.getElementById('order-alert-bar').style.display = 'flex';
       if (audio) {
         audio.currentTime = 0;
-        audio.play().catch(() => {});
+        audio.play().then(() => {
+          isAlertPlaying = true;
+        }).catch(e => {
+          console.warn('Audio play blocked:', e);
+        });
       }
-      if (navigator.vibrate) navigator.vibrate([300, 150, 300, 150, 400]);
+      if (navigator.vibrate) navigator.vibrate([400, 200, 400, 200, 500]);
     }
 
     function stopHighAlertTune() {
@@ -480,9 +499,9 @@
         audio.pause();
         audio.currentTime = 0;
       }
+      isAlertPlaying = false;
     }
 
-    // PWA INSTALL PROMPT HANDLER
     window.addEventListener('beforeinstallprompt', (e) => {
       e.preventDefault();
       deferredPrompt = e;
@@ -549,12 +568,16 @@
       startLiveGpsTracking();
       fetchRiderOrders();
       setupRiderRealtime();
+
+      if (autoRefreshTimer) clearInterval(autoRefreshTimer);
+      autoRefreshTimer = setInterval(fetchRiderOrders, 4000); // 4 second me auto check
     }
 
     function riderLogout() {
       if (!confirm('Logout karna chahte hain?')) return;
       stopHighAlertTune();
       if (liveGpsWatchId) navigator.geolocation.clearWatch(liveGpsWatchId);
+      if (autoRefreshTimer) clearInterval(autoRefreshTimer);
       localStorage.removeItem('sm_rider_data');
       location.reload();
     }
@@ -566,6 +589,7 @@
       localStorage.setItem('sm_rider_data', JSON.stringify(currentRider));
       updateDutyUI(newStatus);
       if (!newStatus) stopHighAlertTune();
+      fetchRiderOrders();
     }
 
     function updateDutyUI(isActive) {
@@ -591,38 +615,54 @@
       });
     }
 
+    // 100% RELIABLE ORDER FETCHING (NO MISSED ORDERS)
     async function fetchRiderOrders() {
       if (!currentRider) return;
-      const { data } = await _supabase.from('orders').select('*').order('id', { ascending: false });
+      const { data, error } = await _supabase.from('orders').select('*').order('id', { ascending: false });
+      if (error) {
+        console.error('Fetch orders error:', error);
+        return;
+      }
+
+      const isSuper = (currentRider.rider_type === 'SUPER');
       
-      const isSuper = currentRider.rider_type === 'SUPER';
-      
-      // Rider relevant orders filter
       allRiderOrders = (data || []).filter(o => {
-        // Agar rider ko assign ho chuka hai
+        const orderType = (o.delivery_type || '').toUpperCase();
+
+        // 1. Agar ye order is rider ko assign hai
         if (o.assigned_rider_id === currentRider.id) return true;
-        
-        // Agar abhi tak assign nahi hua hai aur online hai toh role match karein
-        if (!o.assigned_rider_id && currentRider.is_active) {
-          if (isSuper) return o.delivery_type === '24_HOURS';
-          return o.delivery_type !== '24_HOURS';
+
+        // 2. Agar ye order kisi aur rider ko assign ho chuka hai toh hide karein
+        if (o.assigned_rider_id && o.assigned_rider_id !== currentRider.id) return false;
+
+        // 3. Agar order UNASSIGNED hai aur rider ONLINE hai toh role ke hisaab se dikhayein
+        if (currentRider.is_active) {
+          if (isSuper) {
+            return orderType.includes('24');
+          } else {
+            // Normal rider ko express aur unassigned order sabhi milenge
+            return !orderType.includes('24');
+          }
         }
         return false;
       });
 
-      // CHECK FOR NEW INCOMING ORDER REQUIRING HIGH ALERT
-      const incomingPending = allRiderOrders.find(o => {
+      // LOUD SIREN TUNE TRIGGER LOGIC
+      const newOrdersRequiringAttention = allRiderOrders.filter(o => {
         const st = (o.status || '').toLowerCase();
-        return !st.includes('delivered') && !st.includes('cancelled') && (!o.assigned_rider_id || !st.includes('out'));
+        const isCompleted = st.includes('delivered') || st.includes('cancelled');
+        // Unassigned order ya assigned but not dispatched
+        return !isCompleted && (!o.assigned_rider_id || !st.includes('out'));
       });
 
-      if (incomingPending && currentRider.is_active) {
-        if (lastAlertedOrderId !== incomingPending.id) {
-          lastAlertedOrderId = incomingPending.id;
+      if (newOrdersRequiringAttention.length > 0 && currentRider.is_active) {
+        if (!isAlertPlaying) {
           playHighAlertTune();
         }
       } else {
-        stopHighAlertTune();
+        if (isAlertPlaying) {
+          stopHighAlertTune();
+        }
       }
 
       renderRiderOrders();
@@ -632,49 +672,56 @@
       const activeBox = document.getElementById('rider-orders-list');
       const historyBox = document.getElementById('rider-history-list');
 
-      const active = allRiderOrders.filter(o => !o.status.toLowerCase().includes('delivered') && !o.status.toLowerCase().includes('cancelled'));
-      const past = allRiderOrders.filter(o => o.status.toLowerCase().includes('delivered') || o.status.toLowerCase().includes('cancelled'));
+      const active = allRiderOrders.filter(o => {
+        const st = (o.status || '').toLowerCase();
+        return !st.includes('delivered') && !st.includes('cancelled');
+      });
+      const past = allRiderOrders.filter(o => {
+        const st = (o.status || '').toLowerCase();
+        return st.includes('delivered') || st.includes('cancelled');
+      });
 
       document.getElementById('stat-active-count').innerText = active.length;
       document.getElementById('stat-delivered-count').innerText = past.length;
       document.getElementById('stat-earnings').innerText = `₹${past.length * 35}`;
 
       if (active.length === 0) {
-        activeBox.innerHTML = '<div style="text-align:center; padding:30px; color:var(--text-muted);">🎉 Abhi koi active order pending nahi hai.</div>';
+        activeBox.innerHTML = '<div style="text-align:center; padding:35px; color:var(--text-muted); font-weight:700;">🎉 Abhi koi pending order nahi hai.<br><small style="color:#64748b;">(Dukaan se naya order aate hi siren bajega)</small></div>';
       } else {
         activeBox.innerHTML = active.map(o => {
-          const isSuper = o.delivery_type === '24_HOURS';
-          const isAssignedToMe = o.assigned_rider_id === currentRider.id;
-          const isOut = o.status.toLowerCase().includes('out') || o.status.toLowerCase().includes('running');
-          const isArrived = (o.status || '').toLowerCase() === 'arrived';
+          const isSuper = (o.delivery_type || '').toUpperCase().includes('24');
+          const isAssignedToMe = (o.assigned_rider_id === currentRider.id);
+          const st = (o.status || '').toLowerCase();
+          const isOut = st.includes('out') || st.includes('running');
+          const isArrived = st.includes('arrived');
 
           let items = [];
           try { items = Array.isArray(o.items) ? o.items : JSON.parse(o.items || '[]'); } catch(e){}
-          const itemsText = items.map(i => `• ${i.name} × ${i.qty}`).join('<br>');
+          const itemsText = items.map(i => `• <b>${i.name}</b> × ${i.qty}`).join('<br>');
 
           return `
             <div class="order-card ${isSuper ? 'super-order' : ''} ${!isAssignedToMe ? 'alert-pulse-card' : ''}">
               <div style="display:flex; justify-content:space-between; align-items:flex-start;">
                 <div>
-                  <b style="font-size:15px; color:var(--accent-cyan);">#ORD-${o.id}</b>
+                  <b style="font-size:16px; color:var(--accent-cyan);">#ORD-${o.id}</b>
                   <span class="order-badge ${isSuper ? 'badge-24hr' : 'badge-express'}" style="margin-left:6px;">
                     ${isSuper ? '⏳ 24 HR' : '⚡ 14 MIN'}
                   </span>
                   <span class="order-badge ${isOut ? 'badge-picked' : 'badge-pending'}" style="margin-left:4px;">
-                    ${o.status}
+                    ${o.status || 'Placed'}
                   </span>
                 </div>
                 <div style="text-align:right;">
                   <b style="font-size:16px; color:#10b981;">₹${o.total_amount}</b>
-                  <div style="font-size:11px; color:var(--text-muted); font-weight:700;">${o.payment_mode}</div>
+                  <div style="font-size:11px; color:var(--text-muted); font-weight:700;">${o.payment_mode || 'COD'}</div>
                 </div>
               </div>
 
               <div class="detail-box">
-                <div>👤 <b>Customer:</b> ${o.customer_name} (📞 <a href="tel:${o.customer_phone}" style="color:#38bdf8; font-weight:800;">${o.customer_phone}</a>)</div>
-                <div>📍 <b>Address:</b> ${o.delivery_address}</div>
+                <div>👤 <b>Customer:</b> ${o.customer_name || 'N/A'} (📞 <a href="tel:${o.customer_phone}" style="color:#38bdf8; font-weight:900;">${o.customer_phone}</a>)</div>
+                <div>📍 <b>Address:</b> ${o.delivery_address || 'Pata nahi mila'}</div>
                 <div style="margin-top:4px; padding-top:4px; border-top:1px dashed var(--border-color);">
-                  <b>Items:</b><br>${itemsText}
+                  <b>Items list:</b><br>${itemsText || 'Details nahi mili'}
                 </div>
               </div>
 
@@ -685,25 +732,22 @@
                   </a>
                 ` : ''}
 
-                <!-- STEP 1: PICKUP / ACCEPT ORDER -->
+                <!-- ACTION BUTTONS STEP-BY-STEP -->
                 ${!isAssignedToMe ? `
                   <button class="btn-rider-action btn-pick" onclick="pickupAndAcceptOrder(${o.id})">
-                    📦 Order Pickup Karein & Accept (Duty Alert Off)
+                    📦 Order Accept & Pick Karein (Siren Band Hoga)
                   </button>
                 ` : !isOut ? `
-                  <!-- STEP 2: SAMAN PICK KIYA AUR DISPATCH -->
                   <button class="btn-rider-action btn-success" onclick="startDelivery(${o.id})">
-                    🛵 Saman Dukan Se Liya — Start Delivery
+                    🛵 Saman Pick Kar Liya — Start Delivery
                   </button>
                 ` : !isArrived ? `
-                  <!-- STEP 3: CUSTOMER KE GHAR PAHUNCHNA -->
                   <button class="btn-rider-action btn-map" style="background:#f59e0b; color:black;" onclick="markArrived(${o.id})">
-                    🔔 Customer Ke Ghar Pahunch Gaya (Doorbell Alert)
+                    🔔 Customer Ke Ghar Pahunch Gaya (Arrived Bell)
                   </button>
                 ` : `
-                  <!-- STEP 4: SECRET OTP AUR PHOTO COMPLETE -->
                   <button class="btn-rider-action btn-success" onclick="openCompleteModal(${o.id})">
-                    🏁 Complete Delivery (Enter Secret OTP & Photo)
+                    🏁 Complete Delivery (Customer OTP & Photo)
                   </button>
                 `}
               </div>
@@ -722,7 +766,7 @@
               <span style="color:#10b981; font-weight:800;">${o.status}</span>
             </div>
             <div style="font-size:12px; color:var(--text-muted); margin-top:4px;">
-              ₹${o.total_amount} | ${new Date(o.created_at).toLocaleDateString()}
+              ₹${o.total_amount} | ${new Date(o.created_at).toLocaleString()}
             </div>
           </div>
         `).join('');
@@ -740,7 +784,7 @@
         assigned_rider_id: currentRider.id,
         status: 'Rider Assigned'
       }).eq('id', id);
-      alert('✅ Order Pickup ho gaya! Ab dukaan se saman lekar "Start Delivery" karein.');
+      alert('✅ Order Accept Ho Gaya! Dukaan se saman lekar "Start Delivery" karein.');
       fetchRiderOrders();
     }
 
@@ -755,7 +799,7 @@
 
     async function markArrived(id) {
       await _supabase.from('orders').update({ status: 'Arrived' }).eq('id', id);
-      alert('🔔 Customer ko alert bhej diya gaya hai!');
+      alert('🔔 Customer ke phone par Arrived Chime alert baj gaya hai!');
       fetchRiderOrders();
     }
 
