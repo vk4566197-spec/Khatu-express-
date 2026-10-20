@@ -102,8 +102,8 @@
       align-items: center;
       gap: 8px;
     }
-    .btn-install-header {
-      background: linear-gradient(135deg, #ff007f, #ff5400);
+    .btn-sound-test {
+      background: #0284c7;
       color: white;
       border: none;
       padding: 6px 10px;
@@ -111,7 +111,6 @@
       font-size: 11px;
       font-weight: 800;
       cursor: pointer;
-      display: none;
     }
     .btn-logout {
       background: rgba(239, 68, 68, 0.2);
@@ -210,10 +209,6 @@
       box-shadow: 0 4px 14px rgba(0,0,0,0.25);
       position: relative;
     }
-    .order-card.super-order {
-      background: var(--card-super);
-      border-color: #6366f1;
-    }
     .order-card.alert-pulse-card {
       border: 2px solid #ef4444;
       background: #25121e;
@@ -232,7 +227,6 @@
       text-transform: uppercase;
     }
     .badge-express { background: #059669; color: white; }
-    .badge-24hr { background: #4f46e5; color: white; }
     .badge-pending { background: #f59e0b; color: black; }
     .badge-picked { background: #0284c7; color: white; }
 
@@ -342,7 +336,7 @@
   <div class="alert-banner" id="order-alert-bar">
     <div style="display:flex; align-items:center; gap:8px;">
       <span style="font-size:20px;">🚨</span>
-      <span>NAYA ORDER AAYA! TURANT ACCEPT KAREIN!</span>
+      <span>NAYA ORDER AAYA! ACCEPT KAREIN!</span>
     </div>
     <button onclick="stopHighAlertTune()" style="background:#0f172a; border:none; color:white; padding:5px 10px; border-radius:6px; font-size:11px; font-weight:800; cursor:pointer;">Mute 🔕</button>
   </div>
@@ -355,8 +349,8 @@
       <p style="font-size:11.5px; color:var(--text-muted); margin-bottom:16px;">Delivery Partner Portal</p>
 
       <select id="login-rider-type" class="input-rider" style="border-color:#a855f7; font-weight:800; color:#38bdf8;">
-        <option value="EXPRESS">⚡ Normal Express Rider (10-20 Min)</option>
-        <option value="SUPER">👑 Super Rider (24 Hours Dedicated)</option>
+        <option value="EXPRESS">⚡ Express Rider / All Orders</option>
+        <option value="SUPER">👑 Super Rider</option>
       </select>
       
       <input type="tel" id="login-phone" class="input-rider" placeholder="Mobile Number (10 Digit)" maxlength="10">
@@ -378,16 +372,15 @@
       </div>
     </div>
     <div class="header-actions">
-      <button id="btn-sound-test" class="btn-install-header" style="display:inline-block; background:#0284c7;" onclick="testSirenTune()">🔊 Siren Test</button>
-      <button id="btn-install-app" class="btn-install-header" onclick="triggerPWAInstall()">📲 Install</button>
+      <button class="btn-sound-test" onclick="testSirenTune()">🔊 Siren Test</button>
       <button class="btn-logout" onclick="riderLogout()">🚪 Logout</button>
     </div>
   </div>
 
   <div class="profile-banner">
     <div>
-      <div style="font-size:10px; color:var(--text-muted); font-weight:800; text-transform:uppercase;">Current Role:</div>
-      <div style="font-size:12.5px; font-weight:900; color:var(--accent-cyan);" id="profile-role-badge">⚡ Normal Express Rider</div>
+      <div style="font-size:10px; color:var(--text-muted); font-weight:800; text-transform:uppercase;">Rider Status:</div>
+      <div style="font-size:12.5px; font-weight:900; color:var(--accent-cyan);" id="profile-role-badge">⚡ Express Rider Active</div>
     </div>
     <button id="duty-btn" class="duty-toggle-btn" onclick="toggleDuty()">🟢 ONLINE</button>
   </div>
@@ -425,7 +418,7 @@
   <div class="modal-box" id="complete-modal">
     <div class="modal-inner">
       <h3 style="font-size:16px; font-weight:900; margin-bottom:8px; color:var(--accent-cyan);">🏁 Order Delivery Complete Karein</h3>
-      <p style="font-size:11.5px; color:var(--text-muted); margin-bottom:12px;">Customer ka 4-digit secret OTP daalein aur delivery photo upload karein:</p>
+      <p style="font-size:11.5px; color:var(--text-muted); margin-bottom:12px;">Customer ka 4-digit secret OTP daalein aur photo upload karein:</p>
 
       <input type="tel" id="verify-otp-input" class="input-rider" placeholder="Customer 4-Digit OTP *" maxlength="4" style="text-align:center; font-size:18px; font-weight:900; letter-spacing:4px;">
       
@@ -454,12 +447,10 @@
     let activeCompleteOrderId = null;
     let base64DeliveryProof = null;
     let liveGpsWatchId = null;
-    let deferredPrompt = null;
     let isAudioUnlocked = false;
     let isAlertPlaying = false;
     let autoRefreshTimer = null;
 
-    // AUDIO UNLOCK FOR ANDROID CHROME
     function unlockRiderAudio() {
       if (isAudioUnlocked) return;
       const audio = document.getElementById('rider-high-alert-audio');
@@ -485,9 +476,7 @@
         audio.currentTime = 0;
         audio.play().then(() => {
           isAlertPlaying = true;
-        }).catch(e => {
-          console.warn('Audio play blocked:', e);
-        });
+        }).catch(e => console.warn('Audio blocked:', e));
       }
       if (navigator.vibrate) navigator.vibrate([400, 200, 400, 200, 500]);
     }
@@ -500,23 +489,6 @@
         audio.currentTime = 0;
       }
       isAlertPlaying = false;
-    }
-
-    window.addEventListener('beforeinstallprompt', (e) => {
-      e.preventDefault();
-      deferredPrompt = e;
-      const installBtn = document.getElementById('btn-install-app');
-      if (installBtn) installBtn.style.display = 'block';
-    });
-
-    function triggerPWAInstall() {
-      if (deferredPrompt) {
-        deferredPrompt.prompt();
-        deferredPrompt.userChoice.then(() => {
-          deferredPrompt = null;
-          document.getElementById('btn-install-app').style.display = 'none';
-        });
-      }
     }
 
     document.addEventListener('DOMContentLoaded', () => {
@@ -546,11 +518,6 @@
         return alert('Galat Password! Kripya sahi password darj karein.');
       }
 
-      if (data.rider_type !== selectedType) {
-        await _supabase.from('riders').update({ rider_type: selectedType }).eq('id', data.id);
-        data.rider_type = selectedType;
-      }
-
       currentRider = data;
       localStorage.setItem('sm_rider_data', JSON.stringify(data));
       showDashboard();
@@ -561,16 +528,13 @@
       document.getElementById('nav-rider-name').innerText = currentRider.name;
       document.getElementById('nav-rider-phone').innerText = `📞 ${currentRider.phone} (${currentRider.vehicle_no || 'NA'})`;
       
-      const isSuper = currentRider.rider_type === 'SUPER';
-      document.getElementById('profile-role-badge').innerText = isSuper ? '👑 Dedicated Super Rider (24 Hours)' : '⚡ Normal Express Rider (10-20 Min)';
-      
       updateDutyUI(currentRider.is_active);
       startLiveGpsTracking();
       fetchRiderOrders();
       setupRiderRealtime();
 
       if (autoRefreshTimer) clearInterval(autoRefreshTimer);
-      autoRefreshTimer = setInterval(fetchRiderOrders, 4000); // 4 second me auto check
+      autoRefreshTimer = setInterval(fetchRiderOrders, 3000); // Har 3 second me orders update
     }
 
     function riderLogout() {
@@ -615,54 +579,36 @@
       });
     }
 
-    // 100% RELIABLE ORDER FETCHING (NO MISSED ORDERS)
+    // 🌟 100% DIRECT ORDER FETCH (ADMIN WALE SARE ORDERS YAHAN DIKHENGE)
     async function fetchRiderOrders() {
       if (!currentRider) return;
+      
+      // Admin panel ke tarah seedha saare orders fetch karein
       const { data, error } = await _supabase.from('orders').select('*').order('id', { ascending: false });
       if (error) {
-        console.error('Fetch orders error:', error);
+        console.error('Fetch error:', error);
         return;
       }
 
-      const isSuper = (currentRider.rider_type === 'SUPER');
-      
+      // Filter: Sirf uncompleted orders jo ya toh unassigned hain YA is rider ko assign hain
       allRiderOrders = (data || []).filter(o => {
-        const orderType = (o.delivery_type || '').toUpperCase();
-
-        // 1. Agar ye order is rider ko assign hai
-        if (o.assigned_rider_id === currentRider.id) return true;
-
-        // 2. Agar ye order kisi aur rider ko assign ho chuka hai toh hide karein
-        if (o.assigned_rider_id && o.assigned_rider_id !== currentRider.id) return false;
-
-        // 3. Agar order UNASSIGNED hai aur rider ONLINE hai toh role ke hisaab se dikhayein
-        if (currentRider.is_active) {
-          if (isSuper) {
-            return orderType.includes('24');
-          } else {
-            // Normal rider ko express aur unassigned order sabhi milenge
-            return !orderType.includes('24');
-          }
-        }
-        return false;
+        const assignedId = o.assigned_rider_id;
+        // Agar kisi aur rider ne accept kar liya hai toh hide karein
+        if (assignedId && assignedId !== currentRider.id) return false;
+        return true;
       });
 
-      // LOUD SIREN TUNE TRIGGER LOGIC
-      const newOrdersRequiringAttention = allRiderOrders.filter(o => {
+      // LOUD SIREN: Naya active order aate hi bajega
+      const pendingAlertOrders = allRiderOrders.filter(o => {
         const st = (o.status || '').toLowerCase();
-        const isCompleted = st.includes('delivered') || st.includes('cancelled');
-        // Unassigned order ya assigned but not dispatched
-        return !isCompleted && (!o.assigned_rider_id || !st.includes('out'));
+        const isDone = st.includes('delivered') || st.includes('cancelled');
+        return !isDone && (!o.assigned_rider_id || !st.includes('out'));
       });
 
-      if (newOrdersRequiringAttention.length > 0 && currentRider.is_active) {
-        if (!isAlertPlaying) {
-          playHighAlertTune();
-        }
+      if (pendingAlertOrders.length > 0 && currentRider.is_active) {
+        if (!isAlertPlaying) playHighAlertTune();
       } else {
-        if (isAlertPlaying) {
-          stopHighAlertTune();
-        }
+        if (isAlertPlaying) stopHighAlertTune();
       }
 
       renderRiderOrders();
@@ -678,7 +624,7 @@
       });
       const past = allRiderOrders.filter(o => {
         const st = (o.status || '').toLowerCase();
-        return st.includes('delivered') || st.includes('cancelled');
+        return (st.includes('delivered') || st.includes('cancelled')) && (o.assigned_rider_id === currentRider.id);
       });
 
       document.getElementById('stat-active-count').innerText = active.length;
@@ -686,10 +632,9 @@
       document.getElementById('stat-earnings').innerText = `₹${past.length * 35}`;
 
       if (active.length === 0) {
-        activeBox.innerHTML = '<div style="text-align:center; padding:35px; color:var(--text-muted); font-weight:700;">🎉 Abhi koi pending order nahi hai.<br><small style="color:#64748b;">(Dukaan se naya order aate hi siren bajega)</small></div>';
+        activeBox.innerHTML = '<div style="text-align:center; padding:35px; color:var(--text-muted); font-weight:700;">🎉 Abhi koi active order nahi hai.<br><small style="color:#64748b;">(Customer ke order lagate hi siren bajega)</small></div>';
       } else {
         activeBox.innerHTML = active.map(o => {
-          const isSuper = (o.delivery_type || '').toUpperCase().includes('24');
           const isAssignedToMe = (o.assigned_rider_id === currentRider.id);
           const st = (o.status || '').toLowerCase();
           const isOut = st.includes('out') || st.includes('running');
@@ -700,14 +645,11 @@
           const itemsText = items.map(i => `• <b>${i.name}</b> × ${i.qty}`).join('<br>');
 
           return `
-            <div class="order-card ${isSuper ? 'super-order' : ''} ${!isAssignedToMe ? 'alert-pulse-card' : ''}">
+            <div class="order-card ${!isAssignedToMe ? 'alert-pulse-card' : ''}">
               <div style="display:flex; justify-content:space-between; align-items:flex-start;">
                 <div>
                   <b style="font-size:16px; color:var(--accent-cyan);">#ORD-${o.id}</b>
-                  <span class="order-badge ${isSuper ? 'badge-24hr' : 'badge-express'}" style="margin-left:6px;">
-                    ${isSuper ? '⏳ 24 HR' : '⚡ 14 MIN'}
-                  </span>
-                  <span class="order-badge ${isOut ? 'badge-picked' : 'badge-pending'}" style="margin-left:4px;">
+                  <span class="order-badge ${isOut ? 'badge-picked' : 'badge-pending'}" style="margin-left:6px;">
                     ${o.status || 'Placed'}
                   </span>
                 </div>
@@ -721,7 +663,7 @@
                 <div>👤 <b>Customer:</b> ${o.customer_name || 'N/A'} (📞 <a href="tel:${o.customer_phone}" style="color:#38bdf8; font-weight:900;">${o.customer_phone}</a>)</div>
                 <div>📍 <b>Address:</b> ${o.delivery_address || 'Pata nahi mila'}</div>
                 <div style="margin-top:4px; padding-top:4px; border-top:1px dashed var(--border-color);">
-                  <b>Items list:</b><br>${itemsText || 'Details nahi mili'}
+                  <b>Saman (Items):</b><br>${itemsText || 'Details uplabdh nahi'}
                 </div>
               </div>
 
@@ -732,18 +674,18 @@
                   </a>
                 ` : ''}
 
-                <!-- ACTION BUTTONS STEP-BY-STEP -->
+                <!-- STEP-BY-STEP ACTIONS -->
                 ${!isAssignedToMe ? `
                   <button class="btn-rider-action btn-pick" onclick="pickupAndAcceptOrder(${o.id})">
-                    📦 Order Accept & Pick Karein (Siren Band Hoga)
+                    📦 Order Accept & Pick Karein (Siren Mute Hoga)
                   </button>
                 ` : !isOut ? `
                   <button class="btn-rider-action btn-success" onclick="startDelivery(${o.id})">
-                    🛵 Saman Pick Kar Liya — Start Delivery
+                    🛵 Saman Dukaan Se Pick Kiya — Start Delivery
                   </button>
                 ` : !isArrived ? `
                   <button class="btn-rider-action btn-map" style="background:#f59e0b; color:black;" onclick="markArrived(${o.id})">
-                    🔔 Customer Ke Ghar Pahunch Gaya (Arrived Bell)
+                    🔔 Customer Ke Ghar Pahunch Gaya (Doorbell Alert)
                   </button>
                 ` : `
                   <button class="btn-rider-action btn-success" onclick="openCompleteModal(${o.id})">
@@ -784,7 +726,7 @@
         assigned_rider_id: currentRider.id,
         status: 'Rider Assigned'
       }).eq('id', id);
-      alert('✅ Order Accept Ho Gaya! Dukaan se saman lekar "Start Delivery" karein.');
+      alert('✅ Order Accept Ho Gaya! Ab dukaan se saman lekar "Start Delivery" karein.');
       fetchRiderOrders();
     }
 
@@ -799,7 +741,7 @@
 
     async function markArrived(id) {
       await _supabase.from('orders').update({ status: 'Arrived' }).eq('id', id);
-      alert('🔔 Customer ke phone par Arrived Chime alert baj gaya hai!');
+      alert('🔔 Customer ke phone par Arrived Chime baj gaya hai!');
       fetchRiderOrders();
     }
 
