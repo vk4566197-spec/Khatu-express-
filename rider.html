@@ -52,8 +52,8 @@
       display: none;
       align-items: center;
       justify-content: space-between;
-      box-shadow: 0 4px 14px rgba(220, 38, 38, 0.6);
-      animation: alertPulse 0.8s infinite alternate;
+      box-shadow: 0 4px 14px rgba(220, 38, 38, 0.7);
+      animation: alertPulse 0.7s infinite alternate;
     }
     @keyframes alertPulse {
       0% { opacity: 0.85; transform: scale(0.99); }
@@ -229,6 +229,7 @@
     .badge-express { background: #059669; color: white; }
     .badge-pending { background: #f59e0b; color: black; }
     .badge-picked { background: #0284c7; color: white; }
+    .badge-arrived { background: #8b5cf6; color: white; }
 
     .detail-box {
       background: #0f172a;
@@ -261,6 +262,7 @@
     .btn-danger { background: #dc2626; border: none; }
     .btn-map { background: #0284c7; border: none; }
     .btn-pick { background: linear-gradient(135deg, #f59e0b, #d97706); color: black; border: none; font-size: 14px; }
+    .btn-arrived { background: #7c3aed; border: none; }
 
     /* LOGIN MODAL */
     .login-container {
@@ -336,7 +338,7 @@
   <div class="alert-banner" id="order-alert-bar">
     <div style="display:flex; align-items:center; gap:8px;">
       <span style="font-size:20px;">🚨</span>
-      <span>NAYA ORDER AAYA! ACCEPT KAREIN!</span>
+      <span>NAYA ORDER AAYA! TURANT PICKUP KAREIN!</span>
     </div>
     <button onclick="stopHighAlertTune()" style="background:#0f172a; border:none; color:white; padding:5px 10px; border-radius:6px; font-size:11px; font-weight:800; cursor:pointer;">Mute 🔕</button>
   </div>
@@ -418,20 +420,20 @@
   <div class="modal-box" id="complete-modal">
     <div class="modal-inner">
       <h3 style="font-size:16px; font-weight:900; margin-bottom:8px; color:var(--accent-cyan);">🏁 Order Delivery Complete Karein</h3>
-      <p style="font-size:11.5px; color:var(--text-muted); margin-bottom:12px;">Customer ka 4-digit secret OTP daalein aur photo upload karein:</p>
+      <p style="font-size:11.5px; color:var(--text-muted); margin-bottom:12px;">Customer se Secret OTP poochhein aur photo kheinchein:</p>
 
       <input type="tel" id="verify-otp-input" class="input-rider" placeholder="Customer 4-Digit OTP *" maxlength="4" style="text-align:center; font-size:18px; font-weight:900; letter-spacing:4px;">
       
       <div id="proof-photo-preview" style="width:100%; height:120px; background:#0f172a; border:1.5px dashed var(--border-color); border-radius:12px; display:flex; align-items:center; justify-content:center; margin-bottom:10px; overflow:hidden;">
-        <span style="font-size:11px; color:var(--text-muted);">📸 Delivery Proof Photo</span>
+        <span style="font-size:11px; color:var(--text-muted);">📸 Delivery Proof Photo (Optional)</span>
       </div>
       <input type="file" id="delivery-photo-input" accept="image/*" capture="environment" style="display:none;" onchange="handleDeliveryPhotoCaptured(this)">
       <button type="button" class="btn-rider-action btn-map" style="width:100%; margin-bottom:14px;" onclick="document.getElementById('delivery-photo-input').click()">
-        📸 Proof Photo Kheinchein *
+        📸 Proof Photo Kheinchein
       </button>
 
       <div style="display:flex; gap:8px;">
-        <button class="btn-rider-action btn-success" style="flex:1;" onclick="submitOrderDelivered()">✓ Confirm Delivery</button>
+        <button class="btn-rider-action btn-success" id="btn-submit-delivery" style="flex:1;" onclick="submitOrderDelivered()">✓ Confirm Delivered</button>
         <button class="btn-rider-action btn-danger" style="flex:1;" onclick="closeCompleteModal()">✕ Cancel</button>
       </div>
     </div>
@@ -450,9 +452,62 @@
     let isAudioUnlocked = false;
     let isAlertPlaying = false;
     let autoRefreshTimer = null;
+    let sirenIntervalTimer = null;
+    let audioCtx = null;
+
+    // SYNTHESIZED EMERGENCY SIREN (Works without any external file)
+    function startEmergencySiren() {
+      try {
+        if (!audioCtx) {
+          audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+        if (audioCtx.state === 'suspended') {
+          audioCtx.resume();
+        }
+
+        if (sirenIntervalTimer) clearInterval(sirenIntervalTimer);
+        
+        let freq = 650;
+        let goingUp = true;
+        
+        sirenIntervalTimer = setInterval(() => {
+          if (!isAlertPlaying) return;
+          try {
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = 'sawtooth';
+            osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+            gain.gain.setValueAtTime(0.18, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.18);
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.18);
+
+            freq = goingUp ? freq + 80 : freq - 80;
+            if (freq >= 950) goingUp = false;
+            if (freq <= 550) goingUp = true;
+          } catch(e){}
+        }, 180);
+      } catch(err){}
+    }
+
+    function stopEmergencySiren() {
+      if (sirenIntervalTimer) {
+        clearInterval(sirenIntervalTimer);
+        sirenIntervalTimer = null;
+      }
+    }
 
     function unlockRiderAudio() {
       if (isAudioUnlocked) return;
+      try {
+        if (!audioCtx) {
+          audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+      } catch(e){}
+
       const audio = document.getElementById('rider-high-alert-audio');
       if (audio) {
         audio.play().then(() => {
@@ -461,34 +516,42 @@
           isAudioUnlocked = true;
         }).catch(() => {});
       }
+      isAudioUnlocked = true;
     }
 
     function testSirenTune() {
       unlockRiderAudio();
       playHighAlertTune();
-      setTimeout(stopHighAlertTune, 3000);
+      setTimeout(stopHighAlertTune, 3500);
     }
 
     function playHighAlertTune() {
-      const audio = document.getElementById('rider-high-alert-audio');
+      isAlertPlaying = true;
       document.getElementById('order-alert-bar').style.display = 'flex';
+      
+      // Try playing MP3
+      const audio = document.getElementById('rider-high-alert-audio');
       if (audio) {
         audio.currentTime = 0;
-        audio.play().then(() => {
-          isAlertPlaying = true;
-        }).catch(e => console.warn('Audio blocked:', e));
+        audio.play().catch(() => {});
       }
+
+      // Start Synthesized Backup Siren
+      startEmergencySiren();
+
       if (navigator.vibrate) navigator.vibrate([400, 200, 400, 200, 500]);
     }
 
     function stopHighAlertTune() {
-      const audio = document.getElementById('rider-high-alert-audio');
+      isAlertPlaying = false;
       document.getElementById('order-alert-bar').style.display = 'none';
+      
+      const audio = document.getElementById('rider-high-alert-audio');
       if (audio) {
         audio.pause();
         audio.currentTime = 0;
       }
-      isAlertPlaying = false;
+      stopEmergencySiren();
     }
 
     document.addEventListener('DOMContentLoaded', () => {
@@ -534,7 +597,7 @@
       setupRiderRealtime();
 
       if (autoRefreshTimer) clearInterval(autoRefreshTimer);
-      autoRefreshTimer = setInterval(fetchRiderOrders, 3000); // Har 3 second me orders update
+      autoRefreshTimer = setInterval(fetchRiderOrders, 3000);
     }
 
     function riderLogout() {
@@ -579,26 +642,23 @@
       });
     }
 
-    // 🌟 100% DIRECT ORDER FETCH (ADMIN WALE SARE ORDERS YAHAN DIKHENGE)
+    // DIRECT ORDER FETCH & SIREN TRIGGER
     async function fetchRiderOrders() {
       if (!currentRider) return;
       
-      // Admin panel ke tarah seedha saare orders fetch karein
       const { data, error } = await _supabase.from('orders').select('*').order('id', { ascending: false });
       if (error) {
         console.error('Fetch error:', error);
         return;
       }
 
-      // Filter: Sirf uncompleted orders jo ya toh unassigned hain YA is rider ko assign hain
       allRiderOrders = (data || []).filter(o => {
         const assignedId = o.assigned_rider_id;
-        // Agar kisi aur rider ne accept kar liya hai toh hide karein
         if (assignedId && assignedId !== currentRider.id) return false;
         return true;
       });
 
-      // LOUD SIREN: Naya active order aate hi bajega
+      // Check if unaccepted or un-dispatched active orders exist
       const pendingAlertOrders = allRiderOrders.filter(o => {
         const st = (o.status || '').toLowerCase();
         const isDone = st.includes('delivered') || st.includes('cancelled');
@@ -632,7 +692,7 @@
       document.getElementById('stat-earnings').innerText = `₹${past.length * 35}`;
 
       if (active.length === 0) {
-        activeBox.innerHTML = '<div style="text-align:center; padding:35px; color:var(--text-muted); font-weight:700;">🎉 Abhi koi active order nahi hai.<br><small style="color:#64748b;">(Customer ke order lagate hi siren bajega)</small></div>';
+        activeBox.innerHTML = '<div style="text-align:center; padding:35px; color:var(--text-muted); font-weight:700;">🎉 Abhi koi active order nahi hai.<br><small style="color:#64748b;">(Order aate hi emergency siren bajega)</small></div>';
       } else {
         activeBox.innerHTML = active.map(o => {
           const isAssignedToMe = (o.assigned_rider_id === currentRider.id);
@@ -644,12 +704,16 @@
           try { items = Array.isArray(o.items) ? o.items : JSON.parse(o.items || '[]'); } catch(e){}
           const itemsText = items.map(i => `• <b>${i.name}</b> × ${i.qty}`).join('<br>');
 
+          let statusBadgeClass = 'badge-pending';
+          if (isArrived) statusBadgeClass = 'badge-arrived';
+          else if (isOut) statusBadgeClass = 'badge-picked';
+
           return `
             <div class="order-card ${!isAssignedToMe ? 'alert-pulse-card' : ''}">
               <div style="display:flex; justify-content:space-between; align-items:flex-start;">
                 <div>
                   <b style="font-size:16px; color:var(--accent-cyan);">#ORD-${o.id}</b>
-                  <span class="order-badge ${isOut ? 'badge-picked' : 'badge-pending'}" style="margin-left:6px;">
+                  <span class="order-badge ${statusBadgeClass}" style="margin-left:6px;">
                     ${o.status || 'Placed'}
                   </span>
                 </div>
@@ -684,7 +748,7 @@
                     🛵 Saman Dukaan Se Pick Kiya — Start Delivery
                   </button>
                 ` : !isArrived ? `
-                  <button class="btn-rider-action btn-map" style="background:#f59e0b; color:black;" onclick="markArrived(${o.id})">
+                  <button class="btn-rider-action btn-arrived" onclick="markArrived(${o.id})">
                     🔔 Customer Ke Ghar Pahunch Gaya (Doorbell Alert)
                   </button>
                 ` : `
@@ -720,31 +784,52 @@
       return match ? `${match[1]},${match[2]}` : '';
     }
 
+    // 1. ACCEPT ORDER
     async function pickupAndAcceptOrder(id) {
       stopHighAlertTune();
-      await _supabase.from('orders').update({
+      const { error } = await _supabase.from('orders').update({
         assigned_rider_id: currentRider.id,
         status: 'Rider Assigned'
       }).eq('id', id);
-      alert('✅ Order Accept Ho Gaya! Ab dukaan se saman lekar "Start Delivery" karein.');
-      fetchRiderOrders();
+
+      if (error) {
+        alert('Order Accept Error: ' + error.message);
+      } else {
+        alert('✅ Order Accept Ho Gaya! Dukaan se saman pack karwayein aur "Start Delivery" dabayein.');
+        fetchRiderOrders();
+      }
     }
 
+    // 2. START DELIVERY (FIXED: Unnecessary columns removed)
     async function startDelivery(id) {
       stopHighAlertTune();
-      await _supabase.from('orders').update({
-        status: 'Out for Delivery',
-        estimated_delivery_time: '10-15 mins'
+      const { error } = await _supabase.from('orders').update({
+        status: 'Out for Delivery'
       }).eq('id', id);
-      fetchRiderOrders();
+
+      if (error) {
+        alert('Start Delivery Error: ' + error.message);
+      } else {
+        alert('🛵 Order Out for Delivery Ho Gaya! Map follow karke customer ke paas jayein.');
+        fetchRiderOrders();
+      }
     }
 
+    // 3. MARK ARRIVED (Sends chime to customer app)
     async function markArrived(id) {
-      await _supabase.from('orders').update({ status: 'Arrived' }).eq('id', id);
-      alert('🔔 Customer ke phone par Arrived Chime baj gaya hai!');
-      fetchRiderOrders();
+      const { error } = await _supabase.from('orders').update({
+        status: 'Arrived'
+      }).eq('id', id);
+
+      if (error) {
+        alert('Status update error: ' + error.message);
+      } else {
+        alert('🔔 Customer ke phone par Arrived Alert bhej diya gaya hai!');
+        fetchRiderOrders();
+      }
     }
 
+    // 4. COMPLETE DELIVERY
     function openCompleteModal(id) {
       activeCompleteOrderId = id;
       document.getElementById('complete-modal').classList.add('active');
@@ -754,7 +839,7 @@
       document.getElementById('complete-modal').classList.remove('active');
       base64DeliveryProof = null;
       document.getElementById('verify-otp-input').value = '';
-      document.getElementById('proof-photo-preview').innerHTML = '<span style="font-size:11px; color:var(--text-muted);">📸 Delivery Proof Photo</span>';
+      document.getElementById('proof-photo-preview').innerHTML = '<span style="font-size:11px; color:var(--text-muted);">📸 Delivery Proof Photo (Optional)</span>';
     }
 
     function handleDeliveryPhotoCaptured(input) {
@@ -771,23 +856,37 @@
     async function submitOrderDelivered() {
       const enteredOtp = document.getElementById('verify-otp-input').value.trim();
       if (!enteredOtp || enteredOtp.length !== 4) return alert('Kripya customer ka 4-digit secret OTP bharein!');
-      if (!base64DeliveryProof) return alert('Delivery proof photo kheinchna anivarya hai!');
 
       const targetOrder = allRiderOrders.find(o => o.id === activeCompleteOrderId);
       if (!targetOrder) return;
 
-      if (targetOrder.delivery_otp && targetOrder.delivery_otp !== enteredOtp) {
-        return alert('❌ Galat OTP! Kripya customer se sahi OTP poochhein.');
+      // Safe String comparison for OTP
+      if (targetOrder.delivery_otp && String(targetOrder.delivery_otp).trim() !== enteredOtp) {
+        return alert(`❌ Galat OTP! Customer se unka 4-digit secret OTP poochhein.`);
       }
 
-      await _supabase.from('orders').update({
-        status: 'Delivered',
-        delivery_proof_photo: base64DeliveryProof
-      }).eq('id', activeCompleteOrderId);
+      const btn = document.getElementById('btn-submit-delivery');
+      btn.disabled = true;
+      btn.innerText = 'Submitting... ⏳';
 
-      alert('🎉 Order Safaltapoorvak Deliver Ho Gaya!');
-      closeCompleteModal();
-      fetchRiderOrders();
+      const updateData = { status: 'Delivered' };
+      if (base64DeliveryProof) {
+        updateData.delivery_proof_photo = base64DeliveryProof;
+      }
+
+      const { error } = await _supabase.from('orders').update(updateData).eq('id', activeCompleteOrderId);
+
+      if (error) {
+        alert('Delivery submit error: ' + error.message);
+        btn.disabled = false;
+        btn.innerText = '✓ Confirm Delivered';
+      } else {
+        alert('🎉 Order Safaltapoorvak Deliver Ho Gaya! Earning jud gayi hai.');
+        closeCompleteModal();
+        btn.disabled = false;
+        btn.innerText = '✓ Confirm Delivered';
+        fetchRiderOrders();
+      }
     }
 
     function switchRiderTab(tab) {
