@@ -3,323 +3,876 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>SM Rider Partner</title>
+    <title>SM Rider Partner - Local Vocal Delivery</title>
+    <!-- Supabase JS Client -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
+        :root {
+            --bg-dark: #0a0c10;
+            --card-bg: #151921;
+            --accent-green: #00e676;
+            --accent-blue: #2f81f7;
+            --accent-red: #f85149;
+            --accent-yellow: #e3b341;
+            --border-color: #21262d;
+            --text-main: #f0f6fc;
+            --text-muted: #8b949e;
+        }
+
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             -webkit-tap-highlight-color: transparent;
         }
+
         body {
-            background-color: #0d0f12;
-            color: #ffffff;
-            padding-bottom: 30px;
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            padding-bottom: 50px;
+            min-height: 100vh;
         }
-        .header {
-            background: #161b22;
-            padding: 16px;
+
+        /* Top Sticky Navbar */
+        .navbar {
+            background: rgba(21, 25, 33, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 14px 18px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-bottom: 1px solid #2d333b;
+            border-bottom: 1px solid var(--border-color);
             position: sticky;
             top: 0;
             z-index: 100;
         }
-        .header h1 {
-            font-size: 18px;
-            color: #00e676;
+
+        .brand-box {
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
-        .status-badge {
-            background: #238636;
-            color: #fff;
-            padding: 4px 10px;
-            border-radius: 12px;
-            font-size: 12px;
-            font-weight: bold;
+
+        .brand-logo {
+            width: 34px;
+            height: 34px;
+            background: linear-gradient(135deg, #00e676, #00b0ff);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 900;
+            font-size: 14px;
+            color: #000;
         }
-        .container {
-            padding: 16px;
+
+        .brand-name {
+            font-size: 17px;
+            font-weight: 800;
+            letter-spacing: 0.5px;
+            color: var(--text-main);
         }
-        .card {
-            background: #161b22;
-            border-radius: 14px;
-            border: 1px solid #30363d;
-            padding: 18px;
-            margin-bottom: 16px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+
+        .brand-name span {
+            color: var(--accent-green);
         }
-        .step-badge {
-            display: inline-block;
-            background: #1f6feb;
-            color: #fff;
+
+        .status-pill {
+            background: rgba(0, 230, 118, 0.15);
+            color: var(--accent-green);
+            border: 1px solid var(--accent-green);
+            padding: 5px 12px;
+            border-radius: 20px;
             font-size: 11px;
             font-weight: 700;
-            padding: 3px 8px;
-            border-radius: 6px;
-            margin-bottom: 10px;
-            text-transform: uppercase;
+            letter-spacing: 1px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
         }
-        .title {
-            font-size: 16px;
-            font-weight: bold;
-            margin-bottom: 8px;
-            color: #f0f6fc;
+
+        .status-dot {
+            width: 7px;
+            height: 7px;
+            background: var(--accent-green);
+            border-radius: 50%;
+            box-shadow: 0 0 8px var(--accent-green);
+            animation: pulseDot 1.5s infinite;
         }
-        .info-row {
+
+        @keyframes pulseDot {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.4; transform: scale(0.8); }
+        }
+
+        /* Main Container */
+        .container {
+            padding: 16px;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        /* Rider Info Mini Card */
+        .rider-bar {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 12px 16px;
             display: flex;
             justify-content: space-between;
-            margin: 8px 0;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .rider-bar-item {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .rider-bar-label {
+            font-size: 11px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+        }
+
+        .rider-bar-val {
             font-size: 14px;
-            color: #8b949e;
+            font-weight: 700;
+            color: var(--text-main);
         }
-        .info-row span:last-child {
-            color: #f0f6fc;
+
+        /* Card Styles */
+        .card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            border: 1px solid var(--border-color);
+            padding: 20px;
+            margin-bottom: 16px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .step-tag {
+            display: inline-block;
+            background: rgba(47, 129, 247, 0.15);
+            color: var(--accent-blue);
+            border: 1px solid rgba(47, 129, 247, 0.4);
+            font-size: 11px;
+            font-weight: 800;
+            padding: 4px 10px;
+            border-radius: 6px;
+            margin-bottom: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .card-heading {
+            font-size: 18px;
+            font-weight: 800;
+            margin-bottom: 14px;
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .details-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 16px;
+        }
+
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            font-size: 14px;
+        }
+
+        .detail-label {
+            color: var(--text-muted);
+            min-width: 100px;
+        }
+
+        .detail-val {
             font-weight: 600;
+            color: var(--text-main);
+            text-align: right;
+            word-break: break-word;
         }
-        .items-box {
-            background: #0d1117;
-            border-radius: 8px;
-            padding: 12px;
-            margin: 12px 0;
-            border: 1px dashed #30363d;
+
+        /* Items Container */
+        .order-items-box {
+            background: #0d1017;
+            border-radius: 10px;
+            padding: 14px;
+            border: 1px dashed var(--border-color);
+            margin: 14px 0;
         }
-        .items-box p {
+
+        .order-items-title {
             font-size: 13px;
-            color: #c9d1d9;
-            margin-bottom: 4px;
+            font-weight: 700;
+            color: var(--accent-blue);
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
         }
+
+        .item-list-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 13px;
+            padding: 5px 0;
+            border-bottom: 1px solid #1c2129;
+            color: #c9d1d9;
+        }
+
+        .item-list-row:last-child {
+            border-bottom: none;
+        }
+
+        /* Buttons & Actions */
         .btn-group {
             display: flex;
-            gap: 10px;
-            margin-top: 15px;
+            gap: 12px;
+            margin-top: 16px;
         }
+
         .btn {
             flex: 1;
             padding: 14px;
-            border-radius: 10px;
+            border-radius: 12px;
             border: none;
             font-size: 15px;
-            font-weight: bold;
+            font-weight: 700;
             cursor: pointer;
             text-align: center;
-            transition: opacity 0.2s;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            text-decoration: none;
         }
+
         .btn:active {
-            opacity: 0.8;
+            transform: scale(0.97);
+            filter: brightness(0.9);
         }
-        .btn-accept { background: #00e676; color: #000; }
-        .btn-reject { background: #da3633; color: #fff; }
-        .btn-primary { background: #2f81f7; color: #fff; width: 100%; margin-top: 12px; }
-        .btn-map { background: #21262d; border: 1px solid #388bfd; color: #58a6ff; }
-        
-        .photo-upload-box {
+
+        .btn-full {
+            width: 100%;
+            margin-top: 14px;
+        }
+
+        .btn-green {
+            background: linear-gradient(135deg, #00e676, #00b0ff);
+            color: #050505;
+        }
+
+        .btn-red {
+            background: rgba(248, 81, 73, 0.15);
+            border: 1px solid var(--accent-red);
+            color: var(--accent-red);
+        }
+
+        .btn-blue {
+            background: linear-gradient(135deg, #1f6feb, #388bfd);
+            color: #ffffff;
+        }
+
+        .btn-outline {
+            background: #1c2128;
+            border: 1px solid var(--border-color);
+            color: #58a6ff;
+        }
+
+        .btn-yellow {
+            background: linear-gradient(135deg, #e3b341, #f59e0b);
+            color: #000;
+        }
+
+        /* Badges */
+        .badge {
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 800;
+            display: inline-block;
+        }
+
+        .badge-cod {
+            background: rgba(227, 179, 65, 0.15);
+            border: 1px solid var(--accent-yellow);
+            color: var(--accent-yellow);
+        }
+
+        .badge-paid {
+            background: rgba(0, 230, 118, 0.15);
+            border: 1px solid var(--accent-green);
+            color: var(--accent-green);
+        }
+
+        /* Photo Upload & Preview */
+        .photo-picker {
             border: 2px dashed #388bfd;
-            border-radius: 10px;
-            padding: 14px;
+            background: rgba(56, 139, 253, 0.04);
+            border-radius: 12px;
+            padding: 16px;
             text-align: center;
-            margin: 12px 0;
             cursor: pointer;
-            background: #0d1117;
+            margin: 14px 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            transition: border-color 0.2s ease;
         }
-        .preview-img {
-            max-width: 100%;
-            height: 140px;
-            object-fit: cover;
-            border-radius: 8px;
+
+        .photo-picker:hover {
+            border-color: var(--accent-green);
+        }
+
+        .photo-picker-text {
+            font-size: 13px;
+            font-weight: 600;
+            color: #58a6ff;
+        }
+
+        .photo-picker-sub {
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+
+        .preview-box {
+            position: relative;
             margin-top: 10px;
+            width: 100%;
+            height: 170px;
+            border-radius: 10px;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
             display: none;
         }
-        .hidden { display: none !important; }
-        .pay-tag {
+
+        .preview-box img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .preview-tag {
+            position: absolute;
+            bottom: 8px;
+            left: 8px;
+            background: rgba(0, 0, 0, 0.8);
+            color: var(--accent-green);
+            font-size: 11px;
+            font-weight: bold;
             padding: 3px 8px;
             border-radius: 4px;
-            font-weight: bold;
         }
-        .pay-cod { background: #d29922; color: #000; }
-        .pay-paid { background: #238636; color: #fff; }
+
+        /* Waiting Screen */
+        .waiting-state {
+            text-align: center;
+            padding: 60px 20px;
+        }
+
+        .radar-spinner {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            background: rgba(0, 230, 118, 0.05);
+            border: 2px solid var(--accent-green);
+            margin: 0 auto 20px auto;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .radar-spinner::after {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            border: 2px solid var(--accent-green);
+            animation: radarPing 2s cubic-bezier(0, 0.2, 0.8, 1) infinite;
+        }
+
+        @keyframes radarPing {
+            0% { transform: scale(1); opacity: 1; }
+            100% { transform: scale(1.8); opacity: 0; }
+        }
+
+        .waiting-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 6px;
+        }
+
+        .waiting-sub {
+            font-size: 13px;
+            color: var(--text-muted);
+            line-height: 1.5;
+        }
+
+        .hidden {
+            display: none !important;
+        }
     </style>
 </head>
 <body>
 
-    <div class="header">
-        <h1>SM RIDER</h1>
-        <div class="status-badge">ONLINE</div>
-    </div>
+    <!-- Header Navbar -->
+    <header class="navbar">
+        <div class="brand-box">
+            <div class="brand-logo">SM</div>
+            <div class="brand-name">RIDER <span>PARTNER</span></div>
+        </div>
+        <div class="status-pill">
+            <div class="status-dot"></div>
+            ONLINE
+        </div>
+    </header>
 
-    <div class="container">
+    <main class="container">
 
-        <!-- STEP 1: NEW ORDER INCOMING -->
-        <div id="step-1" class="card">
-            <span class="step-badge">Step 1: Naya Order</span>
-            <div class="title">Naya Order Aaya Hai!</div>
-            <div class="info-row"><span>Order ID:</span><span>#SM-8492</span></div>
-            <div class="info-row"><span>Hub / Store:</span><span>SM Central Hub, Bareilly</span></div>
-            <div class="info-row"><span>Delivery Distance:</span><span>2.4 KM</span></div>
-            <div class="info-row"><span>Estimated Earning:</span><span>₹45</span></div>
-
-            <div class="btn-group">
-                <button class="btn btn-reject" onclick="rejectOrder()">Reject</button>
-                <button class="btn btn-accept" onclick="goToStep(2)">Accept Order</button>
+        <!-- Rider Top Stats -->
+        <div class="rider-bar">
+            <div class="rider-bar-item">
+                <span class="rider-bar-label">Zone</span>
+                <span class="rider-bar-val">Bareilly Central</span>
+            </div>
+            <div class="rider-bar-item">
+                <span class="rider-bar-label">Today Completed</span>
+                <span class="rider-bar-val" id="statCompleted">0 Orders</span>
+            </div>
+            <div class="rider-bar-item">
+                <span class="rider-bar-label">Today Earned</span>
+                <span class="rider-bar-val" style="color:var(--accent-green);" id="statEarnings">₹0</span>
             </div>
         </div>
 
-        <!-- STEP 2: REACH HUB & PICKUP -->
-        <div id="step-2" class="card hidden">
-            <span class="step-badge">Step 2: Pickup From Hub</span>
-            <div class="title">Hub Par Jakar Order Pick Karein</div>
+        <!-- 0. RADAR SCREEN (JAB KOI ORDER NA HO) -->
+        <section id="step-waiting" class="card waiting-state">
+            <div class="radar-spinner">⚡</div>
+            <div class="waiting-title">Naye Orders Dhundh Rahe Hain...</div>
+            <div class="waiting-sub">Jaise hi koi customer order karega, screen par instant notification aur details pop-up hongi.</div>
+        </section>
 
-            <div class="info-row"><span>Hub Name:</span><span>SM Central Warehouse 1</span></div>
-            <div class="info-row"><span>Hub Address:</span><span>Station Road, Bareilly</span></div>
-            
-            <a href="https://maps.google.com" target="_blank" style="text-decoration: none;">
-                <button class="btn btn-map" style="width: 100%; margin: 8px 0;">📍 Open Hub in Google Maps</button>
-            </a>
+        <!-- STEP 1: NAYA INCOMING LIVE ORDER -->
+        <section id="step-incoming" class="card hidden">
+            <span class="step-tag">Step 1 • Naya Order</span>
+            <div class="card-heading">🚨 Order Assign Hua Hai!</div>
 
-            <div class="items-box">
-                <div style="font-weight: bold; margin-bottom: 6px; color:#58a6ff;">📦 Items Details:</div>
-                <p>• 1x Fresh Toned Milk (500ml)</p>
-                <p>• 2x Brown Bread (400g)</p>
-                <p>• 1x Amul Butter (100g)</p>
-            </div>
-
-            <div class="title" style="font-size: 14px; margin-top: 10px;">Acceptance / Pickup Photo:</div>
-            <div class="photo-upload-box" onclick="document.getElementById('hubPhoto').click()">
-                📷 Camera se Hub/Order Photo lein
-                <input type="file" id="hubPhoto" accept="image/*" capture="environment" style="display:none;" onchange="handleCompress(event, 'preview1')">
-                <img id="preview1" class="preview-img">
-            </div>
-
-            <button class="btn btn-primary" onclick="confirmPickup()">Order Picked Up →</button>
-        </div>
-
-        <!-- STEP 3: CUSTOMER DETAILS & OUT FOR DELIVERY -->
-        <div id="step-3" class="card hidden">
-            <span class="step-badge">Step 3: Delivering</span>
-            <div class="title">Customer Location Par Jaayein</div>
-
-            <div class="info-row"><span>Customer Name:</span><span>Rahul Sharma</span></div>
-            <div class="info-row"><span>Phone:</span><span><a href="tel:9876543210" style="color:#58a6ff;">📞 Call Customer</a></span></div>
-            <div class="info-row"><span>Address:</span><span>Flat 204, Green Heights, Bareilly</span></div>
-            <div class="info-row">
-                <span>Payment Mode:</span>
-                <span class="pay-tag pay-cod" id="payModeBadge">CASH ON DELIVERY (₹320)</span>
-            </div>
-
-            <a href="https://maps.google.com" target="_blank" style="text-decoration: none;">
-                <button class="btn btn-map" style="width: 100%; margin: 10px 0;">🗺️ Navigate to Customer</button>
-            </a>
-
-            <button class="btn btn-primary" style="background: #d29922; color: #000;" onclick="goToStep(4)">
-                📍 Arrived at Customer Doorstep
-            </button>
-        </div>
-
-        <!-- STEP 4: VERIFY PAYMENT & FINAL DELIVERY PHOTO -->
-        <div id="step-4" class="card hidden">
-            <span class="step-badge">Step 4: Final Delivery</span>
-            <div class="title">Payment & Doorstep Verification</div>
-
-            <div class="info-row"><span>Order Total:</span><span>₹320</span></div>
-            <div class="info-row"><span>Collect Cash:</span><span style="color:#00e676; font-size:16px;">₹320 (COD)</span></div>
-
-            <div style="margin: 12px 0;">
-                <label style="font-size: 13px; color:#8b949e;">Payment Confirmation:</label>
-                <div class="btn-group" style="margin-top:6px;">
-                    <button class="btn btn-accept" id="cashBtn" onclick="markPaid('Cash Collected')">✔ Cash Mil Gaya</button>
-                    <button class="btn btn-map" id="onlineBtn" onclick="markPaid('Online / Already Paid')">Online Paid</button>
+            <div class="details-grid">
+                <div class="detail-row">
+                    <span class="detail-label">Order ID</span>
+                    <span class="detail-val" id="inOrderId">#SM-0000</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Store / Hub</span>
+                    <span class="detail-val" id="inHubName">SM Central Warehouse</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Delivery Distance</span>
+                    <span class="detail-val" id="inDistance">2.1 KM</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Earning Payout</span>
+                    <span class="detail-val" style="color:var(--accent-green); font-size:16px;" id="inPayout">₹45.00</span>
                 </div>
             </div>
 
-            <div class="title" style="font-size: 14px; margin-top: 14px;">Doorstep Proof Photo:</div>
-            <div class="photo-upload-box" onclick="document.getElementById('delPhoto').click()">
-                📷 Customer / Packet ki Photo lein
-                <input type="file" id="delPhoto" accept="image/*" capture="environment" style="display:none;" onchange="handleCompress(event, 'preview2')">
-                <img id="preview2" class="preview-img">
+            <div class="btn-group">
+                <button type="button" class="btn btn-red" onclick="rejectCurrentOrder()">Reject / Skip</button>
+                <button type="button" class="btn btn-green" onclick="acceptCurrentOrder()">Accept Order</button>
+            </div>
+        </section>
+
+        <!-- STEP 2: REACH HUB & PICKUP ORDER -->
+        <section id="step-pickup" class="card hidden">
+            <span class="step-tag">Step 2 • Hub Pickup</span>
+            <div class="card-heading">🏪 Hub Par Jakar Saman Lein</div>
+
+            <div class="details-grid">
+                <div class="detail-row">
+                    <span class="detail-label">Hub Name</span>
+                    <span class="detail-val" id="pickHubTitle">SM Central Warehouse 1</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Hub Address</span>
+                    <span class="detail-val" id="pickHubAddress">Station Road, Near Bus Stand, Bareilly</span>
+                </div>
             </div>
 
-            <button class="btn btn-primary" style="background:#00e676; color:#000; font-size:16px;" onclick="completeDelivery()">
-                🚀 Complete Delivery
+            <a id="pickHubMapBtn" href="https://maps.google.com" target="_blank" class="btn btn-outline btn-full">
+                🗺️ Hub Google Maps me Kholein
+            </a>
+
+            <!-- Saman ki list -->
+            <div class="order-items-box">
+                <div class="order-items-title">
+                    <span>📦 ITEMS TO PICK</span>
+                    <span id="pickItemCount">0 Items</span>
+                </div>
+                <div id="pickItemsList"></div>
+            </div>
+
+            <div style="font-size: 13px; font-weight: 700; margin-top: 14px; color: #fff;">1. Hub / Parcel ki Photo Upload Karein:</div>
+            
+            <div class="photo-picker" onclick="document.getElementById('hubPhotoInput').click()">
+                <div style="font-size: 26px;">📷</div>
+                <div class="photo-picker-text">Camera se Photo Lein</div>
+                <div class="photo-picker-sub">Auto-compress (Fast Upload)</div>
+                <input type="file" id="hubPhotoInput" accept="image/*" capture="environment" style="display:none;" onchange="processImage(event, 'previewImgHub', 'previewBoxHub', 'pickup')">
+            </div>
+
+            <div id="previewBoxHub" class="preview-box">
+                <img id="previewImgHub" alt="Hub Photo">
+                <span class="preview-tag">✔ Compressed Ready</span>
+            </div>
+
+            <button type="button" class="btn btn-blue btn-full" onclick="confirmPickupDone()">Order Pick Ho Gaya →</button>
+        </section>
+
+        <!-- STEP 3: NAVIGATE TO CUSTOMER & ARRIVE -->
+        <section id="step-deliver" class="card hidden">
+            <span class="step-tag">Step 3 • Delivering</span>
+            <div class="card-heading">🛵 Customer tak Delivery</div>
+
+            <div class="details-grid">
+                <div class="detail-row">
+                    <span class="detail-label">Customer</span>
+                    <span class="detail-val" id="custName">--</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Contact</span>
+                    <span class="detail-val">
+                        <a id="custPhoneLink" href="tel:" style="color:var(--accent-blue); text-decoration:none;">📞 Call Customer</a>
+                    </span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Address</span>
+                    <span class="detail-val" id="custAddress">--</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Payment Mode</span>
+                    <span class="detail-val">
+                        <span id="custPayBadge" class="badge badge-cod">COD</span>
+                    </span>
+                </div>
+            </div>
+
+            <a id="custMapBtn" href="https://maps.google.com" target="_blank" class="btn btn-outline btn-full">
+                🗺️ Navigate to Customer Doorstep
+            </a>
+
+            <button type="button" class="btn btn-yellow btn-full" onclick="arriveAtCustomer()">
+                📍 Customer ke Pass Pahunch Gaye (Arrived)
             </button>
-        </div>
+        </section>
 
-        <!-- SUCCESS SCREEN -->
-        <div id="step-success" class="card hidden" style="text-align: center; padding: 30px 20px;">
-            <div style="font-size: 50px; margin-bottom: 10px;">🎉</div>
-            <div class="title" style="color: #00e676; font-size: 20px;">Order Delivered Successfully!</div>
-            <p style="color: #8b949e; margin: 10px 0;">₹45 aapke rider wallet me add ho gaye hain.</p>
-            <button class="btn btn-primary" onclick="goToStep(1)">Naye Order ke liye Ready</button>
-        </div>
+        <!-- STEP 4: PAYMENT VERIFY & PROOF PHOTO -->
+        <section id="step-verify" class="card hidden">
+            <span class="step-tag">Step 4 • Final Handover</span>
+            <div class="card-heading">💰 Payment aur Proof Verification</div>
 
-    </div>
+            <div class="details-grid">
+                <div class="detail-row">
+                    <span class="detail-label">Total Amount</span>
+                    <span class="detail-val" style="font-size:18px; color:var(--accent-green);" id="verifyTotal">₹0.00</span>
+                </div>
+            </div>
+
+            <div style="margin: 14px 0;">
+                <label style="font-size: 13px; color: var(--text-muted); display: block; margin-bottom: 8px;">Payment Confirmation:</label>
+                <div class="btn-group" style="margin-top: 0;">
+                    <button type="button" class="btn btn-green" id="btnCashPaid" onclick="selectPaymentDone('CASH_COLLECTED')">✔ Cash Mil Gaya</button>
+                    <button type="button" class="btn btn-outline" id="btnOnlinePaid" onclick="selectPaymentDone('ONLINE_PAID')">Online Paid Hai</button>
+                </div>
+            </div>
+
+            <div style="font-size: 13px; font-weight: 700; margin-top: 14px; color: #fff;">2. Doorstep Delivery Proof Photo:</div>
+            
+            <div class="photo-picker" onclick="document.getElementById('proofPhotoInput').click()">
+                <div style="font-size: 26px;">📸</div>
+                <div class="photo-picker-text">Doorstep / Parcel Photo Lein</div>
+                <div class="photo-picker-sub">Auto-compress (Fast Upload)</div>
+                <input type="file" id="proofPhotoInput" accept="image/*" capture="environment" style="display:none;" onchange="processImage(event, 'previewImgProof', 'previewBoxProof', 'delivery')">
+            </div>
+
+            <div id="previewBoxProof" class="preview-box">
+                <img id="previewImgProof" alt="Proof Photo">
+                <span class="preview-tag">✔ Compressed Ready</span>
+            </div>
+
+            <button type="button" class="btn btn-green btn-full" style="font-size: 16px; margin-top: 18px;" onclick="completeFinalDelivery()">
+                🚀 Deliver Order
+            </button>
+        </section>
+
+        <!-- STEP 5: SUCCESS CELEBRATION -->
+        <section id="step-success" class="card hidden" style="text-align: center; padding: 36px 20px;">
+            <div style="font-size: 52px; margin-bottom: 12px;">🎉</div>
+            <div class="card-heading" style="justify-content: center; color: var(--accent-green); font-size: 22px;">Order Delivered Successfully!</div>
+            <p style="color: var(--text-muted); font-size: 14px; margin: 12px 0 20px 0;">
+                Delivery complete ho gayi hai aur payout aapke rider wallet me add ho gaya hai.
+            </p>
+            <button type="button" class="btn btn-blue btn-full" onclick="resetToWaitingRadar()">
+                Naye Orders ke Liye Ready Ho Jaayein
+            </button>
+        </section>
+
+    </main>
 
     <script>
-        // Smooth Step Controller
-        function goToStep(stepNum) {
-            document.querySelectorAll('.card').forEach(c => c.classList.add('hidden'));
-            if(stepNum === 'success') {
-                document.getElementById('step-success').classList.remove('hidden');
+        // ==========================================
+        // 1. SUPABASE INITIALIZATION
+        // ==========================================
+        const SUPABASE_PROJECT_URL = "https://YOUR_PROJECT_ID.supabase.co";
+        const SUPABASE_ANON_KEY = "YOUR_ANON_PUBLIC_KEY";
+
+        let client = null;
+        if (window.supabase && SUPABASE_PROJECT_URL.indexOf("YOUR_PROJECT_ID") === -1) {
+            client = window.supabase.createClient(SUPABASE_PROJECT_URL, SUPABASE_ANON_KEY);
+        }
+
+        // State Machine
+        let activeOrder = null;
+        let isPaymentConfirmed = false;
+        let hubPhotoBase64 = null;
+        let proofPhotoBase64 = null;
+        let totalOrdersDelivered = 0;
+        let totalEarnings = 0;
+
+        // ==========================================
+        // 2. LIVE ORDER FETCHING (SUPABASE SYNC)
+        // ==========================================
+        async function checkIncomingOrders() {
+            if (!client || activeOrder) return;
+
+            try {
+                const { data, error } = await client
+                    .from('orders')
+                    .select('*')
+                    .eq('status', 'Pending')
+                    .order('created_at', { ascending: false })
+                    .limit(1);
+
+                if (!error && data && data.length > 0) {
+                    activeOrder = data[0];
+                    renderIncomingOrder(activeOrder);
+                }
+            } catch (err) {
+                console.warn("Polling error:", err);
+            }
+        }
+
+        // Live Polling every 4 seconds
+        setInterval(checkIncomingOrders, 4000);
+
+        function renderIncomingOrder(order) {
+            document.getElementById('step-waiting').classList.add('hidden');
+            document.getElementById('step-incoming').classList.remove('hidden');
+
+            document.getElementById('inOrderId').innerText = '#' + (order.order_id || order.id || 'SM-101');
+            document.getElementById('inHubName').innerText = order.hub_name || 'SM Central Hub';
+            document.getElementById('inDistance').innerText = (order.distance || '2.4') + ' KM';
+            document.getElementById('inPayout').innerText = '₹' + (order.rider_earning || '45.00');
+
+            // Render Hub details for next step
+            document.getElementById('pickHubTitle').innerText = order.hub_name || 'SM Central Warehouse 1';
+            document.getElementById('pickHubAddress').innerText = order.hub_address || 'Station Road, Bareilly';
+            if (order.hub_lat && order.hub_lng) {
+                document.getElementById('pickHubMapBtn').href = `https://www.google.com/maps/search/?api=1&query=${order.hub_lat},${order.hub_lng}`;
+            }
+
+            // Render Items details
+            const items = Array.isArray(order.items) ? order.items : [];
+            document.getElementById('pickItemCount').innerText = items.length + ' Items';
+            
+            let itemsHtml = '';
+            if (items.length > 0) {
+                items.forEach(it => {
+                    itemsHtml += `
+                        <div class="item-list-row">
+                            <span>${it.quantity || it.qty || 1}x ${it.name || 'Item'}</span>
+                            <span style="font-weight:600;">₹${it.price || 0}</span>
+                        </div>
+                    `;
+                });
             } else {
-                document.getElementById('step-' + stepNum).classList.remove('hidden');
+                itemsHtml = `<div class="item-list-row"><span>1x Standard Grocery Basket</span><span>₹${order.total_amount || 0}</span></div>`;
             }
-            window.scrollTo({top: 0, behavior: 'smooth'});
+            document.getElementById('pickItemsList').innerHTML = itemsHtml;
+
+            // Render Customer Details
+            document.getElementById('custName').innerText = order.customer_name || 'Customer';
+            document.getElementById('custPhoneLink').href = 'tel:' + (order.customer_phone || '');
+            document.getElementById('custAddress').innerText = order.customer_address || 'Address provided on call';
+            
+            if (order.customer_lat && order.customer_lng) {
+                document.getElementById('custMapBtn').href = `https://www.google.com/maps/search/?api=1&query=${order.customer_lat},${order.customer_lng}`;
+            } else {
+                document.getElementById('custMapBtn').href = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(order.customer_address || 'Bareilly')}`;
+            }
+
+            // Payment tag
+            const badge = document.getElementById('custPayBadge');
+            const total = order.total_amount || 0;
+            document.getElementById('verifyTotal').innerText = '₹' + total;
+
+            if ((order.payment_mode || '').toUpperCase() === 'ONLINE') {
+                badge.className = 'badge badge-paid';
+                badge.innerText = 'ONLINE PAID';
+                isPaymentConfirmed = true;
+            } else {
+                badge.className = 'badge badge-cod';
+                badge.innerText = 'COD (Cash ₹' + total + ')';
+                isPaymentConfirmed = false;
+            }
         }
 
-        function rejectOrder() {
-            if(confirm("Kya aap sach me ye order reject karna chahte hain?")) {
-                alert("Order Rejected.");
-                location.reload();
+        // ==========================================
+        // 3. STEP ACTIONS & WORKFLOW
+        // ==========================================
+        async function acceptCurrentOrder() {
+            if (client && activeOrder) {
+                await client.from('orders').update({ status: 'Accepted' }).eq('id', activeOrder.id);
+            }
+            switchScreen('step-pickup');
+        }
+
+        function rejectCurrentOrder() {
+            if (confirm("Kya aap sach me is order ko skip/reject karna chahte hain?")) {
+                activeOrder = null;
+                switchScreen('step-waiting');
             }
         }
 
-        function confirmPickup() {
-            const img = document.getElementById('preview1').src;
-            if(!img || img.length < 100) {
-                alert("Kripya pahle order/hub ki photo upload karein!");
+        async function confirmPickupDone() {
+            if (!hubPhotoBase64) {
+                alert("Kripya pahle hub ya parcel ki pickup photo capture karein!");
                 return;
             }
-            goToStep(3);
+
+            if (client && activeOrder) {
+                await client.from('orders').update({ 
+                    status: 'Out for Delivery',
+                    pickup_photo: hubPhotoBase64 
+                }).eq('id', activeOrder.id);
+            }
+
+            switchScreen('step-deliver');
         }
 
-        let isPaymentDone = false;
-        function markPaid(type) {
-            isPaymentDone = true;
-            alert("Payment Verified: " + type);
-            document.getElementById('cashBtn').style.opacity = '0.5';
-            document.getElementById('onlineBtn').style.opacity = '0.5';
+        function arriveAtCustomer() {
+            switchScreen('step-verify');
         }
 
-        function completeDelivery() {
-            if(!isPaymentDone) {
-                alert("Pahle payment collect/confirm karein!");
+        function selectPaymentDone(type) {
+            isPaymentConfirmed = true;
+            const cashBtn = document.getElementById('btnCashPaid');
+            const onlineBtn = document.getElementById('btnOnlinePaid');
+
+            if (type === 'CASH_COLLECTED') {
+                cashBtn.style.opacity = '1';
+                cashBtn.innerText = '✔ Cash Received';
+                onlineBtn.style.opacity = '0.4';
+            } else {
+                onlineBtn.style.opacity = '1';
+                onlineBtn.innerText = '✔ Verified Online';
+                cashBtn.style.opacity = '0.4';
+            }
+        }
+
+        async function completeFinalDelivery() {
+            if (!isPaymentConfirmed) {
+                alert("Kripya pahle Payment receive/confirm karein!");
                 return;
             }
-            const img = document.getElementById('preview2').src;
-            if(!img || img.length < 100) {
-                alert("Delivery complete karne ke liye photo upload zaroori hai!");
+
+            if (!proofPhotoBase64) {
+                alert("Delivery confirm karne ke liye doorstep proof photo capture karein!");
                 return;
             }
-            goToStep('success');
+
+            if (client && activeOrder) {
+                await client.from('orders').update({ 
+                    status: 'Delivered',
+                    delivery_photo: proofPhotoBase64,
+                    delivered_at: new Date().toISOString()
+                }).eq('id', activeOrder.id);
+            }
+
+            // Update local stats
+            totalOrdersDelivered += 1;
+            totalEarnings += 45;
+            document.getElementById('statCompleted').innerText = totalOrdersDelivered + ' Orders';
+            document.getElementById('statEarnings').innerText = '₹' + totalEarnings;
+
+            switchScreen('step-success');
         }
 
-        // FAST AUTO-COMPRESS PHOTO FUNCTION (HTML5 Canvas)
-        function handleCompress(e, previewId) {
-            const file = e.target.files[0];
+        function resetToWaitingRadar() {
+            activeOrder = null;
+            isPaymentConfirmed = false;
+            hubPhotoBase64 = null;
+            proofPhotoBase64 = null;
+
+            // Reset image previews
+            document.getElementById('previewBoxHub').style.display = 'none';
+            document.getElementById('previewImgHub').src = '';
+            document.getElementById('previewBoxProof').style.display = 'none';
+            document.getElementById('previewImgProof').src = '';
+
+            // Reset payment buttons
+            document.getElementById('btnCashPaid').style.opacity = '1';
+            document.getElementById('btnCashPaid').innerText = '✔ Cash Mil Gaya';
+            document.getElementById('btnOnlinePaid').style.opacity = '1';
+            document.getElementById('btnOnlinePaid').innerText = 'Online Paid Hai';
+
+            switchScreen('step-waiting');
+        }
+
+        function switchScreen(screenId) {
+            const screens = ['step-waiting', 'step-incoming', 'step-pickup', 'step-deliver', 'step-verify', 'step-success'];
+            screens.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.classList.add('hidden');
+            });
+            const target = document.getElementById(screenId);
+            if (target) target.classList.remove('hidden');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // ==========================================
+        // 4. FAST AUTO-COMPRESS CANVAS ENGINE
+        // ==========================================
+        function processImage(event, imgElementId, boxElementId, uploadType) {
+            const file = event.target.files[0];
             if (!file) return;
 
             const reader = new FileReader();
             reader.readAsDataURL(file);
-            reader.onload = function(event) {
+            reader.onload = function (e) {
                 const img = new Image();
-                img.src = event.target.result;
-                img.onload = function() {
+                img.src = e.target.result;
+                img.onload = function () {
                     const canvas = document.createElement('canvas');
-                    // Resize to max 800px width/height for instant speed
                     let width = img.width;
                     let height = img.height;
-                    const maxDim = 800;
+                    const maxDim = 800; // Fast compress limit
 
                     if (width > height && width > maxDim) {
                         height = Math.round((height * maxDim) / width);
@@ -334,12 +887,19 @@
                     const ctx = canvas.getContext('2d');
                     ctx.drawImage(img, 0, 0, width, height);
 
-                    // Compress to 65% quality JPEG (50-100KB only)
-                    const compressedBase64 = canvas.toDataURL('image/jpeg', 0.65);
+                    // 65% Quality instant JPEG (~70-100KB)
+                    const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.65);
 
-                    const preview = document.getElementById(previewId);
-                    preview.src = compressedBase64;
-                    preview.style.display = 'block';
+                    if (uploadType === 'pickup') {
+                        hubPhotoBase64 = compressedDataUrl;
+                    } else if (uploadType === 'delivery') {
+                        proofPhotoBase64 = compressedDataUrl;
+                    }
+
+                    const previewImg = document.getElementById(imgElementId);
+                    const previewBox = document.getElementById(boxElementId);
+                    previewImg.src = compressedDataUrl;
+                    previewBox.style.display = 'block';
                 };
             };
         }
