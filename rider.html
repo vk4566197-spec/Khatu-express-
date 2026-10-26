@@ -3,71 +3,53 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>🛵 SM RIDER — Delivery Partner Dashboard</title>
+  <title>🛵 SM RIDER — Ultra Fast Dashboard</title>
 
   <link rel="icon" type="image/png" href="logo.png">
   <meta name="theme-color" content="#0a0c10">
 
-  <!-- BROWSER CACHE CONTROL -->
+  <!-- AGGRESSIVE NO-CACHE HEADERS -->
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
 
-  <!-- UNREGISTER OLD SERVICE WORKERS -->
-  <script>
-    try {
-      if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.getRegistrations().then(function(registrations) {
-          for (var i = 0; i < registrations.length; i++) {
-            registrations[i].unregister();
-          }
-        });
-      }
-      if (window.caches) {
-        caches.keys().then(function(names) {
-          for (var i = 0; i < names.length; i++) caches.delete(names[i]);
-        });
-      }
-    } catch(e) {}
-  </script>
-
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;700;800;900&display=swap" rel="stylesheet">
 
   <style>
     :root {
-      --bg-dark: #0a0c10;
-      --card-bg: #151921;
-      --accent-green: #00e676;
-      --accent-blue: #38bdf8;
-      --accent-red: #ef4444;
-      --accent-yellow: #f59e0b;
-      --border-color: #21262d;
-      --text-main: #f0f6fc;
-      --text-muted: #8b949e;
+      --bg: #090c10;
+      --card: #151921;
+      --green: #00e676;
+      --blue: #38bdf8;
+      --red: #ef4444;
+      --yellow: #f59e0b;
+      --border: #242c38;
+      --text: #f0f6fc;
+      --muted: #8b949e;
     }
 
     * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
-      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
       -webkit-tap-highlight-color: transparent;
     }
 
     body {
-      background-color: var(--bg-dark);
-      color: var(--text-main);
+      background-color: var(--bg);
+      color: var(--text);
       padding-bottom: 90px;
       min-height: 100vh;
+      overflow-x: hidden;
     }
 
     /* TOP NAVBAR */
     .top-nav {
-      background: rgba(21, 25, 33, 0.96);
-      backdrop-filter: blur(10px);
-      padding: 14px 16px;
-      border-bottom: 1px solid var(--border-color);
+      background: rgba(21, 25, 33, 0.98);
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border);
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -82,122 +64,102 @@
       gap: 10px;
     }
 
-    .rider-brand img {
-      width: 36px;
-      height: 36px;
-      border-radius: 8px;
-      border: 1.5px solid var(--accent-green);
-      background: #fff;
-    }
-
     .brand-title {
       font-size: 16px;
       font-weight: 900;
       color: #ffffff;
-      line-height: 1.2;
     }
-
-    .brand-title span {
-      color: var(--accent-green);
-    }
+    .brand-title span { color: var(--green); }
 
     .brand-sub {
-      font-size: 11px;
-      color: var(--accent-blue);
+      font-size: 10.5px;
+      color: var(--blue);
       font-weight: 700;
     }
 
     .status-toggle-box {
-      display: inline-flex !important;
-      align-items: center !important;
-      gap: 8px !important;
-      background: #0d1117 !important;
-      padding: 8px 16px !important;
-      border-radius: 25px !important;
-      border: 2px solid var(--accent-green) !important;
-      cursor: pointer !important;
-      user-select: none !important;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.4) !important;
-      transition: all 0.2s ease;
-    }
-    .status-toggle-box:active {
-      transform: scale(0.94);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: #0d1117;
+      padding: 7px 14px;
+      border-radius: 20px;
+      border: 1.5px solid var(--green);
+      cursor: pointer;
+      user-select: none;
     }
 
     .status-dot {
-      width: 10px;
-      height: 10px;
+      width: 9px;
+      height: 9px;
       border-radius: 50%;
-      background: var(--accent-green);
-      box-shadow: 0 0 10px var(--accent-green);
-      display: inline-block;
+      background: var(--green);
+      box-shadow: 0 0 8px var(--green);
     }
-
     .status-dot.offline {
-      background: var(--accent-red) !important;
-      box-shadow: none !important;
+      background: var(--red);
+      box-shadow: none;
     }
 
     .status-text {
-      font-size: 12px;
+      font-size: 11px;
       font-weight: 900;
-      color: #ffffff;
+      color: #fff;
     }
 
     /* STATS BAR */
     .stats-bar {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      gap: 10px;
-      padding: 14px 16px;
+      gap: 8px;
+      padding: 12px 16px;
     }
 
     .stat-card {
-      background: var(--card-bg);
-      border: 1px solid var(--border-color);
-      border-radius: 14px;
-      padding: 12px 10px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 10px;
       text-align: center;
     }
 
     .stat-num {
-      font-size: 18px;
+      font-size: 17px;
       font-weight: 900;
-      color: var(--accent-blue);
+      color: var(--blue);
     }
 
     .stat-label {
-      font-size: 10px;
-      color: var(--text-muted);
+      font-size: 9.5px;
+      color: var(--muted);
       font-weight: 700;
       margin-top: 2px;
       text-transform: uppercase;
     }
 
-    /* FILTER TABS */
+    /* TABS */
     .tabs-row {
       display: flex;
-      gap: 10px;
-      padding: 4px 16px 14px 16px;
+      gap: 8px;
+      padding: 0 16px 12px 16px;
     }
 
     .tab-btn {
       flex: 1;
-      background: var(--card-bg);
-      border: 1.5px solid var(--border-color);
-      color: var(--text-muted);
-      padding: 11px 12px;
-      border-radius: 12px;
-      font-size: 13px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      color: var(--muted);
+      padding: 10px;
+      border-radius: 10px;
+      font-size: 12px;
       font-weight: 800;
       cursor: pointer;
-      text-align: center;
     }
 
     .tab-btn.active {
       background: #1f6feb;
       border-color: #388bfd;
-      color: #ffffff;
+      color: #fff;
     }
 
     .container {
@@ -206,122 +168,97 @@
 
     /* ORDER CARD */
     .order-card {
-      background: var(--card-bg);
-      border: 1.5px solid var(--border-color);
-      border-radius: 16px;
-      padding: 16px;
-      margin-bottom: 14px;
-      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
-      position: relative;
+      background: var(--card);
+      border: 1.5px solid var(--border);
+      border-radius: 14px;
+      padding: 14px;
+      margin-bottom: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
     }
 
     .order-card.new-pulse {
-      border-color: var(--accent-green);
-      animation: glowCard 1.5s infinite alternate;
+      border-color: var(--green);
     }
 
-    @keyframes glowCard {
-      0% { box-shadow: 0 0 8px rgba(0, 230, 118, 0.3); }
-      100% { box-shadow: 0 0 20px rgba(0, 230, 118, 0.7); }
+    .step-tag {
+      font-size: 10px;
+      font-weight: 800;
+      color: var(--blue);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 6px;
+      display: block;
     }
 
     .order-top {
       display: flex;
       justify-content: space-between;
       align-items: flex-start;
-      margin-bottom: 10px;
-      padding-bottom: 10px;
-      border-bottom: 1px dashed var(--border-color);
+      margin-bottom: 8px;
+      padding-bottom: 8px;
+      border-bottom: 1px dashed var(--border);
     }
 
-    .ord-id {
-      font-size: 15px;
-      font-weight: 900;
-      color: var(--accent-blue);
-    }
-
-    .ord-amount {
-      font-size: 17px;
-      font-weight: 900;
-      color: var(--accent-green);
-    }
+    .ord-id { font-size: 14px; font-weight: 900; color: var(--blue); }
+    .ord-amount { font-size: 16px; font-weight: 900; color: var(--green); }
 
     .ord-tag {
       display: inline-block;
-      padding: 3px 8px;
-      border-radius: 6px;
-      font-size: 10px;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 9.5px;
       font-weight: 800;
       text-transform: uppercase;
-      margin-top: 3px;
+      margin-top: 2px;
     }
-
     .tag-placed { background: #0284c7; color: #fff; }
-    .tag-transit { background: #f59e0b; color: #000; }
+    .tag-transit { background: #d97706; color: #fff; }
     .tag-delivered { background: #059669; color: #fff; }
     .tag-cancelled { background: #dc2626; color: #fff; }
 
-    .step-indicator {
-      display: inline-block;
-      font-size: 11px;
-      font-weight: 800;
-      color: #388bfd;
-      margin-bottom: 8px;
-      text-transform: uppercase;
-    }
-
     .cust-info-box {
       background: #0d1117;
-      border: 1px solid var(--border-color);
-      border-radius: 12px;
-      padding: 12px;
-      margin-bottom: 12px;
-      font-size: 12.5px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 10px;
+      margin-bottom: 10px;
+      font-size: 12px;
     }
 
     .cust-row {
       display: flex;
       align-items: flex-start;
-      gap: 8px;
-      margin-bottom: 6px;
+      gap: 6px;
+      margin-bottom: 5px;
       color: #cbd5e1;
-      font-weight: 600;
-      word-break: break-word;
     }
+    .cust-row:last-child { margin-bottom: 0; }
 
-    .cust-row:last-child {
-      margin-bottom: 0;
-    }
-
-    .items-summary-box {
+    .items-box {
       background: #0d1017;
-      border-radius: 10px;
-      padding: 10px 12px;
-      font-size: 12px;
-      margin-bottom: 12px;
-      border: 1px dashed var(--border-color);
+      border-radius: 8px;
+      padding: 8px 10px;
+      font-size: 11.5px;
+      margin-bottom: 10px;
+      border: 1px dashed var(--border);
     }
 
-    .item-summary-line {
+    .item-line {
       display: flex;
       justify-content: space-between;
-      margin-bottom: 4px;
+      margin-bottom: 3px;
       color: #cbd5e1;
-      font-weight: 600;
     }
-
-    .item-summary-line:last-child {
-      margin-bottom: 0;
-    }
+    .item-line:last-child { margin-bottom: 0; }
 
     /* ACTION BUTTONS */
     .btn-action-primary {
       background: linear-gradient(135deg, #00e676, #00b0ff);
-      color: #000000;
+      color: #000;
       border: none;
-      padding: 13px;
-      border-radius: 12px;
-      font-size: 13.5px;
+      padding: 12px;
+      border-radius: 10px;
+      font-size: 13px;
       font-weight: 900;
       cursor: pointer;
       width: 100%;
@@ -331,14 +268,15 @@
       justify-content: center;
       gap: 6px;
     }
+    .btn-action-primary:active { transform: scale(0.98); }
 
     .btn-action-call {
       background: #1f6feb;
-      color: #ffffff;
+      color: #fff;
       border: none;
-      padding: 12px;
-      border-radius: 12px;
-      font-size: 13px;
+      padding: 10px;
+      border-radius: 10px;
+      font-size: 12px;
       font-weight: 800;
       cursor: pointer;
       text-decoration: none;
@@ -350,19 +288,15 @@
     }
 
     .btn-action-cancel {
-      background: rgba(239, 68, 68, 0.12);
-      border: 1.5px solid var(--accent-red);
-      color: var(--accent-red);
-      padding: 11px;
-      border-radius: 12px;
-      font-size: 12.5px;
+      background: transparent;
+      border: 1px solid var(--red);
+      color: var(--red);
+      padding: 9px;
+      border-radius: 10px;
+      font-size: 11.5px;
       font-weight: 800;
       cursor: pointer;
       width: 100%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
     }
 
     /* MODAL WINDOWS */
@@ -372,105 +306,103 @@
       left: 0;
       width: 100vw;
       height: 100vh;
-      background: rgba(0,0,0,0.85);
-      backdrop-filter: blur(6px);
+      background: rgba(0,0,0,0.88);
+      backdrop-filter: blur(4px);
       z-index: 999999;
       display: none;
       align-items: center;
       justify-content: center;
-      padding: 20px;
+      padding: 16px;
     }
-
-    .modal-bg.active {
-      display: flex;
-    }
+    .modal-bg.active { display: flex; }
 
     .modal-card {
       background: #161b22;
-      border: 1px solid var(--border-color);
-      border-radius: 20px;
-      padding: 22px;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 18px;
       width: 100%;
-      max-width: 400px;
+      max-width: 360px;
       text-align: center;
-      box-shadow: 0 10px 35px rgba(0,0,0,0.7);
     }
 
     .otp-input-field {
       width: 100%;
       background: #0d1117;
       border: 2px solid #30363d;
-      border-radius: 14px;
-      padding: 12px;
-      font-size: 24px;
+      border-radius: 12px;
+      padding: 10px;
+      font-size: 22px;
       font-weight: 900;
-      color: #ffffff;
+      color: #fff;
       text-align: center;
-      letter-spacing: 8px;
-      margin: 12px 0;
+      letter-spacing: 6px;
+      margin: 10px 0;
       outline: none;
-    }
-    .otp-input-field:focus {
-      border-color: var(--accent-green);
     }
 
     .photo-preview-box {
       width: 100%;
-      height: 160px;
-      border-radius: 14px;
+      height: 140px;
+      border-radius: 10px;
       border: 2px dashed #388bfd;
-      margin: 12px 0;
+      margin: 10px 0;
       overflow: hidden;
       display: flex;
       align-items: center;
       justify-content: center;
       background: #0d1117;
     }
-
-    .photo-preview-box img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
+    .photo-preview-box img { width: 100%; height: 100%; object-fit: cover; }
 
     .btn-camera {
       background: #21262d;
       color: #58a6ff;
       border: 1px solid #30363d;
-      padding: 12px;
-      border-radius: 10px;
+      padding: 11px;
+      border-radius: 8px;
       width: 100%;
       font-weight: 800;
-      font-size: 13px;
+      font-size: 12px;
       cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
     }
 
     .empty-msg {
       text-align: center;
-      padding: 60px 20px;
-      color: var(--text-muted);
-      font-size: 14px;
+      padding: 50px 20px;
+      color: var(--muted);
+      font-size: 13px;
       font-weight: 700;
+    }
+
+    .syncing-pill {
+      position: fixed;
+      bottom: 12px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(13, 17, 23, 0.9);
+      border: 1px solid var(--border);
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 10px;
+      color: var(--muted);
+      font-weight: 700;
+      pointer-events: none;
+      z-index: 999;
     }
   </style>
 </head>
 <body>
 
-  <!-- TOP APP BAR -->
+  <!-- NAVBAR -->
   <header class="top-nav">
     <div class="rider-brand">
-      <img src="logo.png" alt="Logo" onerror="this.style.display='none'">
       <div>
-        <div class="brand-title">SM RIDER <span>PARTNER</span></div>
-        <div class="brand-sub" id="rider-name-display">Fast Delivery Rider</div>
+        <div class="brand-title">SM RIDER <span>EXPRESS</span></div>
+        <div class="brand-sub">Instant Live Dispatcher</div>
       </div>
     </div>
     
-    <!-- DUTY TOGGLE BUTTON -->
     <div class="status-toggle-box" id="duty-btn" onclick="toggleDuty();">
       <span class="status-dot" id="online-indicator"></span>
       <span class="status-text" id="online-status-text">ONLINE</span>
@@ -485,18 +417,18 @@
     </div>
     <div class="stat-card">
       <div class="stat-num" id="stat-delivered-count">0</div>
-      <div class="stat-label">Delivered Today</div>
+      <div class="stat-label">Delivered</div>
     </div>
     <div class="stat-card">
       <div class="stat-num" id="stat-earnings">₹0</div>
-      <div class="stat-label">Total Earning</div>
+      <div class="stat-label">Earned</div>
     </div>
   </section>
 
-  <!-- FILTER TABS -->
+  <!-- TABS -->
   <nav class="tabs-row">
     <button class="tab-btn active" id="tab-active" onclick="switchTab('active')">⚡ Active Orders</button>
-    <button class="tab-btn" id="tab-history" onclick="switchTab('history')">✓ Completed / Past</button>
+    <button class="tab-btn" id="tab-history" onclick="switchTab('history')">✓ Completed</button>
   </nav>
 
   <!-- ORDERS CONTAINER -->
@@ -504,101 +436,87 @@
     <div class="empty-msg">ऑर्डर्स लोड हो रहे हैं...</div>
   </main>
 
-  <!-- 1. HUB PICKUP SAMAN PHOTO MODAL -->
+  <div class="syncing-pill" id="sync-pill">⚡ Live Synced</div>
+
+  <!-- 1. HUB PICKUP MODAL -->
   <div class="modal-bg" id="pickup-modal">
     <div class="modal-card">
-      <div style="font-size: 17px; font-weight: 900; color: #38bdf8; margin-bottom: 4px;">🛍️ सामान पिकअप फोटो (Pickup Proof)</div>
-      <div style="font-size: 12px; color: #94a3b8; margin-bottom: 6px;">दुकान / हब से पैक सामान का फोटो खींचें:</div>
+      <div style="font-size: 15px; font-weight: 900; color: #38bdf8; margin-bottom: 2px;">🛍️ पिकअप फ़ोटो (Step 1)</div>
+      <div style="font-size: 11px; color: #94a3b8; margin-bottom: 8px;">दुकान / हब से पैक सामान का फोटो खींचें:</div>
 
       <div class="photo-preview-box" id="pickup-photo-preview">
-        <span style="color:#64748b; font-size:12px; font-weight:700;">सामान की फ़ोटो यहाँ दिखेगी *</span>
+        <span style="color:#64748b; font-size:11px;">सामान की फ़ोटो यहाँ दिखेगी</span>
       </div>
 
       <input type="file" id="pickup-photo-input" accept="image/*" capture="environment" style="display:none;" onchange="handlePickupPhotoChosen(this)">
       <button class="btn-camera" onclick="document.getElementById('pickup-photo-input').click()">
-        📸 पैक सामान का फोटो खींचें (Auto-Compressed)
+        📸 कैमरा खोलें (Fast Compress)
       </button>
 
-      <button class="btn-action-primary" id="btn-confirm-pickup" style="margin-top:14px; display:none;" onclick="confirmPickupWithPhoto()">
+      <button class="btn-action-primary" id="btn-confirm-pickup" style="margin-top:12px; display:none;" onclick="confirmPickupWithPhoto()">
         🛵 Pickup पूरा करें (Out for Delivery)
       </button>
 
-      <button onclick="closePickupModal()" style="background:none; border:none; color:#94a3b8; font-weight:800; font-size:12px; margin-top:12px; cursor:pointer;">
-        रद्द करें (Cancel)
+      <button onclick="closePickupModal()" style="background:none; border:none; color:#94a3b8; font-weight:700; font-size:11px; margin-top:10px; cursor:pointer;">
+        रद्द करें (Close)
       </button>
     </div>
   </div>
 
-  <!-- 2. DELIVERY PROOF PHOTO & OTP MODAL -->
+  <!-- 2. DELIVERY PROOF & OTP MODAL -->
   <div class="modal-bg" id="delivery-modal">
     <div class="modal-card">
-      <div style="font-size: 17px; font-weight: 900; color: #00e676; margin-bottom: 4px;">📦 डिलीवरी सत्यापन (Proof & OTP)</div>
-      <div style="font-size: 12px; color: #94a3b8; margin-bottom: 8px;">1. ग्राहक को सामान सौंपते हुए फ़ोटो लें<br>2. ग्राहक का 4 अंकों का OTP डालें</div>
+      <div style="font-size: 15px; font-weight: 900; color: #00e676; margin-bottom: 2px;">📦 डिलीवरी सत्यापन (Step 2)</div>
+      <div style="font-size: 11px; color: #94a3b8; margin-bottom: 6px;">ग्राहक को सामान सौंपते हुए फ़ोटो लें & OTP डालें:</div>
 
       <div class="photo-preview-box" id="delivery-proof-preview">
-        <span style="color:#64748b; font-size:12px; font-weight:700;">सामान सौंपते हुए फ़ोटो लें *</span>
+        <span style="color:#64748b; font-size:11px;">सामान सौंपते हुए फ़ोटो लें</span>
       </div>
 
       <input type="file" id="delivery-photo-input" accept="image/*" capture="environment" style="display:none;" onchange="handleDeliveryPhotoChosen(this)">
       <button class="btn-camera" onclick="document.getElementById('delivery-photo-input').click()">
-        📸 सामान सौंपते हुए फ़ोटो खींचें (Auto-Compressed)
+        📸 सामान सौंपते हुए फ़ोटो खींचें
       </button>
 
-      <div style="text-align:left; margin-top:10px; font-size:12px; color:#cbd5e1; font-weight:700;">ग्राहक का 4-अंकों का OTP दर्ज करें:</div>
+      <div style="text-align:left; margin-top:8px; font-size:11px; color:#cbd5e1; font-weight:700;">4-Digit Customer OTP:</div>
       <input type="tel" id="input-delivery-otp" class="otp-input-field" maxlength="4" placeholder="----">
 
       <button class="btn-action-primary" id="btn-confirm-delivery" onclick="confirmDeliveryWithProof()">
         ✓ सत्यापित करें और डिलीवर मार्क करें
       </button>
-      <button onclick="closeDeliveryModal()" style="background:none; border:none; color:#94a3b8; font-weight:800; font-size:12px; margin-top:12px; cursor:pointer;">
-        रद्द करें (Cancel)
+
+      <button onclick="closeDeliveryModal()" style="background:none; border:none; color:#94a3b8; font-weight:700; font-size:11px; margin-top:10px; cursor:pointer;">
+        रद्द करें (Close)
       </button>
     </div>
   </div>
 
   <script>
-    // AAPKE ASLI SUPABASE CREDENTIALS
-    var SUPABASE_URL = 'https://mpeikimhkjuinqkjaumr.supabase.co';
-    var SUPABASE_KEY = 'sb_publishable_2_wD-pbi_pNf8niiHxFbYA_saCIhApN';
+    // CREDENTIALS
+    const SUPABASE_URL = 'https://mpeikimhkjuinqkjaumr.supabase.co';
+    const SUPABASE_KEY = 'sb_publishable_2_wD-pbi_pNf8niiHxFbYA_saCIhApN';
 
-    var currentTab = 'active';
-    var allRiderOrders = [];
-    var isRiderOnline = true;
-    var selectedOrderForDelivery = null;
-    var selectedOrderForPickup = null;
-    var base64PickupPhoto = null;
-    var base64DeliveryPhoto = null;
-    var lastToggleTime = 0;
+    let currentTab = 'active';
+    let allRiderOrders = [];
+    let lastOrdersJson = ''; // Cache to avoid unnecessary DOM lag
+    let isRiderOnline = true;
+    let selectedOrderForDelivery = null;
+    let selectedOrderForPickup = null;
+    let base64PickupPhoto = null;
+    let base64DeliveryPhoto = null;
+    let isFetching = false;
 
-    // DIRECT 1-TAP DUTY TOGGLE
+    // DUTY TOGGLE
     function toggleDuty() {
-      var now = Date.now();
-      if (now - lastToggleTime < 250) return;
-      lastToggleTime = now;
-
       isRiderOnline = !isRiderOnline;
       localStorage.setItem('sm_rider_duty_status', isRiderOnline ? 'ONLINE' : 'OFFLINE');
       renderDutyUI();
-
-      try {
-        fetch(SUPABASE_URL + '/rest/v1/riders?id=eq.1', {
-          method: 'PATCH',
-          headers: {
-            'apikey': SUPABASE_KEY,
-            'Authorization': 'Bearer ' + SUPABASE_KEY,
-            'Content-Type': 'application/json',
-            'Prefer': 'return=minimal'
-          },
-          body: JSON.stringify({ is_active: isRiderOnline, last_ping: new Date().toISOString() })
-        }).catch(function(){});
-      } catch(e) {}
     }
 
     function renderDutyUI() {
-      var dot = document.getElementById('online-indicator');
-      var txt = document.getElementById('online-status-text');
-      var box = document.getElementById('duty-btn');
-
+      const dot = document.getElementById('online-indicator');
+      const txt = document.getElementById('online-status-text');
+      const box = document.getElementById('duty-btn');
       if (!dot || !txt || !box) return;
 
       if (isRiderOnline) {
@@ -612,70 +530,81 @@
       }
     }
 
-    // ULTRA-FAST CANVAS PHOTO COMPRESSOR (Zero Lag, Max 600px, 60% Quality)
-    function compressImage(file, maxWidth, quality) {
-      maxWidth = maxWidth || 600;
-      quality = quality || 0.60;
-      return new Promise(function(resolve, reject) {
-        var reader = new FileReader();
+    // ULTRA MICRO FAST COMPRESSOR (450px width, 0.45 quality ~ 20-30KB)
+    function compressImageUltraFast(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
         reader.readAsDataURL(file);
-        reader.onload = function(event) {
-          var img = new Image();
-          img.src = event.target.result;
-          img.onload = function() {
-            var canvas = document.createElement('canvas');
-            var width = img.width;
-            var height = img.height;
-            if (width > maxWidth) {
-              height = Math.round((height * maxWidth) / width);
-              width = maxWidth;
-            }
-            canvas.width = width;
-            canvas.height = height;
-            var ctx = canvas.getContext('2d');
-            ctx.drawImage(img, 0, 0, width, height);
-            resolve(canvas.toDataURL('image/jpeg', quality));
+        reader.onload = (e) => {
+          const img = new Image();
+          img.src = e.target.result;
+          img.onload = () => {
+            const canvas = document.createElement('canvas');
+            let w = img.width, h = img.height;
+            const max = 450;
+            if (w > h && w > max) { h = Math.round((h * max) / w); w = max; }
+            else if (h > max) { w = Math.round((w * max) / h); h = max; }
+
+            canvas.width = w;
+            canvas.height = h;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, w, h);
+            // Ultra low payload for immediate network transfer
+            resolve(canvas.toDataURL('image/jpeg', 0.45));
           };
-          img.onerror = function(e) { reject(e); };
+          img.onerror = reject;
         };
-        reader.onerror = function(e) { reject(e); };
+        reader.onerror = reject;
       });
     }
 
-    // DIRECT NATIVE REST API ORDER SYNC
-    function fetchOrders() {
-      fetch(SUPABASE_URL + '/rest/v1/orders?select=*&order=id.desc', {
-        headers: {
-          'apikey': SUPABASE_KEY,
-          'Authorization': 'Bearer ' + SUPABASE_KEY
+    // DIRECT ANTI-CACHE FETCH
+    async function fetchOrders() {
+      if (isFetching) return;
+      isFetching = true;
+
+      try {
+        const timestamp = Date.now();
+        const res = await fetch(`${SUPABASE_URL}/rest/v1/orders?select=*&order=id.desc&t=${timestamp}`, {
+          headers: {
+            'apikey': SUPABASE_KEY,
+            'Authorization': `Bearer ${SUPABASE_KEY}`,
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache'
+          }
+        });
+
+        if (!res.ok) throw new Error("HTTP: " + res.status);
+        const data = await res.json();
+        
+        // Only update screen if data really changed (prevents lag & flickering)
+        const currentDataStr = JSON.stringify(data);
+        if (currentDataStr !== lastOrdersJson) {
+          lastOrdersJson = currentDataStr;
+          allRiderOrders = data || [];
+          updateStats();
+          renderOrdersList();
         }
-      })
-      .then(function(res) {
-        if (!res.ok) throw new Error("HTTP error " + res.status);
-        return res.json();
-      })
-      .then(function(data) {
-        allRiderOrders = data || [];
-        updateStats();
-        renderOrdersList();
-      })
-      .catch(function(err) {
-        console.warn("Orders fetch err:", err);
-      });
+
+        const pill = document.getElementById('sync-pill');
+        if (pill) {
+          pill.innerText = '⚡ Synced ' + new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit', second:'2-digit'});
+        }
+      } catch (err) {
+        console.warn("Sync err:", err);
+      } finally {
+        isFetching = false;
+      }
     }
 
     function updateStats() {
-      var active = allRiderOrders.filter(function(o) { return o.status !== 'Delivered' && o.status !== 'Cancelled'; });
-      var delivered = allRiderOrders.filter(function(o) { return o.status === 'Delivered'; });
-      var totalEarn = delivered.length * 35; // Per delivered order payout
+      const active = allRiderOrders.filter(o => o.status !== 'Delivered' && o.status !== 'Cancelled');
+      const delivered = allRiderOrders.filter(o => o.status === 'Delivered');
+      const totalEarn = delivered.length * 35;
 
-      var activeEl = document.getElementById('stat-active-count');
-      var deliveredEl = document.getElementById('stat-delivered-count');
-      var earnEl = document.getElementById('stat-earnings');
-
-      if (activeEl) activeEl.innerText = active.length;
-      if (deliveredEl) deliveredEl.innerText = delivered.length;
-      if (earnEl) earnEl.innerText = '₹' + totalEarn;
+      document.getElementById('stat-active-count').innerText = active.length;
+      document.getElementById('stat-delivered-count').innerText = delivered.length;
+      document.getElementById('stat-earnings').innerText = '₹' + totalEarn;
     }
 
     function switchTab(tab) {
@@ -686,92 +615,95 @@
     }
 
     function renderOrdersList() {
-      var container = document.getElementById('orders-container');
+      const container = document.getElementById('orders-container');
       if (!container) return;
 
-      var filtered = [];
-      if (currentTab === 'active') {
-        filtered = allRiderOrders.filter(function(o) { return o.status !== 'Delivered' && o.status !== 'Cancelled'; });
-      } else {
-        filtered = allRiderOrders.filter(function(o) { return o.status === 'Delivered' || o.status === 'Cancelled'; });
-      }
+      const filtered = allRiderOrders.filter(o => {
+        if (currentTab === 'active') {
+          return o.status !== 'Delivered' && o.status !== 'Cancelled';
+        } else {
+          return o.status === 'Delivered' || o.status === 'Cancelled';
+        }
+      });
 
       if (filtered.length === 0) {
-        container.innerHTML = '<div class="empty-msg">' + (currentTab === 'active' ? '🎉 अभी कोई नया ऑर्डर नहीं है।' : 'कोई पिछला ऑर्डर रिकॉर्ड नहीं मिला।') + '</div>';
+        container.innerHTML = `<div class="empty-msg">${currentTab === 'active' ? '🎉 अभी कोई नया ऑर्डर नहीं है।' : 'कोई पिछला ऑर्डर रिकॉर्ड नहीं मिला।'}</div>`;
         return;
       }
 
-      container.innerHTML = filtered.map(function(order) {
-        var items = [];
+      container.innerHTML = filtered.map(order => {
+        let items = [];
         try {
-          if (Array.isArray(order.items)) {
-            items = order.items;
-          } else if (typeof order.items === 'string') {
-            items = JSON.parse(order.items);
-          }
+          items = Array.isArray(order.items) ? order.items : JSON.parse(order.items || '[]');
         } catch(e) { items = []; }
 
-        var isDispatched = (order.status === 'Out for Delivery');
-        var isDelivered = (order.status === 'Delivered');
-        var isCancelled = (order.status === 'Cancelled');
-        var isNew = !isDispatched && !isDelivered && !isCancelled;
+        const isDispatched = (order.status === 'Out for Delivery');
+        const isDelivered = (order.status === 'Delivered');
+        const isCancelled = (order.status === 'Cancelled');
+        const isNew = !isDispatched && !isDelivered && !isCancelled;
 
-        var mapsUrl = null;
-        if (order.delivery_address && order.delivery_address.indexOf('http') !== -1) {
-          var match = order.delivery_address.match(/https?:\/\/[^\s]+/);
+        let mapsUrl = null;
+        if (order.delivery_address && order.delivery_address.includes('http')) {
+          const match = order.delivery_address.match(/https?:\/\/[^\s]+/);
           if (match) mapsUrl = match[0];
         } else if (order.customer_lat && order.customer_lng) {
-          mapsUrl = 'https://www.google.com/maps/search/?api=1&query=' + order.customer_lat + ',' + order.customer_lng;
+          mapsUrl = `https://www.google.com/maps/search/?api=1&query=${order.customer_lat},${order.customer_lng}`;
         } else if (order.delivery_address) {
-          mapsUrl = 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(order.delivery_address);
+          mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(order.delivery_address)}`;
         }
 
-        var itemsHtml = items.length > 0 ? items.map(function(it) {
-          return '<div class="item-summary-line"><span>' + (it.name || 'Item') + ' (' + (it.unit || '1u') + ')</span><span><b>× ' + (it.qty || 1) + '</b></span></div>';
-        }).join('') : '<div style="color:#94a3b8; font-size:11px;">सामान विवरण उपलब्ध नहीं</div>';
+        const itemsHtml = items.length > 0 ? items.map(it => 
+          `<div class="item-line"><span>${it.name || 'Item'} (${it.unit || '1u'})</span><span><b>× ${it.qty || 1}</b></span></div>`
+        ).join('') : '<div style="color:#94a3b8; font-size:11px;">सामान विवरण उपलब्ध नहीं</div>';
 
-        return '<div class="order-card ' + (isNew ? 'new-pulse' : '') + '">' +
-          '<div class="step-indicator">' + (isNew ? 'Step 1 • New Incoming Order' : isDispatched ? 'Step 2 • Out for Delivery' : 'Completed') + '</div>' +
-          '<div class="order-top">' +
-            '<div>' +
-              '<div class="ord-id">#ORD-' + order.id + '</div>' +
-              '<span class="ord-tag ' + (isDelivered ? 'tag-delivered' : isCancelled ? 'tag-cancelled' : isDispatched ? 'tag-transit' : 'tag-placed') + '">' + (order.status || 'Order Placed') + '</span>' +
-            '</div>' +
-            '<div style="text-align:right;">' +
-              '<div class="ord-amount">₹' + (order.total_amount || 0) + '</div>' +
-              '<div style="font-size:10.5px; color:#94a3b8; font-weight:700;">' + (order.payment_mode || 'COD') + '</div>' +
-            '</div>' +
-          '</div>' +
-          '<div class="cust-info-box">' +
-            '<div class="cust-row"><span>👤</span> <b>' + (order.customer_name || 'Customer') + '</b></div>' +
-            '<div class="cust-row"><span>📞</span> <span>' + (order.customer_phone || 'NA') + '</span></div>' +
-            '<div class="cust-row"><span>📍</span> <span style="white-space:pre-line;">' + (order.delivery_address || 'पता उपलब्ध नहीं है') + '</span></div>' +
-            (order.distance_km ? '<div class="cust-row" style="color:#38bdf8;"><span>📏</span> <span>दूरी: <b>' + order.distance_km + ' KM</b></span></div>' : '') +
-            (order.cancellation_reason ? '<div class="cust-row" style="color:#ef4444;"><span>⚠️</span> <span>कैंसिलेशन: <b>' + order.cancellation_reason + ' (' + (order.cancelled_by || '') + ')</b></span></div>' : '') +
-          '</div>' +
-          '<div class="items-summary-box">' +
-            '<div style="font-size:11px; font-weight:800; color:#38bdf8; margin-bottom:6px;">📦 ITEMS TO DELIVER:</div>' +
-            itemsHtml +
-            (order.free_gift_added ? '<div class="item-summary-line" style="color:#34d399;"><span>🎁 ' + order.free_gift_added + '</span><span>FREE</span></div>' : '') +
-          '</div>' +
-          (!isDelivered && !isCancelled ? (
-            '<a href="tel:' + order.customer_phone + '" class="btn-action-call">📞 Call Customer (' + (order.customer_name || 'Customer') + ')</a>' +
-            (mapsUrl ? '<a href="' + mapsUrl + '" target="_blank" class="btn-action-call" style="background:#21262d; border:1px solid #30363d; margin-bottom:8px;">🗺️ Navigate to Customer Doorstep ↗</a>' : '') +
-            (!isDispatched ? 
-              '<button class="btn-action-primary" onclick="openPickupModal(' + order.id + ')">📸 Accept & Pickup (सामान का फोटो लें)</button>' : 
-              '<button class="btn-action-primary" onclick="openDeliveryProofModal(' + order.id + ', \'' + (order.delivery_otp || '') + '\')">📸 Arrived & Deliver (फोटो & OTP)</button>'
-            ) +
-            '<button class="btn-action-cancel" onclick="riderCancelOrder(' + order.id + ')">❌ Reject / Cancel Order (रद्द करें)</button>'
-          ) : '') +
-        '</div>';
+        return `
+          <div class="order-card ${isNew ? 'new-pulse' : ''}">
+            <span class="step-tag">${isNew ? 'Step 1 • New Assigned Order' : isDispatched ? 'Step 2 • Delivering' : 'Completed'}</span>
+            <div class="order-top">
+              <div>
+                <div class="ord-id">#ORD-${order.id}</div>
+                <span class="ord-tag ${isDelivered ? 'tag-delivered' : isCancelled ? 'tag-cancelled' : isDispatched ? 'tag-transit' : 'tag-placed'}">
+                  ${order.status || 'Order Placed'}
+                </span>
+              </div>
+              <div style="text-align:right;">
+                <div class="ord-amount">₹${order.total_amount || 0}</div>
+                <div style="font-size:10px; color:#94a3b8; font-weight:700;">${order.payment_mode || 'COD'}</div>
+              </div>
+            </div>
+
+            <div class="cust-info-box">
+              <div class="cust-row"><span>👤</span> <b>${order.customer_name || 'Customer'}</b></div>
+              <div class="cust-row"><span>📞</span> <span>${order.customer_phone || 'NA'}</span></div>
+              <div class="cust-row"><span>📍</span> <span style="white-space:pre-line;">${order.delivery_address || 'पता उपलब्ध नहीं'}</span></div>
+              ${order.distance_km ? `<div class="cust-row" style="color:#38bdf8;"><span>📏</span> <span>दूरी: <b>${order.distance_km} KM</b></span></div>` : ''}
+            </div>
+
+            <div class="items-box">
+              <div style="font-size:11px; font-weight:800; color:#38bdf8; margin-bottom:5px;">📦 ITEMS TO DELIVER:</div>
+              ${itemsHtml}
+            </div>
+
+            ${!isDelivered && !isCancelled ? `
+              <a href="tel:${order.customer_phone}" class="btn-action-call">📞 Call Customer (${order.customer_name || 'Customer'})</a>
+              ${mapsUrl ? `<a href="${mapsUrl}" target="_blank" class="btn-action-call" style="background:#21262d; border:1px solid #30363d;">🗺️ Navigate to Customer Doorstep ↗</a>` : ''}
+              
+              ${!isDispatched ? 
+                `<button class="btn-action-primary" onclick="openPickupModal(${order.id})">📸 Accept & Pickup (सामान का फोटो लें)</button>` : 
+                `<button class="btn-action-primary" onclick="openDeliveryProofModal(${order.id}, '${order.delivery_otp || ''}')">📸 Arrived & Deliver (फोटो & OTP)</button>`
+              }
+              <button class="btn-action-cancel" onclick="riderCancelOrder(${order.id})">❌ Reject / Cancel Order</button>
+            ` : ''}
+          </div>
+        `;
       }).join('');
     }
 
-    // PICKUP STEP & MODAL
+    // STEP 1: PICKUP MODAL HANDLERS
     function openPickupModal(orderId) {
       selectedOrderForPickup = orderId;
       base64PickupPhoto = null;
-      document.getElementById('pickup-photo-preview').innerHTML = '<span style="color:#64748b; font-size:12px; font-weight:700;">सामान की फ़ोटो यहाँ दिखेगी *</span>';
+      document.getElementById('pickup-photo-preview').innerHTML = '<span style="color:#64748b; font-size:11px;">सामान की फ़ोटो यहाँ दिखेगी</span>';
       document.getElementById('btn-confirm-pickup').style.display = 'none';
       document.getElementById('pickup-modal').classList.add('active');
     }
@@ -781,59 +713,66 @@
       selectedOrderForPickup = null;
     }
 
-    function handlePickupPhotoChosen(input) {
+    async function handlePickupPhotoChosen(input) {
       if (!input.files || input.files.length === 0) return;
-      compressImage(input.files[0], 600, 0.60).then(function(base64) {
-        base64PickupPhoto = base64;
-        document.getElementById('pickup-photo-preview').innerHTML = '<img src="' + base64PickupPhoto + '" alt="Pickup Proof">';
+      try {
+        document.getElementById('pickup-photo-preview').innerHTML = '<span style="color:#38bdf8; font-size:11px;">⚡ Compressing photo...</span>';
+        base64PickupPhoto = await compressImageUltraFast(input.files[0]);
+        document.getElementById('pickup-photo-preview').innerHTML = `<img src="${base64PickupPhoto}" alt="Proof">`;
         document.getElementById('btn-confirm-pickup').style.display = 'block';
-      }).catch(function(err) {
-        alert('फ़ोटो कंप्रेस एरर: ' + err.message);
-      });
+      } catch(err) {
+        alert("Photo process error: " + err.message);
+      }
     }
 
-    function confirmPickupWithPhoto() {
-      if (!selectedOrderForPickup) return;
-      if (!base64PickupPhoto) return alert('कृपया पहले सामान का फोटो लें!');
+    async function confirmPickupWithPhoto() {
+      if (!selectedOrderForPickup || !base64PickupPhoto) {
+        alert("कृपया सामान का फोटो लें!");
+        return;
+      }
 
-      var btn = document.getElementById('btn-confirm-pickup');
+      const btn = document.getElementById('btn-confirm-pickup');
       btn.disabled = true;
-      btn.innerText = '⏳ पिकअप सेव हो रहा है...';
+      btn.innerText = '⏳ सेव हो रहा है...';
 
-      fetch(SUPABASE_URL + '/rest/v1/orders?id=eq.' + selectedOrderForPickup, {
-        method: 'PATCH',
-        headers: {
-          'apikey': SUPABASE_KEY,
-          'Authorization': 'Bearer ' + SUPABASE_KEY,
-          'Content-Type': 'application/json',
-          'Prefer': 'return=minimal'
-        },
-        body: JSON.stringify({
-          status: 'Out for Delivery',
-          assigned_rider_id: 1,
-          pickup_proof_photo: base64PickupPhoto
-        })
-      })
-      .then(function() {
-        alert('✅ Order #ORD-' + selectedOrderForPickup + ' पिकअप हो गया! अब ग्राहक तक पहुँचें।');
+      try {
+        const res = await fetch(`${SUPABASE_URL}/rest/v1/orders?id=eq.${selectedOrderForPickup}`, {
+          method: 'PATCH',
+          headers: {
+            'apikey': SUPABASE_KEY,
+            'Authorization': `Bearer ${SUPABASE_KEY}`,
+            'Content-Type': 'application/json',
+            'Prefer': 'return=minimal'
+          },
+          body: JSON.stringify({
+            status: 'Out for Delivery',
+            assigned_rider_id: 1,
+            pickup_proof_photo: base64PickupPhoto
+          })
+        });
+
+        if (!res.ok) throw new Error("Status code: " + res.status);
+
         closePickupModal();
+        // Instant local update taaki wait na karna pade
+        const ord = allRiderOrders.find(o => o.id === selectedOrderForPickup);
+        if (ord) ord.status = 'Out for Delivery';
+        renderOrdersList();
         fetchOrders();
-      })
-      .catch(function(e) {
-        alert('पिकअप एरर: ' + e.message);
-      })
-      .finally(function() {
+      } catch (err) {
+        alert("पिकअप एरर: " + err.message);
+      } finally {
         btn.disabled = false;
         btn.innerText = '🛵 Pickup पूरा करें (Out for Delivery)';
-      });
+      }
     }
 
-    // DELIVERY STEP & MODAL
+    // STEP 2: DELIVERY MODAL HANDLERS
     function openDeliveryProofModal(orderId, expectedOtp) {
       selectedOrderForDelivery = { id: orderId, expectedOtp: expectedOtp };
       base64DeliveryPhoto = null;
       document.getElementById('input-delivery-otp').value = '';
-      document.getElementById('delivery-proof-preview').innerHTML = '<span style="color:#64748b; font-size:12px; font-weight:700;">सामान सौंपते हुए फ़ोटो लें *</span>';
+      document.getElementById('delivery-proof-preview').innerHTML = '<span style="color:#64748b; font-size:11px;">सामान सौंपते हुए फ़ोटो लें</span>';
       document.getElementById('delivery-modal').classList.add('active');
     }
 
@@ -842,93 +781,104 @@
       selectedOrderForDelivery = null;
     }
 
-    function handleDeliveryPhotoChosen(input) {
+    async function handleDeliveryPhotoChosen(input) {
       if (!input.files || input.files.length === 0) return;
-      compressImage(input.files[0], 600, 0.60).then(function(base64) {
-        base64DeliveryPhoto = base64;
-        document.getElementById('delivery-proof-preview').innerHTML = '<img src="' + base64DeliveryPhoto + '" alt="Delivery Proof">';
-      }).catch(function(err) {
-        alert('फ़ोटो कंप्रेस एरर: ' + err.message);
-      });
+      try {
+        document.getElementById('delivery-proof-preview').innerHTML = '<span style="color:#00e676; font-size:11px;">⚡ Compressing photo...</span>';
+        base64DeliveryPhoto = await compressImageUltraFast(input.files[0]);
+        document.getElementById('delivery-proof-preview').innerHTML = `<img src="${base64DeliveryPhoto}" alt="Proof">`;
+      } catch(err) {
+        alert("Photo process error: " + err.message);
+      }
     }
 
-    function confirmDeliveryWithProof() {
+    async function confirmDeliveryWithProof() {
       if (!selectedOrderForDelivery) return;
-      if (!base64DeliveryPhoto) return alert('⚠️ ग्राहक को सामान सौंपते हुए फ़ोटो खींचना अनिवार्य है!');
-
-      var enteredOtp = document.getElementById('input-delivery-otp').value.trim();
-      if (enteredOtp.length !== 4) return alert('कृपया ग्राहक से 4 अंकों का OTP पूछकर डालें!');
-
-      if (selectedOrderForDelivery.expectedOtp && selectedOrderForDelivery.expectedOtp.toString().trim() !== enteredOtp) {
-        return alert('❌ गलत OTP! ग्राहक के मोबाइल पर दिख रहा 4 अंकों का सही कोड पूछें।');
+      if (!base64DeliveryPhoto) {
+        alert("ग्राहक को सामान सौंपते हुए फ़ोटो खींचना अनिवार्य है!");
+        return;
       }
 
-      var deliverBtn = document.getElementById('btn-confirm-delivery');
-      deliverBtn.disabled = true;
-      deliverBtn.innerText = '⏳ डिलीवरी सत्यापित हो रही है...';
+      const enteredOtp = document.getElementById('input-delivery-otp').value.trim();
+      if (enteredOtp.length !== 4) {
+        alert("कृपया ग्राहक से 4 अंकों का OTP पूछकर डालें!");
+        return;
+      }
 
-      fetch(SUPABASE_URL + '/rest/v1/orders?id=eq.' + selectedOrderForDelivery.id, {
-        method: 'PATCH',
-        headers: {
-          'apikey': SUPABASE_KEY,
-          'Authorization': 'Bearer ' + SUPABASE_KEY,
-          'Content-Type': 'application/json',
-          'Prefer': 'return=minimal'
-        },
-        body: JSON.stringify({
-          status: 'Delivered',
-          delivery_proof_photo: base64DeliveryPhoto
-        })
-      })
-      .then(function() {
-        alert('🎉 बधाई हो! Order #ORD-' + selectedOrderForDelivery.id + ' सफलतापूर्वक डिलीver हो गया।');
+      if (selectedOrderForDelivery.expectedOtp && selectedOrderForDelivery.expectedOtp.toString().trim() !== enteredOtp) {
+        alert("❌ गलत OTP! ग्राहक के ऐप पर दिख रहा सही कोड डालें।");
+        return;
+      }
+
+      const btn = document.getElementById('btn-confirm-delivery');
+      btn.disabled = true;
+      btn.innerText = '⏳ डिलीवरी सेव हो रही है...';
+
+      try {
+        const res = await fetch(`${SUPABASE_URL}/rest/v1/orders?id=eq.${selectedOrderForDelivery.id}`, {
+          method: 'PATCH',
+          headers: {
+            'apikey': SUPABASE_KEY,
+            'Authorization': `Bearer ${SUPABASE_KEY}`,
+            'Content-Type': 'application/json',
+            'Prefer': 'return=minimal'
+          },
+          body: JSON.stringify({
+            status: 'Delivered',
+            delivery_proof_photo: base64DeliveryPhoto
+          })
+        });
+
+        if (!res.ok) throw new Error("Status code: " + res.status);
+
+        alert("🎉 ऑर्डर सफलतापूर्वक डिलीवर हो गया!");
         closeDeliveryModal();
+        const ord = allRiderOrders.find(o => o.id === selectedOrderForDelivery.id);
+        if (ord) ord.status = 'Delivered';
+        updateStats();
+        renderOrdersList();
         fetchOrders();
-      })
-      .catch(function(err) {
-        alert('डिलीवरी एरर: ' + err.message);
-      })
-      .finally(function() {
-        deliverBtn.disabled = false;
-        deliverBtn.innerText = '✓ सत्यापित करें और डिलीवर मार्क करें';
-      });
+      } catch(err) {
+        alert("डिलीवरी एरर: " + err.message);
+      } finally {
+        btn.disabled = false;
+        btn.innerText = '✓ सत्यापित करें और डिलीवर मार्क करें';
+      }
     }
 
-    function riderCancelOrder(orderId) {
-      var reason = prompt("ऑर्डर कैंसिल करने का कारण लिखें:");
+    async function riderCancelOrder(orderId) {
+      const reason = prompt("ऑर्डर कैंसिल करने का कारण:");
       if (!reason || reason.trim().length < 3) return alert("कारण लिखना अनिवार्य है!");
-      if (!confirm("क्या आप वाकई Order #ORD-" + orderId + " को रद्द करना चाहते हैं?")) return;
 
-      fetch(SUPABASE_URL + '/rest/v1/orders?id=eq.' + orderId, {
-        method: 'PATCH',
-        headers: {
-          'apikey': SUPABASE_KEY,
-          'Authorization': 'Bearer ' + SUPABASE_KEY,
-          'Content-Type': 'application/json',
-          'Prefer': 'return=minimal'
-        },
-        body: JSON.stringify({
-          status: 'Cancelled',
-          cancelled_by: 'Rider',
-          cancellation_reason: reason.trim()
-        })
-      })
-      .then(function() {
-        alert('✅ Order #ORD-' + orderId + ' रद्द हो गया।');
+      try {
+        await fetch(`${SUPABASE_URL}/rest/v1/orders?id=eq.${orderId}`, {
+          method: 'PATCH',
+          headers: {
+            'apikey': SUPABASE_KEY,
+            'Authorization': `Bearer ${SUPABASE_KEY}`,
+            'Content-Type': 'application/json',
+            'Prefer': 'return=minimal'
+          },
+          body: JSON.stringify({
+            status: 'Cancelled',
+            cancelled_by: 'Rider',
+            cancellation_reason: reason.trim()
+          })
+        });
         fetchOrders();
-      })
-      .catch(function(err) {
-        alert("एरर: " + err.message);
-      });
+      } catch(e) {
+        alert("रद्द करने में एरर: " + e.message);
+      }
     }
 
-    // BOOTSTRAP ON LOAD
-    window.addEventListener('DOMContentLoaded', function() {
-      var saved = localStorage.getItem('sm_rider_duty_status');
+    // BOOTSTRAP
+    window.addEventListener('DOMContentLoaded', () => {
+      const saved = localStorage.getItem('sm_rider_duty_status');
       isRiderOnline = (saved !== 'OFFLINE');
       renderDutyUI();
       fetchOrders();
-      setInterval(fetchOrders, 3000);
+      // Har 2.5 second me background auto-sync bina screen freeze kiye
+      setInterval(fetchOrders, 2500);
     });
   </script>
 </body>
