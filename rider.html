@@ -1,917 +1,348 @@
 <!DOCTYPE html>
 <html lang="hi">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>⚡ SM RIDER — Delivery Partner Portal</title>
-
-  <link rel="icon" type="image/png" href="logo.png">
-  <link rel="manifest" href="manifest-rider.json">
-  <meta name="theme-color" content="#120224">
-  <meta name="mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-
-  <script>
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('sw.js', { scope: './' });
-      });
-    }
-  </script>
-
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-
-  <style>
-    :root {
-      --bg-dark: #0f172a;
-      --card-bg: #1e293b;
-      --card-super: #1a1b3a;
-      --primary-purple: #3c006b;
-      --accent-cyan: #00f5d4;
-      --accent-pink: #ff007f;
-      --accent-green: #10b981;
-      --accent-yellow: #f59e0b;
-      --accent-red: #ef4444;
-      --border-color: #334155;
-      --text-main: #f8fafc;
-      --text-muted: #94a3b8;
-    }
-
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; -webkit-tap-highlight-color: transparent; }
-    body { background-color: var(--bg-dark); color: var(--text-main); min-height: 100vh; padding-bottom: 90px; }
-
-    .alert-banner {
-      background: linear-gradient(90deg, #dc2626, #b91c1c);
-      color: white;
-      padding: 12px 16px;
-      font-size: 13px;
-      font-weight: 900;
-      display: none;
-      align-items: center;
-      justify-content: space-between;
-      box-shadow: 0 4px 14px rgba(220, 38, 38, 0.7);
-      animation: alertPulse 0.7s infinite alternate;
-    }
-    @keyframes alertPulse {
-      0% { opacity: 0.85; transform: scale(0.99); }
-      100% { opacity: 1; transform: scale(1.01); }
-    }
-
-    .rider-top-nav {
-      background: #18052e;
-      padding: 14px 16px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      border-bottom: 1.5px solid #3c006b;
-      position: sticky;
-      top: 0;
-      z-index: 1000;
-    }
-    .rider-brand {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-    .rider-logo-img {
-      width: 40px;
-      height: 40px;
-      border-radius: 12px;
-      object-fit: contain;
-      border: 1.5px solid var(--accent-pink);
-      background: #fff;
-    }
-    .brand-title {
-      font-size: 15px;
-      font-weight: 900;
-      background: linear-gradient(90deg, #ff007f, #ffbe0b);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-    .brand-sub {
-      font-size: 11px;
-      color: var(--accent-cyan);
-      font-weight: 700;
-    }
-
-    .header-actions {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    .btn-sound-test {
-      background: #0284c7;
-      color: white;
-      border: none;
-      padding: 6px 10px;
-      border-radius: 10px;
-      font-size: 11px;
-      font-weight: 800;
-      cursor: pointer;
-    }
-    .btn-logout {
-      background: rgba(239, 68, 68, 0.2);
-      border: 1px solid #ef4444;
-      color: #fca5a5;
-      padding: 6px 12px;
-      border-radius: 10px;
-      font-size: 11px;
-      font-weight: 800;
-      cursor: pointer;
-    }
-
-    .profile-banner {
-      background: #172033;
-      padding: 12px 16px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      border-bottom: 1px solid var(--border-color);
-    }
-    .duty-toggle-btn {
-      background: var(--accent-green);
-      color: #fff;
-      border: none;
-      padding: 7px 16px;
-      border-radius: 20px;
-      font-size: 12px;
-      font-weight: 900;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-    .duty-toggle-btn.offline {
-      background: var(--accent-red);
-    }
-
-    .stats-row {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 8px;
-      padding: 12px 16px;
-    }
-    .stat-card {
-      background: var(--card-bg);
-      border: 1px solid var(--border-color);
-      border-radius: 14px;
-      padding: 10px 8px;
-      text-align: center;
-    }
-    .stat-val {
-      font-size: 16px;
-      font-weight: 900;
-      color: var(--accent-cyan);
-    }
-    .stat-label {
-      font-size: 10px;
-      font-weight: 700;
-      color: var(--text-muted);
-      margin-top: 2px;
-    }
-
-    .tabs-nav {
-      display: flex;
-      gap: 8px;
-      padding: 0 16px 12px 16px;
-    }
-    .tab-pill {
-      flex: 1;
-      background: var(--card-bg);
-      border: 1.5px solid var(--border-color);
-      color: var(--text-muted);
-      padding: 10px 12px;
-      border-radius: 12px;
-      font-size: 12px;
-      font-weight: 800;
-      text-align: center;
-      cursor: pointer;
-    }
-    .tab-pill.active {
-      background: var(--primary-purple);
-      border-color: #a855f7;
-      color: #ffffff;
-    }
-
-    .content-area {
-      padding: 0 16px;
-    }
-
-    .order-card {
-      background: var(--card-bg);
-      border: 1.5px solid var(--border-color);
-      border-radius: 16px;
-      padding: 14px;
-      margin-bottom: 14px;
-      box-shadow: 0 4px 14px rgba(0,0,0,0.25);
-      position: relative;
-    }
-    .order-card.alert-pulse-card {
-      border: 2px solid #ef4444;
-      background: #25121e;
-      animation: glowBorder 1.2s infinite alternate;
-    }
-    @keyframes glowBorder {
-      0% { box-shadow: 0 0 5px rgba(239, 68, 68, 0.4); }
-      100% { box-shadow: 0 0 18px rgba(239, 68, 68, 0.85); }
-    }
-
-    .order-badge {
-      font-size: 10px;
-      font-weight: 900;
-      padding: 3px 8px;
-      border-radius: 6px;
-      text-transform: uppercase;
-    }
-    .badge-pending { background: #f59e0b; color: black; }
-    .badge-picked { background: #0284c7; color: white; }
-    .badge-arrived { background: #8b5cf6; color: white; }
-
-    .detail-box {
-      background: #0f172a;
-      border-radius: 10px;
-      padding: 10px;
-      font-size: 12px;
-      color: #cbd5e1;
-      margin: 8px 0;
-      display: flex;
-      flex-direction: column;
-      gap: 5px;
-    }
-
-    .action-btn-grid {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      margin-top: 10px;
-    }
-
-    .btn-rider-action {
-      background: var(--primary-purple);
-      color: white;
-      border: 1px solid #a855f7;
-      padding: 12px 14px;
-      border-radius: 12px;
-      font-size: 13px;
-      font-weight: 900;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
-      text-decoration: none;
-    }
-    .btn-success { background: #059669; border: none; }
-    .btn-danger { background: #dc2626; border: none; }
-    .btn-map { background: #0284c7; border: none; }
-    .btn-pick { background: linear-gradient(135deg, #f59e0b, #d97706); color: black; border: none; }
-    .btn-arrived { background: #7c3aed; border: none; }
-    .btn-complete-direct {
-      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-      color: white;
-      border: 1px solid #34d399;
-      font-size: 14px;
-      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
-    }
-
-    /* LOGIN MODAL */
-    .login-container {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      background: var(--bg-dark);
-      z-index: 99999;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 24px;
-    }
-    .login-card {
-      background: var(--card-bg);
-      border: 2px solid var(--primary-purple);
-      border-radius: 20px;
-      padding: 24px;
-      width: 100%;
-      max-width: 360px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-      text-align: center;
-    }
-    .input-rider {
-      width: 100%;
-      background: #0f172a;
-      border: 1.5px solid var(--border-color);
-      border-radius: 12px;
-      padding: 12px 14px;
-      font-size: 13px;
-      color: #ffffff;
-      outline: none;
-      margin-bottom: 12px;
-    }
-    .input-rider:focus {
-      border-color: var(--accent-pink);
-    }
-
-    .modal-box {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      background: rgba(0,0,0,0.85);
-      backdrop-filter: blur(4px);
-      z-index: 10000;
-      display: none;
-      align-items: center;
-      justify-content: center;
-      padding: 16px;
-    }
-    .modal-box.active { display: flex; }
-    .modal-inner {
-      background: var(--card-bg);
-      border: 2px solid #a855f7;
-      border-radius: 16px;
-      padding: 20px;
-      width: 100%;
-      max-width: 400px;
-    }
-  </style>
-</head>
-<body onclick="unlockRiderAudio()" ontouchstart="unlockRiderAudio()">
-
-  <!-- AUDIO ELEMENT FOR HIGH ALERT TUNE -->
-  <audio id="rider-high-alert-audio" src="alert.mp3" preload="auto" loop></audio>
-
-  <!-- TOP HIGH ALERT NOTIFICATION -->
-  <div class="alert-banner" id="order-alert-bar">
-    <div style="display:flex; align-items:center; gap:8px;">
-      <span style="font-size:20px;">🚨</span>
-      <span>NAYA ORDER AAYA! TURANT PICKUP KAREIN!</span>
-    </div>
-    <button onclick="stopHighAlertTune()" style="background:#0f172a; border:none; color:white; padding:5px 10px; border-radius:6px; font-size:11px; font-weight:800; cursor:pointer;">Mute 🔕</button>
-  </div>
-
-  <!-- LOGIN SCREEN -->
-  <div class="login-container" id="rider-login-screen">
-    <div class="login-card">
-      <img src="logo.png" style="width:70px; height:70px; border-radius:18px; object-fit:contain; border:2px solid var(--accent-pink); margin-bottom:12px;" onerror="this.style.display='none'">
-      <h2 style="font-size:18px; font-weight:900; margin-bottom:2px;">SM RIDER LOGIN</h2>
-      <p style="font-size:11.5px; color:var(--text-muted); margin-bottom:16px;">Delivery Partner Portal</p>
-
-      <select id="login-rider-type" class="input-rider" style="border-color:#a855f7; font-weight:800; color:#38bdf8;">
-        <option value="EXPRESS">⚡ Express Rider / All Orders</option>
-        <option value="SUPER">👑 Super Rider</option>
-      </select>
-      
-      <input type="tel" id="login-phone" class="input-rider" placeholder="Mobile Number (10 Digit)" maxlength="10">
-      <input type="password" id="login-password" class="input-rider" placeholder="Password (Default: 1234)">
-      
-      <button class="btn-rider-action btn-success" style="width:100%; padding:13px;" onclick="riderLogin()">
-        🚀 Login & Duty Shuru Karein
-      </button>
-    </div>
-  </div>
-
-  <!-- MAIN RIDER APP HEADER -->
-  <div class="rider-top-nav">
-    <div class="rider-brand">
-      <img src="logo.png" class="rider-logo-img" alt="Logo" onerror="this.style.display='none'">
-      <div>
-        <div class="brand-title" id="nav-rider-name">SM RIDER 🛵</div>
-        <div class="brand-sub" id="nav-rider-phone">----</div>
-      </div>
-    </div>
-    <div class="header-actions">
-      <button class="btn-sound-test" onclick="testSirenTune()">🔊 Siren Test</button>
-      <button class="btn-logout" onclick="riderLogout()">🚪 Logout</button>
-    </div>
-  </div>
-
-  <div class="profile-banner">
-    <div>
-      <div style="font-size:10px; color:var(--text-muted); font-weight:800; text-transform:uppercase;">Rider Status:</div>
-      <div style="font-size:12.5px; font-weight:900; color:var(--accent-cyan);" id="profile-role-badge">⚡ Express Rider Active</div>
-    </div>
-    <button id="duty-btn" class="duty-toggle-btn" onclick="toggleDuty()">🟢 ONLINE</button>
-  </div>
-
-  <div class="stats-row">
-    <div class="stat-card">
-      <div class="stat-val" id="stat-active-count">0</div>
-      <div class="stat-label">Active Orders</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-val" id="stat-delivered-count">0</div>
-      <div class="stat-label">Delivered</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-val" id="stat-earnings">₹0</div>
-      <div class="stat-label">Today Earned</div>
-    </div>
-  </div>
-
-  <div class="tabs-nav">
-    <button class="tab-pill active" id="tab-btn-active" onclick="switchRiderTab('active')">⚡ Active Orders</button>
-    <button class="tab-pill" id="tab-btn-history" onclick="switchRiderTab('history')">📜 Completed / Past</button>
-  </div>
-
-  <div class="content-area">
-    <div id="section-active-orders">
-      <div id="rider-orders-list"><div style="text-align:center; padding:30px; color:var(--text-muted);">Orders check ho rahe hain...</div></div>
-    </div>
-    <div id="section-history-orders" style="display:none;">
-      <div id="rider-history-list"></div>
-    </div>
-  </div>
-
-  <!-- COMPLETE DELIVERY MODAL (OTP & PHOTO PROOF) -->
-  <div class="modal-box" id="complete-modal">
-    <div class="modal-inner">
-      <h3 style="font-size:16px; font-weight:900; margin-bottom:8px; color:var(--accent-cyan);">🏁 Order Delivery Complete Karein</h3>
-      <p style="font-size:11.5px; color:var(--text-muted); margin-bottom:12px;">Customer se 4-Digit Secret OTP poochhkar daalein:</p>
-
-      <input type="tel" id="verify-otp-input" class="input-rider" placeholder="Customer 4-Digit OTP *" maxlength="4" style="text-align:center; font-size:22px; font-weight:900; letter-spacing:6px; color:#38bdf8;">
-      
-      <div id="proof-photo-preview" style="width:100%; height:110px; background:#0f172a; border:1.5px dashed var(--border-color); border-radius:12px; display:flex; align-items:center; justify-content:center; margin-bottom:10px; overflow:hidden;">
-        <span style="font-size:11px; color:var(--text-muted);">📸 Delivery Proof Photo (Optional)</span>
-      </div>
-      <input type="file" id="delivery-photo-input" accept="image/*" capture="environment" style="display:none;" onchange="handleDeliveryPhotoCaptured(this)">
-      <button type="button" class="btn-rider-action btn-map" style="width:100%; margin-bottom:14px; padding:9px;" onclick="document.getElementById('delivery-photo-input').click()">
-        📸 Photo Kheinchein (Aichhik)
-      </button>
-
-      <div style="display:flex; gap:8px;">
-        <button class="btn-rider-action btn-success" id="btn-submit-delivery" style="flex:1;" onclick="submitOrderDelivered()">✓ Confirm Delivered</button>
-        <button class="btn-rider-action btn-danger" style="flex:1;" onclick="closeCompleteModal()">✕ Cancel</button>
-      </div>
-    </div>
-  </div>
-
-  <script>
-    const SUPABASE_URL = 'https://mpeikimhkjuinqkjaumr.supabase.co';
-    const SUPABASE_KEY = 'sb_publishable_2_wD-pbi_pNf8niiHxFbYA_saCIhApN';
-    const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
-    let currentRider = null;
-    let allRiderOrders = [];
-    let activeCompleteOrderId = null;
-    let base64DeliveryProof = null;
-    let liveGpsWatchId = null;
-    let isAudioUnlocked = false;
-    let isAlertPlaying = false;
-    let autoRefreshTimer = null;
-    let sirenIntervalTimer = null;
-    let audioCtx = null;
-
-    // SYNTHESIZED EMERGENCY SIREN
-    function startEmergencySiren() {
-      try {
-        if (!audioCtx) {
-          audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>SM Rider Partner</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            -webkit-tap-highlight-color: transparent;
         }
-        if (audioCtx.state === 'suspended') audioCtx.resume();
-        if (sirenIntervalTimer) clearInterval(sirenIntervalTimer);
+        body {
+            background-color: #0d0f12;
+            color: #ffffff;
+            padding-bottom: 30px;
+        }
+        .header {
+            background: #161b22;
+            padding: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #2d333b;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .header h1 {
+            font-size: 18px;
+            color: #00e676;
+        }
+        .status-badge {
+            background: #238636;
+            color: #fff;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        .container {
+            padding: 16px;
+        }
+        .card {
+            background: #161b22;
+            border-radius: 14px;
+            border: 1px solid #30363d;
+            padding: 18px;
+            margin-bottom: 16px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+        }
+        .step-badge {
+            display: inline-block;
+            background: #1f6feb;
+            color: #fff;
+            font-size: 11px;
+            font-weight: 700;
+            padding: 3px 8px;
+            border-radius: 6px;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+        }
+        .title {
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 8px;
+            color: #f0f6fc;
+        }
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            margin: 8px 0;
+            font-size: 14px;
+            color: #8b949e;
+        }
+        .info-row span:last-child {
+            color: #f0f6fc;
+            font-weight: 600;
+        }
+        .items-box {
+            background: #0d1117;
+            border-radius: 8px;
+            padding: 12px;
+            margin: 12px 0;
+            border: 1px dashed #30363d;
+        }
+        .items-box p {
+            font-size: 13px;
+            color: #c9d1d9;
+            margin-bottom: 4px;
+        }
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        .btn {
+            flex: 1;
+            padding: 14px;
+            border-radius: 10px;
+            border: none;
+            font-size: 15px;
+            font-weight: bold;
+            cursor: pointer;
+            text-align: center;
+            transition: opacity 0.2s;
+        }
+        .btn:active {
+            opacity: 0.8;
+        }
+        .btn-accept { background: #00e676; color: #000; }
+        .btn-reject { background: #da3633; color: #fff; }
+        .btn-primary { background: #2f81f7; color: #fff; width: 100%; margin-top: 12px; }
+        .btn-map { background: #21262d; border: 1px solid #388bfd; color: #58a6ff; }
         
-        let freq = 650;
-        let goingUp = true;
-        
-        sirenIntervalTimer = setInterval(() => {
-          if (!isAlertPlaying) return;
-          try {
-            const osc = audioCtx.createOscillator();
-            const gain = audioCtx.createGain();
-            osc.type = 'sawtooth';
-            osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
-            gain.gain.setValueAtTime(0.18, audioCtx.currentTime);
-            gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.18);
-            osc.connect(gain);
-            gain.connect(audioCtx.destination);
-            osc.start();
-            osc.stop(audioCtx.currentTime + 0.18);
+        .photo-upload-box {
+            border: 2px dashed #388bfd;
+            border-radius: 10px;
+            padding: 14px;
+            text-align: center;
+            margin: 12px 0;
+            cursor: pointer;
+            background: #0d1117;
+        }
+        .preview-img {
+            max-width: 100%;
+            height: 140px;
+            object-fit: cover;
+            border-radius: 8px;
+            margin-top: 10px;
+            display: none;
+        }
+        .hidden { display: none !important; }
+        .pay-tag {
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+        .pay-cod { background: #d29922; color: #000; }
+        .pay-paid { background: #238636; color: #fff; }
+    </style>
+</head>
+<body>
 
-            freq = goingUp ? freq + 80 : freq - 80;
-            if (freq >= 950) goingUp = false;
-            if (freq <= 550) goingUp = true;
-          } catch(e){}
-        }, 180);
-      } catch(err){}
-    }
+    <div class="header">
+        <h1>SM RIDER</h1>
+        <div class="status-badge">ONLINE</div>
+    </div>
 
-    function stopEmergencySiren() {
-      if (sirenIntervalTimer) {
-        clearInterval(sirenIntervalTimer);
-        sirenIntervalTimer = null;
-      }
-    }
+    <div class="container">
 
-    function unlockRiderAudio() {
-      if (isAudioUnlocked) return;
-      try {
-        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        if (audioCtx.state === 'suspended') audioCtx.resume();
-      } catch(e){}
+        <!-- STEP 1: NEW ORDER INCOMING -->
+        <div id="step-1" class="card">
+            <span class="step-badge">Step 1: Naya Order</span>
+            <div class="title">Naya Order Aaya Hai!</div>
+            <div class="info-row"><span>Order ID:</span><span>#SM-8492</span></div>
+            <div class="info-row"><span>Hub / Store:</span><span>SM Central Hub, Bareilly</span></div>
+            <div class="info-row"><span>Delivery Distance:</span><span>2.4 KM</span></div>
+            <div class="info-row"><span>Estimated Earning:</span><span>₹45</span></div>
 
-      const audio = document.getElementById('rider-high-alert-audio');
-      if (audio) {
-        audio.play().then(() => {
-          audio.pause();
-          audio.currentTime = 0;
-          isAudioUnlocked = true;
-        }).catch(() => {});
-      }
-      isAudioUnlocked = true;
-    }
-
-    function testSirenTune() {
-      unlockRiderAudio();
-      playHighAlertTune();
-      setTimeout(stopHighAlertTune, 3500);
-    }
-
-    function playHighAlertTune() {
-      isAlertPlaying = true;
-      document.getElementById('order-alert-bar').style.display = 'flex';
-      
-      const audio = document.getElementById('rider-high-alert-audio');
-      if (audio) {
-        audio.currentTime = 0;
-        audio.play().catch(() => {});
-      }
-      startEmergencySiren();
-      if (navigator.vibrate) navigator.vibrate([400, 200, 400, 200, 500]);
-    }
-
-    function stopHighAlertTune() {
-      isAlertPlaying = false;
-      document.getElementById('order-alert-bar').style.display = 'none';
-      
-      const audio = document.getElementById('rider-high-alert-audio');
-      if (audio) {
-        audio.pause();
-        audio.currentTime = 0;
-      }
-      stopEmergencySiren();
-    }
-
-    document.addEventListener('DOMContentLoaded', () => {
-      const savedRider = localStorage.getItem('sm_rider_data');
-      if (savedRider) {
-        currentRider = JSON.parse(savedRider);
-        showDashboard();
-      } else {
-        document.getElementById('rider-login-screen').style.display = 'flex';
-      }
-    });
-
-    async function riderLogin() {
-      unlockRiderAudio();
-      const selectedType = document.getElementById('login-rider-type').value;
-      const phone = document.getElementById('login-phone').value.trim();
-      const pass = document.getElementById('login-password').value.trim();
-
-      if (!phone) return alert('Kripya apna mobile number bharein!');
-
-      const { data, error } = await _supabase.from('riders').select('*').eq('phone', phone).single();
-      if (error || !data) {
-        return alert('Rider record nahi mila! Kripya Admin se register karwayein.');
-      }
-
-      if (data.password && data.password !== pass) {
-        return alert('Galat Password! Kripya sahi password darj karein.');
-      }
-
-      currentRider = data;
-      localStorage.setItem('sm_rider_data', JSON.stringify(data));
-      showDashboard();
-    }
-
-    function showDashboard() {
-      document.getElementById('rider-login-screen').style.display = 'none';
-      document.getElementById('nav-rider-name').innerText = currentRider.name;
-      document.getElementById('nav-rider-phone').innerText = `📞 ${currentRider.phone} (${currentRider.vehicle_no || 'NA'})`;
-      
-      updateDutyUI(currentRider.is_active);
-      startLiveGpsTracking();
-      fetchRiderOrders();
-      setupRiderRealtime();
-
-      if (autoRefreshTimer) clearInterval(autoRefreshTimer);
-      autoRefreshTimer = setInterval(fetchRiderOrders, 3000);
-    }
-
-    function riderLogout() {
-      if (!confirm('Logout karna chahte hain?')) return;
-      stopHighAlertTune();
-      if (liveGpsWatchId) navigator.geolocation.clearWatch(liveGpsWatchId);
-      if (autoRefreshTimer) clearInterval(autoRefreshTimer);
-      localStorage.removeItem('sm_rider_data');
-      location.reload();
-    }
-
-    async function toggleDuty() {
-      const newStatus = !currentRider.is_active;
-      await _supabase.from('riders').update({ is_active: newStatus }).eq('id', currentRider.id);
-      currentRider.is_active = newStatus;
-      localStorage.setItem('sm_rider_data', JSON.stringify(currentRider));
-      updateDutyUI(newStatus);
-      if (!newStatus) stopHighAlertTune();
-      fetchRiderOrders();
-    }
-
-    function updateDutyUI(isActive) {
-      const btn = document.getElementById('duty-btn');
-      if (isActive) {
-        btn.className = 'duty-toggle-btn';
-        btn.innerText = '🟢 ONLINE';
-      } else {
-        btn.className = 'duty-toggle-btn offline';
-        btn.innerText = '🔴 OFFLINE';
-      }
-    }
-
-    function startLiveGpsTracking() {
-      if (!navigator.geolocation) return;
-      liveGpsWatchId = navigator.geolocation.watchPosition(async (pos) => {
-        const lat = pos.coords.latitude;
-        const lng = pos.coords.longitude;
-        await _supabase.from('riders').update({ current_lat: lat, current_lng: lng }).eq('id', currentRider.id);
-      }, (err) => console.warn('GPS error:', err.message), {
-        enableHighAccuracy: true,
-        maximumAge: 5000
-      });
-    }
-
-    async function fetchRiderOrders() {
-      if (!currentRider) return;
-      
-      const { data, error } = await _supabase.from('orders').select('*').order('id', { ascending: false });
-      if (error) {
-        console.error('Fetch error:', error);
-        return;
-      }
-
-      allRiderOrders = (data || []).filter(o => {
-        const assignedId = o.assigned_rider_id;
-        if (assignedId && assignedId !== currentRider.id) return false;
-        return true;
-      });
-
-      const pendingAlertOrders = allRiderOrders.filter(o => {
-        const st = (o.status || '').toLowerCase();
-        const isDone = st.includes('delivered') || st.includes('cancelled');
-        return !isDone && (!o.assigned_rider_id || !st.includes('out'));
-      });
-
-      if (pendingAlertOrders.length > 0 && currentRider.is_active) {
-        if (!isAlertPlaying) playHighAlertTune();
-      } else {
-        if (isAlertPlaying) stopHighAlertTune();
-      }
-
-      renderRiderOrders();
-    }
-
-    function renderRiderOrders() {
-      const activeBox = document.getElementById('rider-orders-list');
-      const historyBox = document.getElementById('rider-history-list');
-
-      const active = allRiderOrders.filter(o => {
-        const st = (o.status || '').toLowerCase();
-        return !st.includes('delivered') && !st.includes('cancelled');
-      });
-      const past = allRiderOrders.filter(o => {
-        const st = (o.status || '').toLowerCase();
-        return (st.includes('delivered') || st.includes('cancelled')) && (o.assigned_rider_id === currentRider.id);
-      });
-
-      document.getElementById('stat-active-count').innerText = active.length;
-      document.getElementById('stat-delivered-count').innerText = past.length;
-      document.getElementById('stat-earnings').innerText = `₹${past.length * 35}`;
-
-      if (active.length === 0) {
-        activeBox.innerHTML = '<div style="text-align:center; padding:35px; color:var(--text-muted); font-weight:700;">🎉 Abhi koi active order nahi hai.<br><small style="color:#64748b;">(Naya order aate hi emergency siren bajega)</small></div>';
-      } else {
-        activeBox.innerHTML = active.map(o => {
-          const isAssignedToMe = (o.assigned_rider_id === currentRider.id);
-          const st = (o.status || '').toLowerCase();
-          const isOut = st.includes('out') || st.includes('running');
-          const isArrived = st.includes('arrived');
-
-          let items = [];
-          try { items = Array.isArray(o.items) ? o.items : JSON.parse(o.items || '[]'); } catch(e){}
-          const itemsText = items.map(i => `• <b>${i.name}</b> × ${i.qty}`).join('<br>');
-
-          let statusBadgeClass = 'badge-pending';
-          if (isArrived) statusBadgeClass = 'badge-arrived';
-          else if (isOut) statusBadgeClass = 'badge-picked';
-
-          return `
-            <div class="order-card ${!isAssignedToMe ? 'alert-pulse-card' : ''}">
-              <div style="display:flex; justify-content:space-between; align-items:flex-start;">
-                <div>
-                  <b style="font-size:16px; color:var(--accent-cyan);">#ORD-${o.id}</b>
-                  <span class="order-badge ${statusBadgeClass}" style="margin-left:6px;">
-                    ${o.status || 'Placed'}
-                  </span>
-                </div>
-                <div style="text-align:right;">
-                  <b style="font-size:16px; color:#10b981;">₹${o.total_amount}</b>
-                  <div style="font-size:11px; color:var(--text-muted); font-weight:700;">${o.payment_mode || 'COD'}</div>
-                </div>
-              </div>
-
-              <div class="detail-box">
-                <div>👤 <b>Customer:</b> ${o.customer_name || 'N/A'} (📞 <a href="tel:${o.customer_phone}" style="color:#38bdf8; font-weight:900;">${o.customer_phone}</a>)</div>
-                <div>📍 <b>Address:</b> ${o.delivery_address || 'Pata nahi mila'}</div>
-                <div style="margin-top:4px; padding-top:4px; border-top:1px dashed var(--border-color);">
-                  <b>Saman (Items):</b><br>${itemsText || 'Details uplabdh nahi'}
-                </div>
-              </div>
-
-              <div class="action-btn-grid">
-                ${o.delivery_address && o.delivery_address.includes('GPS:') ? `
-                  <a href="https://maps.google.com/?q=${extractGps(o.delivery_address)}" target="_blank" class="btn-rider-action btn-map">
-                    🗺️ Open Map Navigation ↗
-                  </a>
-                ` : ''}
-
-                <!-- 1. ACCEPT BUTTON -->
-                ${!isAssignedToMe ? `
-                  <button class="btn-rider-action btn-pick" onclick="pickupAndAcceptOrder(${o.id})">
-                    📦 Order Accept & Pick Karein (Siren Mute)
-                  </button>
-                ` : ''}
-
-                <!-- 2. START DELIVERY BUTTON -->
-                ${isAssignedToMe && !isOut ? `
-                  <button class="btn-rider-action btn-map" onclick="startDelivery(${o.id})">
-                    🛵 Saman Pick Kiya — Start Delivery
-                  </button>
-                ` : ''}
-
-                <!-- 3. DOORBELL / ARRIVED BUTTON -->
-                ${isAssignedToMe && isOut && !isArrived ? `
-                  <button class="btn-rider-action btn-arrived" onclick="markArrived(${o.id})">
-                    🔔 Customer Ke Ghar Arrived (Doorbell Alert)
-                  </button>
-                ` : ''}
-
-                <!-- 4. DIRECT DELIVERY COMPLETE BUTTON (HAR SAMAY AVAILABLE) -->
-                ${isAssignedToMe ? `
-                  <button class="btn-rider-action btn-complete-direct" onclick="openCompleteModal(${o.id})">
-                    🏁 Enter Secret OTP & Complete Delivery
-                  </button>
-                ` : ''}
-              </div>
+            <div class="btn-group">
+                <button class="btn btn-reject" onclick="rejectOrder()">Reject</button>
+                <button class="btn btn-accept" onclick="goToStep(2)">Accept Order</button>
             </div>
-          `;
-        }).join('');
-      }
+        </div>
 
-      if (past.length === 0) {
-        historyBox.innerHTML = '<div style="text-align:center; padding:30px; color:var(--text-muted);">Koi purana completed order nahi mila.</div>';
-      } else {
-        historyBox.innerHTML = past.map(o => `
-          <div class="order-card" style="opacity:0.85;">
-            <div style="display:flex; justify-content:space-between;">
-              <b>#ORD-${o.id}</b>
-              <span style="color:#10b981; font-weight:800;">${o.status}</span>
+        <!-- STEP 2: REACH HUB & PICKUP -->
+        <div id="step-2" class="card hidden">
+            <span class="step-badge">Step 2: Pickup From Hub</span>
+            <div class="title">Hub Par Jakar Order Pick Karein</div>
+
+            <div class="info-row"><span>Hub Name:</span><span>SM Central Warehouse 1</span></div>
+            <div class="info-row"><span>Hub Address:</span><span>Station Road, Bareilly</span></div>
+            
+            <a href="https://maps.google.com" target="_blank" style="text-decoration: none;">
+                <button class="btn btn-map" style="width: 100%; margin: 8px 0;">📍 Open Hub in Google Maps</button>
+            </a>
+
+            <div class="items-box">
+                <div style="font-weight: bold; margin-bottom: 6px; color:#58a6ff;">📦 Items Details:</div>
+                <p>• 1x Fresh Toned Milk (500ml)</p>
+                <p>• 2x Brown Bread (400g)</p>
+                <p>• 1x Amul Butter (100g)</p>
             </div>
-            <div style="font-size:12px; color:var(--text-muted); margin-top:4px;">
-              ₹${o.total_amount} | ${new Date(o.created_at).toLocaleString()}
+
+            <div class="title" style="font-size: 14px; margin-top: 10px;">Acceptance / Pickup Photo:</div>
+            <div class="photo-upload-box" onclick="document.getElementById('hubPhoto').click()">
+                📷 Camera se Hub/Order Photo lein
+                <input type="file" id="hubPhoto" accept="image/*" capture="environment" style="display:none;" onchange="handleCompress(event, 'preview1')">
+                <img id="preview1" class="preview-img">
             </div>
-          </div>
-        `).join('');
-      }
-    }
 
-    function extractGps(addr) {
-      const match = addr.match(/GPS:\s*([\d\.-]+),\s*([\d\.-]+)/);
-      return match ? `${match[1]},${match[2]}` : '';
-    }
+            <button class="btn btn-primary" onclick="confirmPickup()">Order Picked Up →</button>
+        </div>
 
-    // 1. ACCEPT ORDER
-    async function pickupAndAcceptOrder(id) {
-      stopHighAlertTune();
-      const { error } = await _supabase.from('orders').update({
-        assigned_rider_id: currentRider.id,
-        status: 'Rider Assigned'
-      }).eq('id', id);
+        <!-- STEP 3: CUSTOMER DETAILS & OUT FOR DELIVERY -->
+        <div id="step-3" class="card hidden">
+            <span class="step-badge">Step 3: Delivering</span>
+            <div class="title">Customer Location Par Jaayein</div>
 
-      if (error) {
-        alert('Order Accept Error: ' + error.message);
-      } else {
-        alert('✅ Order Accept Ho Gaya!');
-        fetchRiderOrders();
-      }
-    }
+            <div class="info-row"><span>Customer Name:</span><span>Rahul Sharma</span></div>
+            <div class="info-row"><span>Phone:</span><span><a href="tel:9876543210" style="color:#58a6ff;">📞 Call Customer</a></span></div>
+            <div class="info-row"><span>Address:</span><span>Flat 204, Green Heights, Bareilly</span></div>
+            <div class="info-row">
+                <span>Payment Mode:</span>
+                <span class="pay-tag pay-cod" id="payModeBadge">CASH ON DELIVERY (₹320)</span>
+            </div>
 
-    // 2. START DELIVERY
-    async function startDelivery(id) {
-      stopHighAlertTune();
-      const { error } = await _supabase.from('orders').update({
-        status: 'Out for Delivery'
-      }).eq('id', id);
+            <a href="https://maps.google.com" target="_blank" style="text-decoration: none;">
+                <button class="btn btn-map" style="width: 100%; margin: 10px 0;">🗺️ Navigate to Customer</button>
+            </a>
 
-      if (error) {
-        alert('Start Delivery Error: ' + error.message);
-      } else {
-        alert('🛵 Order Out for Delivery Ho Gaya!');
-        fetchRiderOrders();
-      }
-    }
+            <button class="btn btn-primary" style="background: #d29922; color: #000;" onclick="goToStep(4)">
+                📍 Arrived at Customer Doorstep
+            </button>
+        </div>
 
-    // 3. MARK ARRIVED
-    async function markArrived(id) {
-      const { error } = await _supabase.from('orders').update({
-        status: 'Arrived'
-      }).eq('id', id);
+        <!-- STEP 4: VERIFY PAYMENT & FINAL DELIVERY PHOTO -->
+        <div id="step-4" class="card hidden">
+            <span class="step-badge">Step 4: Final Delivery</span>
+            <div class="title">Payment & Doorstep Verification</div>
 
-      if (error) {
-        alert('Status update error: ' + error.message);
-      } else {
-        alert('🔔 Customer ke phone par Arrived Alert bhej diya gaya hai!');
-        fetchRiderOrders();
-      }
-    }
+            <div class="info-row"><span>Order Total:</span><span>₹320</span></div>
+            <div class="info-row"><span>Collect Cash:</span><span style="color:#00e676; font-size:16px;">₹320 (COD)</span></div>
 
-    // 4. COMPLETE DELIVERY
-    function openCompleteModal(id) {
-      activeCompleteOrderId = id;
-      document.getElementById('complete-modal').classList.add('active');
-    }
+            <div style="margin: 12px 0;">
+                <label style="font-size: 13px; color:#8b949e;">Payment Confirmation:</label>
+                <div class="btn-group" style="margin-top:6px;">
+                    <button class="btn btn-accept" id="cashBtn" onclick="markPaid('Cash Collected')">✔ Cash Mil Gaya</button>
+                    <button class="btn btn-map" id="onlineBtn" onclick="markPaid('Online / Already Paid')">Online Paid</button>
+                </div>
+            </div>
 
-    function closeCompleteModal() {
-      document.getElementById('complete-modal').classList.remove('active');
-      base64DeliveryProof = null;
-      document.getElementById('verify-otp-input').value = '';
-      document.getElementById('proof-photo-preview').innerHTML = '<span style="font-size:11px; color:var(--text-muted);">📸 Delivery Proof Photo (Optional)</span>';
-    }
+            <div class="title" style="font-size: 14px; margin-top: 14px;">Doorstep Proof Photo:</div>
+            <div class="photo-upload-box" onclick="document.getElementById('delPhoto').click()">
+                📷 Customer / Packet ki Photo lein
+                <input type="file" id="delPhoto" accept="image/*" capture="environment" style="display:none;" onchange="handleCompress(event, 'preview2')">
+                <img id="preview2" class="preview-img">
+            </div>
 
-    function handleDeliveryPhotoCaptured(input) {
-      if (!input.files || !input.files[0]) return;
-      const file = input.files[0];
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        base64DeliveryProof = e.target.result;
-        document.getElementById('proof-photo-preview').innerHTML = `<img src="${base64DeliveryProof}" style="width:100%; height:100%; object-fit:cover;">`;
-      };
-      reader.readAsDataURL(file);
-    }
+            <button class="btn btn-primary" style="background:#00e676; color:#000; font-size:16px;" onclick="completeDelivery()">
+                🚀 Complete Delivery
+            </button>
+        </div>
 
-    async function submitOrderDelivered() {
-      const enteredOtp = document.getElementById('verify-otp-input').value.trim();
-      if (!enteredOtp || enteredOtp.length !== 4) return alert('Kripya customer ka 4-digit secret OTP bharein!');
+        <!-- SUCCESS SCREEN -->
+        <div id="step-success" class="card hidden" style="text-align: center; padding: 30px 20px;">
+            <div style="font-size: 50px; margin-bottom: 10px;">🎉</div>
+            <div class="title" style="color: #00e676; font-size: 20px;">Order Delivered Successfully!</div>
+            <p style="color: #8b949e; margin: 10px 0;">₹45 aapke rider wallet me add ho gaye hain.</p>
+            <button class="btn btn-primary" onclick="goToStep(1)">Naye Order ke liye Ready</button>
+        </div>
 
-      const targetOrder = allRiderOrders.find(o => o.id === activeCompleteOrderId);
-      if (!targetOrder) return;
+    </div>
 
-      if (targetOrder.delivery_otp && String(targetOrder.delivery_otp).trim() !== enteredOtp) {
-        return alert('❌ Galat OTP! Customer se unka sahi 4-digit secret OTP poochhein.');
-      }
+    <script>
+        // Smooth Step Controller
+        function goToStep(stepNum) {
+            document.querySelectorAll('.card').forEach(c => c.classList.add('hidden'));
+            if(stepNum === 'success') {
+                document.getElementById('step-success').classList.remove('hidden');
+            } else {
+                document.getElementById('step-' + stepNum).classList.remove('hidden');
+            }
+            window.scrollTo({top: 0, behavior: 'smooth'});
+        }
 
-      const btn = document.getElementById('btn-submit-delivery');
-      btn.disabled = true;
-      btn.innerText = 'Submitting... ⏳';
+        function rejectOrder() {
+            if(confirm("Kya aap sach me ye order reject karna chahte hain?")) {
+                alert("Order Rejected.");
+                location.reload();
+            }
+        }
 
-      const updateData = { status: 'Delivered' };
-      if (base64DeliveryProof) {
-        updateData.delivery_proof_photo = base64DeliveryProof;
-      }
+        function confirmPickup() {
+            const img = document.getElementById('preview1').src;
+            if(!img || img.length < 100) {
+                alert("Kripya pahle order/hub ki photo upload karein!");
+                return;
+            }
+            goToStep(3);
+        }
 
-      const { error } = await _supabase.from('orders').update(updateData).eq('id', activeCompleteOrderId);
+        let isPaymentDone = false;
+        function markPaid(type) {
+            isPaymentDone = true;
+            alert("Payment Verified: " + type);
+            document.getElementById('cashBtn').style.opacity = '0.5';
+            document.getElementById('onlineBtn').style.opacity = '0.5';
+        }
 
-      if (error) {
-        alert('Delivery submit error: ' + error.message);
-        btn.disabled = false;
-        btn.innerText = '✓ Confirm Delivered';
-      } else {
-        alert('🎉 Badhai! Order Safaltapoorvak Deliver Ho Gaya!');
-        closeCompleteModal();
-        btn.disabled = false;
-        btn.innerText = '✓ Confirm Delivered';
-        fetchRiderOrders();
-      }
-    }
+        function completeDelivery() {
+            if(!isPaymentDone) {
+                alert("Pahle payment collect/confirm karein!");
+                return;
+            }
+            const img = document.getElementById('preview2').src;
+            if(!img || img.length < 100) {
+                alert("Delivery complete karne ke liye photo upload zaroori hai!");
+                return;
+            }
+            goToStep('success');
+        }
 
-    function switchRiderTab(tab) {
-      document.querySelectorAll('.tab-pill').forEach(b => b.classList.remove('active'));
-      document.getElementById(`tab-btn-${tab}`).classList.add('active');
-      document.getElementById('section-active-orders').style.display = tab === 'active' ? 'block' : 'none';
-      document.getElementById('section-history-orders').style.display = tab === 'history' ? 'block' : 'none';
-    }
+        // FAST AUTO-COMPRESS PHOTO FUNCTION (HTML5 Canvas)
+        function handleCompress(e, previewId) {
+            const file = e.target.files[0];
+            if (!file) return;
 
-    function setupRiderRealtime() {
-      _supabase.channel('rider_sync_channel')
-        .on('postgres_changes', { event: '*', schema: 'public', table: 'orders' }, () => {
-          fetchRiderOrders();
-        })
-        .subscribe();
-    }
-  </script>
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = function(event) {
+                const img = new Image();
+                img.src = event.target.result;
+                img.onload = function() {
+                    const canvas = document.createElement('canvas');
+                    // Resize to max 800px width/height for instant speed
+                    let width = img.width;
+                    let height = img.height;
+                    const maxDim = 800;
+
+                    if (width > height && width > maxDim) {
+                        height = Math.round((height * maxDim) / width);
+                        width = maxDim;
+                    } else if (height > maxDim) {
+                        width = Math.round((width * maxDim) / height);
+                        height = maxDim;
+                    }
+
+                    canvas.width = width;
+                    canvas.height = height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, width, height);
+
+                    // Compress to 65% quality JPEG (50-100KB only)
+                    const compressedBase64 = canvas.toDataURL('image/jpeg', 0.65);
+
+                    const preview = document.getElementById(previewId);
+                    preview.src = compressedBase64;
+                    preview.style.display = 'block';
+                };
+            };
+        }
+    </script>
 </body>
 </html>
