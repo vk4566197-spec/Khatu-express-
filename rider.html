@@ -1,908 +1,935 @@
 <!DOCTYPE html>
 <html lang="hi">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>SM Rider Partner - Local Vocal Delivery</title>
-    <!-- Supabase JS Client -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <style>
-        :root {
-            --bg-dark: #0a0c10;
-            --card-bg: #151921;
-            --accent-green: #00e676;
-            --accent-blue: #2f81f7;
-            --accent-red: #f85149;
-            --accent-yellow: #e3b341;
-            --border-color: #21262d;
-            --text-main: #f0f6fc;
-            --text-muted: #8b949e;
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>🛵 SM RIDER — Delivery Partner Dashboard</title>
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            -webkit-tap-highlight-color: transparent;
-        }
+  <link rel="icon" type="image/png" href="logo.png">
+  <meta name="theme-color" content="#0a0c10">
 
-        body {
-            background-color: var(--bg-dark);
-            color: var(--text-main);
-            padding-bottom: 50px;
-            min-height: 100vh;
-        }
+  <!-- BROWSER CACHE CONTROL -->
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
 
-        /* Top Sticky Navbar */
-        .navbar {
-            background: rgba(21, 25, 33, 0.95);
-            backdrop-filter: blur(10px);
-            padding: 14px 18px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid var(--border-color);
-            position: sticky;
-            top: 0;
-            z-index: 100;
-        }
+  <!-- UNREGISTER OLD SERVICE WORKERS -->
+  <script>
+    try {
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.getRegistrations().then(function(registrations) {
+          for (var i = 0; i < registrations.length; i++) {
+            registrations[i].unregister();
+          }
+        });
+      }
+      if (window.caches) {
+        caches.keys().then(function(names) {
+          for (var i = 0; i < names.length; i++) caches.delete(names[i]);
+        });
+      }
+    } catch(e) {}
+  </script>
 
-        .brand-box {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 
-        .brand-logo {
-            width: 34px;
-            height: 34px;
-            background: linear-gradient(135deg, #00e676, #00b0ff);
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 900;
-            font-size: 14px;
-            color: #000;
-        }
+  <style>
+    :root {
+      --bg-dark: #0a0c10;
+      --card-bg: #151921;
+      --accent-green: #00e676;
+      --accent-blue: #38bdf8;
+      --accent-red: #ef4444;
+      --accent-yellow: #f59e0b;
+      --border-color: #21262d;
+      --text-main: #f0f6fc;
+      --text-muted: #8b949e;
+    }
 
-        .brand-name {
-            font-size: 17px;
-            font-weight: 800;
-            letter-spacing: 0.5px;
-            color: var(--text-main);
-        }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
 
-        .brand-name span {
-            color: var(--accent-green);
-        }
+    body {
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      padding-bottom: 90px;
+      min-height: 100vh;
+    }
 
-        .status-pill {
-            background: rgba(0, 230, 118, 0.15);
-            color: var(--accent-green);
-            border: 1px solid var(--accent-green);
-            padding: 5px 12px;
-            border-radius: 20px;
-            font-size: 11px;
-            font-weight: 700;
-            letter-spacing: 1px;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
+    /* TOP NAVBAR */
+    .top-nav {
+      background: rgba(21, 25, 33, 0.96);
+      backdrop-filter: blur(10px);
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
 
-        .status-dot {
-            width: 7px;
-            height: 7px;
-            background: var(--accent-green);
-            border-radius: 50%;
-            box-shadow: 0 0 8px var(--accent-green);
-            animation: pulseDot 1.5s infinite;
-        }
+    .rider-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
 
-        @keyframes pulseDot {
-            0%, 100% { opacity: 1; transform: scale(1); }
-            50% { opacity: 0.4; transform: scale(0.8); }
-        }
+    .rider-brand img {
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      border: 1.5px solid var(--accent-green);
+      background: #fff;
+    }
 
-        /* Main Container */
-        .container {
-            padding: 16px;
-            max-width: 500px;
-            margin: 0 auto;
-        }
+    .brand-title {
+      font-size: 16px;
+      font-weight: 900;
+      color: #ffffff;
+      line-height: 1.2;
+    }
 
-        /* Rider Info Mini Card */
-        .rider-bar {
-            background: var(--card-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            padding: 12px 16px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 16px;
-        }
+    .brand-title span {
+      color: var(--accent-green);
+    }
 
-        .rider-bar-item {
-            display: flex;
-            flex-direction: column;
-            gap: 2px;
-        }
+    .brand-sub {
+      font-size: 11px;
+      color: var(--accent-blue);
+      font-weight: 700;
+    }
 
-        .rider-bar-label {
-            font-size: 11px;
-            color: var(--text-muted);
-            text-transform: uppercase;
-        }
+    .status-toggle-box {
+      display: inline-flex !important;
+      align-items: center !important;
+      gap: 8px !important;
+      background: #0d1117 !important;
+      padding: 8px 16px !important;
+      border-radius: 25px !important;
+      border: 2px solid var(--accent-green) !important;
+      cursor: pointer !important;
+      user-select: none !important;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.4) !important;
+      transition: all 0.2s ease;
+    }
+    .status-toggle-box:active {
+      transform: scale(0.94);
+    }
 
-        .rider-bar-val {
-            font-size: 14px;
-            font-weight: 700;
-            color: var(--text-main);
-        }
+    .status-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--accent-green);
+      box-shadow: 0 0 10px var(--accent-green);
+      display: inline-block;
+    }
 
-        /* Card Styles */
-        .card {
-            background: var(--card-bg);
-            border-radius: 16px;
-            border: 1px solid var(--border-color);
-            padding: 20px;
-            margin-bottom: 16px;
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
-            position: relative;
-            overflow: hidden;
-        }
+    .status-dot.offline {
+      background: var(--accent-red) !important;
+      box-shadow: none !important;
+    }
 
-        .step-tag {
-            display: inline-block;
-            background: rgba(47, 129, 247, 0.15);
-            color: var(--accent-blue);
-            border: 1px solid rgba(47, 129, 247, 0.4);
-            font-size: 11px;
-            font-weight: 800;
-            padding: 4px 10px;
-            border-radius: 6px;
-            margin-bottom: 14px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
+    .status-text {
+      font-size: 12px;
+      font-weight: 900;
+      color: #ffffff;
+    }
 
-        .card-heading {
-            font-size: 18px;
-            font-weight: 800;
-            margin-bottom: 14px;
-            color: #ffffff;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
+    /* STATS BAR */
+    .stats-bar {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      padding: 14px 16px;
+    }
 
-        .details-grid {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            margin-bottom: 16px;
-        }
+    .stat-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 14px;
+      padding: 12px 10px;
+      text-align: center;
+    }
 
-        .detail-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            font-size: 14px;
-        }
+    .stat-num {
+      font-size: 18px;
+      font-weight: 900;
+      color: var(--accent-blue);
+    }
 
-        .detail-label {
-            color: var(--text-muted);
-            min-width: 100px;
-        }
+    .stat-label {
+      font-size: 10px;
+      color: var(--text-muted);
+      font-weight: 700;
+      margin-top: 2px;
+      text-transform: uppercase;
+    }
 
-        .detail-val {
-            font-weight: 600;
-            color: var(--text-main);
-            text-align: right;
-            word-break: break-word;
-        }
+    /* FILTER TABS */
+    .tabs-row {
+      display: flex;
+      gap: 10px;
+      padding: 4px 16px 14px 16px;
+    }
 
-        /* Items Container */
-        .order-items-box {
-            background: #0d1017;
-            border-radius: 10px;
-            padding: 14px;
-            border: 1px dashed var(--border-color);
-            margin: 14px 0;
-        }
+    .tab-btn {
+      flex: 1;
+      background: var(--card-bg);
+      border: 1.5px solid var(--border-color);
+      color: var(--text-muted);
+      padding: 11px 12px;
+      border-radius: 12px;
+      font-size: 13px;
+      font-weight: 800;
+      cursor: pointer;
+      text-align: center;
+    }
 
-        .order-items-title {
-            font-size: 13px;
-            font-weight: 700;
-            color: var(--accent-blue);
-            margin-bottom: 8px;
-            display: flex;
-            justify-content: space-between;
-        }
+    .tab-btn.active {
+      background: #1f6feb;
+      border-color: #388bfd;
+      color: #ffffff;
+    }
 
-        .item-list-row {
-            display: flex;
-            justify-content: space-between;
-            font-size: 13px;
-            padding: 5px 0;
-            border-bottom: 1px solid #1c2129;
-            color: #c9d1d9;
-        }
+    .container {
+      padding: 0 16px;
+    }
 
-        .item-list-row:last-child {
-            border-bottom: none;
-        }
+    /* ORDER CARD */
+    .order-card {
+      background: var(--card-bg);
+      border: 1.5px solid var(--border-color);
+      border-radius: 16px;
+      padding: 16px;
+      margin-bottom: 14px;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
+      position: relative;
+    }
 
-        /* Buttons & Actions */
-        .btn-group {
-            display: flex;
-            gap: 12px;
-            margin-top: 16px;
-        }
+    .order-card.new-pulse {
+      border-color: var(--accent-green);
+      animation: glowCard 1.5s infinite alternate;
+    }
 
-        .btn {
-            flex: 1;
-            padding: 14px;
-            border-radius: 12px;
-            border: none;
-            font-size: 15px;
-            font-weight: 700;
-            cursor: pointer;
-            text-align: center;
-            transition: all 0.2s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            text-decoration: none;
-        }
+    @keyframes glowCard {
+      0% { box-shadow: 0 0 8px rgba(0, 230, 118, 0.3); }
+      100% { box-shadow: 0 0 20px rgba(0, 230, 118, 0.7); }
+    }
 
-        .btn:active {
-            transform: scale(0.97);
-            filter: brightness(0.9);
-        }
+    .order-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 10px;
+      padding-bottom: 10px;
+      border-bottom: 1px dashed var(--border-color);
+    }
 
-        .btn-full {
-            width: 100%;
-            margin-top: 14px;
-        }
+    .ord-id {
+      font-size: 15px;
+      font-weight: 900;
+      color: var(--accent-blue);
+    }
 
-        .btn-green {
-            background: linear-gradient(135deg, #00e676, #00b0ff);
-            color: #050505;
-        }
+    .ord-amount {
+      font-size: 17px;
+      font-weight: 900;
+      color: var(--accent-green);
+    }
 
-        .btn-red {
-            background: rgba(248, 81, 73, 0.15);
-            border: 1px solid var(--accent-red);
-            color: var(--accent-red);
-        }
+    .ord-tag {
+      display: inline-block;
+      padding: 3px 8px;
+      border-radius: 6px;
+      font-size: 10px;
+      font-weight: 800;
+      text-transform: uppercase;
+      margin-top: 3px;
+    }
 
-        .btn-blue {
-            background: linear-gradient(135deg, #1f6feb, #388bfd);
-            color: #ffffff;
-        }
+    .tag-placed { background: #0284c7; color: #fff; }
+    .tag-transit { background: #f59e0b; color: #000; }
+    .tag-delivered { background: #059669; color: #fff; }
+    .tag-cancelled { background: #dc2626; color: #fff; }
 
-        .btn-outline {
-            background: #1c2128;
-            border: 1px solid var(--border-color);
-            color: #58a6ff;
-        }
+    .step-indicator {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 800;
+      color: #388bfd;
+      margin-bottom: 8px;
+      text-transform: uppercase;
+    }
 
-        .btn-yellow {
-            background: linear-gradient(135deg, #e3b341, #f59e0b);
-            color: #000;
-        }
+    .cust-info-box {
+      background: #0d1117;
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 12px;
+      margin-bottom: 12px;
+      font-size: 12.5px;
+    }
 
-        /* Badges */
-        .badge {
-            padding: 4px 10px;
-            border-radius: 6px;
-            font-size: 11px;
-            font-weight: 800;
-            display: inline-block;
-        }
+    .cust-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      margin-bottom: 6px;
+      color: #cbd5e1;
+      font-weight: 600;
+      word-break: break-word;
+    }
 
-        .badge-cod {
-            background: rgba(227, 179, 65, 0.15);
-            border: 1px solid var(--accent-yellow);
-            color: var(--accent-yellow);
-        }
+    .cust-row:last-child {
+      margin-bottom: 0;
+    }
 
-        .badge-paid {
-            background: rgba(0, 230, 118, 0.15);
-            border: 1px solid var(--accent-green);
-            color: var(--accent-green);
-        }
+    .items-summary-box {
+      background: #0d1017;
+      border-radius: 10px;
+      padding: 10px 12px;
+      font-size: 12px;
+      margin-bottom: 12px;
+      border: 1px dashed var(--border-color);
+    }
 
-        /* Photo Upload & Preview */
-        .photo-picker {
-            border: 2px dashed #388bfd;
-            background: rgba(56, 139, 253, 0.04);
-            border-radius: 12px;
-            padding: 16px;
-            text-align: center;
-            cursor: pointer;
-            margin: 14px 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 8px;
-            transition: border-color 0.2s ease;
-        }
+    .item-summary-line {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 4px;
+      color: #cbd5e1;
+      font-weight: 600;
+    }
 
-        .photo-picker:hover {
-            border-color: var(--accent-green);
-        }
+    .item-summary-line:last-child {
+      margin-bottom: 0;
+    }
 
-        .photo-picker-text {
-            font-size: 13px;
-            font-weight: 600;
-            color: #58a6ff;
-        }
+    /* ACTION BUTTONS */
+    .btn-action-primary {
+      background: linear-gradient(135deg, #00e676, #00b0ff);
+      color: #000000;
+      border: none;
+      padding: 13px;
+      border-radius: 12px;
+      font-size: 13.5px;
+      font-weight: 900;
+      cursor: pointer;
+      width: 100%;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
 
-        .photo-picker-sub {
-            font-size: 11px;
-            color: var(--text-muted);
-        }
+    .btn-action-call {
+      background: #1f6feb;
+      color: #ffffff;
+      border: none;
+      padding: 12px;
+      border-radius: 12px;
+      font-size: 13px;
+      font-weight: 800;
+      cursor: pointer;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      margin-bottom: 8px;
+    }
 
-        .preview-box {
-            position: relative;
-            margin-top: 10px;
-            width: 100%;
-            height: 170px;
-            border-radius: 10px;
-            overflow: hidden;
-            border: 1px solid var(--border-color);
-            display: none;
-        }
+    .btn-action-cancel {
+      background: rgba(239, 68, 68, 0.12);
+      border: 1.5px solid var(--accent-red);
+      color: var(--accent-red);
+      padding: 11px;
+      border-radius: 12px;
+      font-size: 12.5px;
+      font-weight: 800;
+      cursor: pointer;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
 
-        .preview-box img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
+    /* MODAL WINDOWS */
+    .modal-bg {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0,0,0,0.85);
+      backdrop-filter: blur(6px);
+      z-index: 999999;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
 
-        .preview-tag {
-            position: absolute;
-            bottom: 8px;
-            left: 8px;
-            background: rgba(0, 0, 0, 0.8);
-            color: var(--accent-green);
-            font-size: 11px;
-            font-weight: bold;
-            padding: 3px 8px;
-            border-radius: 4px;
-        }
+    .modal-bg.active {
+      display: flex;
+    }
 
-        /* Waiting Screen */
-        .waiting-state {
-            text-align: center;
-            padding: 60px 20px;
-        }
+    .modal-card {
+      background: #161b22;
+      border: 1px solid var(--border-color);
+      border-radius: 20px;
+      padding: 22px;
+      width: 100%;
+      max-width: 400px;
+      text-align: center;
+      box-shadow: 0 10px 35px rgba(0,0,0,0.7);
+    }
 
-        .radar-spinner {
-            width: 70px;
-            height: 70px;
-            border-radius: 50%;
-            background: rgba(0, 230, 118, 0.05);
-            border: 2px solid var(--accent-green);
-            margin: 0 auto 20px auto;
-            position: relative;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
+    .otp-input-field {
+      width: 100%;
+      background: #0d1117;
+      border: 2px solid #30363d;
+      border-radius: 14px;
+      padding: 12px;
+      font-size: 24px;
+      font-weight: 900;
+      color: #ffffff;
+      text-align: center;
+      letter-spacing: 8px;
+      margin: 12px 0;
+      outline: none;
+    }
+    .otp-input-field:focus {
+      border-color: var(--accent-green);
+    }
 
-        .radar-spinner::after {
-            content: '';
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            border-radius: 50%;
-            border: 2px solid var(--accent-green);
-            animation: radarPing 2s cubic-bezier(0, 0.2, 0.8, 1) infinite;
-        }
+    .photo-preview-box {
+      width: 100%;
+      height: 160px;
+      border-radius: 14px;
+      border: 2px dashed #388bfd;
+      margin: 12px 0;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #0d1117;
+    }
 
-        @keyframes radarPing {
-            0% { transform: scale(1); opacity: 1; }
-            100% { transform: scale(1.8); opacity: 0; }
-        }
+    .photo-preview-box img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
 
-        .waiting-title {
-            font-size: 18px;
-            font-weight: 700;
-            color: #fff;
-            margin-bottom: 6px;
-        }
+    .btn-camera {
+      background: #21262d;
+      color: #58a6ff;
+      border: 1px solid #30363d;
+      padding: 12px;
+      border-radius: 10px;
+      width: 100%;
+      font-weight: 800;
+      font-size: 13px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
 
-        .waiting-sub {
-            font-size: 13px;
-            color: var(--text-muted);
-            line-height: 1.5;
-        }
-
-        .hidden {
-            display: none !important;
-        }
-    </style>
+    .empty-msg {
+      text-align: center;
+      padding: 60px 20px;
+      color: var(--text-muted);
+      font-size: 14px;
+      font-weight: 700;
+    }
+  </style>
 </head>
 <body>
 
-    <!-- Header Navbar -->
-    <header class="navbar">
-        <div class="brand-box">
-            <div class="brand-logo">SM</div>
-            <div class="brand-name">RIDER <span>PARTNER</span></div>
-        </div>
-        <div class="status-pill">
-            <div class="status-dot"></div>
-            ONLINE
-        </div>
-    </header>
+  <!-- TOP APP BAR -->
+  <header class="top-nav">
+    <div class="rider-brand">
+      <img src="logo.png" alt="Logo" onerror="this.style.display='none'">
+      <div>
+        <div class="brand-title">SM RIDER <span>PARTNER</span></div>
+        <div class="brand-sub" id="rider-name-display">Fast Delivery Rider</div>
+      </div>
+    </div>
+    
+    <!-- DUTY TOGGLE BUTTON -->
+    <div class="status-toggle-box" id="duty-btn" onclick="toggleDuty();">
+      <span class="status-dot" id="online-indicator"></span>
+      <span class="status-text" id="online-status-text">ONLINE</span>
+    </div>
+  </header>
 
-    <main class="container">
+  <!-- STATS BAR -->
+  <section class="stats-bar">
+    <div class="stat-card">
+      <div class="stat-num" id="stat-active-count">0</div>
+      <div class="stat-label">Active Orders</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num" id="stat-delivered-count">0</div>
+      <div class="stat-label">Delivered Today</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num" id="stat-earnings">₹0</div>
+      <div class="stat-label">Total Earning</div>
+    </div>
+  </section>
 
-        <!-- Rider Top Stats -->
-        <div class="rider-bar">
-            <div class="rider-bar-item">
-                <span class="rider-bar-label">Zone</span>
-                <span class="rider-bar-val">Bareilly Central</span>
-            </div>
-            <div class="rider-bar-item">
-                <span class="rider-bar-label">Today Completed</span>
-                <span class="rider-bar-val" id="statCompleted">0 Orders</span>
-            </div>
-            <div class="rider-bar-item">
-                <span class="rider-bar-label">Today Earned</span>
-                <span class="rider-bar-val" style="color:var(--accent-green);" id="statEarnings">₹0</span>
-            </div>
-        </div>
+  <!-- FILTER TABS -->
+  <nav class="tabs-row">
+    <button class="tab-btn active" id="tab-active" onclick="switchTab('active')">⚡ Active Orders</button>
+    <button class="tab-btn" id="tab-history" onclick="switchTab('history')">✓ Completed / Past</button>
+  </nav>
 
-        <!-- 0. RADAR SCREEN (JAB KOI ORDER NA HO) -->
-        <section id="step-waiting" class="card waiting-state">
-            <div class="radar-spinner">⚡</div>
-            <div class="waiting-title">Naye Orders Dhundh Rahe Hain...</div>
-            <div class="waiting-sub">Jaise hi koi customer order karega, screen par instant notification aur details pop-up hongi.</div>
-        </section>
+  <!-- ORDERS CONTAINER -->
+  <main class="container" id="orders-container">
+    <div class="empty-msg">ऑर्डर्स लोड हो रहे हैं...</div>
+  </main>
 
-        <!-- STEP 1: NAYA INCOMING LIVE ORDER -->
-        <section id="step-incoming" class="card hidden">
-            <span class="step-tag">Step 1 • Naya Order</span>
-            <div class="card-heading">🚨 Order Assign Hua Hai!</div>
+  <!-- 1. HUB PICKUP SAMAN PHOTO MODAL -->
+  <div class="modal-bg" id="pickup-modal">
+    <div class="modal-card">
+      <div style="font-size: 17px; font-weight: 900; color: #38bdf8; margin-bottom: 4px;">🛍️ सामान पिकअप फोटो (Pickup Proof)</div>
+      <div style="font-size: 12px; color: #94a3b8; margin-bottom: 6px;">दुकान / हब से पैक सामान का फोटो खींचें:</div>
 
-            <div class="details-grid">
-                <div class="detail-row">
-                    <span class="detail-label">Order ID</span>
-                    <span class="detail-val" id="inOrderId">#SM-0000</span>
-                </div>
-                <div class="detail-row">
-                    <span class="detail-label">Store / Hub</span>
-                    <span class="detail-val" id="inHubName">SM Central Warehouse</span>
-                </div>
-                <div class="detail-row">
-                    <span class="detail-label">Delivery Distance</span>
-                    <span class="detail-val" id="inDistance">2.1 KM</span>
-                </div>
-                <div class="detail-row">
-                    <span class="detail-label">Earning Payout</span>
-                    <span class="detail-val" style="color:var(--accent-green); font-size:16px;" id="inPayout">₹45.00</span>
-                </div>
-            </div>
+      <div class="photo-preview-box" id="pickup-photo-preview">
+        <span style="color:#64748b; font-size:12px; font-weight:700;">सामान की फ़ोटो यहाँ दिखेगी *</span>
+      </div>
 
-            <div class="btn-group">
-                <button type="button" class="btn btn-red" onclick="rejectCurrentOrder()">Reject / Skip</button>
-                <button type="button" class="btn btn-green" onclick="acceptCurrentOrder()">Accept Order</button>
-            </div>
-        </section>
+      <input type="file" id="pickup-photo-input" accept="image/*" capture="environment" style="display:none;" onchange="handlePickupPhotoChosen(this)">
+      <button class="btn-camera" onclick="document.getElementById('pickup-photo-input').click()">
+        📸 पैक सामान का फोटो खींचें (Auto-Compressed)
+      </button>
 
-        <!-- STEP 2: REACH HUB & PICKUP ORDER -->
-        <section id="step-pickup" class="card hidden">
-            <span class="step-tag">Step 2 • Hub Pickup</span>
-            <div class="card-heading">🏪 Hub Par Jakar Saman Lein</div>
+      <button class="btn-action-primary" id="btn-confirm-pickup" style="margin-top:14px; display:none;" onclick="confirmPickupWithPhoto()">
+        🛵 Pickup पूरा करें (Out for Delivery)
+      </button>
 
-            <div class="details-grid">
-                <div class="detail-row">
-                    <span class="detail-label">Hub Name</span>
-                    <span class="detail-val" id="pickHubTitle">SM Central Warehouse 1</span>
-                </div>
-                <div class="detail-row">
-                    <span class="detail-label">Hub Address</span>
-                    <span class="detail-val" id="pickHubAddress">Station Road, Near Bus Stand, Bareilly</span>
-                </div>
-            </div>
+      <button onclick="closePickupModal()" style="background:none; border:none; color:#94a3b8; font-weight:800; font-size:12px; margin-top:12px; cursor:pointer;">
+        रद्द करें (Cancel)
+      </button>
+    </div>
+  </div>
 
-            <a id="pickHubMapBtn" href="https://maps.google.com" target="_blank" class="btn btn-outline btn-full">
-                🗺️ Hub Google Maps me Kholein
-            </a>
+  <!-- 2. DELIVERY PROOF PHOTO & OTP MODAL -->
+  <div class="modal-bg" id="delivery-modal">
+    <div class="modal-card">
+      <div style="font-size: 17px; font-weight: 900; color: #00e676; margin-bottom: 4px;">📦 डिलीवरी सत्यापन (Proof & OTP)</div>
+      <div style="font-size: 12px; color: #94a3b8; margin-bottom: 8px;">1. ग्राहक को सामान सौंपते हुए फ़ोटो लें<br>2. ग्राहक का 4 अंकों का OTP डालें</div>
 
-            <!-- Saman ki list -->
-            <div class="order-items-box">
-                <div class="order-items-title">
-                    <span>📦 ITEMS TO PICK</span>
-                    <span id="pickItemCount">0 Items</span>
-                </div>
-                <div id="pickItemsList"></div>
-            </div>
+      <div class="photo-preview-box" id="delivery-proof-preview">
+        <span style="color:#64748b; font-size:12px; font-weight:700;">सामान सौंपते हुए फ़ोटो लें *</span>
+      </div>
 
-            <div style="font-size: 13px; font-weight: 700; margin-top: 14px; color: #fff;">1. Hub / Parcel ki Photo Upload Karein:</div>
-            
-            <div class="photo-picker" onclick="document.getElementById('hubPhotoInput').click()">
-                <div style="font-size: 26px;">📷</div>
-                <div class="photo-picker-text">Camera se Photo Lein</div>
-                <div class="photo-picker-sub">Auto-compress (Fast Upload)</div>
-                <input type="file" id="hubPhotoInput" accept="image/*" capture="environment" style="display:none;" onchange="processImage(event, 'previewImgHub', 'previewBoxHub', 'pickup')">
-            </div>
+      <input type="file" id="delivery-photo-input" accept="image/*" capture="environment" style="display:none;" onchange="handleDeliveryPhotoChosen(this)">
+      <button class="btn-camera" onclick="document.getElementById('delivery-photo-input').click()">
+        📸 सामान सौंपते हुए फ़ोटो खींचें (Auto-Compressed)
+      </button>
 
-            <div id="previewBoxHub" class="preview-box">
-                <img id="previewImgHub" alt="Hub Photo">
-                <span class="preview-tag">✔ Compressed Ready</span>
-            </div>
+      <div style="text-align:left; margin-top:10px; font-size:12px; color:#cbd5e1; font-weight:700;">ग्राहक का 4-अंकों का OTP दर्ज करें:</div>
+      <input type="tel" id="input-delivery-otp" class="otp-input-field" maxlength="4" placeholder="----">
 
-            <button type="button" class="btn btn-blue btn-full" onclick="confirmPickupDone()">Order Pick Ho Gaya →</button>
-        </section>
+      <button class="btn-action-primary" id="btn-confirm-delivery" onclick="confirmDeliveryWithProof()">
+        ✓ सत्यापित करें और डिलीवर मार्क करें
+      </button>
+      <button onclick="closeDeliveryModal()" style="background:none; border:none; color:#94a3b8; font-weight:800; font-size:12px; margin-top:12px; cursor:pointer;">
+        रद्द करें (Cancel)
+      </button>
+    </div>
+  </div>
 
-        <!-- STEP 3: NAVIGATE TO CUSTOMER & ARRIVE -->
-        <section id="step-deliver" class="card hidden">
-            <span class="step-tag">Step 3 • Delivering</span>
-            <div class="card-heading">🛵 Customer tak Delivery</div>
+  <script>
+    // AAPKE ASLI SUPABASE CREDENTIALS
+    var SUPABASE_URL = 'https://mpeikimhkjuinqkjaumr.supabase.co';
+    var SUPABASE_KEY = 'sb_publishable_2_wD-pbi_pNf8niiHxFbYA_saCIhApN';
 
-            <div class="details-grid">
-                <div class="detail-row">
-                    <span class="detail-label">Customer</span>
-                    <span class="detail-val" id="custName">--</span>
-                </div>
-                <div class="detail-row">
-                    <span class="detail-label">Contact</span>
-                    <span class="detail-val">
-                        <a id="custPhoneLink" href="tel:" style="color:var(--accent-blue); text-decoration:none;">📞 Call Customer</a>
-                    </span>
-                </div>
-                <div class="detail-row">
-                    <span class="detail-label">Address</span>
-                    <span class="detail-val" id="custAddress">--</span>
-                </div>
-                <div class="detail-row">
-                    <span class="detail-label">Payment Mode</span>
-                    <span class="detail-val">
-                        <span id="custPayBadge" class="badge badge-cod">COD</span>
-                    </span>
-                </div>
-            </div>
+    var currentTab = 'active';
+    var allRiderOrders = [];
+    var isRiderOnline = true;
+    var selectedOrderForDelivery = null;
+    var selectedOrderForPickup = null;
+    var base64PickupPhoto = null;
+    var base64DeliveryPhoto = null;
+    var lastToggleTime = 0;
 
-            <a id="custMapBtn" href="https://maps.google.com" target="_blank" class="btn btn-outline btn-full">
-                🗺️ Navigate to Customer Doorstep
-            </a>
+    // DIRECT 1-TAP DUTY TOGGLE
+    function toggleDuty() {
+      var now = Date.now();
+      if (now - lastToggleTime < 250) return;
+      lastToggleTime = now;
 
-            <button type="button" class="btn btn-yellow btn-full" onclick="arriveAtCustomer()">
-                📍 Customer ke Pass Pahunch Gaye (Arrived)
-            </button>
-        </section>
+      isRiderOnline = !isRiderOnline;
+      localStorage.setItem('sm_rider_duty_status', isRiderOnline ? 'ONLINE' : 'OFFLINE');
+      renderDutyUI();
 
-        <!-- STEP 4: PAYMENT VERIFY & PROOF PHOTO -->
-        <section id="step-verify" class="card hidden">
-            <span class="step-tag">Step 4 • Final Handover</span>
-            <div class="card-heading">💰 Payment aur Proof Verification</div>
+      try {
+        fetch(SUPABASE_URL + '/rest/v1/riders?id=eq.1', {
+          method: 'PATCH',
+          headers: {
+            'apikey': SUPABASE_KEY,
+            'Authorization': 'Bearer ' + SUPABASE_KEY,
+            'Content-Type': 'application/json',
+            'Prefer': 'return=minimal'
+          },
+          body: JSON.stringify({ is_active: isRiderOnline, last_ping: new Date().toISOString() })
+        }).catch(function(){});
+      } catch(e) {}
+    }
 
-            <div class="details-grid">
-                <div class="detail-row">
-                    <span class="detail-label">Total Amount</span>
-                    <span class="detail-val" style="font-size:18px; color:var(--accent-green);" id="verifyTotal">₹0.00</span>
-                </div>
-            </div>
+    function renderDutyUI() {
+      var dot = document.getElementById('online-indicator');
+      var txt = document.getElementById('online-status-text');
+      var box = document.getElementById('duty-btn');
 
-            <div style="margin: 14px 0;">
-                <label style="font-size: 13px; color: var(--text-muted); display: block; margin-bottom: 8px;">Payment Confirmation:</label>
-                <div class="btn-group" style="margin-top: 0;">
-                    <button type="button" class="btn btn-green" id="btnCashPaid" onclick="selectPaymentDone('CASH_COLLECTED')">✔ Cash Mil Gaya</button>
-                    <button type="button" class="btn btn-outline" id="btnOnlinePaid" onclick="selectPaymentDone('ONLINE_PAID')">Online Paid Hai</button>
-                </div>
-            </div>
+      if (!dot || !txt || !box) return;
 
-            <div style="font-size: 13px; font-weight: 700; margin-top: 14px; color: #fff;">2. Doorstep Delivery Proof Photo:</div>
-            
-            <div class="photo-picker" onclick="document.getElementById('proofPhotoInput').click()">
-                <div style="font-size: 26px;">📸</div>
-                <div class="photo-picker-text">Doorstep / Parcel Photo Lein</div>
-                <div class="photo-picker-sub">Auto-compress (Fast Upload)</div>
-                <input type="file" id="proofPhotoInput" accept="image/*" capture="environment" style="display:none;" onchange="processImage(event, 'previewImgProof', 'previewBoxProof', 'delivery')">
-            </div>
+      if (isRiderOnline) {
+        dot.className = 'status-dot';
+        txt.innerText = 'ONLINE';
+        box.style.borderColor = '#00e676';
+      } else {
+        dot.className = 'status-dot offline';
+        txt.innerText = 'OFFLINE';
+        box.style.borderColor = '#ef4444';
+      }
+    }
 
-            <div id="previewBoxProof" class="preview-box">
-                <img id="previewImgProof" alt="Proof Photo">
-                <span class="preview-tag">✔ Compressed Ready</span>
-            </div>
+    // ULTRA-FAST CANVAS PHOTO COMPRESSOR (Zero Lag, Max 600px, 60% Quality)
+    function compressImage(file, maxWidth, quality) {
+      maxWidth = maxWidth || 600;
+      quality = quality || 0.60;
+      return new Promise(function(resolve, reject) {
+        var reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = function(event) {
+          var img = new Image();
+          img.src = event.target.result;
+          img.onload = function() {
+            var canvas = document.createElement('canvas');
+            var width = img.width;
+            var height = img.height;
+            if (width > maxWidth) {
+              height = Math.round((height * maxWidth) / width);
+              width = maxWidth;
+            }
+            canvas.width = width;
+            canvas.height = height;
+            var ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, width, height);
+            resolve(canvas.toDataURL('image/jpeg', quality));
+          };
+          img.onerror = function(e) { reject(e); };
+        };
+        reader.onerror = function(e) { reject(e); };
+      });
+    }
 
-            <button type="button" class="btn btn-green btn-full" style="font-size: 16px; margin-top: 18px;" onclick="completeFinalDelivery()">
-                🚀 Deliver Order
-            </button>
-        </section>
+    // DIRECT NATIVE REST API ORDER SYNC
+    function fetchOrders() {
+      fetch(SUPABASE_URL + '/rest/v1/orders?select=*&order=id.desc', {
+        headers: {
+          'apikey': SUPABASE_KEY,
+          'Authorization': 'Bearer ' + SUPABASE_KEY
+        }
+      })
+      .then(function(res) {
+        if (!res.ok) throw new Error("HTTP error " + res.status);
+        return res.json();
+      })
+      .then(function(data) {
+        allRiderOrders = data || [];
+        updateStats();
+        renderOrdersList();
+      })
+      .catch(function(err) {
+        console.warn("Orders fetch err:", err);
+      });
+    }
 
-        <!-- STEP 5: SUCCESS CELEBRATION -->
-        <section id="step-success" class="card hidden" style="text-align: center; padding: 36px 20px;">
-            <div style="font-size: 52px; margin-bottom: 12px;">🎉</div>
-            <div class="card-heading" style="justify-content: center; color: var(--accent-green); font-size: 22px;">Order Delivered Successfully!</div>
-            <p style="color: var(--text-muted); font-size: 14px; margin: 12px 0 20px 0;">
-                Delivery complete ho gayi hai aur payout aapke rider wallet me add ho gaya hai.
-            </p>
-            <button type="button" class="btn btn-blue btn-full" onclick="resetToWaitingRadar()">
-                Naye Orders ke Liye Ready Ho Jaayein
-            </button>
-        </section>
+    function updateStats() {
+      var active = allRiderOrders.filter(function(o) { return o.status !== 'Delivered' && o.status !== 'Cancelled'; });
+      var delivered = allRiderOrders.filter(function(o) { return o.status === 'Delivered'; });
+      var totalEarn = delivered.length * 35; // Per delivered order payout
 
-    </main>
+      var activeEl = document.getElementById('stat-active-count');
+      var deliveredEl = document.getElementById('stat-delivered-count');
+      var earnEl = document.getElementById('stat-earnings');
 
-    <script>
-        // ==========================================
-        // 1. SUPABASE INITIALIZATION
-        // ==========================================
-        const SUPABASE_PROJECT_URL = "https://YOUR_PROJECT_ID.supabase.co";
-        const SUPABASE_ANON_KEY = "YOUR_ANON_PUBLIC_KEY";
+      if (activeEl) activeEl.innerText = active.length;
+      if (deliveredEl) deliveredEl.innerText = delivered.length;
+      if (earnEl) earnEl.innerText = '₹' + totalEarn;
+    }
 
-        let client = null;
-        if (window.supabase && SUPABASE_PROJECT_URL.indexOf("YOUR_PROJECT_ID") === -1) {
-            client = window.supabase.createClient(SUPABASE_PROJECT_URL, SUPABASE_ANON_KEY);
+    function switchTab(tab) {
+      currentTab = tab;
+      document.getElementById('tab-active').className = tab === 'active' ? 'tab-btn active' : 'tab-btn';
+      document.getElementById('tab-history').className = tab === 'history' ? 'tab-btn active' : 'tab-btn';
+      renderOrdersList();
+    }
+
+    function renderOrdersList() {
+      var container = document.getElementById('orders-container');
+      if (!container) return;
+
+      var filtered = [];
+      if (currentTab === 'active') {
+        filtered = allRiderOrders.filter(function(o) { return o.status !== 'Delivered' && o.status !== 'Cancelled'; });
+      } else {
+        filtered = allRiderOrders.filter(function(o) { return o.status === 'Delivered' || o.status === 'Cancelled'; });
+      }
+
+      if (filtered.length === 0) {
+        container.innerHTML = '<div class="empty-msg">' + (currentTab === 'active' ? '🎉 अभी कोई नया ऑर्डर नहीं है।' : 'कोई पिछला ऑर्डर रिकॉर्ड नहीं मिला।') + '</div>';
+        return;
+      }
+
+      container.innerHTML = filtered.map(function(order) {
+        var items = [];
+        try {
+          if (Array.isArray(order.items)) {
+            items = order.items;
+          } else if (typeof order.items === 'string') {
+            items = JSON.parse(order.items);
+          }
+        } catch(e) { items = []; }
+
+        var isDispatched = (order.status === 'Out for Delivery');
+        var isDelivered = (order.status === 'Delivered');
+        var isCancelled = (order.status === 'Cancelled');
+        var isNew = !isDispatched && !isDelivered && !isCancelled;
+
+        var mapsUrl = null;
+        if (order.delivery_address && order.delivery_address.indexOf('http') !== -1) {
+          var match = order.delivery_address.match(/https?:\/\/[^\s]+/);
+          if (match) mapsUrl = match[0];
+        } else if (order.customer_lat && order.customer_lng) {
+          mapsUrl = 'https://www.google.com/maps/search/?api=1&query=' + order.customer_lat + ',' + order.customer_lng;
+        } else if (order.delivery_address) {
+          mapsUrl = 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(order.delivery_address);
         }
 
-        // State Machine
-        let activeOrder = null;
-        let isPaymentConfirmed = false;
-        let hubPhotoBase64 = null;
-        let proofPhotoBase64 = null;
-        let totalOrdersDelivered = 0;
-        let totalEarnings = 0;
+        var itemsHtml = items.length > 0 ? items.map(function(it) {
+          return '<div class="item-summary-line"><span>' + (it.name || 'Item') + ' (' + (it.unit || '1u') + ')</span><span><b>× ' + (it.qty || 1) + '</b></span></div>';
+        }).join('') : '<div style="color:#94a3b8; font-size:11px;">सामान विवरण उपलब्ध नहीं</div>';
 
-        // ==========================================
-        // 2. LIVE ORDER FETCHING (SUPABASE SYNC)
-        // ==========================================
-        async function checkIncomingOrders() {
-            if (!client || activeOrder) return;
+        return '<div class="order-card ' + (isNew ? 'new-pulse' : '') + '">' +
+          '<div class="step-indicator">' + (isNew ? 'Step 1 • New Incoming Order' : isDispatched ? 'Step 2 • Out for Delivery' : 'Completed') + '</div>' +
+          '<div class="order-top">' +
+            '<div>' +
+              '<div class="ord-id">#ORD-' + order.id + '</div>' +
+              '<span class="ord-tag ' + (isDelivered ? 'tag-delivered' : isCancelled ? 'tag-cancelled' : isDispatched ? 'tag-transit' : 'tag-placed') + '">' + (order.status || 'Order Placed') + '</span>' +
+            '</div>' +
+            '<div style="text-align:right;">' +
+              '<div class="ord-amount">₹' + (order.total_amount || 0) + '</div>' +
+              '<div style="font-size:10.5px; color:#94a3b8; font-weight:700;">' + (order.payment_mode || 'COD') + '</div>' +
+            '</div>' +
+          '</div>' +
+          '<div class="cust-info-box">' +
+            '<div class="cust-row"><span>👤</span> <b>' + (order.customer_name || 'Customer') + '</b></div>' +
+            '<div class="cust-row"><span>📞</span> <span>' + (order.customer_phone || 'NA') + '</span></div>' +
+            '<div class="cust-row"><span>📍</span> <span style="white-space:pre-line;">' + (order.delivery_address || 'पता उपलब्ध नहीं है') + '</span></div>' +
+            (order.distance_km ? '<div class="cust-row" style="color:#38bdf8;"><span>📏</span> <span>दूरी: <b>' + order.distance_km + ' KM</b></span></div>' : '') +
+            (order.cancellation_reason ? '<div class="cust-row" style="color:#ef4444;"><span>⚠️</span> <span>कैंसिलेशन: <b>' + order.cancellation_reason + ' (' + (order.cancelled_by || '') + ')</b></span></div>' : '') +
+          '</div>' +
+          '<div class="items-summary-box">' +
+            '<div style="font-size:11px; font-weight:800; color:#38bdf8; margin-bottom:6px;">📦 ITEMS TO DELIVER:</div>' +
+            itemsHtml +
+            (order.free_gift_added ? '<div class="item-summary-line" style="color:#34d399;"><span>🎁 ' + order.free_gift_added + '</span><span>FREE</span></div>' : '') +
+          '</div>' +
+          (!isDelivered && !isCancelled ? (
+            '<a href="tel:' + order.customer_phone + '" class="btn-action-call">📞 Call Customer (' + (order.customer_name || 'Customer') + ')</a>' +
+            (mapsUrl ? '<a href="' + mapsUrl + '" target="_blank" class="btn-action-call" style="background:#21262d; border:1px solid #30363d; margin-bottom:8px;">🗺️ Navigate to Customer Doorstep ↗</a>' : '') +
+            (!isDispatched ? 
+              '<button class="btn-action-primary" onclick="openPickupModal(' + order.id + ')">📸 Accept & Pickup (सामान का फोटो लें)</button>' : 
+              '<button class="btn-action-primary" onclick="openDeliveryProofModal(' + order.id + ', \'' + (order.delivery_otp || '') + '\')">📸 Arrived & Deliver (फोटो & OTP)</button>'
+            ) +
+            '<button class="btn-action-cancel" onclick="riderCancelOrder(' + order.id + ')">❌ Reject / Cancel Order (रद्द करें)</button>'
+          ) : '') +
+        '</div>';
+      }).join('');
+    }
 
-            try {
-                const { data, error } = await client
-                    .from('orders')
-                    .select('*')
-                    .eq('status', 'Pending')
-                    .order('created_at', { ascending: false })
-                    .limit(1);
+    // PICKUP STEP & MODAL
+    function openPickupModal(orderId) {
+      selectedOrderForPickup = orderId;
+      base64PickupPhoto = null;
+      document.getElementById('pickup-photo-preview').innerHTML = '<span style="color:#64748b; font-size:12px; font-weight:700;">सामान की फ़ोटो यहाँ दिखेगी *</span>';
+      document.getElementById('btn-confirm-pickup').style.display = 'none';
+      document.getElementById('pickup-modal').classList.add('active');
+    }
 
-                if (!error && data && data.length > 0) {
-                    activeOrder = data[0];
-                    renderIncomingOrder(activeOrder);
-                }
-            } catch (err) {
-                console.warn("Polling error:", err);
-            }
-        }
+    function closePickupModal() {
+      document.getElementById('pickup-modal').classList.remove('active');
+      selectedOrderForPickup = null;
+    }
 
-        // Live Polling every 4 seconds
-        setInterval(checkIncomingOrders, 4000);
+    function handlePickupPhotoChosen(input) {
+      if (!input.files || input.files.length === 0) return;
+      compressImage(input.files[0], 600, 0.60).then(function(base64) {
+        base64PickupPhoto = base64;
+        document.getElementById('pickup-photo-preview').innerHTML = '<img src="' + base64PickupPhoto + '" alt="Pickup Proof">';
+        document.getElementById('btn-confirm-pickup').style.display = 'block';
+      }).catch(function(err) {
+        alert('फ़ोटो कंप्रेस एरर: ' + err.message);
+      });
+    }
 
-        function renderIncomingOrder(order) {
-            document.getElementById('step-waiting').classList.add('hidden');
-            document.getElementById('step-incoming').classList.remove('hidden');
+    function confirmPickupWithPhoto() {
+      if (!selectedOrderForPickup) return;
+      if (!base64PickupPhoto) return alert('कृपया पहले सामान का फोटो लें!');
 
-            document.getElementById('inOrderId').innerText = '#' + (order.order_id || order.id || 'SM-101');
-            document.getElementById('inHubName').innerText = order.hub_name || 'SM Central Hub';
-            document.getElementById('inDistance').innerText = (order.distance || '2.4') + ' KM';
-            document.getElementById('inPayout').innerText = '₹' + (order.rider_earning || '45.00');
+      var btn = document.getElementById('btn-confirm-pickup');
+      btn.disabled = true;
+      btn.innerText = '⏳ पिकअप सेव हो रहा है...';
 
-            // Render Hub details for next step
-            document.getElementById('pickHubTitle').innerText = order.hub_name || 'SM Central Warehouse 1';
-            document.getElementById('pickHubAddress').innerText = order.hub_address || 'Station Road, Bareilly';
-            if (order.hub_lat && order.hub_lng) {
-                document.getElementById('pickHubMapBtn').href = `https://www.google.com/maps/search/?api=1&query=${order.hub_lat},${order.hub_lng}`;
-            }
+      fetch(SUPABASE_URL + '/rest/v1/orders?id=eq.' + selectedOrderForPickup, {
+        method: 'PATCH',
+        headers: {
+          'apikey': SUPABASE_KEY,
+          'Authorization': 'Bearer ' + SUPABASE_KEY,
+          'Content-Type': 'application/json',
+          'Prefer': 'return=minimal'
+        },
+        body: JSON.stringify({
+          status: 'Out for Delivery',
+          assigned_rider_id: 1,
+          pickup_proof_photo: base64PickupPhoto
+        })
+      })
+      .then(function() {
+        alert('✅ Order #ORD-' + selectedOrderForPickup + ' पिकअप हो गया! अब ग्राहक तक पहुँचें।');
+        closePickupModal();
+        fetchOrders();
+      })
+      .catch(function(e) {
+        alert('पिकअप एरर: ' + e.message);
+      })
+      .finally(function() {
+        btn.disabled = false;
+        btn.innerText = '🛵 Pickup पूरा करें (Out for Delivery)';
+      });
+    }
 
-            // Render Items details
-            const items = Array.isArray(order.items) ? order.items : [];
-            document.getElementById('pickItemCount').innerText = items.length + ' Items';
-            
-            let itemsHtml = '';
-            if (items.length > 0) {
-                items.forEach(it => {
-                    itemsHtml += `
-                        <div class="item-list-row">
-                            <span>${it.quantity || it.qty || 1}x ${it.name || 'Item'}</span>
-                            <span style="font-weight:600;">₹${it.price || 0}</span>
-                        </div>
-                    `;
-                });
-            } else {
-                itemsHtml = `<div class="item-list-row"><span>1x Standard Grocery Basket</span><span>₹${order.total_amount || 0}</span></div>`;
-            }
-            document.getElementById('pickItemsList').innerHTML = itemsHtml;
+    // DELIVERY STEP & MODAL
+    function openDeliveryProofModal(orderId, expectedOtp) {
+      selectedOrderForDelivery = { id: orderId, expectedOtp: expectedOtp };
+      base64DeliveryPhoto = null;
+      document.getElementById('input-delivery-otp').value = '';
+      document.getElementById('delivery-proof-preview').innerHTML = '<span style="color:#64748b; font-size:12px; font-weight:700;">सामान सौंपते हुए फ़ोटो लें *</span>';
+      document.getElementById('delivery-modal').classList.add('active');
+    }
 
-            // Render Customer Details
-            document.getElementById('custName').innerText = order.customer_name || 'Customer';
-            document.getElementById('custPhoneLink').href = 'tel:' + (order.customer_phone || '');
-            document.getElementById('custAddress').innerText = order.customer_address || 'Address provided on call';
-            
-            if (order.customer_lat && order.customer_lng) {
-                document.getElementById('custMapBtn').href = `https://www.google.com/maps/search/?api=1&query=${order.customer_lat},${order.customer_lng}`;
-            } else {
-                document.getElementById('custMapBtn').href = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(order.customer_address || 'Bareilly')}`;
-            }
+    function closeDeliveryModal() {
+      document.getElementById('delivery-modal').classList.remove('active');
+      selectedOrderForDelivery = null;
+    }
 
-            // Payment tag
-            const badge = document.getElementById('custPayBadge');
-            const total = order.total_amount || 0;
-            document.getElementById('verifyTotal').innerText = '₹' + total;
+    function handleDeliveryPhotoChosen(input) {
+      if (!input.files || input.files.length === 0) return;
+      compressImage(input.files[0], 600, 0.60).then(function(base64) {
+        base64DeliveryPhoto = base64;
+        document.getElementById('delivery-proof-preview').innerHTML = '<img src="' + base64DeliveryPhoto + '" alt="Delivery Proof">';
+      }).catch(function(err) {
+        alert('फ़ोटो कंप्रेस एरर: ' + err.message);
+      });
+    }
 
-            if ((order.payment_mode || '').toUpperCase() === 'ONLINE') {
-                badge.className = 'badge badge-paid';
-                badge.innerText = 'ONLINE PAID';
-                isPaymentConfirmed = true;
-            } else {
-                badge.className = 'badge badge-cod';
-                badge.innerText = 'COD (Cash ₹' + total + ')';
-                isPaymentConfirmed = false;
-            }
-        }
+    function confirmDeliveryWithProof() {
+      if (!selectedOrderForDelivery) return;
+      if (!base64DeliveryPhoto) return alert('⚠️ ग्राहक को सामान सौंपते हुए फ़ोटो खींचना अनिवार्य है!');
 
-        // ==========================================
-        // 3. STEP ACTIONS & WORKFLOW
-        // ==========================================
-        async function acceptCurrentOrder() {
-            if (client && activeOrder) {
-                await client.from('orders').update({ status: 'Accepted' }).eq('id', activeOrder.id);
-            }
-            switchScreen('step-pickup');
-        }
+      var enteredOtp = document.getElementById('input-delivery-otp').value.trim();
+      if (enteredOtp.length !== 4) return alert('कृपया ग्राहक से 4 अंकों का OTP पूछकर डालें!');
 
-        function rejectCurrentOrder() {
-            if (confirm("Kya aap sach me is order ko skip/reject karna chahte hain?")) {
-                activeOrder = null;
-                switchScreen('step-waiting');
-            }
-        }
+      if (selectedOrderForDelivery.expectedOtp && selectedOrderForDelivery.expectedOtp.toString().trim() !== enteredOtp) {
+        return alert('❌ गलत OTP! ग्राहक के मोबाइल पर दिख रहा 4 अंकों का सही कोड पूछें।');
+      }
 
-        async function confirmPickupDone() {
-            if (!hubPhotoBase64) {
-                alert("Kripya pahle hub ya parcel ki pickup photo capture karein!");
-                return;
-            }
+      var deliverBtn = document.getElementById('btn-confirm-delivery');
+      deliverBtn.disabled = true;
+      deliverBtn.innerText = '⏳ डिलीवरी सत्यापित हो रही है...';
 
-            if (client && activeOrder) {
-                await client.from('orders').update({ 
-                    status: 'Out for Delivery',
-                    pickup_photo: hubPhotoBase64 
-                }).eq('id', activeOrder.id);
-            }
+      fetch(SUPABASE_URL + '/rest/v1/orders?id=eq.' + selectedOrderForDelivery.id, {
+        method: 'PATCH',
+        headers: {
+          'apikey': SUPABASE_KEY,
+          'Authorization': 'Bearer ' + SUPABASE_KEY,
+          'Content-Type': 'application/json',
+          'Prefer': 'return=minimal'
+        },
+        body: JSON.stringify({
+          status: 'Delivered',
+          delivery_proof_photo: base64DeliveryPhoto
+        })
+      })
+      .then(function() {
+        alert('🎉 बधाई हो! Order #ORD-' + selectedOrderForDelivery.id + ' सफलतापूर्वक डिलीver हो गया।');
+        closeDeliveryModal();
+        fetchOrders();
+      })
+      .catch(function(err) {
+        alert('डिलीवरी एरर: ' + err.message);
+      })
+      .finally(function() {
+        deliverBtn.disabled = false;
+        deliverBtn.innerText = '✓ सत्यापित करें और डिलीवर मार्क करें';
+      });
+    }
 
-            switchScreen('step-deliver');
-        }
+    function riderCancelOrder(orderId) {
+      var reason = prompt("ऑर्डर कैंसिल करने का कारण लिखें:");
+      if (!reason || reason.trim().length < 3) return alert("कारण लिखना अनिवार्य है!");
+      if (!confirm("क्या आप वाकई Order #ORD-" + orderId + " को रद्द करना चाहते हैं?")) return;
 
-        function arriveAtCustomer() {
-            switchScreen('step-verify');
-        }
+      fetch(SUPABASE_URL + '/rest/v1/orders?id=eq.' + orderId, {
+        method: 'PATCH',
+        headers: {
+          'apikey': SUPABASE_KEY,
+          'Authorization': 'Bearer ' + SUPABASE_KEY,
+          'Content-Type': 'application/json',
+          'Prefer': 'return=minimal'
+        },
+        body: JSON.stringify({
+          status: 'Cancelled',
+          cancelled_by: 'Rider',
+          cancellation_reason: reason.trim()
+        })
+      })
+      .then(function() {
+        alert('✅ Order #ORD-' + orderId + ' रद्द हो गया।');
+        fetchOrders();
+      })
+      .catch(function(err) {
+        alert("एरर: " + err.message);
+      });
+    }
 
-        function selectPaymentDone(type) {
-            isPaymentConfirmed = true;
-            const cashBtn = document.getElementById('btnCashPaid');
-            const onlineBtn = document.getElementById('btnOnlinePaid');
-
-            if (type === 'CASH_COLLECTED') {
-                cashBtn.style.opacity = '1';
-                cashBtn.innerText = '✔ Cash Received';
-                onlineBtn.style.opacity = '0.4';
-            } else {
-                onlineBtn.style.opacity = '1';
-                onlineBtn.innerText = '✔ Verified Online';
-                cashBtn.style.opacity = '0.4';
-            }
-        }
-
-        async function completeFinalDelivery() {
-            if (!isPaymentConfirmed) {
-                alert("Kripya pahle Payment receive/confirm karein!");
-                return;
-            }
-
-            if (!proofPhotoBase64) {
-                alert("Delivery confirm karne ke liye doorstep proof photo capture karein!");
-                return;
-            }
-
-            if (client && activeOrder) {
-                await client.from('orders').update({ 
-                    status: 'Delivered',
-                    delivery_photo: proofPhotoBase64,
-                    delivered_at: new Date().toISOString()
-                }).eq('id', activeOrder.id);
-            }
-
-            // Update local stats
-            totalOrdersDelivered += 1;
-            totalEarnings += 45;
-            document.getElementById('statCompleted').innerText = totalOrdersDelivered + ' Orders';
-            document.getElementById('statEarnings').innerText = '₹' + totalEarnings;
-
-            switchScreen('step-success');
-        }
-
-        function resetToWaitingRadar() {
-            activeOrder = null;
-            isPaymentConfirmed = false;
-            hubPhotoBase64 = null;
-            proofPhotoBase64 = null;
-
-            // Reset image previews
-            document.getElementById('previewBoxHub').style.display = 'none';
-            document.getElementById('previewImgHub').src = '';
-            document.getElementById('previewBoxProof').style.display = 'none';
-            document.getElementById('previewImgProof').src = '';
-
-            // Reset payment buttons
-            document.getElementById('btnCashPaid').style.opacity = '1';
-            document.getElementById('btnCashPaid').innerText = '✔ Cash Mil Gaya';
-            document.getElementById('btnOnlinePaid').style.opacity = '1';
-            document.getElementById('btnOnlinePaid').innerText = 'Online Paid Hai';
-
-            switchScreen('step-waiting');
-        }
-
-        function switchScreen(screenId) {
-            const screens = ['step-waiting', 'step-incoming', 'step-pickup', 'step-deliver', 'step-verify', 'step-success'];
-            screens.forEach(id => {
-                const el = document.getElementById(id);
-                if (el) el.classList.add('hidden');
-            });
-            const target = document.getElementById(screenId);
-            if (target) target.classList.remove('hidden');
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
-
-        // ==========================================
-        // 4. FAST AUTO-COMPRESS CANVAS ENGINE
-        // ==========================================
-        function processImage(event, imgElementId, boxElementId, uploadType) {
-            const file = event.target.files[0];
-            if (!file) return;
-
-            const reader = new FileReader();
-            reader.readAsDataURL(file);
-            reader.onload = function (e) {
-                const img = new Image();
-                img.src = e.target.result;
-                img.onload = function () {
-                    const canvas = document.createElement('canvas');
-                    let width = img.width;
-                    let height = img.height;
-                    const maxDim = 800; // Fast compress limit
-
-                    if (width > height && width > maxDim) {
-                        height = Math.round((height * maxDim) / width);
-                        width = maxDim;
-                    } else if (height > maxDim) {
-                        width = Math.round((width * maxDim) / height);
-                        height = maxDim;
-                    }
-
-                    canvas.width = width;
-                    canvas.height = height;
-                    const ctx = canvas.getContext('2d');
-                    ctx.drawImage(img, 0, 0, width, height);
-
-                    // 65% Quality instant JPEG (~70-100KB)
-                    const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.65);
-
-                    if (uploadType === 'pickup') {
-                        hubPhotoBase64 = compressedDataUrl;
-                    } else if (uploadType === 'delivery') {
-                        proofPhotoBase64 = compressedDataUrl;
-                    }
-
-                    const previewImg = document.getElementById(imgElementId);
-                    const previewBox = document.getElementById(boxElementId);
-                    previewImg.src = compressedDataUrl;
-                    previewBox.style.display = 'block';
-                };
-            };
-        }
-    </script>
+    // BOOTSTRAP ON LOAD
+    window.addEventListener('DOMContentLoaded', function() {
+      var saved = localStorage.getItem('sm_rider_duty_status');
+      isRiderOnline = (saved !== 'OFFLINE');
+      renderDutyUI();
+      fetchOrders();
+      setInterval(fetchOrders, 3000);
+    });
+  </script>
 </body>
 </html>
